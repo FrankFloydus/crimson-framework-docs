@@ -1,20 +1,48 @@
 ---
 title: "Start a solo game"
-description: "Mount a 3D world and spawn a local player with GameRuntime."
+description: "Build a small 3D scene, write your first Crimson script, and run it offline."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Start an offline session and see the world through the spawned player's camera. Install Crimson before creating the scenes. [Installation](/installation)
+You’ll build a small 3D scene and a player camera, then start a solo session. Each code checkpoint gives you something to verify before you move on. Use a Godot 4.7 project with the Crimson addon installed. [Installation](/installation)
 
 ## Create the world and player scenes
 
-1. Create a 3D scene with a `Node3D` root named `World`. Add a [`PlayerSpawnPoint`](/api/classes/PlayerSpawnPoint) child and leave it at the origin. Add a `MeshInstance3D` child, assign a `BoxMesh` to **Mesh**, and add a `DirectionalLight3D` child. Save the scene as `res://world.tscn`.
-2. Create a second 3D scene with a `Node3D` root named `Player`. Add one `Camera3D` child with its **Position** set to `(0, 2, 5)` and its X **Rotation** set to `-20°`. Save the scene as `res://player.tscn`. With a single camera in the player scene, Crimson can select it automatically.
+### 1. Build the world
+
+1. Start a new scene. In the **Scene** dock, click **3D Scene** to create a `Node3D` root. Rename the root `World`.
+2. Select `World` and click **Add Child Node**. Search for [`PlayerSpawnPoint`](/api/classes/PlayerSpawnPoint) and click **Create**. Leave its **Transform → Position** at `(0, 0, 0)`. Crimson uses this position to place the player.
+3. Select `World` again and add a `MeshInstance3D` child named `Floor`. In the **Inspector**, open the **Mesh** dropdown and choose **New BoxMesh**. Click the new resource to expand it and set its **Size** to `(12, 0.2, 12)`. Under the node’s **Transform**, set **Position** to `(0, -0.1, 0)` so the floor’s top is level with the spawn point.
+4. Add another `MeshInstance3D` directly under `World` and name it `Box`. Give it a **New BoxMesh** and keep the default size. Set the node’s **Position** to `(0, 0.5, -3)` so it sits on the floor in front of the camera. For the color shown in the screenshot, add a **New StandardMaterial3D** under **Geometry → Material Override** and set its **Albedo → Color** to `#C63858`.
+5. Add a `DirectionalLight3D` directly under `World`. Set **Transform → Rotation** to `(-45°, -30°, 0°)` and turn on **Shadow → Enabled**. Press **Ctrl+S** and save the scene as `res://world.tscn`.
+
+### 2. Build the player
+
+1. Create another scene with a **3D Scene** root named `Player`.
+2. Add a `Camera3D` child. In **Transform**, set **Position** to `(0, 2, 5)` and **Rotation** to `(-20°, 0°, 0°)`. The camera sits above and behind the spawn point, angled toward the box.
+3. Save the scene as `res://player.tscn`. Keep one camera in the player scene so Crimson can select it for you.
 
 ## Start the session
 
-Create a scene with a plain `Node` root named `Main` and save it as `res://main.tscn`. Attach this script to `Main` to configure the game in code. You can also configure the same scenes in the [Inspector](#configure-the-same-game-in-the-inspector).
+### 3. Create Main and check that its script runs
+
+1. In a new scene, choose **Other Node**. Search for `Node`, click **Create**, and rename the root `Main`. Save the scene as `res://main.tscn`.
+2. Right-click `Main` in the **Scene** dock and select **Attach Script**. In the dialog, select **GDScript**, choose the **Object: Empty** template, and set **Path** to `res://main.gd`. Click **Create**. Godot opens the script for you.
+3. Replace the contents of `main.gd` with this first checkpoint. Godot calls `_ready()` once `Main` and its children are in the scene tree.
+
+```gdscript
+extends Node
+
+func _ready() -> void:
+    print("Main is ready.")
+```
+
+Save with **Ctrl+S**. With `main.tscn` as the current scene, press **F6**. The game view is empty at this point. Look for `Main is ready.` in the editor’s **Output** panel, then click **Stop** in the editor toolbar.
+
+### 4. Give Crimson the scenes to load
+
+Click the script icon beside `Main` in the **Scene** dock to return to `main.gd`. Replace the file with this checkpoint. The constants name your world and load both scene resources. [`configure()`](/api/classes/GameRuntime/methods/configure) gives you a definition to fill in. [`boot(self)`](/api/classes/GameDefinition/methods/boot) adds the configured game runtime under `Main`.
 
 ```gdscript
 extends Node
@@ -26,35 +54,68 @@ const PLAYER_SCENE: PackedScene = preload("res://player.tscn")
 var game: GameRuntime
 
 func _ready() -> void:
-    game = (
-        GameRuntime.configure()
-        .with_starting_world(WORLD_ID, WORLD_SCENE)
-        .with_player(PLAYER_SCENE)
-        .boot(self)
-    )
+    var definition: GameDefinition = GameRuntime.configure()
+    definition = definition.with_starting_world(WORLD_ID, WORLD_SCENE)
+    definition = definition.with_player(PLAYER_SCENE)
+    game = definition.boot(self)
     if game == null:
         push_error("Could not attach GameRuntime.")
         return
 
-    var result: Dictionary = await game.play_solo().wait()
+    print("Game runtime attached.")
+```
+
+Save and press **F6** again. When **Output** says `Game runtime attached.`, `Main` has a configured runtime. The view stays empty until you start the session. Stop the game before editing the script again.
+
+### 5. Start solo play
+
+Keep the configuration you just tested and replace the checkpoint’s `print()` with the solo operation. [`play_solo()`](/api/classes/GameRuntime/methods/play_solo) starts loading the world and returns a [`GameOperation`](/api/classes/GameOperation). [`await operation.wait()`](/api/classes/GameOperation/methods/wait) resumes when Crimson has finished loading and spawning the player, or reports a failure. Here is the complete `main.gd` at this checkpoint.
+
+```gdscript
+extends Node
+
+const WORLD_ID: StringName = &"training_room"
+const WORLD_SCENE: PackedScene = preload("res://world.tscn")
+const PLAYER_SCENE: PackedScene = preload("res://player.tscn")
+
+var game: GameRuntime
+
+func _ready() -> void:
+    var definition: GameDefinition = GameRuntime.configure()
+    definition = definition.with_starting_world(WORLD_ID, WORLD_SCENE)
+    definition = definition.with_player(PLAYER_SCENE)
+    game = definition.boot(self)
+    if game == null:
+        push_error("Could not attach GameRuntime.")
+        return
+
+    var operation: GameOperation = game.play_solo()
+    var result: Dictionary = await operation.wait()
     if not result.ok:
         push_error("Could not start solo play: %s" % result.message)
         return
 
-    print("Solo ready: ", game.get_local_player().name)
+    var player: Node3D = game.get_local_player()
+    print("Solo ready: ", player.name)
 ```
 
-[`boot(self)`](/api/classes/GameDefinition/methods/boot) attaches [`GameRuntime`](/api/classes/GameRuntime) to the main scene, which stays alive while it hosts the world. [`play_solo()`](/api/classes/GameRuntime/methods/play_solo) returns a [`GameOperation`](/api/classes/GameOperation). Use [`wait()`](/api/classes/GameOperation/methods/wait) to get a result with `ok`, `code`, and `message`. After success, [`get_world()`](/api/classes/GameRuntime/methods/get_world) and [`get_local_player()`](/api/classes/GameRuntime/methods/get_local_player) return the live nodes. Call [`game.leave()`](/api/classes/GameRuntime/methods/leave) when you're ready to end the session.
+## Run the scene
+
+Save and press **F6** with `main.tscn` selected. The box and floor should appear through the spawned player’s camera. **Output** should show a line beginning with `Solo ready:`. The player stays at the spawn point because this scene has no movement controls.
+
+![Running solo session showing a red box on the floor through the player camera](/images/getting-started/solo.png)
+
+If the view stays empty, read **Output** first. Check that both scene paths match the constants, the world has a `PlayerSpawnPoint`, and the player scene contains its camera. If Godot cannot find `GameRuntime`, check that the addon loaded. [Verify the installation](/installation#verify-the-installation)
 
 ## Configure the same game in the Inspector
 
-To keep the configuration in the scene, add a [`GameRuntime`](/api/classes/GameRuntime) child named `Game` under `Main`. Create a [`GameDefinition`](/api/classes/GameDefinition) resource in the **[Definition](/api/classes/GameRuntime/properties/definition)** property. Use the world and player scenes you created above.
+Once you have the solo session working, you can move the scene assignments into the Inspector. Stop the game, open `main.tscn`, and add a [`GameRuntime`](/api/classes/GameRuntime) child named `Game` to `Main`. Select `Game` and choose **New GameDefinition** from the **[Definition](/api/classes/GameRuntime/properties/definition)** dropdown. Click the new resource to edit it.
 
-- **[Starting World](/api/classes/GameDefinition/properties/starting_world)** to `training_room`
-- **[Starting World Scene](/api/classes/GameDefinition/properties/starting_world_scene)** to `res://world.tscn`
-- **[Player Scene](/api/classes/GameDefinition/properties/player_scene)** to `res://player.tscn`
+- Set **[Starting World](/api/classes/GameDefinition/properties/starting_world)** to `training_room`.
+- Drag `res://world.tscn` from **FileSystem** onto **[Starting World Scene](/api/classes/GameDefinition/properties/starting_world_scene)**.
+- Drag `res://player.tscn` onto **[Player Scene](/api/classes/GameDefinition/properties/player_scene)**.
 
-Attach this script to `Main` in place of the code configuration script.
+Open the existing `main.gd` attached to `Main` and replace its contents with this version. The runtime is already a child of `Main`, so the script gets it through `$Game` and starts the same solo operation.
 
 ```gdscript
 extends Node
@@ -62,18 +123,16 @@ extends Node
 @onready var game: GameRuntime = $Game
 
 func _ready() -> void:
-    var result: Dictionary = await game.play_solo().wait()
+    var operation: GameOperation = game.play_solo()
+    var result: Dictionary = await operation.wait()
     if not result.ok:
         push_error("Could not start solo play: %s" % result.message)
         return
 
-    print("Solo ready: ", game.get_local_player().name)
+    var player: Node3D = game.get_local_player()
+    print("Solo ready: ", player.name)
 ```
 
-## Run the scene
+Save and press **F6** to check that you see the same view and `Solo ready:` message.
 
-Press **F6** with `main.tscn` open, or set it as the main scene and press **F5**. You should see the box through the spawned player's camera and a line starting with `Solo ready:` in **Output**. The player stays at the spawn point until you add a controller and input actions.
-
-Look up the game, scene loading, and player classes. [API reference](/api/overview)
-
-Add Steam services or invite other players through Steam. [Steamworks](/steam/overview)
+You can use these scenes to host a game and join it from a second instance on the same computer. [Start a multiplayer game](/multiplayer-quickstart)

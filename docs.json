@@ -17,7 +17,8 @@
             "pages": [
               "index",
               "installation",
-              "quickstart"
+              "quickstart",
+              "multiplayer-quickstart"
             ]
           },
           {
