@@ -12,7 +12,9 @@ Run these commands from the directory containing `docs.json`. Install Node.js an
 npx mint@latest dev --no-open
 ```
 
-Open the local URL printed by Mintlify. Run these checks before opening a pull request.
+Open the local URL printed by Mintlify. On Windows, run the preview command from the docs directory in WSL. The native Windows CLI can emit backslashes in nested routes, which prevents the sidebar from highlighting the current page.
+
+Run these checks before opening a pull request.
 
 ```powershell
 npx mint@latest validate

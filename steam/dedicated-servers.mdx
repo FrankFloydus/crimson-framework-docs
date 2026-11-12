@@ -24,17 +24,22 @@ if started.ok:
     print("Steam server locator: ", game.get_online_listing())
 ```
 
-Use distinct UDP ports for gameplay and queries. Set `bind_to(address)` for a specific local IPv4 interface. Pass a reachable literal IPv4 address to `start_dedicated_online(public_address)` when clients need an address different from the bound or Steam-reported address. For an operator login, call `with_login(&"MY_STEAM_SERVER_TOKEN")` and set that environment variable only in the dedicated process. [SteamServer](/api/classes/SteamServer) · [Valve GameServer API](https://partner.steamgames.com/doc/api/ISteamGameServer)
+Use distinct UDP ports for gameplay and queries. Set [`bind_to(address)`](/api/classes/SteamServer#bind_to) for a specific local IPv4 interface. Pass a reachable literal IPv4 address to [`start_dedicated_online(public_address)`](/api/classes/GameRuntime#start_dedicated_online) when clients need an address different from the bound or Steam-reported address. For an operator login, call [`with_login(&"MY_STEAM_SERVER_TOKEN")`](/api/classes/SteamServer#with_login) and set that environment variable only in the dedicated process. [Valve GameServer API](https://partner.steamgames.com/doc/api/ISteamGameServer)
 
 ## Join an exact server
 
-Start the guest with a Steam client provider that uses the same AppID and namespace. Give it the server's locator as `listing_id`, then call `await game.join_online(listing_id).wait()`. Crimson checks the server identity and verifies the guest's Steam ticket before admitting the guest. Check the operation's `ok` and `message` fields to show the result in your join UI. [Valve authentication and ownership](https://partner.steamgames.com/doc/features/auth)
+Start the guest with a Steam client provider that uses the same AppID and namespace. Pass the server's locator to [`game.join_online(listing_id)`](/api/classes/GameRuntime#join_online) and await the [operation](/api/classes/GameOperation#wait). Crimson checks the server identity and verifies the guest's Steam ticket before admitting the guest. Check the operation's `ok` and `message` fields to show the result in your join UI. [Valve authentication and ownership](https://partner.steamgames.com/doc/features/auth)
 
-`SteamServices.server_for(game).status()` reports playerless-world readiness, secure state, advertisement request, and admitted remote player count. Store the result as an observation. Query again or subscribe to `status_changed` for the current state. [SteamDedicatedServer](/api/classes/SteamDedicatedServer) · [SteamServerStatus](/api/classes/SteamServerStatus)
+```gdscript
+func join_dedicated_server(game: GameRuntime, listing_id: String) -> Dictionary:
+    return await game.join_online(listing_id).wait()
+```
+
+Get the server attachment with [`SteamServices.server_for(game)`](/api/classes/SteamServices#server_for). Its [`status()`](/api/classes/SteamDedicatedServer#status) reports playerless-world readiness, secure state, advertisement request, and admitted remote player count. Store the result as an observation. Query again or subscribe to [`status_changed`](/api/classes/SteamDedicatedServer#status_changed) for the current state. [SteamServerStatus](/api/classes/SteamServerStatus)
 
 ## List the server in Steam
 
-Direct mode is the default and provides an explicit locator. To request browser discovery, use `settings.advertise_on(SteamServer.INTERNET)` and supply your game's Steam master-server version, description, and installation folder through `with_product_metadata()`. Advertisement starts after the server is logged in and has a secure policy, current certificate, listener, and ready world. `advertisement_requested` confirms the local request. Confirm discovery from a separate Steam client. [Valve dedicated servers](https://partner.steamgames.com/doc/features/multiplayer/game_servers)
+Direct mode is the default and provides an explicit locator. To request browser discovery, use [`settings.advertise_on()`](/api/classes/SteamServer#advertise_on) with [`SteamServer.INTERNET`](/api/classes/SteamServer#advertisement). Supply your game's Steam master-server version, description, and installation folder through [`with_product_metadata()`](/api/classes/SteamServer#with_product_metadata). Advertisement starts after the server is logged in and has a secure policy, current certificate, listener, and ready world. [`advertisement_requested`](/api/classes/SteamServerStatus#properties) confirms the local request. Confirm discovery from a separate Steam client. [Valve dedicated servers](https://partner.steamgames.com/doc/features/multiplayer/game_servers)
 
 ```gdscript
 var browser := steam.server_browser()
@@ -46,11 +51,11 @@ if servers.ok and not servers.value.is_empty():
         await game.join_listing(refreshed.value.listing).wait()
 ```
 
-Browser results are observations. The join performs its own server and guest checks. The current Steam SDK supports joint Internet and LAN advertisement. A LAN-only host request reports unavailable, while `query(SteamServer.LAN)` can read compatible LAN announcements. [SteamServerBrowser](/api/classes/SteamServerBrowser)
+Browser results are observations. The join performs its own server and guest checks. The current Steam SDK supports joint Internet and LAN advertisement. A LAN-only host request reports unavailable. The browser's [`query()`](/api/classes/SteamServerBrowser#query) can read compatible LAN announcements when given [`SteamServer.LAN`](/api/classes/SteamServer#advertisement).
 
 ## Record server-owned progression
 
-Configure the relevant stats or achievements as **Game Server** or **Official GS** in Steamworks. After a peer is admitted, call `SteamServices.server_for(game).stats(peer_id)`. The returned handle belongs to that admission and expires when the peer leaves.
+Configure the relevant stats or achievements as **Game Server** or **Official GS** in Steamworks. After a peer is admitted, call [`SteamServices.server_for(game).stats(peer_id)`](/api/classes/SteamDedicatedServer#stats). The returned handle belongs to that admission and expires when the peer leaves.
 
 ```gdscript
 var server := SteamServices.server_for(game)
@@ -63,10 +68,10 @@ if stats != null:
         push_warning(stored.message)
 ```
 
-An edit can load the Steam cache as needed. For explicit cached reads, call `await stats.load().wait()` first. Check `applied`, `failed_at`, and `store_submitted` after a failed edit. If the setters succeeded and persistence failed, use `store()` to retry persistence without replaying the edits. [SteamServerPlayerStats](/api/classes/SteamServerPlayerStats) · [Valve GameServer stats](https://partner.steamgames.com/doc/api/ISteamGameServerStats)
+An edit can load the Steam cache as needed. For explicit cached reads, call [`stats.load()`](/api/classes/SteamServerPlayerStats#load) and await its [`wait()`](/api/classes/SteamServerStatsOperation#wait) result. After a failed edit, check the [result properties](/api/classes/SteamServerStatsResult#properties) `applied`, `failed_at`, and `store_submitted`. If the setters succeeded and persistence failed, use [`store()`](/api/classes/SteamServerPlayerStats#store) to retry persistence without replaying the edits. [Valve GameServer stats](https://partner.steamgames.com/doc/api/ISteamGameServerStats)
 
 ## Use hosted Steam Datagram Relay
 
-Hosted dedicated relay requires a Crimson addon variant with hosted relay support, a Valve-provisioned endpoint, and your own Game Coordinator. Select a provisioned profile with `SteamServer.via_sdr()` and pass a `SteamRelayCoordinator` adapter to `SteamProvider.with_relay_coordinator()`. [SteamRelayCoordinator](/api/classes/SteamRelayCoordinator)
+Hosted dedicated relay requires a Crimson addon variant with hosted relay support, a Valve-provisioned endpoint, and your own Game Coordinator. Select a provisioned profile with [`SteamServer.via_sdr()`](/api/classes/SteamServer#via_sdr) and pass a [`SteamRelayCoordinator`](/api/classes/SteamRelayCoordinator) adapter to [`SteamProvider.with_relay_coordinator()`](/api/classes/SteamProvider#with_relay_coordinator).
 
 The trusted coordinator registers the server's relay route and issues a signed relay ticket for each authorized client. Keep the signing key in the coordinator. After the relay connects, Crimson still verifies the client's Steam authentication ticket before admitting the player. Verify the route in Valve's provisioned test environment. [Valve hosted relay](https://partner.steamgames.com/doc/features/multiplayer/steamdatagramrelay)

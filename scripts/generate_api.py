@@ -532,7 +532,7 @@ def subsection_pages(names: list[str], sections: dict[str, str]) -> list[dict]:
 
 
 def navigation(classes: dict[str, ClassDoc]) -> list[dict]:
-    """Produce Mintlify navigation groups for the class catalog."""
+    """Nest class modules so Mintlify renders them as collapsible groups."""
     groups = defaultdict(list)
     for name, doc in sorted(classes.items()):
         groups[doc.group].append(name)
@@ -546,8 +546,8 @@ def navigation(classes: dict[str, ClassDoc]) -> list[dict]:
             pages = subsection_pages(names, sections)
         else:
             pages = [f"{CLASS_ROUTE}/{name}" for name in names]
-        result.append({"group": group, "pages": pages})
-    return result
+        result.append({"group": group, "expanded": False, "pages": pages})
+    return [{"group": "Classes", "pages": result}]
 
 
 def sync_navigation(classes: dict[str, ClassDoc], check: bool) -> None:

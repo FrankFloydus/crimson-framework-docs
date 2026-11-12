@@ -9,7 +9,7 @@ In this quickstart, you create a world scene, a player scene, and a main scene. 
 
 ## Create the world and player scenes
 
-1. Create a 3D scene with a `Node3D` root named `World`. Add a `PlayerSpawnPoint` child and leave it at the origin. Add a `MeshInstance3D` child, assign a `BoxMesh` to **Mesh**, and add a `DirectionalLight3D` child. Save the scene as `res://world.tscn`.
+1. Create a 3D scene with a `Node3D` root named `World`. Add a [`PlayerSpawnPoint`](/api/classes/PlayerSpawnPoint) child and leave it at the origin. Add a `MeshInstance3D` child, assign a `BoxMesh` to **Mesh**, and add a `DirectionalLight3D` child. Save the scene as `res://world.tscn`.
 2. Create a second 3D scene with a `Node3D` root named `Player`. Add one `Camera3D` child with its **Position** set to `(0, 2, 5)` and its X **Rotation** set to `-20°`. Save the scene as `res://player.tscn`. With a single camera in the player scene, Crimson can select it automatically.
 
 ## Start the session
@@ -42,11 +42,27 @@ func _ready() -> void:
 
 Press **F6** with `main.tscn` open, or set it as the main scene and press **F5**. When the box appears, open **Output** and look for a line starting with `Solo ready:`. The player scene in this example is stationary. Add your own controller and input actions when you're ready to move the camera.
 
-`boot(self)` attaches `GameRuntime` to the main scene, which stays alive while it hosts the world. `play_solo()` returns a `GameOperation`. Waiting for that operation gives you a result with `ok`, `code`, and `message`. After success, `get_world()` and `get_local_player()` return the live nodes. Call `game.leave()` when you're ready to end the session.
+[`boot(self)`](/api/classes/GameDefinition#boot) attaches [`GameRuntime`](/api/classes/GameRuntime) to the main scene, which stays alive while it hosts the world. [`play_solo()`](/api/classes/GameRuntime#play_solo) returns a [`GameOperation`](/api/classes/GameOperation). Use [`wait()`](/api/classes/GameOperation#wait) to get a result with `ok`, `code`, and `message`. After success, [`get_world()`](/api/classes/GameRuntime#get_world) and [`get_local_player()`](/api/classes/GameRuntime#get_local_player) return the live nodes. Call [`game.leave()`](/api/classes/GameRuntime#leave) when you're ready to end the session.
 
 ## Configure the same game in the Inspector
 
-You can create the definition in the editor and use the same start action from GDScript. Add a `GameRuntime` child named `Game` under `Main`. Create a `GameDefinition` in its **Definition** property and set **Starting World** to `training_room`, **Starting World Scene** to `world.tscn`, and **Player Scene** to `player.tscn`. In the script, replace the `boot(self)` setup and its null check with `game = $Game` before calling `play_solo()`.
+To keep your game configuration in the scene, add a [`GameRuntime`](/api/classes/GameRuntime) child named `Game` under `Main`. Create a [`GameDefinition`](/api/classes/GameDefinition#properties) in its **Definition** property and set **Starting World** to `training_room`, **Starting World Scene** to `world.tscn`, and **Player Scene** to `player.tscn`.
+
+Attach this script to `Main` to start the game configured in the Inspector.
+
+```gdscript
+extends Node
+
+@onready var game: GameRuntime = $Game
+
+func _ready() -> void:
+    var result: Dictionary = await game.play_solo().wait()
+    if not result.ok:
+        push_error("Could not start solo play: %s" % result.message)
+        return
+
+    print("Solo ready: ", game.get_local_player().name)
+```
 
 Look up the game, scene loading, and player classes. [API reference](/api/overview)
 

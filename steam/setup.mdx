@@ -29,7 +29,7 @@ Test your Debug export and your Release export. For the distribution check, put 
 
 ### Relaunch an unwrapped export through Steam
 
-If your unwrapped game should launch through Steam even when opened from its executable, call `SteamClient.restart_through_steam_if_needed(app_id)` at your common startup entry point, before initializing any Steam service. Quit the current process on `ERR_SKIP` so Steam can launch the installed copy. Proceed with Steam startup on `OK` and surface any other error. Use your authorized shipping AppID. [SteamClient](/api/classes/SteamClient) · [Valve's relaunch check](https://partner.steamgames.com/doc/sdk/api#SteamAPI_RestartAppIfNecessary)
+If your unwrapped game should launch through Steam even when opened from its executable, call [`SteamClient.restart_through_steam_if_needed(app_id)`](/api/classes/SteamClient#restart_through_steam_if_needed) at your common startup entry point, before initializing any Steam service. Quit the current process on `ERR_SKIP` so Steam can launch the installed copy. Proceed with Steam startup on `OK` and surface any other error. Use your authorized shipping AppID. [Valve's relaunch check](https://partner.steamgames.com/doc/sdk/api#SteamAPI_RestartAppIfNecessary)
 
 ### Wrap an export for Steam DRM
 

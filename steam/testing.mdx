@@ -9,7 +9,7 @@ Test in your Godot project first, then repeat the checks that matter to your gam
 
 ## Verify Steam startup
 
-1. Launch your project using the development AppID setup. Run the example that prints the Steam language and online state. Check that `is_ready()` is true and that `is_online()` is true when you expect a connection. [Start a Steam client](/steam/client-services#start-a-client)
+1. Launch your project using the development AppID setup. Run the example that prints the Steam language and online state. Check that [`is_ready()`](/api/classes/SteamClient#is_ready) is true and that [`is_online()`](/api/classes/SteamClient#is_online) is true when you expect a connection. [Start a Steam client](/steam/client-services#start-a-client)
 2. Run your Windows debug and release exports. Confirm `steam_api64.dll` is beside each executable. [Export and verify on Windows](/steam/setup#export-and-verify-on-windows)
 3. Install the release from your private Steam branch. Launch it from the Steam Library. Steam supplies the AppID for this test, so leave `steam_appid.txt` out of the depot. Confirm the Steam features you use still initialize.
 
@@ -42,9 +42,9 @@ If you use Steam Wallet, use Valve's sandbox to run a checkout from your game th
 | Symptom | What to check |
 | --- | --- |
 | Crimson classes are missing in Godot | Check the Godot version, platform, precision, and addon folder. [Installation](/installation) |
-| The Steam client cannot initialize | Read `get_initialization_error()`. Check `steam_api64.dll`, the running Steam account, and whether the launch AppID matches the one your code expects. [Steamworks setup](/steam/setup) |
-| The Steam client starts, but online features fail | Check `is_online()`. Steam Offline Mode can still provide cached data for some features. |
-| The Overlay reports `ERR_BUSY` | Make sure the Overlay is enabled, your game is rendering, and `steam.overlay().is_ready()` is true. For direct development launches, check the Overlay launch argument. [Open the Steam Overlay](/steam/client-services#open-the-steam-overlay) |
+| The Steam client cannot initialize | Read [`get_initialization_error()`](/api/classes/SteamClient#get_initialization_error). Check `steam_api64.dll`, the running Steam account, and whether the launch AppID matches the one your code expects. [Steamworks setup](/steam/setup) |
+| The Steam client starts, but online features fail | Check [`is_online()`](/api/classes/SteamClient#is_online). Steam Offline Mode can still provide cached data for some features. |
+| The Overlay reports `ERR_BUSY` | Make sure the Overlay is enabled, your game is rendering, and [`steam.overlay().is_ready()`](/api/classes/SteamOverlay#is_ready) is true. For direct development launches, check the Overlay launch argument. [Open the Steam Overlay](/steam/client-services#open-the-steam-overlay) |
 | A lobby is missing or the guest cannot join | Check visibility, membership, open seats, and whether both builds use the same AppID, namespace, and virtual port. For a private lobby, have the guest accept the invitation through Steam. |
 | The server is ready but absent from the browser | Check that the server requested Internet advertisement, uses your app's product metadata, and has a reachable query port. Verify the listing from a separate Steam client. [Dedicated server discovery](/steam/dedicated-servers#list-the-server-in-steam) |
 | A service handle stops working after a restart or session change | Get a fresh handle from the current Steam client or game. |

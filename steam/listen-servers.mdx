@@ -9,7 +9,7 @@ A listen server runs on a player's machine. Steam lobbies help that player invit
 
 ## Host a game from a player's machine
 
-Use the world and player scenes from the quickstart. In the node that owns your game, add a Steam provider to your game setup and call `host_online()` when the player chooses to host. Use the same AppID, lobby namespace, virtual port, and compatible build for the host and guests. Keep the returned game in a menu or controller that stays in the scene tree. [Getting started](/quickstart)
+Use the world and player scenes from the quickstart. In the node that owns your game, add a Steam provider to your game setup and call [`host_online()`](/api/classes/GameRuntime#host_online) when the player chooses to host. Use the same AppID, lobby namespace, virtual port, and compatible build for the host and guests. Keep the returned game in a menu or controller that stays in the scene tree. [Getting started](/quickstart)
 
 ```gdscript
 var provider := SteamProvider.configure().for_app(480) \
@@ -32,13 +32,27 @@ if not hosted.ok:
     push_error("Could not host a Steam game: %s" % hosted.message)
 ```
 
-Use an authorized AppID for your game. `SteamProvider.configure()` defaults to a private invitation lobby and virtual port `0`. Call `friends_only()` for a friend lobby or `public_lobbies()` for public discovery. The hosted world and admission must be ready before the listing accepts players. Call `game.leave()` when the host closes the session. [SteamProvider](/api/classes/SteamProvider) · [Steam matchmaking](https://partner.steamgames.com/doc/api/ISteamMatchmaking)
+Use an authorized AppID for your game. [`SteamProvider.configure()`](/api/classes/SteamProvider#configure) defaults to a private invitation lobby and virtual port `0`. Call [`friends_only()`](/api/classes/SteamProvider#friends_only) for a friend lobby or [`public_lobbies()`](/api/classes/SteamProvider#public_lobbies) for public discovery. The hosted world and admission must be ready before the listing accepts players. Call [`game.leave()`](/api/classes/GameRuntime#leave) when the host closes the session. [Steam matchmaking](https://partner.steamgames.com/doc/api/ISteamMatchmaking)
 
 ## Invite and join
 
-Once hosting succeeds, `game.invites().open_overlay()` requests the Steam invite dialog. `ERR_BUSY` means the Overlay is still unavailable in that active scope. To send an invitation to a selected account, call `game.invites().send(steam_id)` with its decimal SteamID64 string. `OK` acknowledges the submission to Steam.
+Once hosting succeeds, get the invite gateway with [`game.invites()`](/api/classes/GameRuntime#invites). Call [`open_overlay()`](/api/classes/GameInvites#open_overlay) to request the Steam invite dialog. `ERR_BUSY` means the Overlay is still unavailable in that active scope. To send an invitation to a selected account, call [`send(steam_id)`](/api/classes/GameInvites#send) with its decimal SteamID64 string. `OK` acknowledges the submission to Steam.
 
-On the guest, read `game.invites().pending()` on startup and listen to `game.invites().received` from the persistent menu. Present the candidate and, after the player confirms, call `await game.join_listing(invite.listing).wait()`. Enable **Use launch command line** in Steamworks to receive Steam launch and Rich Presence arguments. If Steam has already granted lobby access and you know the lobby ID, use `await game.join_online(listing_id).wait()`. [Valve launch arguments](https://partner.steamgames.com/doc/api/ISteamApps#GetLaunchCommandLine)
+On the guest, read [`game.invites().pending()`](/api/classes/GameInvites#pending) on startup and listen to the [`received`](/api/classes/GameInvites#received) signal from the persistent menu. Present the candidate. After the player confirms, pass the invite's [`listing`](/api/classes/SteamInvite#properties) to [`game.join_listing()`](/api/classes/GameRuntime#join_listing) and await the [operation](/api/classes/GameOperation#wait).
+
+```gdscript
+func join_invited_game(game: GameRuntime, invite: SteamInvite) -> Dictionary:
+    return await game.join_listing(invite.listing).wait()
+```
+
+Enable **Use launch command line** in Steamworks to receive Steam launch and Rich Presence arguments. [Valve launch arguments](https://partner.steamgames.com/doc/api/ISteamApps#GetLaunchCommandLine)
+
+If Steam has already granted lobby access and you know the lobby ID, call [`game.join_online(lobby_id)`](/api/classes/GameRuntime#join_online) and await the result.
+
+```gdscript
+func join_known_lobby(game: GameRuntime, lobby_id: String) -> Dictionary:
+    return await game.join_online(lobby_id).wait()
+```
 
 The provider refreshes the lobby before joining. Crimson verifies the AppID, namespace, membership, and host identity. The host binds the guest's Steam ticket to its certified transport identity and checks current lobby membership and AppID ownership before admitting the peer. [Valve session tickets](https://partner.steamgames.com/doc/features/auth)
 
@@ -55,9 +69,9 @@ if found.ok and not found.value.is_empty():
         push_warning("The Steam lobby could not be joined.")
 ```
 
-Use `friend_lobby(friend_id)` to look up a friend's lobby. `fetch_operation()` returns a cancellable search handle. Steam processes one native search at a time, so an abandoned search may briefly hold the query lane while it drains.
+Use [`friend_lobby(friend_id)`](/api/classes/SteamLobbies#friend_lobby) to look up a friend's lobby. [`fetch_operation()`](/api/classes/SteamLobbyQuery#fetch_operation) returns a cancellable search handle. Steam processes one native search at a time, so an abandoned search may briefly hold the query lane while it drains.
 
-A ready public or friends-only host advertises Join Game through Steam Rich Presence while admission is open and seats remain. To hide that join route, call `steam.presence().clear_joinable()`. Restore it with `steam.presence().joinable(lobby.listing())` for the current owned lobby. [Steam Presence](/api/classes/SteamPresence) · [Valve Rich Presence](https://partner.steamgames.com/doc/features/enhancedrichpresence)
+A ready public or friends-only host advertises Join Game through Steam Rich Presence while admission is open and seats remain. To hide that join route, call [`steam.presence().clear_joinable()`](/api/classes/SteamPresence#clear_joinable). To restore it, pass the current owned lobby's [`listing()`](/api/classes/SteamLobby#listing) to [`steam.presence().joinable()`](/api/classes/SteamPresence#joinable). [Valve Rich Presence](https://partner.steamgames.com/doc/features/enhancedrichpresence)
 
 ## Run a social lobby without a game
 
@@ -69,16 +83,34 @@ if created.ok:
     created.value.edit().named("Crew staging").tag(&"mode", "practice").submit()
 ```
 
-The default social lobby is private with four seats including its owner, in the `crimson` namespace. Pass `SteamLobbyOptions.configure().in_namespace(&"my_game").for_players(8).with_visibility(SteamLobbyOptions.PUBLIC)` to `create()` to choose other options. Query social listings with `steam.lobbies().query(&"my_game").social().fetch()`. Join with `steam.lobbies().join(listing).wait()`. Game joins accept gameplay listings.
+The default social lobby is private with four seats including its owner, in the `crimson` namespace. To customize it, use [`SteamLobbyOptions.configure()`](/api/classes/SteamLobbyOptions#configure) and set its namespace, player limit, and visibility with [`in_namespace()`](/api/classes/SteamLobbyOptions#in_namespace), [`for_players()`](/api/classes/SteamLobbyOptions#for_players), and [`with_visibility()`](/api/classes/SteamLobbyOptions#with_visibility). Pass the options to [`create()`](/api/classes/SteamLobbies#create). This example creates an eight-player [public lobby](/api/classes/SteamLobbyOptions#visibility).
 
-One signed-in Steam account can hold one lobby membership across standalone clients and games in a process. A standalone member can leave with `lobby.leave()`. A game member leaves through `game.leave()`. Render `chat_received(member, text)` as plain text and use the game session's verified peer state for gameplay decisions. [SteamLobby](/api/classes/SteamLobby) · [SteamLobbyOptions](/api/classes/SteamLobbyOptions)
+```gdscript
+var options := SteamLobbyOptions.configure().in_namespace(&"my_game") \
+    .for_players(8).with_visibility(SteamLobbyOptions.PUBLIC)
+var created: SteamLobbyResult = await steam.lobbies().create(options).wait()
+if not created.ok:
+    push_warning(created.message)
+```
+
+To find social listings, start with [`steam.lobbies().query()`](/api/classes/SteamLobbies#query), select [`social()`](/api/classes/SteamLobbyQuery#social), then call [`fetch()`](/api/classes/SteamLobbyQuery#fetch). Call [`steam.lobbies().join(listing)`](/api/classes/SteamLobbies#join) and await its [`wait()`](/api/classes/SteamLobbyOperation#wait) result. Game joins accept gameplay listings.
+
+```gdscript
+var found: SteamListingsResult = await steam.lobbies().query(&"my_game").social().fetch()
+if found.ok and not found.value.is_empty():
+    var joined: SteamLobbyResult = await steam.lobbies().join(found.value[0]).wait()
+    if not joined.ok:
+        push_warning(joined.message)
+```
+
+One signed-in Steam account can hold one lobby membership across standalone clients and games in a process. A standalone member can leave with [`lobby.leave()`](/api/classes/SteamLobby#leave). A game member leaves through [`game.leave()`](/api/classes/GameRuntime#leave). Render text from [`chat_received(member, text)`](/api/classes/SteamLobby#chat_received) as plain text and use the game session's verified peer state for gameplay decisions.
 
 ## Use Steam networking and social features
 
-- For game transport diagnostics, call `steam.networking().peer_path(peer_id)` for an admitted peer. `SteamProvider.prefer_relay()` biases a listen connection toward relay. Check `kind` on the observed path because Steam can choose direct routing.
+- For game transport diagnostics, call [`steam.networking().peer_path(peer_id)`](/api/classes/SteamNetworking#peer_path) for an admitted peer. [`SteamProvider.prefer_relay()`](/api/classes/SteamProvider#prefer_relay) biases a listen connection toward relay. Check [`kind`](/api/classes/SteamConnectionPath#properties) on the observed path because Steam can choose direct routing.
 - Use [SteamSockets](/api/classes/SteamSockets) when you own the connection protocol. Pin the expected peer for a direct connection or use a P2P endpoint with the expected Steam account. Wait for the connection before consuming remote identity or sending data.
-- Use [SteamMessages](/api/classes/SteamMessages) for bounded side-channel messages. Supply your game's channel allowlist with `with_message_channels()` and request the scoped handle with `steam.messages().for_peer(peer_id)` after that peer reaches the game.
+- Use [SteamMessages](/api/classes/SteamMessages) for bounded side-channel messages. Supply your game's channel allowlist with [`with_message_channels()`](/api/classes/SteamProvider#with_message_channels) and request the scoped handle with [`steam.messages().for_peer(peer_id)`](/api/classes/SteamMessages#for_peer) after that peer reaches the game.
 - Use [SteamParties](/api/classes/SteamParties) to publish a beacon for a ready, non-private hosted lobby at an eligible group-chat location. A guest reserves through Steam and then joins the returned listing through normal Game admission.
-- Use [GameVoice](/api/classes/GameVoice) through `game.voice()` for push-to-talk and authority-owned recipient policy. Get player consent before capture and feed decoded PCM to your game's audio sink.
+- Use [GameVoice](/api/classes/GameVoice) through [`game.voice()`](/api/classes/GameRuntime#voice) for push-to-talk and authority-owned recipient policy. Get player consent before capture and feed decoded PCM to your game's audio sink.
 
 Use two distinct signed-in accounts for a real invite and remote join. Run the [multiplayer checks](/steam/testing#verify-multiplayer) before shipping.

@@ -13,7 +13,7 @@ If you have the separate trusted publisher addon, install it in a dedicated Godo
 
 ## Resolve the publisher key on the backend
 
-Attach a [SteamPublisherHost](/api/classes/SteamPublisherHost) to your persistent backend scene root. Implement its secret resolver against your backend's secret store. This example uses an environment variable supplied only to the backend process.
+Attach a [`SteamPublisherHost`](/api/classes/SteamPublisherHost) to your persistent backend scene root. Implement [`_resolve_secret()`](/api/classes/SteamPublisherHost#_resolve_secret) against your backend's secret store. This example uses an environment variable supplied only to the backend process.
 
 ```gdscript
 extends SteamPublisherHost
@@ -24,7 +24,7 @@ func _resolve_secret(reference: StringName) -> String:
     return ""
 ```
 
-Pass a reference to the key through the settings. With the resolver script attached to a child named `PublisherHost`, boot the publisher from its scene parent after both nodes enter the tree.
+Pass a reference to the key through [`SteamPublisherSettings`](/api/classes/SteamPublisherSettings#properties). With the resolver script attached to a child named `PublisherHost`, call [`SteamPublisher.boot(settings)`](/api/classes/SteamPublisher#boot) from its scene parent after both nodes enter the tree.
 
 ```gdscript
 var settings := SteamPublisherSettings.new()
@@ -36,13 +36,13 @@ if started.ok:
     publisher = started.value
 ```
 
-Crimson resolves the secret per request and sends it to Valve in `X-WebAPI-Key` over verified TLS. Use a key with the Steamworks permissions required by your AppID and operations. Keep keys, encrypted ticket material, and ticket bytes out of client builds, logs, saves, and replays. [SteamPublisherSettings](/api/classes/SteamPublisherSettings) · [Valve publisher keys](https://partner.steamgames.com/doc/webapi_overview/auth)
+Crimson resolves the secret per request and sends it to Valve in `X-WebAPI-Key` over verified TLS. Use a key with the Steamworks permissions required by your AppID and operations. Keep keys, encrypted ticket material, and ticket bytes out of client builds, logs, saves, and replays. [Valve publisher keys](https://partner.steamgames.com/doc/webapi_overview/auth)
 
 ## Verify a player and their license
 
-On the game client, request a Web API ticket with `await steam.auth().web_ticket("game-profile")`. After checking `ok`, send the ticket bytes to your backend over its authenticated connection. Close the ticket after the backend completes the exchange.
+On the game client, request a Web API ticket with [`await steam.auth().web_ticket("game-profile")`](/api/classes/SteamAuth#web_ticket). After checking [`ok`](/api/classes/SteamResult#properties), send the [ticket bytes](/api/classes/SteamWebTicket#bytes) to your backend over its authenticated connection. [Close the ticket](/api/classes/SteamWebTicket#close) after the backend completes the exchange.
 
-On the backend, verify the ticket with the same AppID and audience and use the verified identity for an ownership lookup. Attach the identity to the backend session that owns this player.
+On the backend, call [`verify()`](/api/classes/SteamPublisherAuth#verify) with the same AppID and audience and use the verified identity with [`owns_app()`](/api/classes/SteamPublisherAuth#owns_app). Attach the identity to the backend session that owns this player.
 
 ```gdscript
 var verified: SteamIdentityResult = await publisher.auth().verify(ticket_bytes, "game-profile")
@@ -60,12 +60,12 @@ Your game still decides which actions that player may take. Use the backend sess
 
 Enable microtransactions for your authorized AppID and provide a trusted [SteamPurchaseStore](/api/classes/SteamPurchaseStore) before you boot. Bind your game's authenticated commerce adapter to its Steam provider. The backend authenticates the buyer, validates the cart, and owns pricing and fulfillment.
 
-1. Read buyer context with `await publisher.purchases().buyer_info(player)` before pricing a new checkout.
-2. Use `begin(player, cart, checkout_id)` to reserve the quote. Persist it in the store. Reuse the same checkout ID and cart when retrying an ambiguous response.
-3. Treat client authorization as a prompt to check Steam. Use `finalize(order_id)` from the backend. The store atomically persists the new order revision and applies the entitlement difference or records it in a durable outbox.
-4. Run `reconcile()` with a persisted cursor to recover pending orders and process reversals. Reconciliation can repeat rows. Commit entitlements idempotently by order and item. A partial reversal removes the affected items.
+1. Read buyer context with [`await publisher.purchases().buyer_info(player)`](/api/classes/SteamPublisherPurchases#buyer_info) before pricing a new checkout.
+2. Use [`begin(player, cart, checkout_id)`](/api/classes/SteamPublisherPurchases#begin) to reserve the quote. Persist it in the store. Reuse the same checkout ID and cart when retrying an ambiguous response.
+3. Treat client authorization as a prompt to check Steam. Use [`finalize(order_id)`](/api/classes/SteamPublisherPurchases#finalize) from the backend. The store atomically persists the new order revision and applies the entitlement difference or records it in a durable outbox.
+4. Run [`reconcile()`](/api/classes/SteamPublisherPurchases#reconcile) with a persisted cursor to recover pending orders and process reversals. Reconciliation can repeat rows. Commit entitlements idempotently by order and item. A partial reversal removes the affected items.
 
-Use `SteamPublisherSettings.SANDBOX` to exercise the Wallet flow with Valve's sandbox for your AppID. Check the API contracts for the store, charge confirmation, and refund authorization before granting real items. [SteamPublisherPurchases](/api/classes/SteamPublisherPurchases) · [Valve microtransactions](https://partner.steamgames.com/doc/features/microtransactions/implementation)
+Use [`SteamPublisherSettings.SANDBOX`](/api/classes/SteamPublisherSettings#environment) to exercise the Wallet flow with Valve's sandbox for your AppID. Check the API contracts for the store, charge confirmation, and refund authorization before granting real items. [SteamPublisherPurchases](/api/classes/SteamPublisherPurchases) · [Valve microtransactions](https://partner.steamgames.com/doc/features/microtransactions/implementation)
 
 ## Use other publisher services
 
