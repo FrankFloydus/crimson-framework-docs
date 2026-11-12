@@ -1,0 +1,101 @@
+{
+  "GameRuntime": {
+    "methods": {
+      "bind_player": "Assign a stable, game-owned player ID to an admitted peer in the authority lobby. The caller supplies the verified identity. Returns a Godot Error.",
+      "configure": "Create a new GameDefinition with the same defaults as a definition created in the Inspector.",
+      "declare_command": "Declare a command name on a guest. Match the authority's requires_primary setting. Returns a Godot Error.",
+      "get_local_character_id": "Return the local player's current primary character ID, or an empty string when no primary is available.",
+      "get_local_player": "Return the spawned player node for this peer in an immediate-play game, or null when there is no local player.",
+      "get_local_player_id": "Return the game-owned player ID for this peer, or an empty string when no local binding is available.",
+      "get_online_listing": "Return the current provider listing ID, or an empty string when the game has no active listing.",
+      "get_phase": "Return the current Phase value. Listen to phase_changed to observe transitions.",
+      "get_player": "Return the spawned player node for peer_id in an immediate-play game, or null when that peer has no mounted player.",
+      "get_projection": "Return a detached copy of this guest's visible replicated records. Read it after projection_updated. The authority's internal command context is omitted.",
+      "get_world": "Return the currently mounted world root, or null when no world is mounted. Reacquire the node after travel, restore, or teardown.",
+      "get_world_epoch": "Return the epoch of the published world. Epochs distinguish successive activations, including visits to the same world ID.",
+      "get_world_id": "Return the last published world ID. Wait for world_ready before using it as the active playable destination.",
+      "host": "Open a coordinated lobby on the session's selected transport, ENet by default. max_clients counts guests. With ENet, port is the UDP port and * binds all interfaces. A successful return opens the lobby for admission and player binding before start_match.",
+      "host_game": "Start a direct-address listen game with the configured starting scene and player. The operation succeeds after the world and local player are ready and the host can admit guests. Use * to bind all interfaces.",
+      "host_online": "Start a listen game using the configured provider. Supply the advertised address, or an empty string for a provider that supplies a route. The operation completes after the world is ready and the provider publishes its listing.",
+      "is_authority": "Return whether this game instance currently owns session authority, including when playing offline.",
+      "join": "Begin joining a coordinated lobby through the session's selected transport. With ENet, supply the host address and UDP port. timeout_seconds bounds connection time. OK means the attempt started. Observe phase_changed and session_ended for the outcome.",
+      "join_game": "Connect to a direct-address game using the configured UDP port. Await the operation for scene and roster readiness and placement of the local player.",
+      "join_online": "Resolve listing_id through the configured provider and join the resulting game. The operation succeeds after admission, world synchronization, and local player readiness.",
+      "leave": "Cancel pending startup or begin releasing the active transport, match, and mounted world. Observe session_ended after leaving an active session. If cancelling an online lookup before the session starts, observe the startup operation. Returns a Godot Error.",
+      "open_offline": "Open a local authority lobby. Use it before restore to continue from a menu without loading the default world first. Returns a Godot Error.",
+      "play_solo": "Mount the configured starting scene and spawn the local player in an offline game. Await the operation before accessing the mounted world or player.",
+      "register_command": "Register an authority-side handler for a command name. The handler receives the trusted player ID and the intent dictionary. Set requires_primary to require a current primary character assignment. Returns a Godot Error.",
+      "restore": "Read a checkpoint for profile and slot and activate its saved world and stores through the authority transition pipeline. Leave sequence and generation_id empty to restore the latest generation, or supply both for an exact restore.",
+      "save": "Capture the running authority's committed state and publish a checkpoint generation. Pass display metadata as a dictionary and set autosave to use autosave admission. A successful operation returns the generation sequence and ID in value.",
+      "save_history": "Read up to limit generations from a known profile and slot, newest first. Supply both before_sequence and before_id to continue from an exclusive cursor. A successful result includes rows in value, the slot status, a truncated flag, and a next cursor when more rows exist.",
+      "save_slot": "Create a handle for save, history, and restore actions on the specified profile and slot of this game.",
+      "set_projector": "Set the authority's visibility callback. It receives peer ID, player ID, world epoch, and committed revision, and returns a dictionary with ok and view. Its per-recipient view takes precedence over the shared-store list. Returns a Godot Error.",
+      "set_shared_stores": "Set the store IDs whose complete records can be published to every bound guest. The default view exposes no shared stores. A custom projector takes precedence. Returns a Godot Error.",
+      "start_dedicated": "Mount the starting world as a dedicated direct-address authority. All configured player seats are available to guests. Await the operation for world and admission readiness.",
+      "start_dedicated_online": "Mount a playerless authority world and publish it through the configured online provider. Supply the advertised address, or an empty string for a provider-managed route. Await the operation for listing and world readiness.",
+      "start_match": "Start a registered world from the coordinated authority lobby. An empty world uses the definition's starting world. Bind all admitted peers before calling it and await world readiness.",
+      "start_offline": "Open a coordinated offline session, bind the local player, and start the configured world. Await the operation for world readiness.",
+      "submit": "Submit a declared gameplay command and a plain dictionary payload from a ready participant. The returned operation reports the authority's command result. Observe projection_updated separately for visible state changes.",
+      "travel_to": "Activate a registered destination on the coordinated authority while preserving committed match stores. Await the operation before using the replacement world. A preparation failure leaves the prior world available."
+    },
+    "signals": {
+      "peer_joined": "Emitted when a peer joins the coordinated session roster. The authority can then bind the admitted connection to a verified player ID.",
+      "peer_left": "Emitted when a peer leaves the coordinated session roster. The departed peer's binding and readiness are retired.",
+      "phase_changed": "Emitted when the game changes Phase. The argument is the new phase.",
+      "projection_updated": "Emitted after a guest applies a visible projection at revision. baseline is true when the update establishes a new baseline. Read get_projection to obtain the applied view.",
+      "session_ended": "Emitted after the game releases session resources. The reason identifies what ended the session.",
+      "world_ready": "Emitted when a world with the given ID and epoch is ready for play. Coordinated network games wait for required scene and baseline acknowledgments."
+    },
+    "constants": {
+      "IDLE": "No active game session. An online listing lookup may still be pending.",
+      "LOBBY": "A coordinated session is open and the first world is pending.",
+      "TRANSITIONING": "A world startup, travel, or restore is in progress.",
+      "RUNNING": "The published world is ready for play.",
+      "RECOVERING": "A failure after publication closed command admission. Leave the game before starting a new session."
+    }
+  },
+  "GameServices": {
+    "description": "Static lookups for active GameRuntime scopes and their scene services.",
+    "methods": {
+      "for_node": "Find the active game whose subtree contains node. Returns null if no active game owns that node.",
+      "game": "Return the explicitly selected default game or the only active game. Returns null if no game can be selected unambiguously.",
+      "scenes": "Return the SceneService of the default game, or null if there is no default game.",
+      "set_default_game": "Select an active GameRuntime as the default for game and scenes. Pass null to clear the explicit selection. Returns a Godot Error."
+    }
+  },
+  "InventoryTransactionAdapter": {
+    "description": "Registers a SpatialInventory snapshot as an authority store so grid edits can commit atomically with other gameplay changes.",
+    "methods": {
+      "configure": "Validate the initial SpatialInventory snapshot and register it under store_id in the supplied coordinator. Returns a Godot Error.",
+      "get_snapshot": "Return the currently committed snapshot in SpatialInventory format, or an empty dictionary before configuration.",
+      "queue_move": "Queue an existing item's new grid origin and rotation in a transaction owned by the configured coordinator. Returns a Godot Error. The inventory changes on a successful commit.",
+      "queue_place": "Queue placement of a new item with the given footprint, grid origin, and rotation. Returns a Godot Error. The authority validates the placement when the transaction commits.",
+      "queue_remove": "Queue removal of item_id in a transaction owned by the configured coordinator. Returns a Godot Error. The inventory changes on a successful commit."
+    }
+  },
+  "OnlineDirectory": {
+    "description": "Implement this Resource in a custom game provider to publish and resolve playable listings. Complete directory requests on the scene thread.",
+    "methods": {
+      "_leave": "Release local membership for listing_id when a resolved join ends or is abandoned. Handle lookups that failed or were still pending.",
+      "_publish": "Publish the authority's mounted world. Use endpoint as the advertised route when supplied, or obtain the route from the provider's transport. Complete request with publish or fail.",
+      "_resolve": "Look up listing_id and complete request with a SessionEndpoint that the chosen transport accepts. Call fail when the listing cannot be resolved.",
+      "_unpublish": "Retire the listing the provider created under listing_id. Release any external listing state when the provider shuts down."
+    }
+  },
+  "OnlineDirectoryRequest": {
+    "description": "One completion handle supplied to a provider for publishing a listing or resolving a route. Complete it on the scene thread. The game cancels pending requests on timeout or teardown.",
+    "methods": {
+      "fail": "Finish a pending directory request with no listing or endpoint. Returns a Godot Error if the request can no longer accept completion.",
+      "is_cancelled": "Return true after the game cancels or abandons this request. Use it to release provider resources.",
+      "publish": "Complete a publication with a unique listing ID. If completion arrives after cancellation, the request attempts to retire the listing. If it returns ERR_UNAVAILABLE, the provider must remove the external listing itself.",
+      "resolve": "Complete a lookup with a non-null endpoint for the selected transport. Returns a Godot Error when the request is invalid or no longer pending."
+    }
+  },
+  "SceneService": {
+    "description": "A scene handle scoped to the GameRuntime that created it. Use it to load a registered world through the game's normal transition lifecycle.",
+    "methods": {
+      "get_world": "Return the mounted world from the originating game scope, or null if the scope is retired or no world is mounted.",
+      "load": "Request authority travel to a registered world ID. Await the returned GameOperation to observe the outcome, including when the originating game scope has retired."
+    }
+  }
+}

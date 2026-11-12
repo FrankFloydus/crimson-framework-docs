@@ -1,0 +1,70 @@
+---
+title: Dedicated servers
+description: "Start a playerless Steam server, verify guests, and publish it for discovery."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+## Start a playerless authority
+
+Prepare your fixed-world `GameDefinition` as in [Getting started](/quickstart), then set up the [Steam runtime](/steam/setup) in the headless project or export. In this example, `definition` is your configured game before `boot()` and `app_id` is its Steam AppID. A dedicated authority uses the native Steam GameServer connection. The default anonymous server login can run without an interactive Steam account.
+
+```gdscript
+var settings := SteamServer.configure("Transfer Hall", 27015, 27016) \
+    .with_product_metadata("1.2.0.0", "Transfer Hall", "TransferHall")
+var provider := SteamProvider.configure().for_app(app_id) \
+    .with_lobby_namespace("my-studio-crimson-demo").dedicated(settings)
+var game := definition.with_provider(provider).boot(self)
+if game == null:
+    return
+var started: Dictionary = await game.start_dedicated_online().wait()
+if started.ok:
+    print("Steam server locator: ", game.get_online_listing())
+```
+
+Use distinct UDP ports for gameplay and queries. Set `bind_to(address)` for a specific local IPv4 interface. Pass a reachable literal IPv4 address to `start_dedicated_online(public_address)` when clients need an address different from the bound or Steam-reported address. For an operator login, call `with_login(&"MY_STEAM_SERVER_TOKEN")` and set that environment variable only in the dedicated process. [SteamServer](/api/classes/SteamServer) · [Valve GameServer API](https://partner.steamgames.com/doc/api/ISteamGameServer)
+
+## Join an exact server
+
+Boot the guest with a Steam client provider and the same AppID and namespace. Give it the locator printed by the authority, then call `await game.join_online(listing_id).wait()`. The locator identifies the server's certified Steam account. The guest issues a ticket for that server, and the authority binds ticket validation to the guest's certified transport identity before opening gameplay admission. An invalid follow-up retires that exact peer. [Valve authentication and ownership](https://partner.steamgames.com/doc/features/auth)
+
+`SteamServices.server_for(game).status()` reports playerless-world readiness, secure state, advertisement request, and admitted remote player count. Store the result as an observation. Query again or subscribe to `status_changed` for the current state. [SteamDedicatedServer](/api/classes/SteamDedicatedServer) · [SteamServerStatus](/api/classes/SteamServerStatus)
+
+## List the server in Steam
+
+Direct mode is the default and provides an explicit locator. To request browser discovery, use `settings.advertise_on(SteamServer.INTERNET)` and supply your game's Steam master-server version, description, and installation folder through `with_product_metadata()`. Advertisement starts after the server is logged in and has a secure policy, current certificate, listener, and ready world. `advertisement_requested` confirms the local request. Confirm discovery from a separate Steam client. [Valve dedicated servers](https://partner.steamgames.com/doc/features/multiplayer/game_servers)
+
+```gdscript
+var browser := steam.server_browser()
+var servers: SteamListingsResult = await browser.query() \
+    .on_map(&"transfer_hall").with_room_for(1).fetch()
+if servers.ok and not servers.value.is_empty():
+    var refreshed: SteamServerDetailsResult = await browser.inspect(servers.value[0]).wait()
+    if refreshed.ok:
+        await game.join_listing(refreshed.value.listing).wait()
+```
+
+Browser results are observations. The join performs its own server and guest checks. The current Steam SDK supports joint Internet and LAN advertisement. A LAN-only host request reports unavailable, while `query(SteamServer.LAN)` can read compatible LAN announcements. [SteamServerBrowser](/api/classes/SteamServerBrowser)
+
+## Record server-owned progression
+
+Configure the relevant stats or achievements as **Game Server** or **Official GS** in Steamworks. After a peer is admitted, call `SteamServices.server_for(game).stats(peer_id)`. The returned handle belongs to that admission and expires when the peer leaves.
+
+```gdscript
+var server := SteamServices.server_for(game)
+var stats := server.stats(peer_id)
+if stats != null:
+    var stored: SteamServerStatsResult = await stats.edit() \
+        .set_int(&"official_matches", authoritative_match_count) \
+        .unlock(&"official_first_win").submit().wait()
+    if not stored.ok:
+        push_warning(stored.message)
+```
+
+An edit can load the Steam cache as needed. For explicit cached reads, call `await stats.load().wait()` first. Check `applied`, `failed_at`, and `store_submitted` after a failed edit. If the setters succeeded and persistence failed, use `store()` to retry persistence without replaying the edits. [SteamServerPlayerStats](/api/classes/SteamServerPlayerStats) · [Valve GameServer stats](https://partner.steamgames.com/doc/api/ISteamGameServerStats)
+
+## Use hosted Steam Datagram Relay
+
+Hosted dedicated relay requires a Valve-provisioned hosted endpoint and Game Coordinator SDK. Place the separate SDK under `framework/vendor/steamworks/sdr` so the build can find `include/steam/steamdatagram_tickets.h`. Select a provisioned profile with `SteamServer.via_sdr()` and supply your [SteamRelayCoordinator](/api/classes/SteamRelayCoordinator) adapter through `SteamProvider.with_relay_coordinator()`.
+
+The trusted coordinator registers the exact server publication and authorizes each client before issuing its relay ticket. Keep the ticket signing key in that coordinator. A separate Steam authentication ticket gates Game admission after transport connects. Use Valve's provisioned test environment to verify an observed relay route. [Crimson coordinator contract](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/PUBLIC_API.md#hosted-steam-datagram-relay) · [Valve hosted relay](https://partner.steamgames.com/doc/features/multiplayer/steamdatagramrelay)

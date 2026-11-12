@@ -1,0 +1,21 @@
+---
+title: Steamworks
+description: "Choose how your Godot game uses Steam through Crimson Framework."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Crimson Framework can use Steam for a single feature such as achievements, Cloud saves, or the Overlay. It can also run an authenticated multiplayer game through Steam. Both paths use the same Windows GDExtension.
+
+| What you want to build | Start here |
+| --- | --- |
+| Add achievements, Cloud saves, or Steam Input | Boot [SteamClient](/api/classes/SteamClient) from a persistent node and use its [client services](/steam/client-services). |
+| Host a game from a player's machine | Attach [SteamProvider](/api/classes/SteamProvider) to your game definition and [host a Steam lobby](/steam/listen-servers). |
+| Run a headless, playerless Steam authority | Configure [SteamServer](/api/classes/SteamServer) and [start a dedicated server](/steam/dedicated-servers). |
+| Verify Web API tickets or process Wallet orders | Run a separate [publisher backend](/steam/publisher) that holds your publisher credentials. |
+
+A standalone client and a game's Steam provider can share the signed-in Steam client in one process. Each has its own scope. When a scope ends, reacquire its service handles from the replacement scope. Keep both clients and game services in a part of the scene tree that survives world changes.
+
+The dedicated authority uses its own Steam GameServer connection. Publisher operations run in a separately built trusted host. You can use direct ENet alongside Steam as a separate multiplayer option in your game.
+
+Start with [Steamworks setup](/steam/setup). Once your first Steam scope starts, use the [test guide](/steam/testing) to verify the capabilities your game depends on. Browse the [API reference](/api/overview) for class signatures and result types.

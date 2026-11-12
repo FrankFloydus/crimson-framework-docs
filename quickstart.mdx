@@ -1,47 +1,53 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Start a solo game"
+description: "Mount a 3D world and spawn a local player with GameRuntime."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+In this quickstart, you create a world scene, a player scene, and a main scene. Crimson loads the world, places the player at a spawn point, and activates the player's camera. Install Crimson before creating the scenes. [Installation](/installation)
 
-## Prerequisites
+## Create the world and player scenes
 
-Before you begin, you must have:
+1. Create a 3D scene with a `Node3D` root named `World`. Add a `PlayerSpawnPoint` child and leave it at the origin. Add a `MeshInstance3D` child, assign a `BoxMesh` to **Mesh**, and add a `DirectionalLight3D` child. Save the scene as `res://world.tscn`.
+2. Create a second 3D scene with a `Node3D` root named `Player`. Add one `Camera3D` child with its **Position** set to `(0, 2, 5)` and its X **Rotation** set to `-20°`. Save the scene as `res://player.tscn`. With a single camera in the player scene, Crimson can select it automatically.
 
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
+## Start the session
 
-## Get started
+Create a scene with a plain `Node` root named `Main` and save it as `res://main.tscn`. Attach a GDScript to `Main` and use this script to boot the game and start a solo session.
 
-<Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+```gdscript
+extends Node
 
-    ```bash
-    npm install your-package
-    ```
-  </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+var game: GameRuntime
 
-    ```bash
-    your-cli init
-    ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+func _ready() -> void:
+    game = (
+        GameRuntime.configure()
+        .with_starting_world(&"training_room", preload("res://world.tscn"))
+        .with_player(preload("res://player.tscn"))
+        .boot(self)
+    )
+    if game == null:
+        push_error("Could not attach GameRuntime.")
+        return
 
-    ```bash
-    your-cli start
-    ```
-  </Step>
-</Steps>
+    var result: Dictionary = await game.play_solo().wait()
+    if not result.ok:
+        push_error("Could not start solo play: %s" % result.message)
+        return
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+    print("Solo ready: ", game.get_local_player().name)
+```
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+Press **F6** with `main.tscn` open, or set it as the main scene and press **F5**. When the box appears, open **Output** and look for a line starting with `Solo ready:`. The player scene in this example is stationary. Add your own controller and input actions when you're ready to move the camera.
+
+`boot(self)` attaches `GameRuntime` to the main scene, which stays alive while it hosts the world. `play_solo()` returns a `GameOperation`. Waiting for that operation gives you a result with `ok`, `code`, and `message`. After success, `get_world()` and `get_local_player()` return the live nodes. Call `game.leave()` when you're ready to end the session.
+
+## Configure the same game in the Inspector
+
+You can create the definition in the editor and use the same start action from GDScript. Add a `GameRuntime` child named `Game` under `Main`. Create a `GameDefinition` in its **Definition** property and set **Starting World** to `training_room`, **Starting World Scene** to `world.tscn`, and **Player Scene** to `player.tscn`. In the script, replace the `boot(self)` setup and its null check with `game = $Game` before calling `play_solo()`.
+
+Look up the game, scene loading, and player classes. [API reference](/api/overview)
+
+Add Steam services or invite other players through Steam. [Steamworks](/steam/overview)

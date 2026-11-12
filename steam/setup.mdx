@@ -1,0 +1,50 @@
+---
+title: Set up and ship Steamworks
+description: "Stage the Steam runtime, verify your AppID, and prepare a Windows export."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+## Requirements
+
+Use the Windows x86-64, single-precision Godot 4.7 build described in [Installation](/installation). The v0.0.3 Crimson addon ZIP includes the Debug and Release extension DLLs. Obtain `steam_api64.dll` from Valve's Steamworks SDK. Crimson v0.0.3 was validated with SDK 1.65. [Steamworks SDK download](https://partner.steamgames.com/doc/sdk)
+
+1. Copy `redistributable_bin/win64/steam_api64.dll` from the SDK to your project's `addons/crimson-framework/bin/` directory beside the Crimson DLLs.
+2. Start Steam and sign in. Run Steam and Godot under the same Windows account and elevation.
+3. Establish an AppID. When you launch your game from the Steam Library, Steam supplies the AppID. For a direct development launch, use an isolated copy of your engine or export. Put a plain text file named `steam_appid.txt` containing just the AppID beside the executable. Start the executable with that directory as the working directory.
+4. Run a scene that [boots a Steam client](/steam/client-services#start-a-client) and check its readiness. Pass the expected AppID to catch an incorrect launch context.
+
+For an initial test, use Valve's Spacewar AppID `480`. Use a test account entitled to your own AppID when testing app definitions, ownership, Wallet, or distribution. Spacewar uses Valve's definitions and test data. [Valve's initialization guide](https://partner.steamgames.com/doc/sdk/api) · [Spacewar example](https://partner.steamgames.com/doc/sdk/api/example)
+
+## Build the addon from source
+
+Follow the toolchain requirements in [Installation](/installation). Extract the complete SDK into `framework/vendor/steamworks/sdk` in the framework checkout. Check for `public/steam/steam_api_flat.h` inside that SDK directory. From the checkout root, run the following commands in an x64 development shell.
+
+```powershell
+git submodule update --init --recursive
+Set-Location framework
+scons platform=windows arch=x86_64 target=template_debug
+scons platform=windows arch=x86_64 target=template_release
+```
+
+The build stages the extension and the Steam runtime in `framework/project/addons/crimson-framework/bin`. Use `steam_sdk=<path>` with SCons or `-DCRIMSON_STEAMWORKS_SDK=<path>` with CMake to select another SDK directory. For a build without Steamworks, use `steam_sdk=off` or `-DCRIMSON_STEAMWORKS_SDK=OFF`. SDK-disabled builds register Steam classes and report that the service is unavailable when you start it.
+
+## Export and verify on Windows
+
+In your Godot Windows export preset, add `crimson_steam` to **Custom Features**. The GDExtension descriptor declares `steam_api64.dll` as a dependency for that feature and places it beside the exported executable. Omit the feature for a direct ENet export without the Steam runtime. Leave development `steam_appid.txt` files out of shipping depots. [Godot GDExtension dependencies](https://docs.godotengine.org/en/4.7/engine_details/engine_api/gdextension/gdextension_file.html#dependencies)
+
+Test your Debug export and your Release export. For the distribution check, put the final export on a private Steam branch. Install that build through the Steam Library with an entitled test account and verify startup, your app's features, and Overlay behavior. [SteamPipe upload](https://partner.steamgames.com/doc/sdk/uploading)
+
+### Relaunch an unwrapped export through Steam
+
+If your unwrapped game should launch through Steam even when opened from its executable, call `SteamClient.restart_through_steam_if_needed(app_id)` at your common startup entry point, before initializing any Steam service. Quit the current process on `ERR_SKIP` so Steam can launch the installed copy. Proceed with Steam startup on `OK` and surface any other error. Use your authorized shipping AppID. [SteamClient](/api/classes/SteamClient) · [Valve's relaunch check](https://partner.steamgames.com/doc/sdk/api#SteamAPI_RestartAppIfNecessary)
+
+### Wrap an export for Steam DRM
+
+If you use Valve's optional DRM wrapper, run the framework's wrapping script from its checkout root. Set the variables to your SteamCMD path, authorized AppID and account, exported executable, and an unused output path. The script keeps the original executable and writes the wrapped copy to the output path after SteamCMD succeeds. Valve receives the input executable for wrapping.
+
+```powershell
+.\framework\scripts\Wrap-SteamRelease.ps1 -SteamCmd $steamCmd -AppId $appId -InputExe $exportedExe -OutputExe $depotExe -Account $steamAccount
+```
+
+The wrapper performs the Steam relaunch check itself. Upload the wrapped executable and its companion files through SteamPipe, then verify the installed build on a private branch. [Steam DRM](https://partner.steamgames.com/doc/features/drm) · [SteamPipe upload](https://partner.steamgames.com/doc/sdk/uploading)

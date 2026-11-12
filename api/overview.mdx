@@ -1,0 +1,33 @@
+---
+title: "API reference"
+description: "Browse the classes, methods, properties, signals, and constants exposed by Crimson Framework for Godot."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+This reference covers the Godot scripting API in Crimson Framework v0.0.3. Each class page lists the members declared by the class. When a class extends another Crimson class, follow **Inherits** to find its inherited members. [Framework release](https://github.com/FrankFloydus/crimson-framework/releases/tag/v0.0.3)
+
+## Find a class
+
+| To work with | Start here |
+| --- | --- |
+| Game startup, travel, and save coordination | [GameRuntime](/api/classes/GameRuntime), [GameDefinition](/api/classes/GameDefinition), [GameOperation](/api/classes/GameOperation) |
+| A fixed world with player spawning and local views | [WorldSession](/api/classes/WorldSession), [WorldSessionDefinition](/api/classes/WorldSessionDefinition) |
+| Session hosting, connection admission, and transport | [GameSession](/api/classes/GameSession), [SessionTransport](/api/classes/SessionTransport) |
+| Scene preparation and synchronization | [SceneLoadManager](/api/classes/SceneLoadManager), [StateReplication](/api/classes/StateReplication) |
+| Transactions, player identity, and possession | [TransactionCoordinator](/api/classes/TransactionCoordinator), [PlayerBindings](/api/classes/PlayerBindings), [PlayerPossession](/api/classes/PlayerPossession) |
+| Grid inventory, items, equipment, and trade | [SpatialInventory](/api/classes/SpatialInventory), [SpatialInventoryActions](/api/classes/SpatialInventoryActions), [SpatialInventoryTrade](/api/classes/SpatialInventoryTrade) |
+| Checkpoints, migrations, and save browser data | [SaveCoordinator](/api/classes/SaveCoordinator), [SavePresentation](/api/classes/SavePresentation) |
+| Steam client services and multiplayer | [SteamClient](/api/classes/SteamClient), [Steamworks guide](/steam/overview) |
+
+## Read a class page
+
+Method signatures use Godot types. `void` means the method returns no value. Read the method description before treating a returned `OK` as completion. For asynchronous operations it can mean the request started. Use the operation or request object to read the final result.
+
+A property can have a setter, a getter, or both. A listed default is the value declared for a fresh instance. A signal lists the values passed to its connected callbacks. Enum values and constants are scoped to their declaring class.
+
+## Choose the Steam build
+
+Steamworks classes use the [Steam runtime setup](/steam/setup). Publisher classes have their own group and require the separate [trusted publisher build](/steam/publisher). Use those classes in the backend that holds your publisher credentials.
+
+For workflows that compose several classes, start with the [quickstart](/quickstart) or the framework's [public API guide](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/PUBLIC_API.md). The API reference documents the Godot bindings. The [architecture guide](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/ARCHITECTURE.md) covers the native C++ module boundaries.

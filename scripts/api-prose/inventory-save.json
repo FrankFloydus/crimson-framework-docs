@@ -1,0 +1,259 @@
+{
+  "SaveCoordinator": {
+    "description": "A scene-tree node that coordinates checkpoint capture, storage, inspection, and staged restore. Configure it and submit requests on the main thread. Keep the host and participant adapters alive for the duration of their tickets. Capture, migration, and restore callbacks run on the main thread, and storage and codec work run on a worker using detached data. Save, load, and inspection requests return a positive ticket when admitted or 0 on rejection. Profile and slot IDs use 1 to 64 lowercase ASCII letters, digits, underscores, or hyphens, with a letter or digit first. App, scope, and participant IDs also allow periods after the first character. The first admitted ticket freezes app and storage configuration. The first admitted save or load also freezes the scope and schema registrations.",
+    "methods": {
+      "activate_prepared_load": "Validate and publish the prepared candidate for the given ticket on the main thread. Returns true when publication succeeds. A valid prepared ticket queues a terminal [signal operation_finished] result.",
+      "bind_participant": "Attach or replace the live adapter for a declared participant. The adapter provides [code]save_capture()[/code] and [code]save_stage(dto, candidate)[/code], with optional [code]save_default()[/code] and [code]save_link(candidate)[/code]. Returns false if the adapter is invalid, the ID is undeclared, or there is queued or active save or load work.",
+      "cancel": "Request cancellation of an admitted ticket. Returns [code]Cancelled[/code] if cancellation won, [code]TooLate[/code] after the commit gate, or [code]UnknownTicket[/code] for an untracked ticket. Wait for the terminal signal before treating admitted work as finished.",
+      "capture_pending": "Capture the earliest admitted but uncaptured save at a committed gameplay boundary. The optional [code]revision[/code] label is limited to 128 UTF-8 bytes. Returns true if the capture succeeds. Call once for each pending save you want to capture.",
+      "configure": "Set the stable app ID and initialize the default storage and codec. Pass a nonempty directory under [code]user://[/code] as [code]root[/code]. Returns false for invalid configuration or if the app and storage configuration has already been frozen by an admitted ticket.",
+      "configure_scope": "Set the single stable scope ID and its current positive schema version. The scope covers every registered participant. Configure it before the first admitted save or load.",
+      "declare_participant": "Declare a unique stable participant ID and positive schema version. During load, a missing required participant fails. An optional participant supplies a default through its adapter. Returns true if declared successfully.",
+      "get_last_admission_error": "Read the error code from the most recent rejected request. Call immediately after a request returns 0. A rejected request produces no ticket events.",
+      "get_prepared_candidate": "Borrow the detached candidate held by a prepared load while its ticket is active. Returns null when the candidate is unavailable. Release borrowed references when the ticket finishes.",
+      "invalidate_world": "Invalidate work associated with the current world before you replace it outside the save system. If active work is past its cancellation gate, wait for it to finish and try again.",
+      "is_idle": "Return true when queued work, active work, and terminal results have drained. Check before reconfiguring or freeing the coordinator.",
+      "load_native_provider": "Load a trusted Windows x86-64 provider DLL after configuration and before the first admitted ticket. Pass an absolute DLL path or a Godot path resolving to an on-disk DLL. The provider-defined UTF-8 configuration is limited to 64 KiB. A provider can supply storage, a codec, or both.",
+      "register_migration": "Register a participant migration from [code]from_version[/code] to the next version. The synchronous callback accepts the old data and returns a dictionary with [code]ok[/code] and, on success, [code]value[/code] containing the upgraded data. Register every required step before the first admitted save or load.",
+      "register_participant": "Declare a participant schema and bind its live adapter in one call. Returns true if registration succeeds. Declare schemas before the first admitted save or load.",
+      "register_scope_migration": "Register one scope migration step from [code]from_version[/code] to the next version. The callback receives an array of records with [code]id[/code], [code]version[/code], and [code]data[/code] and returns the converted array in the result's [code]value[/code] field on success. Scope migrations run before individual participant migrations.",
+      "request_autosave": "Queue an autosave for the next host capture boundary. A newer intent can replace an uncaptured autosave for the same slot and world. Returns a ticket or 0 on rejection.",
+      "request_inspect_generation": "Inspect one committed generation by its exact [code]sequence[/code] and [code]generation_id[/code]. An absent generation reports [code]NotFound[/code] in the terminal result. Use this after a save reports [code]CommitUnknown[/code] to check the returned generation identity before retrying.",
+      "request_list": "List committed generations newest first. The terminal result includes [code]value[/code] for entries, [code]status[/code] for the head, [code]truncated[/code], and [code]next[/code]. For the next page, pass both identity strings from [code]next[/code]. The limit must be positive. The coordinator caps the page size at 16.",
+      "request_load": "Queue a load of the current slot head when both selection strings are empty. To load a specific generation, pass both [code]sequence[/code] and [code]generation_id[/code] from inspection. Returns a ticket or 0 on rejection.",
+      "request_prepare_load": "Select a generation like [method request_load], then read, migrate, stage, and link it. Wait for [signal load_prepared] and call [method activate_prepared_load] when the host is ready to publish the candidate.",
+      "request_save": "Queue a manual save for the next host capture boundary. Pass optional data-only metadata up to 8 KiB. After admission, call [method capture_pending] at a committed gameplay boundary.",
+      "set_host": "Bind the live object that builds and publishes restore candidates. It provides [code]save_create_candidate()[/code] and [code]save_publish(candidate)[/code] and may also validate or discard candidates. Replace the host only when there is no active or queued save or load.",
+      "validate_prepared_load_for_save": "Validate and discard a prepared candidate selected by exact generation identity, leaving the active world in place. The selected generation must still be the head when checked. Wait for the terminal success result before retrying a save over that head."
+    },
+    "signals": {
+      "load_prepared": "Emitted on the main thread after an explicit prepare request finishes staging and linking. The generation dictionary contains [code]sequence[/code] and [code]id[/code]. The ticket remains active until you activate or cancel it.",
+      "operation_finished": "Emitted on the main thread when a ticket reaches a terminal result. The dictionary includes [code]ok[/code] and [code]code[/code] and can include [code]message[/code], [code]warning[/code], or [code]value[/code]. Successful saves and loads return the generation's [code]sequence[/code] and [code]id[/code] in [code]value[/code].",
+      "operation_progress": "Emitted on the main thread when a ticket changes phase. Several transitions can arrive in one frame. A [code]Verifying[/code] update during load gives listeners a chance to cancel before main-thread restore work."
+    }
+  },
+  "SavePresentation": {
+    "description": "Static helpers for building, displaying, and decoding save slot metadata. Call them on the main thread. Preserve a generation's [code]sequence[/code] and [code]id[/code] separately so the UI can load the selected save.",
+    "methods": {
+      "describe": "Turn an inspection entry or its [code]meta[/code] dictionary into display fields [code]label[/code], [code]time_text[/code], [code]context[/code], and [code]preview[/code]. The preview is a texture when the metadata contains a valid image and null otherwise.",
+      "format_date": "Format a Unix timestamp in seconds using the specified fixed offset in minutes. Supported tokens include [code]%Y[/code], [code]%m[/code], [code]%d[/code], [code]%H[/code], [code]%M[/code], [code]%S[/code], [code]%z[/code], and [code]%%[/code]. An out-of-range date or offset returns an empty string.",
+      "make_metadata": "Create bounded display metadata with the save label, Unix timestamp in seconds, and contextual fields. Pass an optional [Image] from your game to include a compact RGB565 preview when it fits the metadata budget. Pass the result to a [SaveCoordinator] save request."
+    }
+  },
+  "SpatialInventoryActions": {
+    "description": "Implements checked moves, swaps, quick transfers, and quantity edits across inventory grids. Use a [SpatialInventoryStackAdapter] for host-owned stack records. Action results report a Godot [code]error[/code], [code]reason[/code], how much moved and remains, a [code]selection[/code] identifying an inventory and item, and [code]changes[/code] identifying items whose views need refreshing.",
+    "methods": {
+      "find_items": "Return IDs for placed items that pass the optional predicate. The predicate receives one placement dictionary and must return true to include its ID. Without a predicate, every placement is included.",
+      "get_allow_rotation": "Return whether automatic placement searches may try a rotated footprint.",
+      "get_destination_policy": "Return the policy that filters quick-transfer destination grids.",
+      "get_destination_provider": "Return the callback that supplies fallback quick-transfer destination grids.",
+      "get_drop_policy": "Return the callback that validates proposed destination edits.",
+      "get_operation_guard": "Return the callback that checks whether the source and destination are still usable.",
+      "get_pickup_policy": "Return the callback that validates lifting items from source grids.",
+      "get_stack_adapter": "Return the adapter for host-owned stack records, or null if none is configured.",
+      "merge_stacks": "Move compatible units from the placed source stack to the placed target stack up to its capacity. A positive [code]limit[/code] caps the transfer. A zero limit uses the available capacity. The source placement is removed if its stack is depleted.",
+      "move_item": "Move a placed item to the requested origin and rotation. Supply [code]swap_id[/code] to exchange with the expected occupant, and optionally pass exact [code]expected_source[/code] and [code]expected_swap[/code] placement dictionaries to guard against stale UI state. A failed validation preserves the affected placements.",
+      "quick_transfer": "Try the provided destination grids in order, or use the destination provider if the array is empty. Merge compatible stacks first when an adapter is available, then try to place the remaining item. Inspect [code]completed[/code] and [code]remaining[/code] because a partial transfer can return [code]OK[/code].",
+      "quick_transfer_matching": "Transfer the selected stack and other source stacks with the same compatibility key. The result includes per-item [code]transfers[/code] and the number of completed source stacks. Transfers commit separately, so some items can stay in the source even when the batch reports [code]OK[/code].",
+      "set_allow_rotation": "Allow or disallow rotation during automatic placement searches. Explicit placement arguments still control explicit moves.",
+      "set_destination_policy": "Set the callback that filters each candidate destination for a quick transfer. Return an empty String to accept that destination, or a reason to skip it.",
+      "set_destination_provider": "Set the callback that supplies ordered destination grids when a quick transfer receives an empty destination array.",
+      "set_drop_policy": "Set the callback that evaluates a proposed destination edit. Return an empty String to allow it or a denial reason to reject it.",
+      "set_operation_guard": "Set a callback taking the source and destination grids. It must return true for the operation to proceed.",
+      "set_pickup_policy": "Set the callback that checks whether the source item may be lifted. Return an empty String to allow it or a denial reason to reject it.",
+      "set_stack_adapter": "Attach the adapter that reads and commits your stack records. Pass null to clear it.",
+      "split_stack": "Move a positive quantity smaller than the source stack into a new item ID and place it at the requested destination. The source record, new record, and destination placement commit through the stack adapter."
+    },
+    "properties": {
+      "allow_rotation": "Whether automatic placement can try a rotated footprint. Defaults to true.",
+      "destination_policy": "Optional String-returning callback that receives the proposed transfer context for each candidate destination. Return an empty string to accept it.",
+      "destination_provider": "Optional callback used when a quick transfer receives no explicit destinations. It receives the proposed transfer context and returns an Array of destination grids in preference order.",
+      "drop_policy": "Optional callback receiving [code]id[/code], [code]footprint[/code], [code]source[/code], [code]destination[/code], [code]origin[/code], [code]rotated[/code], [code]swap_id[/code], and [code]action[/code]. Stack edits can add target or quantity fields. Return an empty String to allow the edit.",
+      "operation_guard": "Optional [code]guard(source, destination) -> bool[/code] callback. Return true while both grids are available to this action.",
+      "pickup_policy": "Optional callback receiving the source placement's [code]id[/code], [code]footprint[/code], [code]origin[/code], and [code]rotated[/code] fields together with its [code]source[/code] grid. Return an empty String to allow pickup.",
+      "stack_adapter": "Adapter for reading and committing game-owned stack records. Assign it before using split or merge actions."
+    }
+  },
+  "SpatialInventoryContainers": {
+    "description": "Tracks which grid owns each item and which grid represents a container's contents. Use its policies to reject duplicate ownership and cycles before committing inventory moves. The registry does not move items on its own.",
+    "methods": {
+      "get_contents": "Return the registered contents grid for a container item ID, or null if it has no registered grid.",
+      "get_host_placement_policy": "Return the optional game rule called after ownership and nesting checks.",
+      "get_owner_inventory": "Return the grid that uniquely owns the given item ID, or null if there is no unique owner.",
+      "placement_policy": "Validate a proposed action using its [code]id[/code], [code]source[/code], [code]destination[/code], and action-specific fields. Rejects duplicate ownership, nesting cycles, and container splits or merges. Returns an empty String to allow the action, or a reason to deny it.",
+      "register_inventory": "Register an inventory grid. Use an empty [code]container_id[/code] for a standalone grid or pass the owning item ID for a container's contents. Returns an error if the registration introduces duplicate ownership or invalid nesting.",
+      "set_host_placement_policy": "Set an optional game rule that receives the placement context after built-in validation. The callback returns an empty String to accept the placement or a reason to deny it.",
+      "unregister_inventory": "Remove a grid from ownership tracking without editing the grid. Returns [code]ERR_DOES_NOT_EXIST[/code] if it was not registered.",
+      "validate_changes": "Check the projected ownership graph after applying the given [method SpatialInventory.apply_placement_changes] rows. Returns an empty String if the proposed batch preserves unique owners and acyclic nesting. Apply the batch separately to check geometry and commit."
+    },
+    "properties": {
+      "host_placement_policy": "Optional game rule receiving the placement context after ownership and nesting validation. Return an empty String to accept or a reason to deny the placement."
+    }
+  },
+  "SpatialInventoryEquipment": {
+    "description": "Equipment slots backed by a [SpatialInventory] backpack. An item can occupy several slots while keeping a single equipped record. Preview an action before committing it when the player needs to review the displaced gear or destination.",
+    "methods": {
+      "configure": "Associate a configured backpack with an ordered list of 1 to 64 unique, nonempty slot IDs. Reconfiguration with different slots or a different backpack returns [code]ERR_BUSY[/code] while items are equipped.",
+      "equip": "Equip a backpack item in the requested slot and return displaced equipment to the backpack in the same commit. Supply a preview as [code]expected[/code] to reject a stale result with [code]ERR_BUSY[/code]. Inspect [code]error[/code] and [code]committed[/code] in the result.",
+      "export_snapshot": "Return a version 1 snapshot with [code]version[/code] and [code]items[/code]. Persist it alongside the backpack and your item records.",
+      "get_backpack": "Return the configured backpack, or null before configuration.",
+      "get_equipped": "Return a detached record for an equipped item ID, or an empty dictionary for an unknown ID.",
+      "get_equipped_items": "Return detached equipped records in primary-slot order. An item occupying multiple slots appears once.",
+      "get_move_policy": "Return the optional rule for equips, unequips, and returns of displaced items.",
+      "get_revision": "Return the current revision of committed equipment state.",
+      "get_slot_ids": "Return the configured slot IDs in their display order.",
+      "get_slot_item": "Return the ID occupying the requested slot, or an empty StringName for an empty or unknown slot.",
+      "get_slot_requirements": "Return the callback that supplies all occupied slots for the requested equip.",
+      "import_snapshot": "Validate and restore equipped records into an empty equipment model with its backpack and slot rules already configured. Invalid data leaves the model unchanged.",
+      "preview_equip": "Plan equipping the item and returning any displaced equipment without mutating the models. The result includes [code]error[/code], [code]reason[/code], [code]slots[/code], [code]displaced[/code], placement [code]changes[/code], and both model revisions.",
+      "preview_unequip": "Plan a backpack placement for the item occupying the slot. [code]Vector2i(-1, -1)[/code] selects first fit, and null rotation keeps the item's stored orientation.",
+      "set_move_policy": "Set a callback that can deny equipment moves, including returns for displaced items. Return an empty string to allow the move or a reason to deny it.",
+      "set_slot_requirements": "Set a callback taking the item ID and requested slot. Return the full array of occupied slots, including the requested slot, or a denial string.",
+      "unequip": "Return the item occupying the requested slot to the backpack. Pass the preview in [code]expected[/code] to require that the reviewed placement still matches before commit."
+    },
+    "properties": {
+      "backpack": "The configured backpack used for incoming equipment and returning items.",
+      "move_policy": "Optional callback receiving the action, item ID, requested slot and occupied slots, backpack, source and destination placement dictionaries, and [code]displaced[/code] flag. Return an empty string to allow the change.",
+      "revision": "Revision of committed equipment state. Compare it with a prior preview revision to detect changes.",
+      "slot_requirements": "Optional [code]slot_requirements(id, requested_slot)[/code] callback. Return all occupied slot IDs or a denial string. By default an item occupies just the requested slot."
+    },
+    "signals": {
+      "changed": "Emitted after committed equipment state changes, including configuration and successful item edits. Read the current model from the listener."
+    }
+  },
+  "SpatialInventorySorter": {
+    "description": "Previews a new arrangement for a grid, applies the checked plan, and retains one level of undo. Create one sorter for each independent sort history.",
+    "methods": {
+      "apply_preview": "Commit the pending plan if the inventory baseline and placement policy still permit it. A successful sort with placement changes records the prior placements for undo. A rejected plan preserves the grid.",
+      "can_undo": "Return whether the sorter retains a committed sort to undo. Intervening edits can still make undo fail.",
+      "cancel_preview": "Discard the pending preview without changing the inventory.",
+      "has_preview": "Return whether an unapplied sort plan is available.",
+      "preview": "Build a detached sort plan. Pinned items keep their positions and orientations. The optional policy receives [code]id[/code], [code]footprint[/code], [code]origin[/code], [code]rotated[/code], [code]source[/code], [code]destination[/code], [code]swap_id[/code], and [code]action[/code]. Return an empty String to accept a candidate. The result reports [code]error[/code], plus [code]grid_size[/code], [code]placements[/code], and [code]changed_count[/code] on success.",
+      "undo": "Restore the placements before the last applied sort, checking expected state and any supplied placement policy. A conflict preserves the grid and keeps undo available."
+    }
+  },
+  "SpatialInventoryStackAdapter": {
+    "description": "Connects placement operations to stack records stored by the game. Build a merge or split plan from live records, then commit it through your synchronous record callback. Use [method invalidate_stack_records] after external edits to the host records.",
+    "methods": {
+      "commit_detached_split": "Recheck and commit a split through the record callback. The [code]claim_cursor[/code] callable receives no arguments and returns a Godot Error. Use it to claim the newly created stack in the game's cursor or held-item model.",
+      "commit_merge": "Recheck the merge plan against current records and commit the quantities through the host callback. Pass an optional no-argument placement callback returning a Godot Error to pair the record changes with placement changes.",
+      "commit_split": "Recheck the split plan, then create the new stack and place it in the destination at the given origin and rotation. Pass its unrotated footprint.",
+      "get_apply_changes": "Return the host callback that stages and commits stack record changes.",
+      "get_describe_stack": "Return the callback used to look up current stack records.",
+      "get_merge_capacity": "Return the remaining capacity of the stack if its compatibility key matches [code]key[/code], otherwise return 0.",
+      "get_split_limits": "Return an [code]error[/code] code and, on success, the current [code]quantity[/code] and [code]max_amount[/code] available for a split. A split leaves at least one unit in the source.",
+      "get_stack_key": "Return the current compatibility key, or an empty StringName if the stack record is unavailable or invalid.",
+      "get_stack_records_revision": "Return the revision tracking changes to the host-owned stack records.",
+      "invalidate_stack_records": "Advance the record revision after the host updates quantities or stack records outside the adapter.",
+      "plan_merge": "Read the source and target records and build a checked merge plan for compatible stacks. A positive [code]limit[/code] caps the units moved. Returns an [code]error[/code] code and, on success, a plan with [code]moved[/code], [code]remaining[/code], and [code]changes[/code].",
+      "plan_split": "Plan a transfer of part of the source quantity to an unused [code]new_id[/code]. The amount must be positive and less than the source quantity. Returns an [code]error[/code] code and, on success, a plan for one of the split commit methods.",
+      "set_apply_changes": "Set the callback taking expected record edits and a placement commit callable. It verifies and stages the edits, calls the commit synchronously when provided, and rolls back the staged records if that call fails.",
+      "set_describe_stack": "Set the callback taking an item ID and returning [code]key[/code], [code]quantity[/code], and [code]max_quantity[/code], or an empty dictionary when no stack record exists."
+    },
+    "properties": {
+      "apply_changes": "Host [code]apply_changes(rows, commit) -> Error[/code] callback. Each row has [code]id[/code], [code]before[/code], and [code]after[/code], with optional [code]source_id[/code] on creation. An empty record means absence. Validate the expected records and roll back on commit failure.",
+      "describe_stack": "Host lookup callback taking an item ID. Return a dictionary with a nonempty compatibility [code]key[/code] and positive integer [code]quantity[/code] and [code]max_quantity[/code], with quantity at most the maximum. Return an empty dictionary when the ID has no stack record."
+    }
+  },
+  "SpatialInventoryStaging": {
+    "description": "A temporary grid that remembers each staged item's original inventory and placement. Use its transfer methods to preserve origin tracking. An unsuccessful bulk restore leaves the staged items in the tray.",
+    "methods": {
+      "configure": "Set the staging grid dimensions in cells. Return [code]ERR_BUSY[/code] when trying to resize a tray with recorded items.",
+      "get_batch_policy": "Return the optional policy that checks the complete restoration batch.",
+      "get_drop_policy": "Return the policy for proposed destination placements.",
+      "get_inventory": "Return the live staging grid for display and placement queries. Use the staging model to edit it.",
+      "get_last_reason": "Return the last operation's explanatory message, or an empty string if there is no reason to report.",
+      "get_pickup_policy": "Return the policy for picking an item up from its source grid.",
+      "is_empty": "Return true when the tray has no placements and no recorded original placements.",
+      "place_item": "Transfer a staged item to the requested external grid, origin, and rotation. On success the item leaves the tray and its original placement record is cleared.",
+      "restore_all": "Try to restore every staged item to its original inventory, origin, and rotation in a single checked batch. If a placement or policy rejects the restore, read [member last_reason].",
+      "set_batch_policy": "Set a callback that evaluates all before-and-after placement rows for a restore. Return an empty String to allow the batch or a reason to reject it.",
+      "set_drop_policy": "Set a callback that checks a proposed destination placement. Return an empty String to allow the move or a reason to reject it.",
+      "set_pickup_policy": "Set a callback that checks whether the source item can be lifted. Return an empty String to allow pickup or a reason to reject it.",
+      "stage_from": "Move a complete item from another grid into the tray and remember the original placement. Returns an error if the item is missing, already tracked, blocked by a policy, or does not fit.",
+      "try_close": "Return [code]OK[/code] when the tray is empty. If [code]restore[/code] is true, attempt to restore everything first. Otherwise an occupied tray returns [code]ERR_BUSY[/code]."
+    },
+    "properties": {
+      "batch_policy": "Optional policy called with all before-and-after placement rows during a bulk restore. Return an empty String to approve the batch.",
+      "drop_policy": "Optional policy called with a destination placement context. Use the same context contract as [SpatialInventoryActions].",
+      "inventory": "The live grid used by the staging tray. Use the tray methods to keep placements and tracked origins in sync.",
+      "last_reason": "Explanation for the most recent staging outcome.",
+      "pickup_policy": "Optional policy called with a source placement context. Use the same context contract as [SpatialInventoryActions]."
+    }
+  },
+  "SpatialInventoryTrade": {
+    "description": "Coordinates an invitation and item or currency exchange between two actors. Register each actor with a backpack and route all offer edits through this model. The game owns authoritative item and identity records. Trade actions return dictionaries with a Godot [code]error[/code], [code]reason[/code], changed placements, and completion details when applicable.",
+    "methods": {
+      "accept": "Accept a pending invitation as its receiver and enter the active phase if the eligibility policy allows it.",
+      "cancel": "Cancel a pending or active trade as a participant. Active cancellation attempts to return offers to the owners, with recovery grids available when a backpack cannot accept the return.",
+      "export_snapshot": "Return a version 2 snapshot of the trade phase, offers, reservations, escrow, and recovery state. Save it alongside the backpacks and game-owned item records. Returns an empty dictionary while a change is committing.",
+      "get_allocate_stack_id": "Return the callback that allocates unused IDs for escrow or split stacks.",
+      "get_apply_stack_changes": "Return the host callback that commits quantity record changes with the paired placement transaction.",
+      "get_currency_offers": "Return a detached dictionary of offered amounts keyed by currency ID. The amounts are promises until settlement.",
+      "get_describe_stack": "Return the callback that describes current stack records by item ID.",
+      "get_initiator": "Return the actor that opened the invitation, or 0 when idle.",
+      "get_item_eligibility": "Return the callback that evaluates whether an item can be offered or exchanged.",
+      "get_offer": "Return the actor's live offer grid, or null for an unknown actor. Use it as a projection for UI and route mutations through the trade methods.",
+      "get_offer_stack": "Return the offered stack's [code]key[/code], [code]quantity[/code], [code]max_quantity[/code], [code]source_id[/code], and [code]record_id[/code]. Returns an empty dictionary if the placement has no escrow stack.",
+      "get_participant_eligibility": "Return the callback that checks whether the actors can trade at the current stage.",
+      "get_phase": "Return the current invitation or exchange phase.",
+      "get_receiver": "Return the invited actor, or 0 when idle.",
+      "get_recovery": "Return the actor's recovery grid, or null for an unknown actor. Use it for returns from cancellation when the backpack lacks space.",
+      "get_reserved_source_ids": "Return the IDs of the actor's source items reserved by their offer.",
+      "get_revision": "Return the revision of committed trade edits.",
+      "get_wallet": "Return the configured [SpatialInventoryWallet], or null if no wallet is assigned.",
+      "import_snapshot": "Validate and apply a saved trade snapshot against the registered participants, their backpacks, and current host stack records. An incompatible snapshot returns an error and preserves committed state.",
+      "is_locked": "Return whether the actor has accepted their current offer by locking it.",
+      "is_reserved": "Return whether the source item ID is reserved by the actor's offer. The host should keep reserved items out of unrelated moves or record edits.",
+      "merge_offer_stacks": "Merge compatible units from one escrow stack into another in the actor's offer, retaining their source allocations. A positive limit caps the units moved, and a zero limit uses available capacity.",
+      "move_offer": "Change the placement of an offered item inside the actor's offer grid. Use the offer placement ID.",
+      "offer_item": "Offer a complete item from the actor's backpack. [code]Vector2i(-1, -1)[/code] selects first fit, and a null rotation uses the source orientation. The trade reserves the source and handles escrow when the item is a stack.",
+      "offer_items": "Try to offer whole items in the caller's order. Skips items that are missing, reserved, disallowed, or unable to fit, and commits the accepted subset together.",
+      "offer_quantity": "Offer part of a placed stack. Set [code]target_id[/code] to add the quantity to a compatible existing escrow stack. Configure all three stack callbacks before using quantity offers.",
+      "register_participant": "Associate a positive actor ID with a configured backpack. Register exactly two actors while idle. The optional offer grid must be empty, and both optional offer and recovery grids must match the requested dimensions. The model creates any omitted grids.",
+      "request": "Open an invitation from the actor to the other registered participant. Eligibility checks must pass and both recovery grids must be empty. A successful request changes the phase to [code]REQUESTED[/code].",
+      "set_allocate_stack_id": "Set the host callback that takes the source item ID and returns a fresh unused instance ID for a stack record.",
+      "set_apply_stack_changes": "Set the host callback for checked quantity record edits. Stage the changes, invoke the paired commit synchronously, and roll back on failure.",
+      "set_currency_offer": "Set the nonnegative amount promised for a currency. Use 0 to remove an offer. Positive amounts require a wallet and sufficient current funds. The wallet changes during settlement, and a changed offer clears both locks.",
+      "set_describe_stack": "Set the host callback for [code]key[/code], [code]quantity[/code], and [code]max_quantity[/code] by item ID. Return an empty dictionary if the ID has no stack record.",
+      "set_item_eligibility": "Set the optional rule for offering and settling items. Return an empty string to allow the action or a reason to deny it.",
+      "set_lock": "Lock or unlock the actor's offer. Locking the second offer attempts settlement immediately. Inspect [code]completed[/code] and [code]error[/code] to distinguish a settled trade from an offer that is waiting or failed validation.",
+      "set_participant_eligibility": "Set the optional rule for participant eligibility during invitation, acceptance, offer, and settlement. Return an empty string to allow the action or a reason to deny it.",
+      "set_wallet": "Attach the wallet used to check funds and commit currency balances during settlement. Replace or clear it while no currency offers or commits are pending.",
+      "withdraw": "Return the offered item or escrow stack to the actor's backpack. Optionally specify its destination origin and rotation, or a compatible target stack ID.",
+      "withdraw_items": "Plan the return of several offered IDs to the actor's backpack and commit their returns together if the placement and record edits succeed."
+    },
+    "properties": {
+      "allocate_stack_id": "Optional callback taking a source item ID and returning a new unique ID for an escrow or split stack.",
+      "apply_stack_changes": "Optional callback for synchronous expected-value stack edits. It receives the change rows and a commit callable and owns rollback of the staged stack records if the paired commit fails.",
+      "describe_stack": "Optional callback taking an item ID and returning its stack compatibility key, quantity, and maximum quantity in a dictionary.",
+      "initiator": "Actor ID that requested the trade, or 0 when idle.",
+      "item_eligibility": "Optional rule receiving [code]stage[/code], [code]actor[/code], [code]other_actor[/code], [code]id[/code], [code]placement[/code], [code]stack[/code], and [code]quantity[/code]. Return an empty string to allow the offer or exchange.",
+      "participant_eligibility": "Optional rule receiving [code]stage[/code], [code]actor[/code], and [code]other_actor[/code]. Return an empty string to allow the operation.",
+      "phase": "Current trade phase. Use [code]IDLE[/code], [code]REQUESTED[/code], and [code]ACTIVE[/code] to check the lifecycle.",
+      "receiver": "Actor ID invited to trade, or 0 when idle.",
+      "revision": "Revision of committed trade edits.",
+      "wallet": "Wallet consulted for proposed amounts and updated as part of settling currency offers."
+    },
+    "constants": {
+      "ACTIVE": "Both actors have accepted the invitation. Unlocked offers can be edited.",
+      "IDLE": "There is no pending invitation or active trade.",
+      "MAX_BALANCE": "Largest supported nonnegative balance or currency amount.",
+      "MAX_CURRENCIES_PER_OFFER": "Maximum number of distinct currencies one actor may offer.",
+      "MAX_RETURN_SOURCES": "Maximum number of source allocations in a return.",
+      "MAX_SNAPSHOT_REVISION": "Largest trade revision accepted when importing a snapshot.",
+      "REQUESTED": "An invitation is waiting for the receiver to accept or a participant to cancel.",
+      "SNAPSHOT_VERSION": "Version of the exported trade snapshot schema."
+    }
+  },
+  "SpatialInventoryWallet": {
+    "description": "Stores nonnegative integer amounts for positive actor IDs and nonempty StringName currency IDs. Its batch operation can pair balance updates with a synchronous commit. Implement both virtual methods if your game stores balances elsewhere.",
+    "methods": {
+      "_apply_balance_changes": "Override to commit balances in a game-owned store. Verify expected amounts, stage all updates, invoke the supplied commit callable synchronously when present, and restore the previous balances if it returns an error.",
+      "_get_balance": "Override to read the authoritative integer amount for the actor and currency. Return 0 when no balance is recorded.",
+      "apply_balance_changes": "Compare and update a batch of dictionaries with [code]actor[/code], [code]currency[/code], [code]before[/code], and [code]after[/code]. A stale expected balance returns [code]ERR_BUSY[/code]. Stage the full batch before the optional no-argument commit callback. A callback error rolls all balances back.",
+      "get_balance": "Return the current integer amount for the actor and currency, or 0 when no balance is recorded by the default store.",
+      "set_balance": "Set a single balance through the expected-value batch operation. Amounts must be nonnegative, and setting 0 clears the stored amount in the default wallet."
+    }
+  }
+}

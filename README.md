@@ -1,55 +1,38 @@
-# Mintlify Starter Kit
+<!-- Copyright Francesco Di Blasi 2026 - All Rights Reserved -->
 
-Use the starter kit to get your docs deployed and ready to customize.
+# Crimson Framework documentation
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+This repository contains the Mintlify guides and Godot scripting API reference for [Crimson Framework](https://github.com/FrankFloydus/crimson-framework). The current documentation covers [v0.0.3](https://github.com/FrankFloydus/crimson-framework/releases/tag/v0.0.3).
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+## Preview and check a change
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+Run these commands from the directory containing `docs.json`. Install Node.js and use the Mintlify CLI through `npx`.
 
-## AI-assisted writing
-
-Set up your AI coding tool to work with Mintlify:
-
-```bash
-npx skills add https://mintlify.com/docs
+```powershell
+npx mint@latest dev --no-open
 ```
 
-This command installs Mintlify's documentation skill for your configured AI tools like Claude Code, Cursor, Windsurf, and others. The skill includes component reference, writing standards, and workflow guidance.
+Open the local URL printed by Mintlify. Run these checks before opening a pull request.
 
-See the guides for [Claude Code](https://www.mintlify.com/docs/guides/claude-code), [Codex](https://www.mintlify.com/docs/guides/codex), [Cursor](https://www.mintlify.com/docs/guides/cursor), and [Devin Desktop](https://www.mintlify.com/docs/guides/devin-desktop) for tool-specific setup.
-
-## Development
-
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
-
-```
-npm i -g mint
+```powershell
+npx mint@latest validate
+npx mint@latest broken-links --check-anchors
 ```
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
+## Update the API reference
 
+The reference generator combines the framework's class XML prose with signatures exported by Godot from the release addon. The `scripts/api-prose/` files supply descriptions that have yet to be added to the framework's class XML. Update descriptions in the framework XML when you change a binding there. Remove any overlapping supplement when you regenerate this site.
+
+Keep the guides and the generated reference tied to the same framework release. Review the release notes, update affected examples and download links, regenerate the reference, and review class and navigation changes together. Use the class pages in `api/classes/` as generated output. Edit guides and `api/overview.mdx` directly.
+
+Fetch the release tag in your local framework checkout. Build a trusted Debug publisher DLL from that tag with the fixture transport disabled. The standard addon comes from the ZIP already tracked in the release tag. The publisher build steps are in the [trusted publisher guide](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/STEAM_PUBLISHER.md).
+
+Run from the docs repository. Here `..` is the framework checkout. Update the DLL paths for your machine.
+
+```powershell
+$godot = 'C:\path\to\Godot_v4.7-stable_win64_console.exe'
+$publisher = '..\framework\bin\publisher\windows\crimson_framework.windows.template_debug.x86_64.dll'
+python scripts/generate_api.py --framework .. --ref v0.0.3 --godot $godot --publisher-dll $publisher
 ```
-mint dev
-```
 
-View your local preview at `http://localhost:3000`.
-
-## Publishing changes
-
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
-
-## Need help?
-
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+The generator writes the class pages and their navigation. Add `--check` to compare the checkout with the expected output. Add `--gaps` to list descriptions that still need prose. Use `--binding-docs` and `--publisher-binding-docs` if you already exported the Godot class XML for both builds. Run `python scripts/generate_api.py --help` for all options.

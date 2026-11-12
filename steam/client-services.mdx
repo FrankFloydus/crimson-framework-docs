@@ -1,0 +1,84 @@
+---
+title: Use Steam client services
+description: "Start a persistent Steam scope and use typed services for your app."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+## Start a client
+
+Once the [runtime is staged](/steam/setup), attach a script to a persistent node and boot the Steam client in `_ready()`. This example uses Valve's Spacewar AppID. Replace `480` with the AppID you expect for your game.
+
+```gdscript
+extends Node
+
+func _ready() -> void:
+    var steam := SteamClient.boot(self, 480)
+    if steam == null:
+        push_error("Could not attach the Steam client.")
+        return
+    if not steam.is_ready():
+        push_error(steam.get_initialization_error())
+        return
+
+    print("Steam game language: ", steam.apps().current_language())
+    print("Steam online: ", steam.is_online())
+```
+
+`boot()` returns `null` if it cannot attach to an owner in the tree. If attachment succeeds but initialization fails, the attached client reports the cause through `get_initialization_error()`. An initialized local client may still be offline. For example, Steam Offline Mode can retain cached progression. Call Steam services on Godot's main thread. [SteamClient](/api/classes/SteamClient)
+
+If you already booted a game with a Steam provider, get the game's scope with `SteamServices.for_game(game)`. Pass that scope or an individual typed service to your UI or game code. Removing the scope owner from the tree expires its service handles. If Steam reports `runtime_lost`, defer restarting a standalone client until the callback returns and obtain new handles after recovery. [SteamServices](/api/classes/SteamServices)
+
+## Choose a service
+
+| Use case | Service |
+| --- | --- |
+| App language, installed DLC, branch, and notification launch IDs | [SteamApps](/api/classes/SteamApps) through `apps()` |
+| Friends, localized display status, and Steam panes | [SteamFriends](/api/classes/SteamFriends), [SteamPresence](/api/classes/SteamPresence), and [SteamOverlay](/api/classes/SteamOverlay) |
+| Stats, achievements, and ranked results | [SteamStats](/api/classes/SteamStats) and [SteamLeaderboards](/api/classes/SteamLeaderboards) |
+| Files, quota, shared files, and write batch hints | [SteamCloud](/api/classes/SteamCloud) |
+| Workshop and Steam Inventory | [SteamWorkshop](/api/classes/SteamWorkshop) and [SteamInventory](/api/classes/SteamInventory) |
+| Gamepad actions, device settings, and on-screen keyboard | [SteamInput](/api/classes/SteamInput) and [SteamDevice](/api/classes/SteamDevice) |
+| Game Recording, screenshots, and Remote Play | [SteamTimeline](/api/classes/SteamTimeline), [SteamScreenshots](/api/classes/SteamScreenshots), and [SteamRemotePlay](/api/classes/SteamRemotePlay) |
+| Steam HTTP requests and redacted SDK warnings | [SteamHttp](/api/classes/SteamHttp) and [SteamDiagnostics](/api/classes/SteamDiagnostics) |
+| Web tickets and checkout | [SteamAuth](/api/classes/SteamAuth) and [SteamPurchases](/api/classes/SteamPurchases), with a [publisher backend](/steam/publisher) |
+
+## Record progression
+
+Publish the stat and achievement definitions for your AppID in Steamworks. Use their exact API names. When one game event changes several values, collect the edits and submit them together.
+
+```gdscript
+var result := steam.stats().edit() \
+    .set_int("wins", total_wins) \
+    .unlock("first_win") \
+    .submit()
+if not result.ok:
+    push_warning(result.message)
+```
+
+The result describes the submission. `value.applied` counts edits accepted into Steam's cache, and `value.failed_at` identifies the first rejected edit when there is one. Accepted edits can remain in the cache after a later error. Observe `stats_stored` for Steam's app-wide persistence result. For scores governed by a dedicated authority or trusted backend, use the [dedicated progression](/steam/dedicated-servers#record-server-owned-progression) or [publisher workflow](/steam/publisher) for that authority.
+
+## Save a profile to Cloud
+
+Enable Cloud and allocate quota for your AppID in Steamworks. Use a dedicated file key for the game's profile. Check each typed result before consuming its value.
+
+```gdscript
+var cloud := steam.cloud()
+var written: SteamResult = await cloud.write("player-profile.json", profile_bytes)
+if written.ok:
+    var loaded: SteamBytesResult = await cloud.read("player-profile.json")
+    if loaded.ok:
+        print("Read %d bytes from Steam Cloud." % loaded.value.size())
+```
+
+Use `write_file()` and `read_file()` when you need to keep an operation handle. A cancelled observation can leave a submitted write in flight. For several related writes or deletes, `begin_write_batch()` supplies a sync hint. Close the returned batch even if one write fails. Each operation still has its own result. Check actual sync on a second device using the same test account. [Steam Cloud write batches](https://partner.steamgames.com/doc/api/ISteamRemoteStorage#BeginFileWriteBatch)
+
+## Open the Steam Overlay
+
+Call `steam.overlay().open_achievements()` from an intentional UI action once `steam.overlay().is_ready()` is true. `OK` confirms that Crimson submitted the request. Confirm the rendered pane during testing. Use `activation_changed(active)` to suspend local gameplay input and restore the relevant focus when the Overlay closes. Keep the multiplayer simulation running.
+
+For a direct, windowed development launch, pass `--crimson-steam-overlay=480` as a user argument after Godot's `--` separator, using the launch AppID. Crimson initializes Steam before Godot creates the display. Enable the Overlay in Steam and run the [rendered test](/steam/testing#check-the-overlay-and-achievements). [Valve's Overlay requirements](https://partner.steamgames.com/doc/features/overlay#requirements)
+
+## Consume Steam results
+
+Read `ok` before using a result's `value`. Some operations expose `wait()` on an operation handle, while convenience methods can be awaited directly. Check the signature in the [API reference](/api/overview). For Steam HTTP, a completed response can still have a 4xx or 5xx status. Check `response.value.is_successful()` when you need a 2xx response. For Steam IDs documented as decimal strings, keep them as strings to preserve their full range.

@@ -1,0 +1,69 @@
+---
+title: Test and troubleshoot
+description: "Run Steam fixtures and verify startup, Overlay, multiplayer, and publisher behavior."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+## Run the Steam smoke tests
+
+Use PowerShell 7 from the root of the framework checkout, with Godot 4.7 for Windows x86-64, the console executable and its companion executable in the same directory, and a Steam-enabled build. Sign in to a Steam test account for Spacewar.
+
+```powershell
+$godot = 'C:\path\to\Godot_v4.7-stable_win64_console.exe'
+$test = '.\framework\scripts\Test-Steam.ps1'
+& $test -GodotExe $godot -Case all -Mode spacewar -Target template_debug
+& $test -GodotExe $godot -Case all -Mode missing -Target template_debug
+```
+
+The runner stages isolated projects and prints their log directory. Omit `-Target` to test both Crimson DLLs. Use a focused case such as `client`, `overlay`, `cloud`, `lobbies`, or `http`. The HTTP case uses Python 3 on `PATH`. Spacewar uses Valve's test AppID. Its automated suite exercises read and lifecycle behavior along with temporary private lobbies, local networking, and temporary presence keys. Achievement unlocks, remote invitations, public publication, and other live actions have dedicated tests.
+
+The `missing` lane stages the Steam-enabled extension without Valve's DLL. For an SDK-disabled build, use `-Mode sdk-off -BinaryDirectory $sdkOffBin` with its separate build directory. For cached progression in Steam Offline Mode, first run the signed `client` and `stats` fixtures, then switch Steam to Offline Mode and run `-Case client -Mode offline`. [Full fixture guide](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/STEAM_TESTING.md)
+
+## Check the Overlay and achievements
+
+Enable the Steam Overlay. The headless `overlay` check exercises service behavior. Use a rendered window to see a Steam pane or notification.
+
+```powershell
+& $test -GodotExe $godot -Case achievement_preview -Mode spacewar
+```
+
+Press **Unlock achievement** only on the test account you intend to change. The fixture requests Valve's **Winner** achievement, waits for Steam callbacks, and reads back the result. Use an account where that achievement is still locked to see a fresh notification. For your own app, use `-Mode app -AppId <your-AppID> -Achievement <API-name>` with an entitled test account and a published, client-settable test achievement. [Valve achievement setup](https://partner.steamgames.com/doc/features/achievements/ach_guide)
+
+## Verify multiplayer
+
+For a listen lobby, use the same build and lobby namespace on two machines signed in to different Steam accounts. Host a private lobby and invite the guest. Verify the guest reaches the world after accepting through Steam. Check the verified Steam identity on the authority, then leave and confirm the lobby or membership is released.
+
+For a dedicated smoke test, use the signed Spacewar setup on the guest. The host uses a separate anonymous Steam GameServer pipe and can run on the same machine. Use the same staged Godot engine and imported project. Run from the staging engine directory in separate PowerShell windows with absolute paths in `$engine` and `$project`.
+
+```powershell
+# Host window
+& $engine --headless --path $project --script res://demo/tests/steam_dedicated.gd -- host-reconnect crimson-qa 27015 27016 127.0.0.1
+
+# Guest window. Replace the placeholder with the host's CRIMSON_STEAM_DEDICATED_READY locator.
+& $engine --headless --path $project --script res://demo/tests/steam_dedicated.gd -- guest-reconnect crimson-qa '<s1 locator>'
+```
+
+The reconnect fixture checks that a rejected attempt does not prevent the exact account from connecting on a fresh attempt. The framework fixture guide also covers friend discovery, real P2P, voice, browser publication, and app-owned progression. [Multiplayer fixture commands](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/STEAM_TESTING.md#run-the-multiplayer-fixtures)
+
+## Verify publisher operations
+
+In a separate trusted build directory, enable both the publisher module and its test transport. Set `$trustedMockBin` to the directory containing the trusted test DLL. This suite uses controlled inputs and does not call Valve's publisher endpoints.
+
+```powershell
+& $test -GodotExe $godot -Case all -Mode mock -Target template_debug -BinaryDirectory $trustedMockBin
+```
+
+Build with the test transport disabled for an authorized live run. Wallet tests require your authorized AppID, publisher permissions, an entitled account, and a durable test store. Encrypted ownership requires the matching app's SDK Auth key and an entitled test account. [Publisher verification guide](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/STEAM_PUBLISHER.md#verify-locally)
+
+## Diagnose common failures
+
+| Symptom | Check |
+| --- | --- |
+| The Crimson class itself is missing in Godot | Verify the Godot version, platform, precision, and addon path. [Installation](/installation) |
+| The Steam client attaches but cannot initialize | Read `get_initialization_error()`. Confirm that the Steam-enabled extension finds `steam_api64.dll`, that Steam is signed in under the same Windows user, and that launch context matches the expected AppID. [Steamworks setup](/steam/setup) |
+| The local client is ready while online services fail | Check `is_online()` separately. Cached app data can be available during Steam Offline Mode. |
+| The Overlay reports `ERR_BUSY` | Check that Steam Overlay is enabled and the game is rendering. For a direct launch, pass `--crimson-steam-overlay=<AppID>` after the `--` separator. Wait for `steam.overlay().is_ready()`. |
+| A Steam lobby is missing or the guest cannot join | Check visibility, lobby membership, open seats, exact AppID, shared namespace and virtual port. For a private lobby, accept the Steam invitation on the guest's account. |
+| A ready server is absent from the browser | Confirm that the server requested Internet advertisement and uses the app's product metadata. Check the query UDP port and use a separate client to observe it. [Dedicated discovery](/steam/dedicated-servers#list-the-server-in-steam) |
+| A previously working handle now reports unavailable | Resolve it from the current client or game after a stop, leave, recovery, or replacement. |
