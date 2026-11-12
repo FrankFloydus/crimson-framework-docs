@@ -22,16 +22,3 @@ get_license_owner_steam_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_license_owner_steam_id(
-    steam_app_ownership: SteamAppOwnership,
-    apply_license_owner_steam_id: Callable
-) -> void:
-    var result: String = steam_app_ownership.get_license_owner_steam_id()
-    apply_license_owner_steam_id.call(result)
-```

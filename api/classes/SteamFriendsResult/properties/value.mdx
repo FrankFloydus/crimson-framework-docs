@@ -26,20 +26,3 @@ var value: SteamFriend[]
 ## Description
 
 Empty if no friends match or the read failed.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_friends_result: SteamFriendsResult, results_list: ItemList) -> void:
-    if steam_friends_result == null:
-        return
-    if not steam_friends_result.ok:
-        push_warning(steam_friends_result.message)
-        return
-    var value: Array[SteamFriend] = steam_friends_result.value
-    results_list.clear()
-    for entry: SteamFriend in value:
-        results_list.add_item(str(entry.display_name))
-```

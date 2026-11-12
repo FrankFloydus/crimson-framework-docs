@@ -22,23 +22,3 @@ var value: SteamCloudFile[]
 | Type | `SteamCloudFile[]` |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamCloudFilesResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_cloud_files_result: SteamCloudFilesResult,
-    results_list: ItemList
-) -> void:
-    if steam_cloud_files_result == null:
-        return
-    if not steam_cloud_files_result.ok:
-        push_warning(steam_cloud_files_result.message)
-        return
-    var value: Array[SteamCloudFile] = steam_cloud_files_result.value
-    results_list.clear()
-    for entry: SteamCloudFile in value:
-        results_list.add_item(str(entry.name))
-```

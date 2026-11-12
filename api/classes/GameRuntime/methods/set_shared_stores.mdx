@@ -29,19 +29,4 @@ set_shared_stores(store_ids: PackedStringArray) -> Error
 
 The default view exposes no shared stores. A custom projector takes precedence. Returns a Godot Error.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_shared_stores(
-    game_runtime: GameRuntime,
-    store_ids: PackedStringArray,
-    status_label: Label
-) -> void:
-    var result: Error = game_runtime.set_shared_stores(store_ids)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set shared stores accepted."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

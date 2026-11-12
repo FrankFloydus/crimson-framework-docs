@@ -18,13 +18,3 @@ is_connected() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_connected(steam_controller: SteamController, action_button: Button) -> void:
-    var result: bool = steam_controller.is_connected()
-    action_button.disabled = not result
-```

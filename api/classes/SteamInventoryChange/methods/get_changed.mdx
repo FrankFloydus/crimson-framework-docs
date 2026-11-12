@@ -20,17 +20,3 @@ get_changed() -> SteamItemInstance[]
 ## Return value
 
 `SteamItemInstance[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_changed(
-    steam_inventory_change: SteamInventoryChange,
-    add_changed_entry: Callable
-) -> void:
-    var result: Array[SteamItemInstance] = steam_inventory_change.get_changed()
-    for entry: SteamItemInstance in result:
-        add_changed_entry.call(entry)
-```

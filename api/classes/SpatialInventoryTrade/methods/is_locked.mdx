@@ -24,17 +24,3 @@ is_locked(actor: int) -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_locked(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    status_label: Label
-) -> void:
-    var result: bool = spatial_inventory_trade.is_locked(actor)
-    status_label.text = "Locked: yes" if result else "Locked: no"
-```

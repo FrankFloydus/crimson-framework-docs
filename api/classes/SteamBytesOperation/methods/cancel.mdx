@@ -22,16 +22,3 @@ cancel() -> Error
 ## Description
 
 Steam drains the submitted call and holds any file reservation until then. Returns `ERR_DOES_NOT_EXIST` when observation has already ended.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(steam_bytes_operation: SteamBytesOperation, status_label: Label) -> void:
-    var result: Error = steam_bytes_operation.cancel()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Cancel accepted."
-```

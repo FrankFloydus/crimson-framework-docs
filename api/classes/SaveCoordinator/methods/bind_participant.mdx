@@ -29,18 +29,3 @@ bind_participant(id: String, adapter: Object) -> bool
 ## Description
 
 The adapter provides `save_capture()` and `save_stage(dto, candidate)`, with optional `save_default()` and `save_link(candidate)`. Returns false if the adapter is invalid, the ID is undeclared, or there is queued or active save or load work.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_bind_participant(
-    save_coordinator: SaveCoordinator,
-    id: String,
-    adapter: Object,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.bind_participant(id, adapter)
-    status_label.text = "Bind participant: yes" if result else "Bind participant: no"
-```

@@ -26,23 +26,3 @@ var value: SteamLeaderboardPage
 ## Description
 
 A successful query may return a page with no rows.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_leaderboard_page_result: SteamLeaderboardPageResult,
-    apply_value: Callable
-) -> void:
-    if steam_leaderboard_page_result == null:
-        return
-    if not steam_leaderboard_page_result.ok:
-        push_warning(steam_leaderboard_page_result.message)
-        return
-    var value: SteamLeaderboardPage = steam_leaderboard_page_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

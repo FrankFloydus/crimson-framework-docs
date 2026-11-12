@@ -18,13 +18,3 @@ is_valid() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_valid(steam_timeline_event: SteamTimelineEvent, status_label: Label) -> void:
-    var result: bool = steam_timeline_event.is_valid()
-    status_label.text = "Valid: yes" if result else "Valid: no"
-```

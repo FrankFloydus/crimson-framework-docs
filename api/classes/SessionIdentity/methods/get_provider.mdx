@@ -18,13 +18,3 @@ get_provider() -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_provider(session_identity: SessionIdentity, provider_label: Label) -> void:
-    var result: StringName = session_identity.get_provider()
-    provider_label.text = "Provider: %s" % str(result)
-```

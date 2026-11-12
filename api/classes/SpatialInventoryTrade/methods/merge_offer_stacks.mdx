@@ -31,22 +31,3 @@ merge_offer_stacks(actor: int, source_id: StringName, target_id: StringName, lim
 ## Description
 
 A positive limit caps the units moved, and a zero limit uses available capacity.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_merge_offer_stacks(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    source_id: StringName,
-    target_id: StringName,
-    limit: int,
-    apply_merge_offer_stacks: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_trade.merge_offer_stacks(actor, source_id, target_id, limit)
-    if result.is_empty():
-        return
-    apply_merge_offer_stacks.call(result)
-```

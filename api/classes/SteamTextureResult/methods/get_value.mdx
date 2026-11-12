@@ -20,18 +20,3 @@ get_value() -> Texture2D
 ## Return value
 
 `Texture2D`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_texture_result: SteamTextureResult, preview: TextureRect) -> void:
-    if steam_texture_result == null:
-        return
-    if not steam_texture_result.ok:
-        push_warning(steam_texture_result.message)
-        return
-    var result: Texture2D = steam_texture_result.get_value()
-    preview.texture = result
-```

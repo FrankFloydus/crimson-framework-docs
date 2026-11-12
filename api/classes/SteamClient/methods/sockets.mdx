@@ -19,14 +19,4 @@ sockets() -> SteamSockets
 
 [`SteamSockets`](/api/classes/SteamSockets)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_sockets(steam_client: SteamClient, apply_sockets: Callable) -> void:
-    var result: SteamSockets = steam_client.sockets()
-    if result == null:
-        return
-    apply_sockets.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

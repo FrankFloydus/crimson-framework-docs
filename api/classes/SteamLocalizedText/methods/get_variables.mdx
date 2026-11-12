@@ -22,18 +22,3 @@ get_variables() -> Dictionary[StringName, String]
 ## Return value
 
 `Dictionary[StringName, String]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_variables(
-    steam_localized_text: SteamLocalizedText,
-    apply_variables: Callable
-) -> void:
-    var result: Dictionary[StringName, String] = steam_localized_text.get_variables()
-    if result.is_empty():
-        return
-    apply_variables.call(result)
-```

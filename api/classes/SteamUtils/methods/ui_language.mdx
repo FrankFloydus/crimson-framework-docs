@@ -22,18 +22,3 @@ ui_language() -> String
 ## Description
 
 For the selected game language, use `SteamApps.current_language()`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_ui_language(steam_client: SteamClient, ui_language_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_utils: SteamUtils = steam_client.utils()
-    if steam_utils == null:
-        return
-    var result: String = steam_utils.ui_language()
-    ui_language_label.text = "Ui language: %s" % str(result)
-```

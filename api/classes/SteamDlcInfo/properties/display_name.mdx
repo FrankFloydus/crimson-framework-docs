@@ -26,13 +26,3 @@ var display_name: String
 ## Description
 
 Steam can supply an empty name.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_display_name(steam_dlc_info: SteamDlcInfo, display_name_label: Label) -> void:
-    var display_name: String = steam_dlc_info.display_name
-    display_name_label.text = "Display name: %s" % str(display_name)
-```

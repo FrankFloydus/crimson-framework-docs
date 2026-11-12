@@ -29,20 +29,3 @@ with_item(sku: StringName, quantity: int) -> SteamPurchaseCart
 ## Description
 
 A SKU uses 1 to 64 letters, digits, dots, dashes, or underscores. A cart holds up to 32 SKUs. Quantities range from 1 through 1000. Invalid selections return null.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_with_item(
-    steam_purchase_cart: SteamPurchaseCart,
-    sku: StringName,
-    quantity: int,
-    apply_item: Callable
-) -> void:
-    var result: SteamPurchaseCart = steam_purchase_cart.with_item(sku, quantity)
-    if result == null:
-        return
-    apply_item.call(result)
-```

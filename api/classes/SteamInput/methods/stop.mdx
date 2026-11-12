@@ -18,18 +18,3 @@ stop() -> void
 ## Description
 
 The last active lease shuts down Steam Input. Stopping again is safe.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_stop(steam_client: SteamClient, controller_rows: ItemList) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_input: SteamInput = steam_client.input()
-    if steam_input == null:
-        return
-    steam_input.stop()
-    controller_rows.clear()
-```

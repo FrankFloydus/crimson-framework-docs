@@ -20,13 +20,3 @@ is_persisted() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_persisted(steam_cloud_file: SteamCloudFile, status_label: Label) -> void:
-    var result: bool = steam_cloud_file.is_persisted()
-    status_label.text = "Persisted: yes" if result else "Persisted: no"
-```

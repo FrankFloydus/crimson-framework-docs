@@ -23,15 +23,4 @@ listing() -> SteamListing
 
 After closing, return the initial snapshot.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_listing(steam_lobby: SteamLobby, name_label: Label) -> void:
-    var result: SteamListing = steam_lobby.listing()
-    if result == null:
-        return
-    var name: String = result.name
-    name_label.text = "Name: %s" % str(name)
-```
+[See gameplay examples for `SteamLobby`](/api/classes/SteamLobby#examples).

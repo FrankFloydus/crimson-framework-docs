@@ -22,16 +22,3 @@ var name_or_path: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_name_or_path()`](/api/classes/SteamCloudChange/methods/get_name_or_path) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_name_or_path(
-    steam_cloud_change: SteamCloudChange,
-    name_or_path_label: Label
-) -> void:
-    var name_or_path: String = steam_cloud_change.name_or_path
-    name_or_path_label.text = "Name or path: %s" % str(name_or_path)
-```

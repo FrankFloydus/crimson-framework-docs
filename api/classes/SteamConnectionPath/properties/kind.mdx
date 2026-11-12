@@ -23,13 +23,3 @@ var kind: SteamConnectionPath.RouteKind = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_kind()`](/api/classes/SteamConnectionPath/methods/get_kind) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_kind(steam_connection_path: SteamConnectionPath, kind_label: Label) -> void:
-    var kind: SteamConnectionPath.RouteKind = steam_connection_path.kind
-    kind_label.text = "Kind: %s" % str(kind)
-```

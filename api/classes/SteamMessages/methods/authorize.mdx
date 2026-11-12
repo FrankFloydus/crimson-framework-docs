@@ -29,31 +29,3 @@ authorize(steam_id: String, channels: StringName[]) -> SteamMessagePeerResult
 ## Description
 
 Supply one to 16 distinct names of up to 32 ASCII characters. Names begin with a letter or digit and may also contain period, hyphen, or underscore. This grants local routing permission only. Game scopes require `for_peer()`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_authorize(
-    steam_scope: SteamScope,
-    steam_id: String,
-    channels: Array[StringName],
-    apply_authorize: Callable
-) -> void:
-    if not steam_scope.is_ready():
-        return
-    var steam_messages: SteamMessages = steam_scope.messages()
-    if steam_messages == null:
-        return
-    var result: SteamMessagePeerResult = steam_messages.authorize(steam_id, channels)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamMessagePeer = result.value
-    if payload == null:
-        return
-    apply_authorize.call(payload)
-```

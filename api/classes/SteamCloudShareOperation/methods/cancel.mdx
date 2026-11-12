@@ -22,19 +22,3 @@ cancel() -> Error
 ## Description
 
 Steam can still finish publishing the shared file. Returns `ERR_DOES_NOT_EXIST` when observation has already ended.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(
-    steam_cloud_share_operation: SteamCloudShareOperation,
-    status_label: Label
-) -> void:
-    var result: Error = steam_cloud_share_operation.cancel()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Cancel accepted."
-```

@@ -25,15 +25,4 @@ get_error() -> Error
 
 `OK` means the action succeeded under its documented completion contract.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_error(steam_result: SteamResult, status_label: Label) -> void:
-    var result: Error = steam_result.get_error()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Get error accepted."
-```
+[See gameplay examples for `SteamResult`](/api/classes/SteamResult#examples).

@@ -18,14 +18,3 @@ lines() -> SteamPurchaseLine[]
 ## Return value
 
 `SteamPurchaseLine[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_lines(steam_purchase_cart: SteamPurchaseCart, add_lines_entry: Callable) -> void:
-    var result: Array[SteamPurchaseLine] = steam_purchase_cart.lines()
-    for entry: SteamPurchaseLine in result:
-        add_lines_entry.call(entry)
-```

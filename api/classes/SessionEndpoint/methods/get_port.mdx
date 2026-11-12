@@ -18,13 +18,3 @@ get_port() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_port(session_endpoint: SessionEndpoint, port_label: Label) -> void:
-    var result: int = session_endpoint.get_port()
-    port_label.text = "Port: %s" % str(result)
-```

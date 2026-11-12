@@ -22,23 +22,3 @@ var value: SteamConnectionPath
 | Type | [`SteamConnectionPath`](/api/classes/SteamConnectionPath) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamConnectionPathResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_connection_path_result: SteamConnectionPathResult,
-    apply_value: Callable
-) -> void:
-    if steam_connection_path_result == null:
-        return
-    if not steam_connection_path_result.ok:
-        push_warning(steam_connection_path_result.message)
-        return
-    var value: SteamConnectionPath = steam_connection_path_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

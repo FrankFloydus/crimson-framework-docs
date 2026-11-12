@@ -26,13 +26,3 @@ owns_dlc(app_id: int) -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_owns_dlc(steam_ownership: SteamOwnership, app_id: int, status_label: Label) -> void:
-    var result: bool = steam_ownership.owns_dlc(app_id)
-    status_label.text = "Owns dlc: yes" if result else "Owns dlc: no"
-```

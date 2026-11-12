@@ -22,17 +22,3 @@ get_equipped_items() -> Dictionary[]
 ## Description
 
 An item occupying multiple slots appears once.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_equipped_items(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    add_equipped_items_entry: Callable
-) -> void:
-    var result: Array[Dictionary] = spatial_inventory_equipment.get_equipped_items()
-    for entry: Dictionary in result:
-        add_equipped_items_entry.call(entry)
-```

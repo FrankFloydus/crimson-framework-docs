@@ -19,14 +19,4 @@ browser() -> SteamBrowser
 
 [`SteamBrowser`](/api/classes/SteamBrowser)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_browser(steam_scope: SteamScope, apply_browser: Callable) -> void:
-    var result: SteamBrowser = steam_scope.browser()
-    if result == null:
-        return
-    apply_browser.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

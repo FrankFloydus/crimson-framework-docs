@@ -24,21 +24,3 @@ Await the call to receive [`SteamLeaderboardPageResult`](/api/classes/SteamLeade
 ## Description
 
 Use `await` to receive a [`SteamLeaderboardPageResult`](/api/classes/SteamLeaderboardPageResult). Immediate errors return the same result type.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_fetch(steam_leaderboard_query: SteamLeaderboardQuery, apply_fetch: Callable) -> void:
-    var result: SteamLeaderboardPageResult = await steam_leaderboard_query.fetch()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamLeaderboardPage = result.value
-    if payload == null:
-        return
-    apply_fetch.call(payload)
-```

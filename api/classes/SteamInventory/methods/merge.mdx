@@ -30,32 +30,3 @@ merge(from_instance_id: String, into_instance_id: String, quantity: int) -> Vari
 ## Description
 
 Steam enforces the matching definition and trade restrictions. Returns [`SteamInventoryChangeResult`](/api/classes/SteamInventoryChangeResult). Refresh inventory before retrying after a timeout.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_merge(
-    steam_client: SteamClient,
-    from_instance_id: String,
-    into_instance_id: String,
-    quantity: int,
-    apply_merge: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_inventory: SteamInventory = steam_client.inventory()
-    if steam_inventory == null:
-        return
-    var result: SteamInventoryChangeResult = await steam_inventory.merge(from_instance_id, into_instance_id, quantity)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventoryChange = result.value
-    if payload == null:
-        return
-    apply_merge.call(payload)
-```

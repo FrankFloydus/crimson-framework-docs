@@ -23,24 +23,4 @@ new_item() -> SteamWorkshopPublishRequest
 
 The draft remains local until `SteamWorkshopPublishRequest.submit()`. New items default to private visibility.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_new_item(
-    steam_client: SteamClient,
-    display_name: String,
-    open_publish_editor: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_workshop: SteamWorkshop = steam_client.workshop()
-    if steam_workshop == null:
-        return
-    var result: SteamWorkshopPublishRequest = steam_workshop.new_item()
-    if result == null:
-        return
-    var named_draft: SteamWorkshopPublishRequest = result.named(display_name)
-    open_publish_editor.call(named_draft)
-```
+[See gameplay examples for `SteamWorkshop`](/api/classes/SteamWorkshop#examples).

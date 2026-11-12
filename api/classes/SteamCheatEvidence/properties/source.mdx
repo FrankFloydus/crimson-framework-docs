@@ -25,13 +25,3 @@ var source: SteamCheatEvidence.Source = 1
 | Access | Read only |
 | Default | `1` |
 | Getter | [`get_source()`](/api/classes/SteamCheatEvidence/methods/get_source) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_source(steam_cheat_evidence: SteamCheatEvidence, source_label: Label) -> void:
-    var source: SteamCheatEvidence.Source = steam_cheat_evidence.source
-    source_label.text = "Source: %s" % str(source)
-```

@@ -23,16 +23,3 @@ var store_submitted: bool = false
 | Access | Read only |
 | Default | `false` |
 | Getter | [`was_store_submitted()`](/api/classes/SteamServerStatsResult/methods/was_store_submitted) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_store_submitted(
-    steam_server_stats_result: SteamServerStatsResult,
-    status_label: Label
-) -> void:
-    var store_submitted: bool = steam_server_stats_result.store_submitted
-    status_label.text = "Store submitted: yes" if store_submitted else "Store submitted: no"
-```

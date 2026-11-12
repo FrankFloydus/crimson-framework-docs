@@ -28,25 +28,3 @@ open_in_overlay(event: SteamTimelineEvent) -> Error
 ## Description
 
 Returns `ERR_BUSY` if the overlay is disabled or still starting.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_open_in_overlay(
-    steam_client: SteamClient,
-    event: SteamTimelineEvent,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: Error = steam_timeline.open_in_overlay(event)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Open in overlay accepted."
-```

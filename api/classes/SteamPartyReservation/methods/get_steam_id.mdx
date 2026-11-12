@@ -20,16 +20,3 @@ get_steam_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_steam_id(
-    steam_party_reservation: SteamPartyReservation,
-    apply_steam_id: Callable
-) -> void:
-    var result: String = steam_party_reservation.get_steam_id()
-    apply_steam_id.call(result)
-```

@@ -22,18 +22,3 @@ set_description(value: String) -> void
 | Parameter | Type | Default |
 | --- | --- | --- |
 | `value` | `String` | — |
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_description(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    value: String,
-    description_label: Label
-) -> void:
-    timeline_marker_presentation.set_description(value)
-    var active_description: String = timeline_marker_presentation.description
-    description_label.text = "Description: %s" % str(active_description)
-```

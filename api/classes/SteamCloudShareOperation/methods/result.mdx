@@ -18,22 +18,3 @@ result() -> SteamStringResult
 ## Return value
 
 [`SteamStringResult`](/api/classes/SteamStringResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_cloud_share_operation: SteamCloudShareOperation,
-    result_label: Label
-) -> void:
-    var result: SteamStringResult = steam_cloud_share_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: String = result.value
-    result_label.text = "Result: %s" % str(payload)
-```

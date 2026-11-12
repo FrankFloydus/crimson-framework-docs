@@ -23,19 +23,4 @@ set_definition(definition: WorldSessionDefinition) -> void
 | --- | --- | --- |
 | `definition` | [`WorldSessionDefinition`](/api/classes/WorldSessionDefinition) | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_definition(
-    world_session: WorldSession,
-    definition: WorldSessionDefinition,
-    apply_definition: Callable
-) -> void:
-    world_session.set_definition(definition)
-    var active_definition: WorldSessionDefinition = world_session.definition
-    if active_definition == null:
-        return
-    apply_definition.call(active_definition)
-```
+[See gameplay examples for `WorldSession`](/api/classes/WorldSession#examples).

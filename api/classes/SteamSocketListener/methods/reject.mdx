@@ -24,20 +24,3 @@ reject(offer: SteamSocketOffer) -> Error
 ## Return value
 
 `Error`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_reject(
-    steam_socket_listener: SteamSocketListener,
-    offer: SteamSocketOffer,
-    status_label: Label
-) -> void:
-    var result: Error = steam_socket_listener.reject(offer)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Reject accepted."
-```

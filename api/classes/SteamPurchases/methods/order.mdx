@@ -26,26 +26,3 @@ order(order_id: String) -> Variant
 `Variant`
 
 Await the call to receive [`SteamPurchaseOutcomeResult`](/api/classes/SteamPurchaseOutcomeResult).
-
-## Example
-
-```gdscript
-extends Node
-
-func run_order(steam_scope: SteamScope, order_id: String, apply_order: Callable) -> void:
-    if not steam_scope.is_ready():
-        return
-    var steam_purchases: SteamPurchases = steam_scope.purchases()
-    if steam_purchases == null:
-        return
-    var result: SteamPurchaseOutcomeResult = await steam_purchases.order(order_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamPurchaseOutcome = result.value
-    if payload == null:
-        return
-    apply_order.call(payload)
-```

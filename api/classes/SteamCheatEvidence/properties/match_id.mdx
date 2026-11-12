@@ -24,13 +24,3 @@ var match_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_match_id()`](/api/classes/SteamCheatEvidence/methods/get_match_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_match_id(steam_cheat_evidence: SteamCheatEvidence, match_id_label: Label) -> void:
-    var match_id: String = steam_cheat_evidence.match_id
-    match_id_label.text = "Match id: %s" % str(match_id)
-```

@@ -22,16 +22,3 @@ var owner_steam_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_owner_steam_id()`](/api/classes/SteamPartyListing/methods/get_owner_steam_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_owner_steam_id(
-    steam_party_listing: SteamPartyListing,
-    apply_owner_steam_id: Callable
-) -> void:
-    var owner_steam_id: String = steam_party_listing.owner_steam_id
-    apply_owner_steam_id.call(owner_steam_id)
-```

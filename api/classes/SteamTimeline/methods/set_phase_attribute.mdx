@@ -30,27 +30,3 @@ set_phase_attribute(group: String, value: String, priority: int = 0) -> Error
 ## Description
 
 Group and value are nonempty. Priority ranges from 0 through 1000.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_phase_attribute(
-    steam_client: SteamClient,
-    group: String,
-    value: String,
-    priority: int,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: Error = steam_timeline.set_phase_attribute(group, value, priority)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set phase attribute accepted."
-```

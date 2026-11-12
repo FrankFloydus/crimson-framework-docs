@@ -26,18 +26,3 @@ set_operation_guard(value: Callable) -> void
 ## Description
 
 It must return true for the operation to proceed.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_operation_guard(
-    spatial_inventory_actions: SpatialInventoryActions,
-    value: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_actions.set_operation_guard(value)
-    var active_operation_guard: Callable = spatial_inventory_actions.operation_guard
-    action_button.disabled = not active_operation_guard.is_valid()
-```

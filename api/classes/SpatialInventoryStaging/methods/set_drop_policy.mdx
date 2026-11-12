@@ -26,18 +26,3 @@ set_drop_policy(value: Callable) -> void
 ## Description
 
 Return an empty String to allow the move or a reason to reject it.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_drop_policy(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    value: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_staging.set_drop_policy(value)
-    var active_drop_policy: Callable = spatial_inventory_staging.drop_policy
-    action_button.disabled = not active_drop_policy.is_valid()
-```

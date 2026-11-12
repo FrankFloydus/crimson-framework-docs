@@ -22,16 +22,3 @@ get_transaction_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_transaction_id(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_transaction_id: Callable
-) -> void:
-    var result: String = steam_publisher_purchase_order.get_transaction_id()
-    apply_transaction_id.call(result)
-```

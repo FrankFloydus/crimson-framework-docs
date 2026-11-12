@@ -19,23 +19,4 @@ music() -> SteamMusic
 
 [`SteamMusic`](/api/classes/SteamMusic)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_music(steam_client: SteamClient, apply_playback: Callable) -> void:
-    var result: SteamMusic = steam_client.music()
-    if result == null:
-        return
-    var playback: SteamMusicStatusResult = result.status()
-    if playback == null:
-        return
-    if not playback.ok:
-        push_warning(playback.message)
-        return
-    var payload: SteamMusicStatus = playback.value
-    if payload == null:
-        return
-    apply_playback.call(payload)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

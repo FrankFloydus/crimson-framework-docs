@@ -19,17 +19,4 @@ get_world_container() -> Node
 
 `Node`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_world_container(
-    scene_load_manager: SceneLoadManager,
-    world_container_label: Label
-) -> void:
-    var result: Node = scene_load_manager.get_world_container()
-    if result == null:
-        return
-    world_container_label.text = str(result.name)
-```
+[See gameplay examples for `SceneLoadManager`](/api/classes/SceneLoadManager#examples).

@@ -29,19 +29,4 @@ set_load_timeout_msec(timeout: int) -> Error
 
 Accepts 1 through 120,000 milliseconds and defaults to 15,000. Returns `ERR\_BUSY` during a transition or `ERR\_INVALID\_PARAMETER` for an out-of-range timeout.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_load_timeout_msec(
-    scene_load_manager: SceneLoadManager,
-    timeout: int,
-    status_label: Label
-) -> void:
-    var result: Error = scene_load_manager.set_load_timeout_msec(timeout)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set load timeout msec accepted."
-```
+[See gameplay examples for `SceneLoadManager`](/api/classes/SceneLoadManager#examples).

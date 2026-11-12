@@ -31,31 +31,3 @@ Await the call to receive [`SteamBrowserPageResult`](/api/classes/SteamBrowserPa
 ## Description
 
 The URL must be absolute with an ASCII authority, no credentials, and percent-encoded non-ASCII URL text. It is limited to 2048 bytes. Use `SteamBrowserPage.page_finished` and `SteamBrowserPage.frame_updated` to confirm page content. The browser dimensions may each range from 1 to 4096 pixels with a combined limit of 4194304 pixels.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_open(
-    steam_client: SteamClient,
-    url: String,
-    size: Vector2i,
-    apply_open: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_browser: SteamBrowser = steam_client.browser()
-    if steam_browser == null:
-        return
-    var result: SteamBrowserPageResult = await steam_browser.open(url, size)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamBrowserPage = result.value
-    if payload == null:
-        return
-    apply_open.call(payload)
-```

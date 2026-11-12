@@ -22,16 +22,3 @@ get_listing_id() -> String
 ## Description
 
 The coordinator must use this same value to register and withdraw.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_listing_id(
-    steam_relay_request: SteamRelayRequest,
-    listing_id_label: Label
-) -> void:
-    var result: String = steam_relay_request.get_listing_id()
-    listing_id_label.text = "Listing id: %s" % str(result)
-```

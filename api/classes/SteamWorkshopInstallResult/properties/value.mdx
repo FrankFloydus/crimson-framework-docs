@@ -22,24 +22,3 @@ var value: SteamWorkshopInstall
 | Type | [`SteamWorkshopInstall`](/api/classes/SteamWorkshopInstall) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamWorkshopInstallResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_workshop_install_result: SteamWorkshopInstallResult,
-    size_bytes_label: Label
-) -> void:
-    if steam_workshop_install_result == null:
-        return
-    if not steam_workshop_install_result.ok:
-        push_warning(steam_workshop_install_result.message)
-        return
-    var value: SteamWorkshopInstall = steam_workshop_install_result.value
-    if value == null:
-        return
-    var size_bytes: int = value.size_bytes
-    size_bytes_label.text = "Size bytes: %s" % str(size_bytes)
-```

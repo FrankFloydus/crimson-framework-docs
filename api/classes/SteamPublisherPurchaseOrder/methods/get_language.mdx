@@ -22,16 +22,3 @@ get_language() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_language(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_language: Callable
-) -> void:
-    var result: String = steam_publisher_purchase_order.get_language()
-    apply_language.call(result)
-```

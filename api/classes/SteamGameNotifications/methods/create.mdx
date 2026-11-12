@@ -31,34 +31,3 @@ create(spec: SteamNotificationSessionSpec, operation_key: String) -> SteamNotifi
 ## Description
 
 Reuse the same immutable operation key to replay an accepted, committed response.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    steam_publisher: SteamPublisher,
-    spec: SteamNotificationSessionSpec,
-    operation_key: String,
-    apply_create: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_game_notifications: SteamGameNotifications = steam_publisher.game_notifications()
-    if steam_game_notifications == null:
-        return
-    var result: SteamNotificationSessionOperation = steam_game_notifications.create(spec, operation_key)
-    if result == null:
-        return
-    var result_value: SteamNotificationSessionResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamNotificationSession = result_value.value
-    if payload == null:
-        return
-    apply_create.call(payload)
-```

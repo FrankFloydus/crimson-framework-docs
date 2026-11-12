@@ -22,16 +22,3 @@ get_environment() -> SteamPublisherSettings.Environment
 ## Return value
 
 `SteamPublisherSettings.Environment`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_environment(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_environment: Callable
-) -> void:
-    var result: SteamPublisherSettings.Environment = steam_publisher_purchase_order.get_environment()
-    apply_environment.call(result)
-```

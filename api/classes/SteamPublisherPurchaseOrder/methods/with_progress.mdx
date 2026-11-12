@@ -34,29 +34,3 @@ with_progress(revision: int, phase: SteamPublisherPurchaseOrder.Phase, transacti
 ## Description
 
 Returns null for an invalid revision, phase, transaction ID, timestamp, or reversed item set. This constructs a storage snapshot and does not request a payment or grant an entitlement.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_with_progress(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    revision: int,
-    phase: SteamPublisherPurchaseOrder.Phase,
-    transaction_id: String,
-    vendor_updated_at: int,
-    reversed_item_ids: PackedInt64Array,
-    apply_progress: Callable
-) -> void:
-    var result: SteamPublisherPurchaseOrder = steam_publisher_purchase_order.with_progress(
-        revision,
-        phase,
-        transaction_id,
-        vendor_updated_at,
-        reversed_item_ids,
-    )
-    if result == null:
-        return
-    apply_progress.call(result)
-```

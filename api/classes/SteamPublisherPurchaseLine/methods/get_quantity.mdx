@@ -22,16 +22,3 @@ get_quantity() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_quantity(
-    steam_publisher_purchase_line: SteamPublisherPurchaseLine,
-    apply_quantity: Callable
-) -> void:
-    var result: int = steam_publisher_purchase_line.get_quantity()
-    apply_quantity.call(result)
-```

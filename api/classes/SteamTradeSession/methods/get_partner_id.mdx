@@ -22,16 +22,3 @@ get_partner_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_partner_id(
-    steam_trade_session: SteamTradeSession,
-    partner_id_label: Label
-) -> void:
-    var result: String = steam_trade_session.get_partner_id()
-    partner_id_label.text = "Partner id: %s" % str(result)
-```

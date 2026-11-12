@@ -25,30 +25,35 @@ This call has no effect on the Steam cache.
 
 ## Example
 
-```gdscript
-extends Node
+### Update Steam progression after a match victory
 
-# Define this integer stat in Steamworks for your app.
-const MATCHES_STAT: String = "matches_played"
+After a match victory, update the player's lifetime win count and unlock the first-win achievement using [keys published in Steamworks](/steam/client-services#record-progression). The victory screen reports whether Steam accepted the update.
+
+```gdscript
+extends Control
+
+const WINS_STAT: String = "total_wins"
+const FIRST_WIN_ACHIEVEMENT: String = "first_win"
+const FIRST_WIN_COUNT: int = 1
 
 @export var steam_client: SteamClient
-@export var stats_status: Label
+@export var steam_status: Label
 
-# Call after a match. Pass the player's new absolute match count.
-func record_matches_played(total_matches: int) -> void:
-    if steam_client == null or stats_status == null:
+
+func record_victory(total_wins: int) -> void:
+    if not is_instance_valid(steam_client) or not steam_client.is_online():
+        steam_status.text = "Victory! Steam progression is unavailable."
         return
+
     var stats: SteamStats = steam_client.stats()
-    if stats == null:
-        stats_status.text = "Steam stats unavailable"
+    var edit: SteamStatsEdit = stats.edit().set_int(WINS_STAT, total_wins)
+    if total_wins == FIRST_WIN_COUNT:
+        edit = edit.unlock(FIRST_WIN_ACHIEVEMENT)
+
+    var result: SteamStatsSubmissionResult = edit.submit()
+    if not result.ok:
+        steam_status.text = "Victory! Steam progression update failed: %s" % result.message
         return
 
-    var draft: SteamStatsEdit = stats.edit()
-    draft = draft.set_int(MATCHES_STAT, total_matches)
-    var submitted: SteamStatsSubmissionResult = draft.submit()
-    if not submitted.ok:
-        stats_status.text = submitted.message
-        return
-    # Observe stats_stored before reporting that Steam stored the change.
-    stats_status.text = "Stat changes accepted locally: %d" % submitted.value.applied
+    steam_status.text = "Victory! Steam accepted %d progression updates." % result.value.applied
 ```

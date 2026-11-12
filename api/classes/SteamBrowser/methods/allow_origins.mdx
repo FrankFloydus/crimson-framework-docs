@@ -28,24 +28,3 @@ allow_origins(origins: PackedStringArray) -> SteamBrowserRequest
 ## Description
 
 An origin contains the scheme, ASCII hostname, and optional port. An optional trailing slash is accepted. For controlled local fixtures, explicitly include a numeric loopback HTTP origin. Policy validation occurs when opening the request.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_allow_origins(
-    steam_client: SteamClient,
-    origins: PackedStringArray,
-    apply_allow_origins: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_browser: SteamBrowser = steam_client.browser()
-    if steam_browser == null:
-        return
-    var result: SteamBrowserRequest = steam_browser.allow_origins(origins)
-    if result == null:
-        return
-    apply_allow_origins.call(result)
-```

@@ -20,18 +20,3 @@ get_wallet() -> SpatialInventoryWallet
 ## Return value
 
 [`SpatialInventoryWallet`](/api/classes/SpatialInventoryWallet)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_wallet(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    apply_wallet: Callable
-) -> void:
-    var result: SpatialInventoryWallet = spatial_inventory_trade.get_wallet()
-    if result == null:
-        return
-    apply_wallet.call(result)
-```

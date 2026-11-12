@@ -29,15 +29,4 @@ static apply_placement_changes(changes: Array) -> Error
 
 Each row is a dictionary containing `inventory`, `id`, `before`, and `after`. Use placement dictionaries from `get_placement()` or an empty dictionary for absence. A stale expected placement returns `ERR_BUSY`. If any row fails validation, every grid keeps its previous state.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_apply_placement_changes(changes: Array, status_label: Label) -> void:
-    var result: Error = SpatialInventory.apply_placement_changes(changes)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Apply placement changes accepted."
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

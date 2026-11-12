@@ -28,25 +28,3 @@ joinable(listing: SteamListing) -> Error
 ## Description
 
 Returns `@GlobalScope.OK` if Steam accepted the route or the Game already owns it. Returns `@GlobalScope.ERR_BUSY` when a foreign connect key exists, `@GlobalScope.ERR_UNAUTHORIZED` for an ineligible or stale lobby, and `@GlobalScope.ERR_UNAVAILABLE` outside a live Steam Game scope.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_joinable(
-    steam_client: SteamClient,
-    listing: SteamListing,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_presence: SteamPresence = steam_client.presence()
-    if steam_presence == null:
-        return
-    var result: Error = steam_presence.joinable(listing)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Joinable accepted."
-```

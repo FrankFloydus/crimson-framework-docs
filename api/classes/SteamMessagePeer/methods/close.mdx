@@ -22,16 +22,3 @@ close() -> Error
 ## Description
 
 Native channels owned by other SDK consumers are preserved.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_close(steam_message_peer: SteamMessagePeer, status_label: Label) -> void:
-    var result: Error = steam_message_peer.close()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Close accepted."
-```

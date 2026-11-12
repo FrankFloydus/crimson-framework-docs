@@ -32,20 +32,3 @@ static create(user: SteamIdentity, state: SteamNotificationUserState.State, mess
 ## Description
 
 Pass the identity minted by the same trusted publisher for this recipient.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    user: SteamIdentity,
-    state: SteamNotificationUserState.State,
-    message: SteamLocalizedText,
-    apply_create: Callable
-) -> void:
-    var result: SteamNotificationUserState = SteamNotificationUserState.create(user, state, message)
-    if result == null:
-        return
-    apply_create.call(result)
-```

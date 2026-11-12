@@ -23,16 +23,3 @@ var applied: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_applied()`](/api/classes/SteamServerStatsResult/methods/get_applied) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_applied(
-    steam_server_stats_result: SteamServerStatsResult,
-    applied_label: Label
-) -> void:
-    var applied: int = steam_server_stats_result.applied
-    applied_label.text = "Applied: %s" % str(applied)
-```

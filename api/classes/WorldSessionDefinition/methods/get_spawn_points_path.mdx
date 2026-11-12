@@ -21,15 +21,4 @@ get_spawn_points_path() -> NodePath
 
 `NodePath`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_spawn_points_path(
-    world_session_definition: WorldSessionDefinition,
-    spawn_points_path_label: Label
-) -> void:
-    var result: NodePath = world_session_definition.get_spawn_points_path()
-    spawn_points_path_label.text = "Spawn points path: %s" % str(result)
-```
+[See gameplay examples for `WorldSessionDefinition`](/api/classes/WorldSessionDefinition#examples).

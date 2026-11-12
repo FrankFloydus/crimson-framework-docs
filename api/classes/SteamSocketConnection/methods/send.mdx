@@ -29,21 +29,3 @@ send(bytes: PackedByteArray, delivery: SteamDelivery.Mode = 0) -> Error
 ## Description
 
 Both directions allow up to 128 frames and 256 KiB per second. `ERR_BUSY` reports SDK backpressure or an exhausted outbound budget.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_send(
-    steam_socket_connection: SteamSocketConnection,
-    bytes: PackedByteArray,
-    delivery: SteamDelivery.Mode,
-    status_label: Label
-) -> void:
-    var result: Error = steam_socket_connection.send(bytes, delivery)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Send accepted."
-```

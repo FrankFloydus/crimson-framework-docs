@@ -32,32 +32,3 @@ reports(from_unix: int, to_unix: int, after_report_id: String = "0") -> Variant
 ## Description
 
 Use the exclusive decimal `after_report_id` cursor from the previous page or `"0"` for the first page. Returns [`SteamCheatReportPageResult`](/api/classes/SteamCheatReportPageResult).
-
-## Example
-
-```gdscript
-extends Node
-
-func run_reports(
-    steam_publisher: SteamPublisher,
-    from_unix: int,
-    to_unix: int,
-    after_report_id: String,
-    apply_reports: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_moderation: SteamPublisherModeration = steam_publisher.moderation()
-    if steam_publisher_moderation == null:
-        return
-    var result: SteamCheatReportPageResult = await steam_publisher_moderation.reports(from_unix, to_unix, after_report_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamCheatReportPage = result.value
-    if payload == null:
-        return
-    apply_reports.call(payload)
-```

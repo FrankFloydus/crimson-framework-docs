@@ -28,18 +28,3 @@ var pickup_policy: Callable = Callable()
 ## Description
 
 Use the same context contract as [`SpatialInventoryActions`](/api/classes/SpatialInventoryActions).
-
-## Example
-
-```gdscript
-extends Node
-
-func update_pickup_policy(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    new_pickup_policy: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_staging.pickup_policy = new_pickup_policy
-    var active_pickup_policy: Callable = spatial_inventory_staging.pickup_policy
-    action_button.disabled = not active_pickup_policy.is_valid()
-```

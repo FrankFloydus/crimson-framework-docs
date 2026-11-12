@@ -20,16 +20,3 @@ get_session_id() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_session_id(
-    steam_remote_play_input_event: SteamRemotePlayInputEvent,
-    session_id_label: Label
-) -> void:
-    var result: int = steam_remote_play_input_event.get_session_id()
-    session_id_label.text = "Session id: %s" % str(result)
-```

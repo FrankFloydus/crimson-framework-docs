@@ -23,12 +23,4 @@ is_valid() -> bool
 
 An invalid branch cannot start a Steam dedicated Game.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_is_valid(steam_server: SteamServer, status_label: Label) -> void:
-    var result: bool = steam_server.is_valid()
-    status_label.text = "Valid: yes" if result else "Valid: no"
-```
+[See gameplay examples for `SteamServer`](/api/classes/SteamServer#examples).

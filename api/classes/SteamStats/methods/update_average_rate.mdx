@@ -31,26 +31,4 @@ update_average_rate(name: String, count: float, seconds: float) -> Error
 
 The accumulated count must be finite within Steam's float range and the duration must be finite and positive. Call `store()` to request persistence.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_update_average_rate(
-    steam_client: SteamClient,
-    name: String,
-    count: float,
-    seconds: float,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: Error = steam_stats.update_average_rate(name, count, seconds)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Update average rate accepted."
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

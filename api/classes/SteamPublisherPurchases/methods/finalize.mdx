@@ -32,30 +32,3 @@ Await the call to receive [`SteamPurchaseOutcomeResult`](/api/classes/SteamPurch
 ## Description
 
 Requires an exact Steam query to verify approval before claiming and capturing the charge. Durable fulfillment follows a verified success. An uncertain earlier finalization remains in reconciliation and is never blindly repeated.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_finalize(
-    steam_publisher: SteamPublisher,
-    order_id: String,
-    apply_finalize: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_purchases: SteamPublisherPurchases = steam_publisher.purchases()
-    if steam_publisher_purchases == null:
-        return
-    var result: SteamPurchaseOutcomeResult = await steam_publisher_purchases.finalize(order_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamPurchaseOutcome = result.value
-    if payload == null:
-        return
-    apply_finalize.call(payload)
-```

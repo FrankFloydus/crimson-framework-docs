@@ -23,20 +23,4 @@ set_worlds(worlds: Dictionary) -> void
 | --- | --- | --- |
 | `worlds` | `Dictionary` | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_worlds(
-    game_definition: GameDefinition,
-    worlds: Dictionary,
-    game: GameRuntime
-) -> void:
-    if game_definition == null:
-        return
-    if game.is_inside_tree():
-        return
-    game_definition.set_worlds(worlds)
-    game.definition = game_definition
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

@@ -25,13 +25,35 @@ If a Steam setter rejects an edit after preflight, earlier accepted edits remain
 
 ## Example
 
-```gdscript
-const WINS_STAT: String = "total_wins"
+### Update Steam progression after a match victory
 
-func record_total_wins(stats: SteamStats, total_wins: int) -> void:
-    # Set WINS_STAT to the stat name published for your app.
-    var result: SteamStatsSubmissionResult = stats.edit().set_int(WINS_STAT, total_wins).submit()
+After a match victory, update the player's lifetime win count and unlock the first-win achievement using [keys published in Steamworks](/steam/client-services#record-progression). The victory screen reports whether Steam accepted the update.
+
+```gdscript
+extends Control
+
+const WINS_STAT: String = "total_wins"
+const FIRST_WIN_ACHIEVEMENT: String = "first_win"
+const FIRST_WIN_COUNT: int = 1
+
+@export var steam_client: SteamClient
+@export var steam_status: Label
+
+
+func record_victory(total_wins: int) -> void:
+    if not is_instance_valid(steam_client) or not steam_client.is_online():
+        steam_status.text = "Victory! Steam progression is unavailable."
+        return
+
+    var stats: SteamStats = steam_client.stats()
+    var edit: SteamStatsEdit = stats.edit().set_int(WINS_STAT, total_wins)
+    if total_wins == FIRST_WIN_COUNT:
+        edit = edit.unlock(FIRST_WIN_ACHIEVEMENT)
+
+    var result: SteamStatsSubmissionResult = edit.submit()
     if not result.ok:
-        push_warning(result.message)
-    # Use stats_stored to observe Steam's backend response.
+        steam_status.text = "Victory! Steam progression update failed: %s" % result.message
+        return
+
+    steam_status.text = "Victory! Steam accepted %d progression updates." % result.value.applied
 ```

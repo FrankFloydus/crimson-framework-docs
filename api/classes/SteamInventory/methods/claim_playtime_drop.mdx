@@ -28,30 +28,3 @@ claim_playtime_drop(generator_id: int) -> Variant
 ## Description
 
 A successful evaluation can grant no items. Returns [`SteamInventoryChangeResult`](/api/classes/SteamInventoryChangeResult). Refresh inventory before retrying after a timeout.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_claim_playtime_drop(
-    steam_client: SteamClient,
-    generator_id: int,
-    apply_claim_playtime_drop: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_inventory: SteamInventory = steam_client.inventory()
-    if steam_inventory == null:
-        return
-    var result: SteamInventoryChangeResult = await steam_inventory.claim_playtime_drop(generator_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventoryChange = result.value
-    if payload == null:
-        return
-    apply_claim_playtime_drop.call(payload)
-```

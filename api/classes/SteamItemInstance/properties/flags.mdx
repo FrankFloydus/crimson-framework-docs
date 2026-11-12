@@ -22,13 +22,3 @@ var flags: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_flags()`](/api/classes/SteamItemInstance/methods/get_flags) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_flags(steam_item_instance: SteamItemInstance, flags_label: Label) -> void:
-    var flags: int = steam_item_instance.flags
-    flags_label.text = "Flags: %s" % str(flags)
-```

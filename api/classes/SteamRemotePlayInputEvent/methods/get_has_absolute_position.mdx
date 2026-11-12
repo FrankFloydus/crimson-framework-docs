@@ -20,16 +20,3 @@ get_has_absolute_position() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_has_absolute_position(
-    steam_remote_play_input_event: SteamRemotePlayInputEvent,
-    status_label: Label
-) -> void:
-    var result: bool = steam_remote_play_input_event.get_has_absolute_position()
-    status_label.text = "Has absolute position: yes" if result else "Has absolute position: no"
-```

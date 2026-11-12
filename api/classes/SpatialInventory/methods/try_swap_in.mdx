@@ -33,22 +33,4 @@ try_swap_in(id: StringName, footprint: Vector2i, origin: Vector2i, rotated: bool
 
 Returns the displaced placement in the format documented in `get_placement()` and emits `changed` once after committing. Returns an empty dictionary on failure and preserves the grid.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_try_swap_in(
-    spatial_inventory: SpatialInventory,
-    id: StringName,
-    footprint: Vector2i,
-    origin: Vector2i,
-    rotated: bool,
-    expected_id: StringName,
-    apply_try_swap_in: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory.try_swap_in(id, footprint, origin, rotated, expected_id)
-    if result.is_empty():
-        return
-    apply_try_swap_in.call(result)
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

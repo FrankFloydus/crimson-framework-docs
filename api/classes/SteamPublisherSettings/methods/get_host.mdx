@@ -22,18 +22,3 @@ get_host() -> SteamPublisherHost
 ## Return value
 
 [`SteamPublisherHost`](/api/classes/SteamPublisherHost)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_host(
-    steam_publisher_settings: SteamPublisherSettings,
-    apply_host: Callable
-) -> void:
-    var result: SteamPublisherHost = steam_publisher_settings.get_host()
-    if result == null:
-        return
-    apply_host.call(result)
-```

@@ -28,15 +28,3 @@ static create(entries: SteamPurchaseItem[]) -> SteamPurchaseCatalog
 ## Description
 
 Returns null for invalid data.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(entries: Array[SteamPurchaseItem], apply_create: Callable) -> void:
-    var result: SteamPurchaseCatalog = SteamPurchaseCatalog.create(entries)
-    if result == null:
-        return
-    apply_create.call(result)
-```

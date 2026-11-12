@@ -20,16 +20,3 @@ get_apply_changes() -> Callable
 ## Return value
 
 `Callable`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_apply_changes(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    action_button: Button
-) -> void:
-    var result: Callable = spatial_inventory_stack_adapter.get_apply_changes()
-    action_button.disabled = not result.is_valid()
-```

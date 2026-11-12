@@ -29,34 +29,3 @@ connect_to(endpoint: SteamSocketEndpoint, timeout_ms: int = 10000) -> SteamSocke
 ## Description
 
 Specify a timeout from 1000 to 30000 milliseconds. For direct routes requiring a specific Steam account, pass the endpoint returned by `SteamSocketEndpoint.expect_peer()`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_connect_to(
-    steam_client: SteamClient,
-    endpoint: SteamSocketEndpoint,
-    timeout_ms: int,
-    apply_connect_to: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_sockets: SteamSockets = steam_client.sockets()
-    if steam_sockets == null:
-        return
-    var result: SteamSocketConnectOperation = steam_sockets.connect_to(endpoint, timeout_ms)
-    if result == null:
-        return
-    var result_value: SteamSocketConnectionResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamSocketConnection = result_value.value
-    if payload == null:
-        return
-    apply_connect_to.call(payload)
-```

@@ -23,18 +23,4 @@ set_port(port: int) -> void
 | --- | --- | --- |
 | `port` | `int` | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_port(
-    world_session_definition: WorldSessionDefinition,
-    port: int,
-    session: WorldSession
-) -> void:
-    if world_session_definition == null:
-        return
-    world_session_definition.set_port(port)
-    session.definition = world_session_definition
-```
+[See gameplay examples for `WorldSessionDefinition`](/api/classes/WorldSessionDefinition#examples).

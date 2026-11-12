@@ -30,22 +30,3 @@ static create(sku: StringName, item_id: int, quantity: int, total: int, descript
 ## Return value
 
 [`SteamPublisherPurchaseLine`](/api/classes/SteamPublisherPurchaseLine)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    sku: StringName,
-    item_id: int,
-    quantity: int,
-    total: int,
-    description: String,
-    apply_create: Callable
-) -> void:
-    var result: SteamPublisherPurchaseLine = SteamPublisherPurchaseLine.create(sku, item_id, quantity, total, description)
-    if result == null:
-        return
-    apply_create.call(result)
-```

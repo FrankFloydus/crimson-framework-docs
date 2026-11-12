@@ -22,16 +22,3 @@ var published_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_published_id()`](/api/classes/SteamWorkshopVote/methods/get_published_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_published_id(
-    steam_workshop_vote: SteamWorkshopVote,
-    published_id_label: Label
-) -> void:
-    var published_id: String = steam_workshop_vote.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```

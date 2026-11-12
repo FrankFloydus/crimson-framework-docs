@@ -24,18 +24,3 @@ get_inventory() -> SpatialInventory
 ## Description
 
 Use the staging model to edit it.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_inventory(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    apply_inventory: Callable
-) -> void:
-    var result: SpatialInventory = spatial_inventory_staging.get_inventory()
-    if result == null:
-        return
-    apply_inventory.call(result)
-```

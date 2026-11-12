@@ -20,16 +20,3 @@ get_definition_id() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_definition_id(
-    steam_item_definition: SteamItemDefinition,
-    definition_id_label: Label
-) -> void:
-    var result: int = steam_item_definition.get_definition_id()
-    definition_id_label.text = "Definition id: %s" % str(result)
-```

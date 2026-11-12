@@ -20,16 +20,3 @@ get_dropped_count() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_dropped_count(
-    steam_diagnostic_batch: SteamDiagnosticBatch,
-    dropped_count_label: Label
-) -> void:
-    var result: int = steam_diagnostic_batch.get_dropped_count()
-    dropped_count_label.text = "Dropped count: %s" % str(result)
-```

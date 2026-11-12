@@ -22,15 +22,3 @@ static game() -> GameRuntime
 ## Description
 
 Returns null if no game can be selected unambiguously.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_game(apply_game: Callable) -> void:
-    var result: GameRuntime = GameServices.game()
-    if result == null:
-        return
-    apply_game.call(result)
-```

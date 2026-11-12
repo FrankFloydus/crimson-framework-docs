@@ -23,20 +23,4 @@ set_player_scene(scene: PackedScene) -> void
 | --- | --- | --- |
 | `scene` | `PackedScene` | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_player_scene(
-    game_definition: GameDefinition,
-    scene: PackedScene,
-    game: GameRuntime
-) -> void:
-    if game_definition == null:
-        return
-    if game.is_inside_tree():
-        return
-    game_definition.set_player_scene(scene)
-    game.definition = game_definition
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

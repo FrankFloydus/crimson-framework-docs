@@ -31,19 +31,3 @@ static create(token: StringName, variables: Dictionary[StringName, String]) -> S
 ## Description
 
 Use a leading `#`, up to 128 UTF-8 token bytes, and up to 8 substitutions. The service checks these bounds before submission.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    token: StringName,
-    variables: Dictionary[StringName, String],
-    apply_create: Callable
-) -> void:
-    var result: SteamLocalizedText = SteamLocalizedText.create(token, variables)
-    if result == null:
-        return
-    apply_create.call(result)
-```

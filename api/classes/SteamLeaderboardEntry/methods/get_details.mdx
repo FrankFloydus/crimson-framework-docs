@@ -24,18 +24,3 @@ get_details() -> PackedInt32Array
 ## Description
 
 Editing a returned packed array leaves the entry unchanged.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_details(
-    steam_leaderboard_entry: SteamLeaderboardEntry,
-    results_list: ItemList
-) -> void:
-    var result: PackedInt32Array = steam_leaderboard_entry.get_details()
-    results_list.clear()
-    for entry: int in result:
-        results_list.add_item(str(entry))
-```

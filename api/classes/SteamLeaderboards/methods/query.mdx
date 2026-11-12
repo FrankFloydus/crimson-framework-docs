@@ -28,33 +28,3 @@ query(board_name: String) -> SteamLeaderboardQuery
 ## Description
 
 Defaults to the first ten global ranks. Use `SteamLeaderboardQuery.fetch()` or `SteamLeaderboardQuery.fetch_operation()` to start the read.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_query(
-    steam_client: SteamClient,
-    board_name: String,
-    apply_search_result: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_leaderboards: SteamLeaderboards = steam_client.leaderboards()
-    if steam_leaderboards == null:
-        return
-    var result: SteamLeaderboardQuery = steam_leaderboards.query(board_name)
-    if result == null:
-        return
-    var search_result: SteamLeaderboardPageResult = await result.fetch()
-    if search_result == null:
-        return
-    if not search_result.ok:
-        push_warning(search_result.message)
-        return
-    var payload: SteamLeaderboardPage = search_result.value
-    if payload == null:
-        return
-    apply_search_result.call(payload)
-```

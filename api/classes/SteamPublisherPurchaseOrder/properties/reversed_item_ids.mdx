@@ -25,17 +25,3 @@ var reversed_item_ids: PackedInt64Array = PackedInt64Array()
 | Access | Read only |
 | Default | `PackedInt64Array()` |
 | Getter | [`get_reversed_item_ids()`](/api/classes/SteamPublisherPurchaseOrder/methods/get_reversed_item_ids) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_reversed_item_ids(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    add_reversed_item_ids_entry: Callable
-) -> void:
-    var reversed_item_ids: PackedInt64Array = steam_publisher_purchase_order.reversed_item_ids
-    for entry: int in reversed_item_ids:
-        add_reversed_item_ids_entry.call(entry)
-```

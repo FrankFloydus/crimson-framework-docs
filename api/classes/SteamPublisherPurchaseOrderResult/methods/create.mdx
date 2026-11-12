@@ -31,25 +31,3 @@ static create(error: Error, value: SteamPublisherPurchaseOrder = null) -> SteamP
 ## Description
 
 Use `ERR_DOES_NOT_EXIST` only when storage confirms absence. An OK result with a null `value` becomes `ERR_INVALID_DATA`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    error: Error,
-    value: SteamPublisherPurchaseOrder,
-    apply_create: Callable
-) -> void:
-    var result: SteamPublisherPurchaseOrderResult = SteamPublisherPurchaseOrderResult.create(error, value)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamPublisherPurchaseOrder = result.value
-    if payload == null:
-        return
-    apply_create.call(payload)
-```

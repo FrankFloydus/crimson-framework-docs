@@ -23,14 +23,4 @@ diagnostics() -> SteamDiagnostics
 
 Returns null when this generation has ended.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_diagnostics(steam_scope: SteamScope, apply_diagnostics: Callable) -> void:
-    var result: SteamDiagnostics = steam_scope.diagnostics()
-    if result == null:
-        return
-    apply_diagnostics.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

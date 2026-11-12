@@ -29,18 +29,3 @@ register_scope_migration(from_version: int, migration: Callable) -> bool
 ## Description
 
 The callback receives an array of records with `id`, `version`, and `data` and returns the converted array in the result's `value` field on success. Scope migrations run before individual participant migrations.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_register_scope_migration(
-    save_coordinator: SaveCoordinator,
-    from_version: int,
-    migration: Callable,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.register_scope_migration(from_version, migration)
-    status_label.text = "Register scope migration: yes" if result else "Register scope migration: no"
-```

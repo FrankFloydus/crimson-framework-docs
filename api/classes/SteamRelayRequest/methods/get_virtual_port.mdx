@@ -18,16 +18,3 @@ get_virtual_port() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_virtual_port(
-    steam_relay_request: SteamRelayRequest,
-    virtual_port_label: Label
-) -> void:
-    var result: int = steam_relay_request.get_virtual_port()
-    virtual_port_label.text = "Virtual port: %s" % str(result)
-```

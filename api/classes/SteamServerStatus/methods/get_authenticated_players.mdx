@@ -21,18 +21,4 @@ get_authenticated_players() -> int
 
 `int`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_authenticated_players(
-    steam_dedicated_server: SteamDedicatedServer,
-    authenticated_players_label: Label
-) -> void:
-    var steam_server_status: SteamServerStatus = steam_dedicated_server.status()
-    if steam_server_status == null:
-        return
-    var result: int = steam_server_status.get_authenticated_players()
-    authenticated_players_label.text = "Authenticated players: %s" % str(result)
-```
+[See gameplay examples for `SteamServerStatus`](/api/classes/SteamServerStatus#examples).

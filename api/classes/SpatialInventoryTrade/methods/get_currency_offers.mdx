@@ -28,19 +28,3 @@ get_currency_offers(actor: int) -> Dictionary
 ## Description
 
 The amounts are promises until settlement.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_currency_offers(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    apply_currency_offers: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_trade.get_currency_offers(actor)
-    if result.is_empty():
-        return
-    apply_currency_offers.call(result)
-```

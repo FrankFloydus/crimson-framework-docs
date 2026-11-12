@@ -23,15 +23,4 @@ apps() -> SteamApps
 
 Returns null when this generation has ended.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_apps(steam_scope: SteamScope, language_label: Label) -> void:
-    var result: SteamApps = steam_scope.apps()
-    if result == null:
-        return
-    var language: String = result.current_language()
-    language_label.text = "Language: %s" % str(language)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

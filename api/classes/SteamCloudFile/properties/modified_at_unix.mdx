@@ -22,16 +22,3 @@ var modified_at_unix: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_modified_at_unix()`](/api/classes/SteamCloudFile/methods/get_modified_at_unix) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_modified_at_unix(
-    steam_cloud_file: SteamCloudFile,
-    modified_at_unix_label: Label
-) -> void:
-    var modified_at_unix: int = steam_cloud_file.modified_at_unix
-    modified_at_unix_label.text = "Modified at unix: %s" % str(modified_at_unix)
-```

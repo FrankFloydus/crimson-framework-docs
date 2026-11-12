@@ -28,31 +28,3 @@ with_response_headers(names: PackedStringArray) -> SteamHttpRequest
 ## Description
 
 Select up to 16 additional names. Matching ignores case, and Content-Type is captured when present. A selected field larger than 2,048 bytes returns a limit error.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_with_response_headers(
-    steam_http_request: SteamHttpRequest,
-    names: PackedStringArray,
-    apply_send: Callable
-) -> void:
-    var result: SteamHttpRequest = steam_http_request.with_response_headers(names)
-    if result == null:
-        return
-    var completion: SteamHttpResponseOperation = result.send()
-    if completion == null:
-        return
-    var result_value: SteamHttpResponseResult = await completion.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamHttpResponse = result_value.value
-    if payload == null:
-        return
-    apply_send.call(payload)
-```

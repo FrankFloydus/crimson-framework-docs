@@ -20,24 +20,3 @@ get_value() -> SteamLeaderboardInfo
 ## Return value
 
 [`SteamLeaderboardInfo`](/api/classes/SteamLeaderboardInfo)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_leaderboard_info_result: SteamLeaderboardInfoResult,
-    name_label: Label
-) -> void:
-    if steam_leaderboard_info_result == null:
-        return
-    if not steam_leaderboard_info_result.ok:
-        push_warning(steam_leaderboard_info_result.message)
-        return
-    var result: SteamLeaderboardInfo = steam_leaderboard_info_result.get_value()
-    if result == null:
-        return
-    var name: String = result.name
-    name_label.text = "Name: %s" % str(name)
-```

@@ -30,26 +30,3 @@ static create(error: Error, value: SteamPurchaseOutcome = null, checkout_id: Str
 ## Description
 
 Echo the original checkout ID on a successful begin response. Error results can carry the same ID for retry.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    error: Error,
-    value: SteamPurchaseOutcome,
-    checkout_id: String,
-    apply_create: Callable
-) -> void:
-    var result: SteamPurchaseOutcomeResult = SteamPurchaseOutcomeResult.create(error, value, checkout_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamPurchaseOutcome = result.value
-    if payload == null:
-        return
-    apply_create.call(payload)
-```

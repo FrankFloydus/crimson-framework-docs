@@ -29,18 +29,4 @@ var local_hidden_path: NodePath = NodePath("")
 
 Set it to the visual subtree hidden on the local player instance.
 
-## Example
-
-```gdscript
-extends Node
-
-func update_local_hidden_path(
-    world_session_definition: WorldSessionDefinition,
-    new_local_hidden_path: NodePath,
-    session: WorldSession
-) -> void:
-    if world_session_definition == null:
-        return
-    world_session_definition.local_hidden_path = new_local_hidden_path
-    session.definition = world_session_definition
-```
+[See gameplay examples for `WorldSessionDefinition`](/api/classes/WorldSessionDefinition#examples).

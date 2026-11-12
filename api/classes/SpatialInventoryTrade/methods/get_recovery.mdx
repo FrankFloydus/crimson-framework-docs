@@ -28,19 +28,3 @@ get_recovery(actor: int) -> SpatialInventory
 ## Description
 
 Use it for returns from cancellation when the backpack lacks space.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_recovery(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    apply_recovery: Callable
-) -> void:
-    var result: SpatialInventory = spatial_inventory_trade.get_recovery(actor)
-    if result == null:
-        return
-    apply_recovery.call(result)
-```

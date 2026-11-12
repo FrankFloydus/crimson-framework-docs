@@ -22,23 +22,3 @@ var value: SteamAnalogInput
 | Type | [`SteamAnalogInput`](/api/classes/SteamAnalogInput) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamAnalogInputResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_analog_input_result: SteamAnalogInputResult,
-    apply_value: Callable
-) -> void:
-    if steam_analog_input_result == null:
-        return
-    if not steam_analog_input_result.ok:
-        push_warning(steam_analog_input_result.message)
-        return
-    var value: SteamAnalogInput = steam_analog_input_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

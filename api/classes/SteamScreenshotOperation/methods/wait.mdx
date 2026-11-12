@@ -18,24 +18,3 @@ wait() -> Variant
 ## Return value
 
 `Variant`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_wait(
-    steam_screenshot_operation: SteamScreenshotOperation,
-    apply_wait: Callable
-) -> void:
-    var result: SteamScreenshotResult = await steam_screenshot_operation.wait()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamScreenshot = result.value
-    if payload == null:
-        return
-    apply_wait.call(payload)
-```

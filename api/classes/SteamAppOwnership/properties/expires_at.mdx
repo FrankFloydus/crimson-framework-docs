@@ -28,16 +28,3 @@ var expires_at: String
 ## Description
 
 Empty when unavailable.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_expires_at(
-    steam_app_ownership: SteamAppOwnership,
-    expires_at_label: Label
-) -> void:
-    var expires_at: String = steam_app_ownership.expires_at
-    expires_at_label.text = "Expires at: %s" % str(expires_at)
-```

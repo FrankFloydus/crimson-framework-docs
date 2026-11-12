@@ -29,20 +29,4 @@ open_store(app_id: int = 0) -> Error
 
 Zero selects the running AppID. A positive unsigned 32-bit AppID selects another product.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_open_store(steam_client: SteamClient, app_id: int, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_overlay: SteamOverlay = steam_client.overlay()
-    if steam_overlay == null:
-        return
-    var result: Error = steam_overlay.open_store(app_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Open store accepted."
-```
+[See gameplay examples for `SteamOverlay`](/api/classes/SteamOverlay#examples).

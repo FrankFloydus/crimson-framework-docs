@@ -24,25 +24,3 @@ Await the call to receive [`SteamScoreUploadResult`](/api/classes/SteamScoreUplo
 ## Description
 
 A settled operation returns the same result immediately.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_wait(
-    steam_score_upload_operation: SteamScoreUploadOperation,
-    score_label: Label
-) -> void:
-    var result: SteamScoreUploadResult = await steam_score_upload_operation.wait()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamScoreUpload = result.value
-    if payload == null:
-        return
-    var score: int = payload.score
-    score_label.text = "Score: %s" % str(score)
-```

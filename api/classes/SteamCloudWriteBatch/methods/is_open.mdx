@@ -18,13 +18,3 @@ is_open() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_open(steam_cloud_write_batch: SteamCloudWriteBatch, status_label: Label) -> void:
-    var result: bool = steam_cloud_write_batch.is_open()
-    status_label.text = "Open: yes" if result else "Open: no"
-```

@@ -24,18 +24,3 @@ var title: SteamLocalizedText
 | Type | [`SteamLocalizedText`](/api/classes/SteamLocalizedText) |
 | Access | Read only |
 | Getter | [`get_title()`](/api/classes/SteamNotificationSessionSpec/methods/get_title) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_title(
-    steam_notification_session_spec: SteamNotificationSessionSpec,
-    apply_title: Callable
-) -> void:
-    var title: SteamLocalizedText = steam_notification_session_spec.title
-    if title == null:
-        return
-    apply_title.call(title)
-```

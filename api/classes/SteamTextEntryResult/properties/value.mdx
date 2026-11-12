@@ -26,23 +26,3 @@ var value: SteamTextEntry
 ## Description
 
 Null when the keyboard could not complete.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_text_entry_result: SteamTextEntryResult,
-    apply_value: Callable
-) -> void:
-    if steam_text_entry_result == null:
-        return
-    if not steam_text_entry_result.ok:
-        push_warning(steam_text_entry_result.message)
-        return
-    var value: SteamTextEntry = steam_text_entry_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

@@ -19,15 +19,4 @@ get_manage_admission() -> bool
 
 `bool`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_manage_admission(
-    scene_load_manager: SceneLoadManager,
-    status_label: Label
-) -> void:
-    var result: bool = scene_load_manager.get_manage_admission()
-    status_label.text = "Manage admission: yes" if result else "Manage admission: no"
-```
+[See gameplay examples for `SceneLoadManager`](/api/classes/SceneLoadManager#examples).

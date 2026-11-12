@@ -27,18 +27,3 @@ var annotation_errors: int[] = []
 ## Description
 
 Steam's rejection maps to `FAILED`. A missing native action maps to `ERR_UNAVAILABLE`. A saved image stays available even when metadata fails.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_annotation_errors(
-    steam_screenshot: SteamScreenshot,
-    results_list: ItemList
-) -> void:
-    var annotation_errors: Array[int] = steam_screenshot.annotation_errors
-    results_list.clear()
-    for entry: int in annotation_errors:
-        results_list.add_item(str(entry))
-```

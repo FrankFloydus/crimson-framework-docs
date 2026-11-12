@@ -22,17 +22,3 @@ var changed: SteamItemInstance[]
 | Type | `SteamItemInstance[]` |
 | Access | Read only |
 | Getter | [`get_changed()`](/api/classes/SteamInventoryChange/methods/get_changed) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_changed(
-    steam_inventory_change: SteamInventoryChange,
-    add_changed_entry: Callable
-) -> void:
-    var changed: Array[SteamItemInstance] = steam_inventory_change.changed
-    for entry: SteamItemInstance in changed:
-        add_changed_entry.call(entry)
-```

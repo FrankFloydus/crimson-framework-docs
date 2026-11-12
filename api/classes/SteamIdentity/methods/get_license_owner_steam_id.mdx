@@ -26,16 +26,3 @@ get_license_owner_steam_id() -> String
 ## Description
 
 Empty when omitted.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_license_owner_steam_id(
-    steam_identity: SteamIdentity,
-    apply_license_owner_steam_id: Callable
-) -> void:
-    var result: String = steam_identity.get_license_owner_steam_id()
-    apply_license_owner_steam_id.call(result)
-```

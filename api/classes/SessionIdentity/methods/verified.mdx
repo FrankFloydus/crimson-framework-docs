@@ -29,15 +29,3 @@ static verified(provider: StringName, subject: String) -> SessionIdentity
 ## Description
 
 Returns null for a blank field, a provider longer than 64 characters, or a subject longer than 256 characters.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_verified(provider: StringName, subject: String, apply_verified: Callable) -> void:
-    var result: SessionIdentity = SessionIdentity.verified(provider, subject)
-    if result == null:
-        return
-    apply_verified.call(result)
-```

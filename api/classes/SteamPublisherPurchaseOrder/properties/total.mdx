@@ -25,16 +25,3 @@ var total: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_total()`](/api/classes/SteamPublisherPurchaseOrder/methods/get_total) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_total(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_total: Callable
-) -> void:
-    var total: int = steam_publisher_purchase_order.total
-    apply_total.call(total)
-```

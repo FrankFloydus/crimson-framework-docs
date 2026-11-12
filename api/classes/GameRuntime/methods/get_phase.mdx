@@ -23,12 +23,4 @@ get_phase() -> GameRuntime.Phase
 
 Listen to phase\_changed to observe transitions.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_phase(game_runtime: GameRuntime, phase_label: Label) -> void:
-    var result: GameRuntime.Phase = game_runtime.get_phase()
-    phase_label.text = "Phase: %s" % str(result)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

@@ -28,21 +28,3 @@ start_phase(phase_id: String) -> Error
 ## Description
 
 An already-open phase returns `ERR_BUSY`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_start_phase(steam_client: SteamClient, phase_id: String, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: Error = steam_timeline.start_phase(phase_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Start phase accepted."
-```

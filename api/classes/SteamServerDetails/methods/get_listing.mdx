@@ -25,15 +25,4 @@ get_listing() -> SteamListing
 
 Gameplay still verifies the connection certificate.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_listing(steam_server_details: SteamServerDetails, name_label: Label) -> void:
-    var result: SteamListing = steam_server_details.get_listing()
-    if result == null:
-        return
-    var name: String = result.name
-    name_label.text = "Name: %s" % str(name)
-```
+[See gameplay examples for `SteamServerDetails`](/api/classes/SteamServerDetails#examples).

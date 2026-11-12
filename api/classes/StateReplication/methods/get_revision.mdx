@@ -22,13 +22,3 @@ get_revision() -> int
 ## Description
 
 Returns zero when the transport is no longer current.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_revision(state_replication: StateReplication, revision_label: Label) -> void:
-    var result: int = state_replication.get_revision()
-    revision_label.text = "Revision: %s" % str(result)
-```

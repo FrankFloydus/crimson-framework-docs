@@ -20,23 +20,3 @@ get_value() -> SteamHttpResponse
 ## Return value
 
 [`SteamHttpResponse`](/api/classes/SteamHttpResponse)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_http_response_result: SteamHttpResponseResult,
-    apply_value: Callable
-) -> void:
-    if steam_http_response_result == null:
-        return
-    if not steam_http_response_result.ok:
-        push_warning(steam_http_response_result.message)
-        return
-    var result: SteamHttpResponse = steam_http_response_result.get_value()
-    if result == null:
-        return
-    apply_value.call(result)
-```

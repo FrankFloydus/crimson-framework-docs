@@ -29,18 +29,3 @@ unbind_peer(peer_id: int, generation: int) -> bool
 ## Description
 
 Returns whether a binding was removed.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_unbind_peer(
-    player_bindings: PlayerBindings,
-    peer_id: int,
-    generation: int,
-    status_label: Label
-) -> void:
-    var result: bool = player_bindings.unbind_peer(peer_id, generation)
-    status_label.text = "Unbind peer: yes" if result else "Unbind peer: no"
-```

@@ -20,13 +20,3 @@ get_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_id(steam_party_beacon: SteamPartyBeacon, id_label: Label) -> void:
-    var result: String = steam_party_beacon.get_id()
-    id_label.text = "Id: %s" % str(result)
-```

@@ -18,18 +18,3 @@ get_snapshot() -> Dictionary
 ## Return value
 
 `Dictionary`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_snapshot(
-    inventory_transaction_adapter: InventoryTransactionAdapter,
-    apply_snapshot: Callable
-) -> void:
-    var result: Dictionary = inventory_transaction_adapter.get_snapshot()
-    if result.is_empty():
-        return
-    apply_snapshot.call(result)
-```

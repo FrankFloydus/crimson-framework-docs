@@ -24,16 +24,3 @@ var partner_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_partner_id()`](/api/classes/SteamTradeSession/methods/get_partner_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_partner_id(
-    steam_trade_session: SteamTradeSession,
-    partner_id_label: Label
-) -> void:
-    var partner_id: String = steam_trade_session.partner_id
-    partner_id_label.text = "Partner id: %s" % str(partner_id)
-```

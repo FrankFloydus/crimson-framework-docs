@@ -28,24 +28,3 @@ with_replay(shared_file_handle: String) -> SteamScoreOptions
 ## Description
 
 Pass a nonzero decimal Steam Remote Storage handle belonging to the active app.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_with_replay(
-    steam_client: SteamClient,
-    shared_file_handle: String,
-    apply_replay: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_leaderboards: SteamLeaderboards = steam_client.leaderboards()
-    if steam_leaderboards == null:
-        return
-    var result: SteamScoreOptions = steam_leaderboards.with_replay(shared_file_handle)
-    if result == null:
-        return
-    apply_replay.call(result)
-```

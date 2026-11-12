@@ -20,13 +20,3 @@ is_hidden() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_hidden(steam_achievement: SteamAchievement, status_label: Label) -> void:
-    var result: bool = steam_achievement.is_hidden()
-    status_label.text = "Hidden: yes" if result else "Hidden: no"
-```

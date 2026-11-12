@@ -24,15 +24,3 @@ get_items() -> SteamWorkshopItem[]
 ## Description
 
 A page contains up to 50 items.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_items(steam_workshop_page: SteamWorkshopPage, results_list: ItemList) -> void:
-    var result: Array[SteamWorkshopItem] = steam_workshop_page.get_items()
-    results_list.clear()
-    for entry: SteamWorkshopItem in result:
-        results_list.add_item(str(entry.title))
-```

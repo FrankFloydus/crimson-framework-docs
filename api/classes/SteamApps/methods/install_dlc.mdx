@@ -28,21 +28,3 @@ install_dlc(dlc_app_id: int) -> Error
 ## Description
 
 Steam's local subscription check must report ownership. `OK` confirms that the request was issued. Use `download_progress()`, `is_dlc_installed()`, or `dlc_installed` to observe installation.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_install_dlc(steam_client: SteamClient, dlc_app_id: int, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_apps: SteamApps = steam_client.apps()
-    if steam_apps == null:
-        return
-    var result: Error = steam_apps.install_dlc(dlc_app_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Install dlc accepted."
-```

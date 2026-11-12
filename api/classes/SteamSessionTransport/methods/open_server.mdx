@@ -30,25 +30,3 @@ open_server(port: int, remote_limit: int, bind_address: String) -> SessionTransp
 ## Description
 
 The bound peer count is 1 to 64. Listen Steam accepts the wildcard bind. A dedicated adapter accepts its configured IPv4 address or the wildcard selection of its configured interface.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_open_server(
-    steam_session_transport: SteamSessionTransport,
-    port: int,
-    remote_limit: int,
-    bind_address: String,
-    install_peer: Callable
-) -> void:
-    var result: SessionTransportResult = steam_session_transport.open_server(port, remote_limit, bind_address)
-    if result == null:
-        return
-    if result.get_error() != OK:
-        push_warning(error_string(result.get_error()))
-        return
-    var peer: MultiplayerPeer = result.get_peer()
-    install_peer.call(peer)
-```

@@ -29,15 +29,3 @@ static route(owner_id: int, virtual_port: int = 0) -> SessionEndpoint
 ## Description
 
 Return null when unavailable or invalid. Dedicated locators are resolved by the Steam game provider instead.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_route(owner_id: int, virtual_port: int, apply_route: Callable) -> void:
-    var result: SessionEndpoint = SteamSessionTransport.route(owner_id, virtual_port)
-    if result == null:
-        return
-    apply_route.call(result)
-```

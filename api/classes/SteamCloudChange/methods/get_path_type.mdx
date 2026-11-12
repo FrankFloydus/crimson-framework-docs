@@ -20,13 +20,3 @@ get_path_type() -> SteamCloudChange.PathType
 ## Return value
 
 `SteamCloudChange.PathType`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_path_type(steam_cloud_change: SteamCloudChange, path_type_label: Label) -> void:
-    var result: SteamCloudChange.PathType = steam_cloud_change.get_path_type()
-    path_type_label.text = "Path type: %s" % str(result)
-```

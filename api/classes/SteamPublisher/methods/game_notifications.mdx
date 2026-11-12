@@ -24,18 +24,3 @@ game_notifications() -> SteamGameNotifications
 ## Description
 
 Durable mutations require an injected `SteamPublisherSettings.notification_store`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_game_notifications(
-    steam_publisher: SteamPublisher,
-    apply_game_notifications: Callable
-) -> void:
-    var result: SteamGameNotifications = steam_publisher.game_notifications()
-    if result == null:
-        return
-    apply_game_notifications.call(result)
-```

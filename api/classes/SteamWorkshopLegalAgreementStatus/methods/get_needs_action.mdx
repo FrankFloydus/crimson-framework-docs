@@ -20,16 +20,3 @@ get_needs_action() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_needs_action(
-    steam_workshop_legal_agreement_status: SteamWorkshopLegalAgreementStatus,
-    status_label: Label
-) -> void:
-    var result: bool = steam_workshop_legal_agreement_status.get_needs_action()
-    status_label.text = "Needs action: yes" if result else "Needs action: no"
-```

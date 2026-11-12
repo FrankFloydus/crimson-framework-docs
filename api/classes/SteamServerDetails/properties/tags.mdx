@@ -24,14 +24,4 @@ var tags: PackedStringArray = PackedStringArray()
 | Default | `PackedStringArray()` |
 | Getter | [`get_tags()`](/api/classes/SteamServerDetails/methods/get_tags) |
 
-## Example
-
-```gdscript
-extends Node
-
-func refresh_tags(steam_server_details: SteamServerDetails, results_list: ItemList) -> void:
-    var tags: PackedStringArray = steam_server_details.tags
-    results_list.clear()
-    for entry: String in tags:
-        results_list.add_item(str(entry))
-```
+[See gameplay examples for `SteamServerDetails`](/api/classes/SteamServerDetails#examples).

@@ -20,16 +20,3 @@ get_item_eligibility() -> Callable
 ## Return value
 
 `Callable`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_item_eligibility(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    action_button: Button
-) -> void:
-    var result: Callable = spatial_inventory_trade.get_item_eligibility()
-    action_button.disabled = not result.is_valid()
-```

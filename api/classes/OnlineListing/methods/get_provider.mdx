@@ -20,13 +20,3 @@ get_provider() -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_provider(online_listing: OnlineListing, provider_label: Label) -> void:
-    var result: StringName = online_listing.get_provider()
-    provider_label.text = "Provider: %s" % str(result)
-```

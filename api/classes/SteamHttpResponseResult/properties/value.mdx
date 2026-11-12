@@ -26,23 +26,3 @@ var value: SteamHttpResponse
 ## Description
 
 The value is `null` on failure.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_http_response_result: SteamHttpResponseResult,
-    apply_value: Callable
-) -> void:
-    if steam_http_response_result == null:
-        return
-    if not steam_http_response_result.ok:
-        push_warning(steam_http_response_result.message)
-        return
-    var value: SteamHttpResponse = steam_http_response_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

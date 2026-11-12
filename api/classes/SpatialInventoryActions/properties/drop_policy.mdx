@@ -28,18 +28,3 @@ var drop_policy: Callable = Callable()
 ## Description
 
 Stack edits can add target or quantity fields. Return an empty String to allow the edit.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_drop_policy(
-    spatial_inventory_actions: SpatialInventoryActions,
-    new_drop_policy: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_actions.drop_policy = new_drop_policy
-    var active_drop_policy: Callable = spatial_inventory_actions.drop_policy
-    action_button.disabled = not active_drop_policy.is_valid()
-```

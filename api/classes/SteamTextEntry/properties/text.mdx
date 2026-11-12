@@ -27,13 +27,3 @@ var text: String = ""
 ## Description
 
 Hidden mode masks characters during input and still returns the submitted value here.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_text(steam_text_entry: SteamTextEntry, text_label: Label) -> void:
-    var text: String = steam_text_entry.text
-    text_label.text = "Text: %s" % str(text)
-```

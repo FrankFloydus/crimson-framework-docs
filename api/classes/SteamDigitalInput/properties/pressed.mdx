@@ -26,13 +26,3 @@ var pressed: bool
 ## Description
 
 False when inactive.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_pressed(steam_digital_input: SteamDigitalInput, status_label: Label) -> void:
-    var pressed: bool = steam_digital_input.pressed
-    status_label.text = "Pressed: yes" if pressed else "Pressed: no"
-```

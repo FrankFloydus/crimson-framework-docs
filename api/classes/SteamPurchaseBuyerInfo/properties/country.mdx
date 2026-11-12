@@ -25,16 +25,3 @@ var country: String = ""
 | Access | Read only |
 | Default | `""` |
 | Getter | [`get_country()`](/api/classes/SteamPurchaseBuyerInfo/methods/get_country) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_country(
-    steam_purchase_buyer_info: SteamPurchaseBuyerInfo,
-    country_label: Label
-) -> void:
-    var country: String = steam_purchase_buyer_info.country
-    country_label.text = "Country: %s" % str(country)
-```

@@ -30,21 +30,3 @@ equip(id: StringName, slot: StringName, expected: Dictionary = {}) -> Dictionary
 ## Description
 
 Supply a preview as `expected` to reject a stale result with `ERR_BUSY`. Inspect `error` and `committed` in the result.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_equip(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    id: StringName,
-    slot: StringName,
-    expected: Dictionary,
-    apply_equip: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_equipment.equip(id, slot, expected)
-    if result.is_empty():
-        return
-    apply_equip.call(result)
-```

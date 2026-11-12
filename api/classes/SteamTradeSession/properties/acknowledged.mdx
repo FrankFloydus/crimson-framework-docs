@@ -24,13 +24,3 @@ var acknowledged: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`is_acknowledged()`](/api/classes/SteamTradeSession/methods/is_acknowledged) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_acknowledged(steam_trade_session: SteamTradeSession, status_label: Label) -> void:
-    var acknowledged: bool = steam_trade_session.acknowledged
-    status_label.text = "Acknowledged: yes" if acknowledged else "Acknowledged: no"
-```

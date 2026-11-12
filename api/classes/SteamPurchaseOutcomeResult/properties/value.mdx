@@ -26,23 +26,3 @@ var value: SteamPurchaseOutcome
 ## Description
 
 A recoverable error can also carry an existing order whose state is `SteamPurchaseOutcome.RECONCILING`.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_purchase_outcome_result: SteamPurchaseOutcomeResult,
-    apply_value: Callable
-) -> void:
-    if steam_purchase_outcome_result == null:
-        return
-    if not steam_purchase_outcome_result.ok:
-        push_warning(steam_purchase_outcome_result.message)
-        return
-    var value: SteamPurchaseOutcome = steam_purchase_outcome_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

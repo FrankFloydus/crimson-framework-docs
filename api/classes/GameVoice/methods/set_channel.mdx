@@ -28,23 +28,3 @@ set_channel(channel: GameVoice.Channel) -> Error
 ## Description
 
 The game authority evaluates the channel and recipient policy before any remote delivery.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_channel(
-    game_runtime: GameRuntime,
-    channel: GameVoice.Channel,
-    status_label: Label
-) -> void:
-    var game_voice: GameVoice = game_runtime.voice()
-    if game_voice == null:
-        return
-    var result: Error = game_voice.set_channel(channel)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set channel accepted."
-```

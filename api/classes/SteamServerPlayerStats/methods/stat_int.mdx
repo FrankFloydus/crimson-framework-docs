@@ -28,23 +28,3 @@ stat_int(name: StringName) -> SteamIntResult
 ## Description
 
 A missing definition or wrong type returns `ERR_DOES_NOT_EXIST`. An unloaded cache returns `ERR_UNCONFIGURED`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_stat_int(
-    steam_server_player_stats: SteamServerPlayerStats,
-    name: StringName,
-    stat_int_label: Label
-) -> void:
-    var result: SteamIntResult = steam_server_player_stats.stat_int(name)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: int = result.value
-    stat_int_label.text = "Stat int: %s" % str(payload)
-```

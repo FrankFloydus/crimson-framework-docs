@@ -19,15 +19,4 @@ apps() -> SteamApps
 
 [`SteamApps`](/api/classes/SteamApps)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_apps(steam_client: SteamClient, language_label: Label) -> void:
-    var result: SteamApps = steam_client.apps()
-    if result == null:
-        return
-    var language: String = result.current_language()
-    language_label.text = "Language: %s" % str(language)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

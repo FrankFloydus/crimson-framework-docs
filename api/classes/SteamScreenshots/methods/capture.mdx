@@ -22,21 +22,3 @@ capture() -> Error
 ## Description
 
 Return `OK` when the request was issued. Observe `screenshot_ready` after a successful save. Return `ERR_BUSY` while the overlay is unavailable for capture or another integration has hooked screenshots.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_capture(steam_client: SteamClient, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_screenshots: SteamScreenshots = steam_client.screenshots()
-    if steam_screenshots == null:
-        return
-    var result: Error = steam_screenshots.capture()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Capture accepted."
-```

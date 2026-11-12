@@ -20,24 +20,3 @@ get_value() -> SteamWorkshopSubscription
 ## Return value
 
 [`SteamWorkshopSubscription`](/api/classes/SteamWorkshopSubscription)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_workshop_subscription_result: SteamWorkshopSubscriptionResult,
-    published_id_label: Label
-) -> void:
-    if steam_workshop_subscription_result == null:
-        return
-    if not steam_workshop_subscription_result.ok:
-        push_warning(steam_workshop_subscription_result.message)
-        return
-    var result: SteamWorkshopSubscription = steam_workshop_subscription_result.get_value()
-    if result == null:
-        return
-    var published_id: String = result.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```

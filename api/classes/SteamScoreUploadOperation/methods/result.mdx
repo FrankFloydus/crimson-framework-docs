@@ -18,25 +18,3 @@ result() -> SteamScoreUploadResult
 ## Return value
 
 [`SteamScoreUploadResult`](/api/classes/SteamScoreUploadResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_score_upload_operation: SteamScoreUploadOperation,
-    score_label: Label
-) -> void:
-    var result: SteamScoreUploadResult = steam_score_upload_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamScoreUpload = result.value
-    if payload == null:
-        return
-    var score: int = payload.score
-    score_label.text = "Score: %s" % str(score)
-```

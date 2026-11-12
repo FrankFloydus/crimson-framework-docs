@@ -30,18 +30,3 @@ var encrypted_ticket_key_ref: StringName = &""
 ## Description
 
 Required for local encrypted ownership verification.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_encrypted_ticket_key_ref(
-    steam_publisher_settings: SteamPublisherSettings,
-    new_encrypted_ticket_key_ref: StringName,
-    apply_encrypted_ticket_key_ref: Callable
-) -> void:
-    steam_publisher_settings.encrypted_ticket_key_ref = new_encrypted_ticket_key_ref
-    var active_encrypted_ticket_key_ref: StringName = steam_publisher_settings.encrypted_ticket_key_ref
-    apply_encrypted_ticket_key_ref.call(active_encrypted_ticket_key_ref)
-```

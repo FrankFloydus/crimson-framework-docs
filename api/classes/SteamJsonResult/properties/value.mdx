@@ -26,18 +26,3 @@ var value: Variant
 ## Description
 
 Check `SteamResult.ok` for parse success.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_json_result: SteamJsonResult, apply_value: Callable) -> void:
-    if steam_json_result == null:
-        return
-    if not steam_json_result.ok:
-        push_warning(steam_json_result.message)
-        return
-    var value: Variant = steam_json_result.value
-    apply_value.call(value)
-```

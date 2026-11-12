@@ -22,13 +22,3 @@ var active: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`is_active()`](/api/classes/SteamAnalogInput/methods/is_active) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_active(steam_analog_input: SteamAnalogInput, status_label: Label) -> void:
-    var active: bool = steam_analog_input.active
-    status_label.text = "Active: yes" if active else "Active: no"
-```

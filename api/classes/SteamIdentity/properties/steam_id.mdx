@@ -24,13 +24,3 @@ var steam_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_steam_id()`](/api/classes/SteamIdentity/methods/get_steam_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_steam_id(steam_identity: SteamIdentity, apply_steam_id: Callable) -> void:
-    var steam_id: String = steam_identity.steam_id
-    apply_steam_id.call(steam_id)
-```

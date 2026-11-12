@@ -30,19 +30,3 @@ declare_participant(id: String, version: int, required: bool = true) -> bool
 ## Description
 
 During load, a missing required participant fails. An optional participant supplies a default through its adapter. Returns true if declared successfully.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_declare_participant(
-    save_coordinator: SaveCoordinator,
-    id: String,
-    version: int,
-    required: bool,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.declare_participant(id, version, required)
-    status_label.text = "Declare participant: yes" if result else "Declare participant: no"
-```

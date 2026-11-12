@@ -25,20 +25,3 @@ var host: SteamPublisherHost
 | Access | Read and write |
 | Getter | [`get_host()`](/api/classes/SteamPublisherSettings/methods/get_host) |
 | Setter | [`set_host()`](/api/classes/SteamPublisherSettings/methods/set_host) |
-
-## Example
-
-```gdscript
-extends Node
-
-func update_host(
-    steam_publisher_settings: SteamPublisherSettings,
-    new_host: SteamPublisherHost,
-    apply_host: Callable
-) -> void:
-    steam_publisher_settings.host = new_host
-    var active_host: SteamPublisherHost = steam_publisher_settings.host
-    if active_host == null:
-        return
-    apply_host.call(active_host)
-```

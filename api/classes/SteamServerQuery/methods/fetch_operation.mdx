@@ -29,30 +29,4 @@ fetch_operation(timeout_ms: int = 5000) -> SteamListingsOperation
 
 A scope permits one active search.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_fetch_operation(
-    steam_server_browser: SteamServerBrowser,
-    timeout_ms: int,
-    results_list: ItemList
-) -> void:
-    var steam_server_query: SteamServerQuery = steam_server_browser.query()
-    if steam_server_query == null:
-        return
-    var result: SteamListingsOperation = steam_server_query.fetch_operation(timeout_ms)
-    if result == null:
-        return
-    var result_value: SteamListingsResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: Array[SteamListing] = result_value.value
-    results_list.clear()
-    for entry: SteamListing in payload:
-        results_list.add_item(str(entry.name))
-```
+[See gameplay examples for `SteamServerQuery`](/api/classes/SteamServerQuery#examples).

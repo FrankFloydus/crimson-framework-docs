@@ -26,18 +26,3 @@ var value: String
 ## Description
 
 A temporary video URL is account-specific and should stay out of logs.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_string_result: SteamStringResult, value_label: Label) -> void:
-    if steam_string_result == null:
-        return
-    if not steam_string_result.ok:
-        push_warning(steam_string_result.message)
-        return
-    var value: String = steam_string_result.value
-    value_label.text = "Value: %s" % str(value)
-```

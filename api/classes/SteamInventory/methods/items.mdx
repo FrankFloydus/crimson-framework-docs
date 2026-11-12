@@ -22,26 +22,3 @@ items() -> Variant
 ## Description
 
 Call when a view needs refresh. Steam can rate-limit full reads and return cached results. Inspect the snapshot's freshness before making decisions that require current inventory.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_items(steam_client: SteamClient, apply_items: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_inventory: SteamInventory = steam_client.inventory()
-    if steam_inventory == null:
-        return
-    var result: SteamInventorySnapshotResult = await steam_inventory.items()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventorySnapshot = result.value
-    if payload == null:
-        return
-    apply_items.call(payload)
-```

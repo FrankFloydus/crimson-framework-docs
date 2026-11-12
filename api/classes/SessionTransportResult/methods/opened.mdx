@@ -28,19 +28,3 @@ static opened(peer: MultiplayerPeer) -> SessionTransportResult
 ## Description
 
 A null peer produces a result with ERR\_INVALID\_PARAMETER.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_opened(peer: MultiplayerPeer, install_peer: Callable) -> void:
-    var result: SessionTransportResult = SessionTransportResult.opened(peer)
-    if result == null:
-        return
-    if result.get_error() != OK:
-        push_warning(error_string(result.get_error()))
-        return
-    var peer_value: MultiplayerPeer = result.get_peer()
-    install_peer.call(peer_value)
-```

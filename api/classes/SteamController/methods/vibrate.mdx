@@ -29,21 +29,3 @@ vibrate(low: float, high: float) -> Error
 ## Description
 
 Pass zero for both to clear the request. `OK` acknowledges the SDK submission. A disconnected controller or missing vibration capability returns `ERR_UNAVAILABLE`. Nonfinite or out-of-range values return `ERR_INVALID_PARAMETER`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_vibrate(
-    steam_controller: SteamController,
-    low: float,
-    high: float,
-    status_label: Label
-) -> void:
-    var result: Error = steam_controller.vibrate(low, high)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Vibrate accepted."
-```

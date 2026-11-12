@@ -31,20 +31,3 @@ request_load(profile: String, slot: String, sequence: String = "", generation_id
 ## Description
 
 To load a specific generation, pass both `sequence` and `generation_id` from inspection. Returns a ticket or 0 on rejection.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_request_load(
-    save_coordinator: SaveCoordinator,
-    profile: String,
-    slot: String,
-    sequence: String,
-    generation_id: String,
-    request_load_label: Label
-) -> void:
-    var result: int = save_coordinator.request_load(profile, slot, sequence, generation_id)
-    request_load_label.text = "Request load: %s" % str(result)
-```

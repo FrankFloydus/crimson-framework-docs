@@ -19,23 +19,4 @@ result() -> SteamServerDetailsResult
 
 [`SteamServerDetailsResult`](/api/classes/SteamServerDetailsResult)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_server_details_operation: SteamServerDetailsOperation,
-    apply_result: Callable
-) -> void:
-    var result: SteamServerDetailsResult = steam_server_details_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamServerDetails = result.value
-    if payload == null:
-        return
-    apply_result.call(payload)
-```
+[See gameplay examples for `SteamServerDetailsOperation`](/api/classes/SteamServerDetailsOperation#examples).

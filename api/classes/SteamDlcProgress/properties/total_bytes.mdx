@@ -26,16 +26,3 @@ var total_bytes: int
 ## Description
 
 Zero indicates an inactive transfer or an unknown total.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_total_bytes(
-    steam_dlc_progress: SteamDlcProgress,
-    total_bytes_label: Label
-) -> void:
-    var total_bytes: int = steam_dlc_progress.total_bytes
-    total_bytes_label.text = "Total bytes: %s" % str(total_bytes)
-```

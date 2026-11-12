@@ -28,20 +28,3 @@ import_snapshot(snapshot: Dictionary) -> Error
 ## Description
 
 An incompatible snapshot returns an error and preserves committed state.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_import_snapshot(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    snapshot: Dictionary,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_trade.import_snapshot(snapshot)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Import snapshot accepted."
-```

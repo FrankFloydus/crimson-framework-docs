@@ -18,16 +18,3 @@ get_stack_records_revision() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_stack_records_revision(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    stack_records_revision_label: Label
-) -> void:
-    var result: int = spatial_inventory_stack_adapter.get_stack_records_revision()
-    stack_records_revision_label.text = "Stack records revision: %s" % str(result)
-```

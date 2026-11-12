@@ -18,27 +18,3 @@ fetch_operation() -> SteamLeaderboardPageOperation
 ## Return value
 
 [`SteamLeaderboardPageOperation`](/api/classes/SteamLeaderboardPageOperation)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_fetch_operation(
-    steam_leaderboard_query: SteamLeaderboardQuery,
-    apply_fetch_operation: Callable
-) -> void:
-    var result: SteamLeaderboardPageOperation = steam_leaderboard_query.fetch_operation()
-    if result == null:
-        return
-    var result_value: SteamLeaderboardPageResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamLeaderboardPage = result_value.value
-    if payload == null:
-        return
-    apply_fetch_operation.call(payload)
-```

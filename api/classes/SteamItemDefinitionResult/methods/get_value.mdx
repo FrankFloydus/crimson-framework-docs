@@ -20,24 +20,3 @@ get_value() -> SteamItemDefinition
 ## Return value
 
 [`SteamItemDefinition`](/api/classes/SteamItemDefinition)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_item_definition_result: SteamItemDefinitionResult,
-    display_name_label: Label
-) -> void:
-    if steam_item_definition_result == null:
-        return
-    if not steam_item_definition_result.ok:
-        push_warning(steam_item_definition_result.message)
-        return
-    var result: SteamItemDefinition = steam_item_definition_result.get_value()
-    if result == null:
-        return
-    var display_name: String = result.display_name
-    display_name_label.text = "Display name: %s" % str(display_name)
-```

@@ -20,15 +20,3 @@ get_location() -> SteamPartyLocation
 ## Return value
 
 [`SteamPartyLocation`](/api/classes/SteamPartyLocation)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_location(steam_party_listing: SteamPartyListing, apply_location: Callable) -> void:
-    var result: SteamPartyLocation = steam_party_listing.get_location()
-    if result == null:
-        return
-    apply_location.call(result)
-```

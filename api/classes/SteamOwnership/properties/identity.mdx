@@ -24,16 +24,3 @@ var identity: SteamIdentity
 | Type | [`SteamIdentity`](/api/classes/SteamIdentity) |
 | Access | Read only |
 | Getter | [`get_identity()`](/api/classes/SteamOwnership/methods/get_identity) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_identity(steam_ownership: SteamOwnership, app_id_label: Label) -> void:
-    var identity: SteamIdentity = steam_ownership.identity
-    if identity == null:
-        return
-    var app_id: int = identity.app_id
-    app_id_label.text = "App id: %s" % str(app_id)
-```

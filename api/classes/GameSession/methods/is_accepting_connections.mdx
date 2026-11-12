@@ -22,13 +22,3 @@ is_accepting_connections() -> bool
 ## Description
 
 Returns false outside the host role.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_accepting_connections(game_session: GameSession, status_label: Label) -> void:
-    var result: bool = game_session.is_accepting_connections()
-    status_label.text = "Accepting connections: yes" if result else "Accepting connections: no"
-```

@@ -33,58 +33,76 @@ The coordinator checks that revision during commit. Returns `ERR\_UNAVAILABLE` f
 
 ## Example
 
-```gdscript
-extends Node
+### Spend scrap to repair a bridge
 
-const PICKUP_STORE: String = "world_pickups"
-const WALLET_STORE: String = "player_wallet"
-const COIN_POUCH: String = "coin_pouch_at_gate"
-const POUCH_COINS: int = 8
+Press **Repair Bridge** to commit the scrap cost and the repair together. On success, the barricade disappears and the supply label shows the remaining scrap.
+
+```gdscript
+extends Node3D
+
+const SUPPLIES: String = "supplies"
+const BRIDGES: String = "bridges"
+const STARTING_SCRAP: int = 10
+const REPAIR_COST: int = 6
+
+@export var repair_button: Button
+@export var barricade: Node3D
+@export var supply_status: Label
+
+var _stores: TransactionCoordinator = TransactionCoordinator.new()
+
 
 func _ready() -> void:
-    var coordinator: TransactionCoordinator = TransactionCoordinator.new()
-    var registered: Error = coordinator.register_store(
-        PICKUP_STORE, {COIN_POUCH: true}, _prepare_pickups
+    repair_button.disabled = true
+    var error: Error = _stores.register_store(
+        SUPPLIES, {"scrap": STARTING_SCRAP}, _prepare_supplies
     )
-    if registered == OK:
-        registered = coordinator.register_store(WALLET_STORE, {"coins": 0}, _prepare_wallet)
-    if registered != OK:
-        push_error(error_string(registered))
+    if error == OK:
+        error = _stores.register_store(BRIDGES, {"repaired": false}, _prepare_bridge)
+    if error != OK:
+        supply_status.text = error_string(error)
+        return
+    repair_button.pressed.connect(_repair_bridge)
+    repair_button.disabled = false
+    supply_status.text = "Repair the bridge for %d scrap." % REPAIR_COST
+
+
+func _repair_bridge() -> void:
+    var transaction: GameTransaction = _stores.begin()
+    var error: Error = transaction.add_change(
+        SUPPLIES, {"cost": REPAIR_COST}, _stores.get_store_revision(SUPPLIES)
+    )
+    if error == OK:
+        error = transaction.add_change(
+            BRIDGES, {"repair": true}, _stores.get_store_revision(BRIDGES)
+        )
+    if error != OK:
+        supply_status.text = error_string(error)
+        return
+    var result: Dictionary = _stores.commit(transaction)
+    if not result.ok:
+        supply_status.text = result.message
         return
 
-    # Run these changes together when the authority awards a pickup.
-    var collect: GameTransaction = coordinator.begin()
-    var pickup_revision: int = coordinator.get_store_revision(PICKUP_STORE)
-    var wallet_revision: int = coordinator.get_store_revision(WALLET_STORE)
-    var queued: Error = collect.add_change(PICKUP_STORE, {"take": COIN_POUCH}, pickup_revision)
-    if queued == OK:
-        queued = collect.add_change(WALLET_STORE, {"add": POUCH_COINS}, wallet_revision)
-    if queued != OK:
-        push_warning(error_string(queued))
-        return
+    var supplies: Dictionary = _stores.read_store(SUPPLIES)
+    barricade.queue_free()
+    repair_button.disabled = true
+    supply_status.text = "Bridge open. Scrap remaining: %d" % int(supplies.scrap)
 
-    var committed: Dictionary = coordinator.commit(collect)
-    if not committed.get("ok", false):
-        push_warning(String(committed.get("message", "Pickup rejected.")))
-        return
 
-    var pickups: Dictionary = coordinator.read_store(PICKUP_STORE)
-    var wallet: Dictionary = coordinator.read_store(WALLET_STORE)
-    print("Pickup still visible: ", pickups[COIN_POUCH], "; HUD coins: ", wallet["coins"])
-
-func _prepare_pickups(state: Dictionary, operations: Array, _context: Dictionary) -> Dictionary:
+func _prepare_supplies(current: Dictionary, operations: Array, _context: Dictionary) -> Dictionary:
     for operation: Dictionary in operations:
-        var pickup_id: String = String(operation["take"])
-        if not state.get(pickup_id, false):
-            return {"ok": false, "message": "This pickup was already collected."}
-        state[pickup_id] = false
-    return {"ok": true, "state": state}
+        var cost: int = operation.get("cost", 0)
+        if cost <= 0 or cost > int(current.scrap):
+            return {"ok": false, "message": "You need more scrap to repair the bridge."}
+        current.scrap -= cost
+    return {"ok": true, "state": current}
 
-func _prepare_wallet(state: Dictionary, operations: Array, _context: Dictionary) -> Dictionary:
+
+func _prepare_bridge(current: Dictionary, operations: Array, _context: Dictionary) -> Dictionary:
     for operation: Dictionary in operations:
-        var amount: int = int(operation["add"])
-        if amount <= 0:
-            return {"ok": false, "message": "A pickup must award a positive amount."}
-        state["coins"] = int(state["coins"]) + amount
-    return {"ok": true, "state": state}
+        if current.repaired or not operation.get("repair", false):
+            return {"ok": false, "message": "The bridge is already repaired."}
+        current.repaired = true
+    return {"ok": true, "state": current}
 ```

@@ -20,16 +20,3 @@ get_client_size() -> Vector2i
 ## Return value
 
 `Vector2i`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_client_size(
-    steam_remote_play_session: SteamRemotePlaySession,
-    client_size_label: Label
-) -> void:
-    var result: Vector2i = steam_remote_play_session.get_client_size()
-    client_size_label.text = "Client size: %s" % str(result)
-```

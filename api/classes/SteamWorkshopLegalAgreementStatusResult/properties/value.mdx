@@ -22,24 +22,3 @@ var value: SteamWorkshopLegalAgreementStatus
 | Type | [`SteamWorkshopLegalAgreementStatus`](/api/classes/SteamWorkshopLegalAgreementStatus) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamWorkshopLegalAgreementStatusResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_workshop_legal_agreement_status_result: SteamWorkshopLegalAgreementStatusResult,
-    app_id_label: Label
-) -> void:
-    if steam_workshop_legal_agreement_status_result == null:
-        return
-    if not steam_workshop_legal_agreement_status_result.ok:
-        push_warning(steam_workshop_legal_agreement_status_result.message)
-        return
-    var value: SteamWorkshopLegalAgreementStatus = steam_workshop_legal_agreement_status_result.value
-    if value == null:
-        return
-    var app_id: int = value.app_id
-    app_id_label.text = "App id: %s" % str(app_id)
-```

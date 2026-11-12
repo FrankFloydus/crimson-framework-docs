@@ -22,23 +22,3 @@ var value: SteamSocketListener
 | Type | [`SteamSocketListener`](/api/classes/SteamSocketListener) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamSocketListenerResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_socket_listener_result: SteamSocketListenerResult,
-    apply_value: Callable
-) -> void:
-    if steam_socket_listener_result == null:
-        return
-    if not steam_socket_listener_result.ok:
-        push_warning(steam_socket_listener_result.message)
-        return
-    var value: SteamSocketListener = steam_socket_listener_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

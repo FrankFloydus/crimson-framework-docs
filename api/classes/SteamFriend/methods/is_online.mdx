@@ -20,13 +20,3 @@ is_online() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_online(steam_friend: SteamFriend, action_button: Button) -> void:
-    var result: bool = steam_friend.is_online()
-    action_button.disabled = not result
-```

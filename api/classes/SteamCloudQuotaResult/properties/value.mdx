@@ -22,24 +22,3 @@ var value: SteamCloudQuota
 | Type | [`SteamCloudQuota`](/api/classes/SteamCloudQuota) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamCloudQuotaResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_cloud_quota_result: SteamCloudQuotaResult,
-    total_bytes_label: Label
-) -> void:
-    if steam_cloud_quota_result == null:
-        return
-    if not steam_cloud_quota_result.ok:
-        push_warning(steam_cloud_quota_result.message)
-        return
-    var value: SteamCloudQuota = steam_cloud_quota_result.value
-    if value == null:
-        return
-    var total_bytes: int = value.total_bytes
-    total_bytes_label.text = "Total bytes: %s" % str(total_bytes)
-```

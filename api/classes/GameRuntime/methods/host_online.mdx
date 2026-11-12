@@ -32,12 +32,65 @@ Supply the advertised address, or an empty string for a provider that supplies a
 
 ## Example
 
+### Host a two-player game for Steam friends
+
+Press Host to open a two-player arena with one seat available to Steam friends and invitees. The [Steam hosting guide](/steam/listen-servers) shows how to configure the host.
+
 ```gdscript
-func host_steam_game(game: GameRuntime) -> void:
-    # Attach the game with multiplayer rules, world spawn points, and a ready Steam provider.
+extends Node
+
+const STEAM_APP_ID: int = 480
+const LOBBY_NAMESPACE: String = "crimson-arena"
+const ARENA_ID: StringName = &"arena"
+const TOTAL_SEATS: int = 2
+
+@export var host_button: Button
+@export var status_label: Label
+@export var arena_scene: PackedScene
+@export var player_scene: PackedScene
+
+var game: GameRuntime
+
+func _ready() -> void:
+    if host_button == null or status_label == null:
+        push_error("Assign the Host button and status label.")
+        return
+    host_button.pressed.connect(_host_for_friends)
+
+func _host_for_friends() -> void:
+    if arena_scene == null or player_scene == null:
+        status_label.text = "Assign the arena and player scenes."
+        return
+
+    host_button.disabled = true
+    var provider: SteamProvider = (
+        SteamProvider.configure()
+        .for_app(STEAM_APP_ID)
+        .with_lobby_namespace(LOBBY_NAMESPACE)
+        .friends_only()
+    )
+    var rules: MultiplayerRules = MultiplayerRules.listen_coop().with_max_players(TOTAL_SEATS)
+    var definition: GameDefinition = (
+        GameRuntime.configure()
+        .with_starting_world(ARENA_ID, arena_scene)
+        .with_player(player_scene)
+        .with_multiplayer(rules)
+        .with_provider(provider)
+    )
+    game = definition.boot(self)
+    if game == null:
+        status_label.text = "Could not create the game."
+        host_button.disabled = false
+        return
+
+    status_label.text = "Opening the arena…"
     var result: Dictionary = await game.host_online().wait()
     if not result.ok:
-        push_error(result.message)
+        status_label.text = result.message
+        game.queue_free()
+        game = null
+        host_button.disabled = false
         return
-    print("Lobby listing: ", game.get_online_listing())
+
+    status_label.text = "Arena open to friends. Lobby %s" % game.get_online_listing()
 ```

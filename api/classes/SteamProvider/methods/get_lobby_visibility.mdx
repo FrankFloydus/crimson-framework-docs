@@ -21,23 +21,4 @@ get_lobby_visibility() -> SteamProvider.Visibility
 
 `SteamProvider.Visibility`
 
-## Example
-
-```gdscript
-extends Node
-
-const STEAM_APP_ID: int = 480
-const LOBBY_NAMESPACE: String = "crimson-harbor"
-
-@export var lobby_details: Label
-
-# Attach to the lobby settings screen and assign its summary label.
-func _ready() -> void:
-    if lobby_details == null:
-        return
-    var provider: SteamProvider = SteamProvider.configure().for_app(STEAM_APP_ID)
-    provider = provider.with_lobby_namespace(LOBBY_NAMESPACE)
-    provider = provider.friends_only()
-    var visibility: SteamProvider.Visibility = provider.get_lobby_visibility()
-    lobby_details.text = "Joinable by Steam friends" if visibility == SteamProvider.FRIENDS_ONLY else "Invite only"
-```
+[See gameplay examples for `SteamProvider`](/api/classes/SteamProvider#examples).

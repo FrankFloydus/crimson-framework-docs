@@ -30,30 +30,3 @@ items(player: SteamIdentity) -> Variant
 ## Description
 
 The typed rows are detached and read-only. The publisher endpoint supplies no snapshot freshness evidence.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_items(
-    steam_publisher: SteamPublisher,
-    player: SteamIdentity,
-    apply_items: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_inventory: SteamPublisherInventory = steam_publisher.inventory()
-    if steam_publisher_inventory == null:
-        return
-    var result: SteamInventorySnapshotResult = await steam_publisher_inventory.items(player)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventorySnapshot = result.value
-    if payload == null:
-        return
-    apply_items.call(payload)
-```

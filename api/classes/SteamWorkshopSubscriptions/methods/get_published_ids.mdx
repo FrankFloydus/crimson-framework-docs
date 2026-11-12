@@ -21,17 +21,4 @@ get_published_ids() -> PackedStringArray
 
 `PackedStringArray`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_published_ids(
-    steam_workshop_subscriptions: SteamWorkshopSubscriptions,
-    results_list: ItemList
-) -> void:
-    var result: PackedStringArray = steam_workshop_subscriptions.get_published_ids()
-    results_list.clear()
-    for entry: String in result:
-        results_list.add_item(str(entry))
-```
+[See gameplay examples for `SteamWorkshopSubscriptions`](/api/classes/SteamWorkshopSubscriptions#examples).

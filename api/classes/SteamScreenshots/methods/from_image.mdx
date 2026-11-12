@@ -28,24 +28,3 @@ from_image(image: Image) -> SteamScreenshotRequest
 ## Description
 
 Each side is limited to 8192 pixels and the total to 16777216 pixels. Invalid input is reported when submitting the draft. Later edits to the original image do not affect the draft.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_from_image(
-    steam_client: SteamClient,
-    image: Image,
-    apply_from_image: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_screenshots: SteamScreenshots = steam_client.screenshots()
-    if steam_screenshots == null:
-        return
-    var result: SteamScreenshotRequest = steam_screenshots.from_image(image)
-    if result == null:
-        return
-    apply_from_image.call(result)
-```

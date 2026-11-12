@@ -22,16 +22,3 @@ var clip_count: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_clip_count()`](/api/classes/TimelinePhaseRecording/methods/get_clip_count) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_clip_count(
-    timeline_phase_recording: TimelinePhaseRecording,
-    clip_count_label: Label
-) -> void:
-    var clip_count: int = timeline_phase_recording.clip_count
-    clip_count_label.text = "Clip count: %s" % str(clip_count)
-```

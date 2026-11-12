@@ -24,16 +24,3 @@ get_text() -> String
 ## Description
 
 Future SDK severity codes use a generic diagnostic description.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_text(
-    steam_diagnostic_message: SteamDiagnosticMessage,
-    apply_text: Callable
-) -> void:
-    var result: String = steam_diagnostic_message.get_text()
-    apply_text.call(result)
-```

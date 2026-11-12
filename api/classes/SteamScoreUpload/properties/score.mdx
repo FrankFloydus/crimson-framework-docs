@@ -22,13 +22,3 @@ var score: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_score()`](/api/classes/SteamScoreUpload/methods/get_score) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_score(steam_score_upload: SteamScoreUpload, score_label: Label) -> void:
-    var score: int = steam_score_upload.score
-    score_label.text = "Score: %s" % str(score)
-```

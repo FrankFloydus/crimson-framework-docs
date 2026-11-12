@@ -23,23 +23,4 @@ friends() -> SteamFriends
 
 Returns null when this generation has ended.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_friends(steam_scope: SteamScope, results_list: ItemList) -> void:
-    var result: SteamFriends = steam_scope.friends()
-    if result == null:
-        return
-    var friends: SteamFriendsResult = result.list()
-    if friends == null:
-        return
-    if not friends.ok:
-        push_warning(friends.message)
-        return
-    var payload: Array[SteamFriend] = friends.value
-    results_list.clear()
-    for entry: SteamFriend in payload:
-        results_list.add_item(str(entry.display_name))
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

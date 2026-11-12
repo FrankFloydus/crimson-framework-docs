@@ -28,21 +28,3 @@ uninstall_dlc(dlc_app_id: int) -> Error
 ## Description
 
 Call after the player confirms removal. `OK` confirms that the request was issued. Use `is_dlc_installed()` to check the resulting state.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_uninstall_dlc(steam_client: SteamClient, dlc_app_id: int, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_apps: SteamApps = steam_client.apps()
-    if steam_apps == null:
-        return
-    var result: Error = steam_apps.uninstall_dlc(dlc_app_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Uninstall dlc accepted."
-```

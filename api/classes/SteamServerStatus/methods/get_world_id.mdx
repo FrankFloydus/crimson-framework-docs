@@ -21,18 +21,4 @@ get_world_id() -> StringName
 
 `StringName`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_world_id(
-    steam_dedicated_server: SteamDedicatedServer,
-    world_id_label: Label
-) -> void:
-    var steam_server_status: SteamServerStatus = steam_dedicated_server.status()
-    if steam_server_status == null:
-        return
-    var result: StringName = steam_server_status.get_world_id()
-    world_id_label.text = "World id: %s" % str(result)
-```
+[See gameplay examples for `SteamServerStatus`](/api/classes/SteamServerStatus#examples).

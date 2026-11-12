@@ -22,13 +22,3 @@ var name: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_name()`](/api/classes/SteamLeaderboardInfo/methods/get_name) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_name(steam_leaderboard_info: SteamLeaderboardInfo, name_label: Label) -> void:
-    var name: String = steam_leaderboard_info.name
-    name_label.text = "Name: %s" % str(name)
-```

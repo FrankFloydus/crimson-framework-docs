@@ -32,23 +32,3 @@ merge_stacks(source: SpatialInventory, id: StringName, destination: SpatialInven
 ## Description
 
 A positive `limit` caps the transfer. A zero limit uses the available capacity. The source placement is removed if its stack is depleted.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_merge_stacks(
-    spatial_inventory_actions: SpatialInventoryActions,
-    source: SpatialInventory,
-    id: StringName,
-    destination: SpatialInventory,
-    target_id: StringName,
-    limit: int,
-    apply_merge_stacks: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_actions.merge_stacks(source, id, destination, target_id, limit)
-    if result.is_empty():
-        return
-    apply_merge_stacks.call(result)
-```

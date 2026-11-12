@@ -21,15 +21,4 @@ get_starting_world() -> StringName
 
 `StringName`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_starting_world(
-    game_definition: GameDefinition,
-    starting_world_label: Label
-) -> void:
-    var result: StringName = game_definition.get_starting_world()
-    starting_world_label.text = "Starting world: %s" % str(result)
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

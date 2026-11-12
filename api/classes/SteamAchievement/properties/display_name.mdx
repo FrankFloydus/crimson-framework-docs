@@ -26,16 +26,3 @@ var display_name: String
 ## Description
 
 Uses `api_name` as a string when Steam omits the name.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_display_name(
-    steam_achievement: SteamAchievement,
-    display_name_label: Label
-) -> void:
-    var display_name: String = steam_achievement.display_name
-    display_name_label.text = "Display name: %s" % str(display_name)
-```

@@ -22,16 +22,3 @@ get_phase() -> SteamPublisherPurchaseOrder.Phase
 ## Return value
 
 `SteamPublisherPurchaseOrder.Phase`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_phase(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_phase: Callable
-) -> void:
-    var result: SteamPublisherPurchaseOrder.Phase = steam_publisher_purchase_order.get_phase()
-    apply_phase.call(result)
-```

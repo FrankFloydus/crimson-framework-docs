@@ -22,18 +22,3 @@ set_clip(value: int) -> void
 | Parameter | Type | Default |
 | --- | --- | --- |
 | `value` | `int` | — |
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_clip(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    value: int,
-    clip_label: Label
-) -> void:
-    timeline_marker_presentation.set_clip(value)
-    var active_clip: int = timeline_marker_presentation.clip
-    clip_label.text = "Clip: %s" % str(active_clip)
-```

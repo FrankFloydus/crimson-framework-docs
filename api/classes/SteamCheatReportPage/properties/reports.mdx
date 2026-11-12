@@ -24,17 +24,3 @@ var reports: SteamCheatReport[]
 | Type | `SteamCheatReport[]` |
 | Access | Read only |
 | Getter | [`get_reports()`](/api/classes/SteamCheatReportPage/methods/get_reports) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_reports(
-    steam_cheat_report_page: SteamCheatReportPage,
-    add_reports_entry: Callable
-) -> void:
-    var reports: Array[SteamCheatReport] = steam_cheat_report_page.reports
-    for entry: SteamCheatReport in reports:
-        add_reports_entry.call(entry)
-```

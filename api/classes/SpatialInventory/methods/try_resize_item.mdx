@@ -30,20 +30,4 @@ try_resize_item(id: StringName, footprint: Vector2i) -> Error
 
 An unsuccessful resize preserves the current placement.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_try_resize_item(
-    spatial_inventory: SpatialInventory,
-    id: StringName,
-    footprint: Vector2i,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory.try_resize_item(id, footprint)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Try resize item accepted."
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

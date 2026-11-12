@@ -19,16 +19,4 @@ input() -> SteamInput
 
 [`SteamInput`](/api/classes/SteamInput)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_input(steam_client: SteamClient, add_controllers_entry: Callable) -> void:
-    var result: SteamInput = steam_client.input()
-    if result == null:
-        return
-    var controllers: Array[SteamController] = result.controllers()
-    for entry: SteamController in controllers:
-        add_controllers_entry.call(entry)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

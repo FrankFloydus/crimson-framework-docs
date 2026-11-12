@@ -25,18 +25,3 @@ get_merge_capacity(id: StringName, key: StringName) -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_merge_capacity(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    id: StringName,
-    key: StringName,
-    merge_capacity_label: Label
-) -> void:
-    var result: int = spatial_inventory_stack_adapter.get_merge_capacity(id, key)
-    merge_capacity_label.text = "Merge capacity: %s" % str(result)
-```

@@ -19,14 +19,4 @@ presence() -> SteamPresence
 
 [`SteamPresence`](/api/classes/SteamPresence)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_presence(steam_client: SteamClient, apply_presence: Callable) -> void:
-    var result: SteamPresence = steam_client.presence()
-    if result == null:
-        return
-    apply_presence.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

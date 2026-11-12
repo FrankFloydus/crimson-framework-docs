@@ -24,16 +24,3 @@ var state: SteamNotificationUserState.State
 | Type | `SteamNotificationUserState.State` |
 | Access | Read only |
 | Getter | [`get_state()`](/api/classes/SteamNotificationUserState/methods/get_state) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_state(
-    steam_notification_user_state: SteamNotificationUserState,
-    apply_state: Callable
-) -> void:
-    var state: SteamNotificationUserState.State = steam_notification_user_state.state
-    apply_state.call(state)
-```

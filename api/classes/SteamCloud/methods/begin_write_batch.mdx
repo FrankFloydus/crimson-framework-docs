@@ -26,23 +26,55 @@ Keep `SteamCloudWriteBatchResult.value` alive and await each submitted asynchron
 ## Example
 
 ```gdscript
-const SETTINGS_FILE: String = "settings.json"
+extends Node
 
-const PROFILE_FILE: String = "profile.json"
-func store_profile_and_settings(
-    cloud: SteamCloud, profile: PackedByteArray, settings: PackedByteArray
-) -> void:
+const STEAM_TEST_APP_ID: int = 480
+const LOADOUT_FILE: String = "loadout.json"
+const CONTROLS_FILE: String = "controls.json"
+
+# Assign the selected loadout field, Invert Y checkbox, Save Profile
+# button, and status label. Enable Cloud for your app and use its AppID.
+@export var selected_loadout: LineEdit
+@export var invert_y: CheckBox
+@export var save_profile: Button
+@export var save_status: Label
+
+var _client: SteamClient
+
+func _ready() -> void:
+    if selected_loadout == null or invert_y == null or save_profile == null or save_status == null:
+        push_error("Assign the profile screen's controls.")
+        return
+    _client = SteamClient.boot(self, STEAM_TEST_APP_ID)
+    save_profile.pressed.connect(_save_profile_to_cloud)
+
+func _save_profile_to_cloud() -> void:
+    var cloud: SteamCloud = _client.cloud() if _client != null else null
+    if cloud == null:
+        save_status.text = "Steam Cloud is unavailable."
+        return
     var opened: SteamCloudWriteBatchResult = cloud.begin_write_batch()
     if not opened.ok:
-        push_warning(opened.message)
+        save_status.text = opened.message
         return
+
+    save_profile.disabled = true
+    save_status.text = "Saving the loadout and control preferences…"
     var batch: SteamCloudWriteBatch = opened.value
-    var profile_result: SteamResult = await cloud.write(PROFILE_FILE, profile)
-    if profile_result.ok:
-        var settings_result: SteamResult = await cloud.write(SETTINGS_FILE, settings)
-        if not settings_result.ok:
-            push_warning(settings_result.message)
+    var loadout: PackedByteArray = JSON.stringify({"name": selected_loadout.text}).to_utf8_buffer()
+    var controls: PackedByteArray = JSON.stringify({"invert_y": invert_y.button_pressed}).to_utf8_buffer()
+    var loadout_saved: SteamResult = await cloud.write(LOADOUT_FILE, loadout)
+    var controls_saved: SteamResult = await cloud.write(CONTROLS_FILE, controls)
+    var closed: Error = batch.close()
+    save_profile.disabled = false
+
+    # Both files have their own result. Closing the hint does not commit them together.
+    if not loadout_saved.ok or not controls_saved.ok:
+        var loadout_status: String = "saved" if loadout_saved.ok else loadout_saved.message
+        var controls_status: String = "saved" if controls_saved.ok else controls_saved.message
+        save_status.text = "Loadout: %s. Controls: %s." % [loadout_status, controls_status]
+    elif closed != OK:
+        save_status.text = "Files written. Steam did not acknowledge the end of the write batch."
     else:
-        push_warning(profile_result.message)
-    batch.close()
+        save_status.text = "Loadout and controls written to Steam Cloud."
 ```

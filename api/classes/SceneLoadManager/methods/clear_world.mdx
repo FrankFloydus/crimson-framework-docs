@@ -23,15 +23,4 @@ clear_world() -> Error
 
 Returns `ERR\_BUSY` during an active transition. Call on each participant during network teardown.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_clear_world(scene_load_manager: SceneLoadManager, status_label: Label) -> void:
-    var result: Error = scene_load_manager.clear_world()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Clear world accepted."
-```
+[See gameplay examples for `SceneLoadManager`](/api/classes/SceneLoadManager#examples).

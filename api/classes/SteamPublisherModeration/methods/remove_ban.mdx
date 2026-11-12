@@ -31,31 +31,3 @@ remove_ban(player_id: String, reason: String) -> Variant
 ## Description
 
 The `reason` stays in the trusted audit record. Returns [`SteamModerationReceiptResult`](/api/classes/SteamModerationReceiptResult). The exact game policy must authorize the request and reserve the audit record before Steam receives it. An expired or closed observation can leave the remote outcome unresolved.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_remove_ban(
-    steam_publisher: SteamPublisher,
-    player_id: String,
-    reason: String,
-    apply_remove_ban: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_moderation: SteamPublisherModeration = steam_publisher.moderation()
-    if steam_publisher_moderation == null:
-        return
-    var result: SteamModerationReceiptResult = await steam_publisher_moderation.remove_ban(player_id, reason)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamModerationReceipt = result.value
-    if payload == null:
-        return
-    apply_remove_ban.call(payload)
-```

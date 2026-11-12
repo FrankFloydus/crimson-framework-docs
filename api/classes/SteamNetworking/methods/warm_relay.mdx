@@ -22,21 +22,3 @@ warm_relay() -> Error
 ## Description
 
 `OK` means preparation was requested. Observe `relay_status_changed` or query `relay_status()` for readiness.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_warm_relay(steam_scope: SteamScope, status_label: Label) -> void:
-    if not steam_scope.is_ready():
-        return
-    var steam_networking: SteamNetworking = steam_scope.networking()
-    if steam_networking == null:
-        return
-    var result: Error = steam_networking.warm_relay()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Warm relay accepted."
-```

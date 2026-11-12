@@ -22,16 +22,3 @@ var size_bytes: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_size_bytes()`](/api/classes/SteamWorkshopInstall/methods/get_size_bytes) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_size_bytes(
-    steam_workshop_install: SteamWorkshopInstall,
-    size_bytes_label: Label
-) -> void:
-    var size_bytes: int = steam_workshop_install.size_bytes
-    size_bytes_label.text = "Size bytes: %s" % str(size_bytes)
-```

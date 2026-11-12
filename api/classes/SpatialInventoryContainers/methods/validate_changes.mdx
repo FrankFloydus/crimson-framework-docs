@@ -28,17 +28,3 @@ validate_changes(changes: Array) -> String
 ## Description
 
 Returns an empty String if the proposed batch preserves unique owners and acyclic nesting. Apply the batch separately to check geometry and commit.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_validate_changes(
-    spatial_inventory_containers: SpatialInventoryContainers,
-    changes: Array,
-    validate_changes_label: Label
-) -> void:
-    var result: String = spatial_inventory_containers.validate_changes(changes)
-    validate_changes_label.text = "Validate changes: %s" % str(result)
-```

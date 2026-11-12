@@ -25,26 +25,4 @@ Await the call to receive [`SteamWorkshopLegalAgreementStatusResult`](/api/class
 
 Check `SteamWorkshopLegalAgreementStatus.needs_action` and offer `show_legal_agreement()` as an explicit player action when needed.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_legal_agreement_status(steam_client: SteamClient, app_id_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_workshop: SteamWorkshop = steam_client.workshop()
-    if steam_workshop == null:
-        return
-    var result: SteamWorkshopLegalAgreementStatusResult = await steam_workshop.legal_agreement_status()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamWorkshopLegalAgreementStatus = result.value
-    if payload == null:
-        return
-    var app_id: int = payload.app_id
-    app_id_label.text = "App id: %s" % str(app_id)
-```
+[See gameplay examples for `SteamWorkshop`](/api/classes/SteamWorkshop#examples).

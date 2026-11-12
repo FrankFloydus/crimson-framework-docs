@@ -29,15 +29,3 @@ static direct(address: String, port: int) -> SessionEndpoint
 ## Description
 
 Trims surrounding whitespace from the address. Returns null for an empty address or a port outside 1 to 65535.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_direct(address: String, port: int, apply_direct: Callable) -> void:
-    var result: SessionEndpoint = SessionEndpoint.direct(address, port)
-    if result == null:
-        return
-    apply_direct.call(result)
-```

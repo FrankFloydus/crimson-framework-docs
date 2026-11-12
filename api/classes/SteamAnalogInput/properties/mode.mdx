@@ -23,13 +23,3 @@ var mode: SteamAnalogInput.Mode = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_mode()`](/api/classes/SteamAnalogInput/methods/get_mode) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_mode(steam_analog_input: SteamAnalogInput, mode_label: Label) -> void:
-    var mode: SteamAnalogInput.Mode = steam_analog_input.mode
-    mode_label.text = "Mode: %s" % str(mode)
-```

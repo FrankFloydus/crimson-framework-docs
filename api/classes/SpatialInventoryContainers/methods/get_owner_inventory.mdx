@@ -24,19 +24,3 @@ get_owner_inventory(item_id: StringName) -> SpatialInventory
 ## Return value
 
 [`SpatialInventory`](/api/classes/SpatialInventory)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_owner_inventory(
-    spatial_inventory_containers: SpatialInventoryContainers,
-    item_id: StringName,
-    apply_owner_inventory: Callable
-) -> void:
-    var result: SpatialInventory = spatial_inventory_containers.get_owner_inventory(item_id)
-    if result == null:
-        return
-    apply_owner_inventory.call(result)
-```

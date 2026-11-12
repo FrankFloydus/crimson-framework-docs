@@ -22,21 +22,3 @@ hardware_default_config() -> SteamUtils.HardwareDefaultConfig
 ## Description
 
 Use it when choosing initial settings and let players retain their own settings. Returns `CONFIG_UNAVAILABLE` when Steam cannot supply the query.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_hardware_default_config(
-    steam_client: SteamClient,
-    hardware_default_config_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_utils: SteamUtils = steam_client.utils()
-    if steam_utils == null:
-        return
-    var result: SteamUtils.HardwareDefaultConfig = steam_utils.hardware_default_config()
-    hardware_default_config_label.text = "Hardware default config: %s" % str(result)
-```

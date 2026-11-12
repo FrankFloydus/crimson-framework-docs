@@ -30,17 +30,22 @@ Assign a game with a starting world and multiplayer rules. The server starts whe
 
 ## Example
 
+### Run the cargo yard as a headless server
+
+Launch a configured cargo yard scene with `--headless` and pass `--crimson-role=server` after `--`. The server logs the mounted map and port so a direct-address guest can connect.
+
 ```gdscript
 extends Node
 
-func update_game(
-    dedicated_server_boot: DedicatedServerBoot,
-    new_game: GameRuntime,
-    apply_game: Callable
-) -> void:
-    dedicated_server_boot.game = new_game
-    var active_game: GameRuntime = dedicated_server_boot.game
-    if active_game == null:
-        return
-    apply_game.call(active_game)
+@export var server_game: GameRuntime
+@export var dedicated_boot: DedicatedServerBoot
+
+
+func _ready() -> void:
+    dedicated_boot.game = server_game
+    server_game.world_ready.connect(_on_world_ready)
+
+
+func _on_world_ready(world_id: StringName, _world_epoch: int) -> void:
+    print("Dedicated cargo yard loaded: ", world_id)
 ```

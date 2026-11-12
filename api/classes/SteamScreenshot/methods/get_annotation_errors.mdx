@@ -20,18 +20,3 @@ get_annotation_errors() -> int[]
 ## Return value
 
 `int[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_annotation_errors(
-    steam_screenshot: SteamScreenshot,
-    results_list: ItemList
-) -> void:
-    var result: Array[int] = steam_screenshot.get_annotation_errors()
-    results_list.clear()
-    for entry: int in result:
-        results_list.add_item(str(entry))
-```

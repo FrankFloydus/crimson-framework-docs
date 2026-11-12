@@ -22,22 +22,3 @@ var value: SteamPartyListing[]
 | Type | `SteamPartyListing[]` |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamPartyListingsResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_party_listings_result: SteamPartyListingsResult,
-    add_value_entry: Callable
-) -> void:
-    if steam_party_listings_result == null:
-        return
-    if not steam_party_listings_result.ok:
-        push_warning(steam_party_listings_result.message)
-        return
-    var value: Array[SteamPartyListing] = steam_party_listings_result.value
-    for entry: SteamPartyListing in value:
-        add_value_entry.call(entry)
-```

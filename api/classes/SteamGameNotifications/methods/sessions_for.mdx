@@ -26,33 +26,3 @@ sessions_for(user: SteamIdentity) -> SteamNotificationSessionsOperation
 ## Return value
 
 [`SteamNotificationSessionsOperation`](/api/classes/SteamNotificationSessionsOperation)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_sessions_for(
-    steam_publisher: SteamPublisher,
-    user: SteamIdentity,
-    results_list: ItemList
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_game_notifications: SteamGameNotifications = steam_publisher.game_notifications()
-    if steam_game_notifications == null:
-        return
-    var result: SteamNotificationSessionsOperation = steam_game_notifications.sessions_for(user)
-    if result == null:
-        return
-    var result_value: SteamNotificationSessionsResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: Array[SteamNotificationSession] = result_value.value
-    results_list.clear()
-    for entry: SteamNotificationSession in payload:
-        results_list.add_item(str(entry.title))
-```

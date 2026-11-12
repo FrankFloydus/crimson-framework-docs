@@ -30,31 +30,3 @@ upload(score: int, details: PackedInt32Array = PackedInt32Array(), force_update:
 ## Description
 
 Steam keeps the best score by default. Set `force_update` to replace it. Await a [`SteamScoreUploadResult`](/api/classes/SteamScoreUploadResult) for the typed score receipt. An overlapping write returns `@GlobalScope.ERR_BUSY`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_upload(
-    steam_leaderboard: SteamLeaderboard,
-    score: int,
-    details: PackedInt32Array,
-    force_update: bool,
-    score_label: Label
-) -> void:
-    var result: SteamScoreUploadOperation = steam_leaderboard.upload(score, details, force_update)
-    if result == null:
-        return
-    var result_value: SteamScoreUploadResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamScoreUpload = result_value.value
-    if payload == null:
-        return
-    var score_value: int = payload.score
-    score_label.text = "Score: %s" % str(score_value)
-```

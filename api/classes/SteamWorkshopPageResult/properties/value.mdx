@@ -22,23 +22,3 @@ var value: SteamWorkshopPage
 | Type | [`SteamWorkshopPage`](/api/classes/SteamWorkshopPage) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamWorkshopPageResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_workshop_page_result: SteamWorkshopPageResult,
-    apply_value: Callable
-) -> void:
-    if steam_workshop_page_result == null:
-        return
-    if not steam_workshop_page_result.ok:
-        push_warning(steam_workshop_page_result.message)
-        return
-    var value: SteamWorkshopPage = steam_workshop_page_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

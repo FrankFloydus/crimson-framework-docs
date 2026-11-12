@@ -22,25 +22,3 @@ locations() -> SteamPartyLocationsResult
 ## Description
 
 Empty eligible lists are valid.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_locations(steam_client: SteamClient, add_locations_entry: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_parties: SteamParties = steam_client.parties()
-    if steam_parties == null:
-        return
-    var result: SteamPartyLocationsResult = steam_parties.locations()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: Array[SteamPartyLocation] = result.value
-    for entry: SteamPartyLocation in payload:
-        add_locations_entry.call(entry)
-```

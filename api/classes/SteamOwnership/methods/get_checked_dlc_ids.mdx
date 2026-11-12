@@ -22,15 +22,3 @@ get_checked_dlc_ids() -> PackedInt64Array
 ## Return value
 
 `PackedInt64Array`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_checked_dlc_ids(steam_ownership: SteamOwnership, results_list: ItemList) -> void:
-    var result: PackedInt64Array = steam_ownership.get_checked_dlc_ids()
-    results_list.clear()
-    for entry: int in result:
-        results_list.add_item(str(entry))
-```

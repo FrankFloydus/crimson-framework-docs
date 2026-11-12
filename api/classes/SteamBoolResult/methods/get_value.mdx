@@ -20,18 +20,3 @@ get_value() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_bool_result: SteamBoolResult, status_label: Label) -> void:
-    if steam_bool_result == null:
-        return
-    if not steam_bool_result.ok:
-        push_warning(steam_bool_result.message)
-        return
-    var result: bool = steam_bool_result.get_value()
-    status_label.text = "Value: yes" if result else "Value: no"
-```

@@ -24,18 +24,3 @@ var variables: Dictionary[StringName, String]
 | Type | `Dictionary[StringName, String]` |
 | Access | Read only |
 | Getter | [`get_variables()`](/api/classes/SteamLocalizedText/methods/get_variables) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_variables(
-    steam_localized_text: SteamLocalizedText,
-    apply_variables: Callable
-) -> void:
-    var variables: Dictionary[StringName, String] = steam_localized_text.variables
-    if variables.is_empty():
-        return
-    apply_variables.call(variables)
-```

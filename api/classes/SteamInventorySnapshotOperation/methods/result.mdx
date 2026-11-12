@@ -18,24 +18,3 @@ result() -> SteamInventorySnapshotResult
 ## Return value
 
 [`SteamInventorySnapshotResult`](/api/classes/SteamInventorySnapshotResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_inventory_snapshot_operation: SteamInventorySnapshotOperation,
-    apply_result: Callable
-) -> void:
-    var result: SteamInventorySnapshotResult = steam_inventory_snapshot_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventorySnapshot = result.value
-    if payload == null:
-        return
-    apply_result.call(payload)
-```

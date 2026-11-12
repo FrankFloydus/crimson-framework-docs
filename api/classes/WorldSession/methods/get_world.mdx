@@ -23,14 +23,4 @@ get_world() -> Node3D
 
 The node remains valid only while it belongs to the session.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_world(world_session: WorldSession, world_label: Label) -> void:
-    var result: Node3D = world_session.get_world()
-    if result == null:
-        return
-    world_label.text = str(result.name)
-```
+[See gameplay examples for `WorldSession`](/api/classes/WorldSession#examples).

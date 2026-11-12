@@ -20,23 +20,3 @@ get_value() -> SteamBrowserPage
 ## Return value
 
 [`SteamBrowserPage`](/api/classes/SteamBrowserPage)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_browser_page_result: SteamBrowserPageResult,
-    apply_value: Callable
-) -> void:
-    if steam_browser_page_result == null:
-        return
-    if not steam_browser_page_result.ok:
-        push_warning(steam_browser_page_result.message)
-        return
-    var result: SteamBrowserPage = steam_browser_page_result.get_value()
-    if result == null:
-        return
-    apply_value.call(result)
-```

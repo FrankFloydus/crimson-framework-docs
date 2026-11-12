@@ -25,17 +25,3 @@ var lines: SteamPublisherPurchaseLine[] = []
 | Access | Read only |
 | Default | `[]` |
 | Getter | [`get_lines()`](/api/classes/SteamPublisherPurchaseOrder/methods/get_lines) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_lines(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    add_lines_entry: Callable
-) -> void:
-    var lines: Array[SteamPublisherPurchaseLine] = steam_publisher_purchase_order.lines
-    for entry: SteamPublisherPurchaseLine in lines:
-        add_lines_entry.call(entry)
-```

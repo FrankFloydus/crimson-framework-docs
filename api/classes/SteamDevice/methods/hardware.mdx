@@ -18,18 +18,3 @@ hardware() -> SteamDevice.Hardware
 ## Return value
 
 `SteamDevice.Hardware`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_hardware(steam_client: SteamClient, hardware_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_device: SteamDevice = steam_client.device()
-    if steam_device == null:
-        return
-    var result: SteamDevice.Hardware = steam_device.hardware()
-    hardware_label.text = "Hardware: %s" % str(result)
-```

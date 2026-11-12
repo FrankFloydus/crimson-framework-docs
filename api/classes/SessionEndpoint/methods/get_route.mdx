@@ -18,13 +18,3 @@ get_route() -> PackedByteArray
 ## Return value
 
 `PackedByteArray`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_route(session_endpoint: SessionEndpoint, byte_count_label: Label) -> void:
-    var result: PackedByteArray = session_endpoint.get_route()
-    byte_count_label.text = "%d bytes" % result.size()
-```

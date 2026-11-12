@@ -30,20 +30,4 @@ declare_command(name: String, requires_primary: bool = false) -> Error
 
 Match the authority's requires\_primary setting. Returns a Godot Error.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_declare_command(
-    game_runtime: GameRuntime,
-    name: String,
-    requires_primary: bool,
-    status_label: Label
-) -> void:
-    var result: Error = game_runtime.declare_command(name, requires_primary)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Declare command accepted."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

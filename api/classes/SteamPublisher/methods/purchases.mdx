@@ -24,15 +24,3 @@ purchases() -> SteamPublisherPurchases
 ## Description
 
 Actions require an injected `SteamPublisherSettings.purchase_store`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_purchases(steam_publisher: SteamPublisher, apply_purchases: Callable) -> void:
-    var result: SteamPublisherPurchases = steam_publisher.purchases()
-    if result == null:
-        return
-    apply_purchases.call(result)
-```

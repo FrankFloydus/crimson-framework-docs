@@ -22,16 +22,3 @@ get_app_id() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_app_id(
-    steam_publisher_settings: SteamPublisherSettings,
-    apply_app_id: Callable
-) -> void:
-    var result: int = steam_publisher_settings.get_app_id()
-    apply_app_id.call(result)
-```

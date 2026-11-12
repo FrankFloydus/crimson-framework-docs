@@ -23,14 +23,4 @@ inventory() -> SteamInventory
 
 Returns null after the attachment ends.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_inventory(steam_scope: SteamScope, apply_inventory: Callable) -> void:
-    var result: SteamInventory = steam_scope.inventory()
-    if result == null:
-        return
-    apply_inventory.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

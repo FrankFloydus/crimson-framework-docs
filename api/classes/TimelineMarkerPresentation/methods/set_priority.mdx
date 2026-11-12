@@ -22,18 +22,3 @@ set_priority(value: int) -> void
 | Parameter | Type | Default |
 | --- | --- | --- |
 | `value` | `int` | — |
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_priority(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    value: int,
-    priority_label: Label
-) -> void:
-    timeline_marker_presentation.set_priority(value)
-    var active_priority: int = timeline_marker_presentation.priority
-    priority_label.text = "Priority: %s" % str(active_priority)
-```

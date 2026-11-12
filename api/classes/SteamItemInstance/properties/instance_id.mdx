@@ -22,16 +22,3 @@ var instance_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_instance_id()`](/api/classes/SteamItemInstance/methods/get_instance_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_instance_id(
-    steam_item_instance: SteamItemInstance,
-    instance_id_label: Label
-) -> void:
-    var instance_id: String = steam_item_instance.instance_id
-    instance_id_label.text = "Instance id: %s" % str(instance_id)
-```

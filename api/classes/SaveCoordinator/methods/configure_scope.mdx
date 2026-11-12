@@ -29,18 +29,3 @@ configure_scope(scope_id: String, version: int) -> bool
 ## Description
 
 The scope covers every registered participant. Configure it before the first admitted save or load.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_configure_scope(
-    save_coordinator: SaveCoordinator,
-    scope_id: String,
-    version: int,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.configure_scope(scope_id, version)
-    status_label.text = "Configure scope: yes" if result else "Configure scope: no"
-```

@@ -29,28 +29,4 @@ with_preview(image: Image) -> SaveRequest
 
 Pass null to clear it. Submission includes a preview when it fits the metadata budget.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_with_preview(
-    save_request: SaveRequest,
-    image: Image,
-    confirmed: bool,
-    status_label: Label
-) -> void:
-    var result: SaveRequest = save_request.with_preview(image)
-    if result == null:
-        return
-    if not confirmed:
-        return
-    var completion: GameOperation = result.submit()
-    if completion == null:
-        return
-    var result_value: Dictionary = await completion.wait()
-    if not result_value.get("ok", false):
-        status_label.text = str(result_value.get("message", "Operation failed."))
-        return
-    status_label.text = "Submit completed."
-```
+[See gameplay examples for `SaveRequest`](/api/classes/SaveRequest#examples).

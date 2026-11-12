@@ -20,22 +20,3 @@ result() -> SteamBoolResult
 ## Return value
 
 [`SteamBoolResult`](/api/classes/SteamBoolResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_notification_bool_operation: SteamNotificationBoolOperation,
-    apply_result: Callable
-) -> void:
-    var result: SteamBoolResult = steam_notification_bool_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: bool = result.value
-    apply_result.call(payload)
-```

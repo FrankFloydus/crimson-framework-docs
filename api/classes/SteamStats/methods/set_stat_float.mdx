@@ -30,25 +30,4 @@ set_stat_float(name: String, value: float) -> Error
 
 Call `store()` to request persistence.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_stat_float(
-    steam_client: SteamClient,
-    name: String,
-    value: float,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: Error = steam_stats.set_stat_float(name, value)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set stat float accepted."
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

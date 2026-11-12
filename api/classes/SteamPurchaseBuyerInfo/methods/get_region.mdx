@@ -22,16 +22,3 @@ get_region() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_region(
-    steam_purchase_buyer_info: SteamPurchaseBuyerInfo,
-    region_label: Label
-) -> void:
-    var result: String = steam_purchase_buyer_info.get_region()
-    region_label.text = "Region: %s" % str(result)
-```

@@ -22,16 +22,3 @@ get_reason_code() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_reason_code(
-    steam_cheat_report: SteamCheatReport,
-    apply_reason_code: Callable
-) -> void:
-    var result: int = steam_cheat_report.get_reason_code()
-    apply_reason_code.call(result)
-```

@@ -23,15 +23,4 @@ cancel_load() -> Error
 
 Returns `ERR\_DOES\_NOT\_EXIST` when idle, `ERR\_UNAUTHORIZED` on a client, or `ERR\_BUSY` if publication has begun.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel_load(scene_load_manager: SceneLoadManager, status_label: Label) -> void:
-    var result: Error = scene_load_manager.cancel_load()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Cancel load accepted."
-```
+[See gameplay examples for `SceneLoadManager`](/api/classes/SceneLoadManager#examples).

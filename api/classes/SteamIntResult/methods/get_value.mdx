@@ -24,18 +24,3 @@ get_value() -> int
 ## Description
 
 Check `SteamResult.ok` to distinguish the outcomes.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_int_result: SteamIntResult, value_label: Label) -> void:
-    if steam_int_result == null:
-        return
-    if not steam_int_result.ok:
-        push_warning(steam_int_result.message)
-        return
-    var result: int = steam_int_result.get_value()
-    value_label.text = "Value: %s" % str(result)
-```

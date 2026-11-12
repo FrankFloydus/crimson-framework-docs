@@ -26,18 +26,3 @@ set_host_placement_policy(value: Callable) -> void
 ## Description
 
 The callback returns an empty String to accept the placement or a reason to deny it.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_host_placement_policy(
-    spatial_inventory_containers: SpatialInventoryContainers,
-    value: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_containers.set_host_placement_policy(value)
-    var active_host_placement_policy: Callable = spatial_inventory_containers.host_placement_policy
-    action_button.disabled = not active_host_placement_policy.is_valid()
-```

@@ -26,18 +26,3 @@ set_apply_changes(value: Callable) -> void
 ## Description
 
 It verifies and stages the edits, calls the commit synchronously when provided, and rolls back the staged records if that call fails.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_apply_changes(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    value: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_stack_adapter.set_apply_changes(value)
-    var active_apply_changes: Callable = spatial_inventory_stack_adapter.apply_changes
-    action_button.disabled = not active_apply_changes.is_valid()
-```

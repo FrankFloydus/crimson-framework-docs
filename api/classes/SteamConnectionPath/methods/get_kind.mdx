@@ -20,13 +20,3 @@ get_kind() -> SteamConnectionPath.RouteKind
 ## Return value
 
 `SteamConnectionPath.RouteKind`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_kind(steam_connection_path: SteamConnectionPath, kind_label: Label) -> void:
-    var result: SteamConnectionPath.RouteKind = steam_connection_path.get_kind()
-    kind_label.text = "Kind: %s" % str(result)
-```

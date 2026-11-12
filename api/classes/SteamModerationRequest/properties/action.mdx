@@ -25,16 +25,3 @@ var action: SteamModerationRequest.Action = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_action()`](/api/classes/SteamModerationRequest/methods/get_action) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_action(
-    steam_moderation_request: SteamModerationRequest,
-    apply_action: Callable
-) -> void:
-    var action: SteamModerationRequest.Action = steam_moderation_request.action
-    apply_action.call(action)
-```

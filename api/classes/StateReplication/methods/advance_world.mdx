@@ -29,21 +29,3 @@ advance_world(world_epoch: int, committed_revision: int) -> Error
 ## Description
 
 Existing peer bindings survive, and each peer must acknowledge a baseline for the new epoch.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_advance_world(
-    state_replication: StateReplication,
-    world_epoch: int,
-    committed_revision: int,
-    status_label: Label
-) -> void:
-    var result: Error = state_replication.advance_world(world_epoch, committed_revision)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Advance world accepted."
-```

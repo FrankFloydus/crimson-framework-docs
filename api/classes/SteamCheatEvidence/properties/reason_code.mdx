@@ -24,16 +24,3 @@ var reason_code: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_reason_code()`](/api/classes/SteamCheatEvidence/methods/get_reason_code) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_reason_code(
-    steam_cheat_evidence: SteamCheatEvidence,
-    reason_code_label: Label
-) -> void:
-    var reason_code: int = steam_cheat_evidence.reason_code
-    reason_code_label.text = "Reason code: %s" % str(reason_code)
-```

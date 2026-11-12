@@ -20,13 +20,3 @@ get_name() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_name(steam_shared_cloud_file: SteamSharedCloudFile, name_label: Label) -> void:
-    var result: String = steam_shared_cloud_file.get_name()
-    name_label.text = "Name: %s" % str(result)
-```

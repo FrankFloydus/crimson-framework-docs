@@ -18,24 +18,3 @@ result() -> SteamScreenshotResult
 ## Return value
 
 [`SteamScreenshotResult`](/api/classes/SteamScreenshotResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_screenshot_operation: SteamScreenshotOperation,
-    apply_result: Callable
-) -> void:
-    var result: SteamScreenshotResult = steam_screenshot_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamScreenshot = result.value
-    if payload == null:
-        return
-    apply_result.call(payload)
-```

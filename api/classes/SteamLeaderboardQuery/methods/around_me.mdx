@@ -29,29 +29,3 @@ around_me(before: int = 4, after: int = 5) -> SteamLeaderboardQuery
 ## Description
 
 The nonnegative counts before and after the center plus the center row must total at most 100.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_around_me(
-    steam_leaderboard_query: SteamLeaderboardQuery,
-    before: int,
-    after: int,
-    apply_completion: Callable
-) -> void:
-    var result: SteamLeaderboardQuery = steam_leaderboard_query.around_me(before, after)
-    if result == null:
-        return
-    var completion: SteamLeaderboardPageResult = await result.fetch()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamLeaderboardPage = completion.value
-    if payload == null:
-        return
-    apply_completion.call(payload)
-```

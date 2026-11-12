@@ -26,23 +26,3 @@ var value: SteamMusicStatus
 ## Description
 
 Inspect its enabled property before requesting playback changes.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_music_status_result: SteamMusicStatusResult,
-    apply_value: Callable
-) -> void:
-    if steam_music_status_result == null:
-        return
-    if not steam_music_status_result.ok:
-        push_warning(steam_music_status_result.message)
-        return
-    var value: SteamMusicStatus = steam_music_status_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

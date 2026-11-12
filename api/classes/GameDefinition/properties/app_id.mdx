@@ -29,20 +29,4 @@ var app_id: String = "crimson.game"
 
 Choose a project-specific value before publishing saves.
 
-## Example
-
-```gdscript
-extends Node
-
-func update_app_id(
-    game_definition: GameDefinition,
-    new_app_id: String,
-    game: GameRuntime
-) -> void:
-    if game_definition == null:
-        return
-    if game.is_inside_tree():
-        return
-    game_definition.app_id = new_app_id
-    game.definition = game_definition
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

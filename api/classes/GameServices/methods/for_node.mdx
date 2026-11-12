@@ -28,15 +28,3 @@ static for_node(node: Node) -> GameRuntime
 ## Description
 
 Returns null if no active game owns that node.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_for_node(node: Node, apply_for_node: Callable) -> void:
-    var result: GameRuntime = GameServices.for_node(node)
-    if result == null:
-        return
-    apply_for_node.call(result)
-```

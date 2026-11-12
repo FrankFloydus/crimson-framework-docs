@@ -28,20 +28,3 @@ cancel(reservation: SteamPartyReservation) -> Error
 ## Description
 
 A guest already in flight still follows the ordinary Game admission rules.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(
-    steam_party_beacon: SteamPartyBeacon,
-    reservation: SteamPartyReservation,
-    status_label: Label
-) -> void:
-    var result: Error = steam_party_beacon.cancel(reservation)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Cancel accepted."
-```

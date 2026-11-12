@@ -23,20 +23,4 @@ store() -> Error
 
 `@GlobalScope.OK` means Steam accepted the local request. Use `stats_stored` to observe the app-wide backend response.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_store(steam_client: SteamClient, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: Error = steam_stats.store()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Store accepted."
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

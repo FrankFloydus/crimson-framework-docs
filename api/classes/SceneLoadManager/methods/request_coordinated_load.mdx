@@ -30,20 +30,4 @@ request_coordinated_load(scene_id: StringName, publish_state: Callable) -> Error
 
 The authority calls it once after the candidate and mount are validated and all captured peers are prepared. Return `OK` to publish state before the new world enters the tree. On rejection, keep the current state intact. A return of `OK` from this method means admission. Signals report the outcome.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_request_coordinated_load(
-    scene_load_manager: SceneLoadManager,
-    scene_id: StringName,
-    publish_state: Callable,
-    status_label: Label
-) -> void:
-    var result: Error = scene_load_manager.request_coordinated_load(scene_id, publish_state)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Request coordinated load accepted."
-```
+[See gameplay examples for `SceneLoadManager`](/api/classes/SceneLoadManager#examples).

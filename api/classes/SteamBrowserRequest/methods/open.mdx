@@ -31,26 +31,3 @@ Await the call to receive [`SteamBrowserPageResult`](/api/classes/SteamBrowserPa
 ## Description
 
 HTTPS permits its initial origin. HTTP is available only for an explicitly included numeric loopback origin at the same port.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_open(
-    steam_browser_request: SteamBrowserRequest,
-    url: String,
-    size: Vector2i,
-    apply_open: Callable
-) -> void:
-    var result: SteamBrowserPageResult = await steam_browser_request.open(url, size)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamBrowserPage = result.value
-    if payload == null:
-        return
-    apply_open.call(payload)
-```

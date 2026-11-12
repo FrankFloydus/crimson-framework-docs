@@ -20,16 +20,3 @@ get_describe_stack() -> Callable
 ## Return value
 
 `Callable`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_describe_stack(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    action_button: Button
-) -> void:
-    var result: Callable = spatial_inventory_trade.get_describe_stack()
-    action_button.disabled = not result.is_valid()
-```

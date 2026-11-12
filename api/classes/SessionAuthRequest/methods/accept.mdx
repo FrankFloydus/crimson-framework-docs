@@ -28,20 +28,3 @@ accept(identity: SessionIdentity) -> Error
 ## Description
 
 Returns ERR\_INVALID\_PARAMETER for an invalid identity, ERR\_BUSY off the scene thread, or ERR\_DOES\_NOT\_EXIST when the request has expired or already settled. The remote end must also finish verification before admission.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_accept(
-    session_auth_request: SessionAuthRequest,
-    identity: SessionIdentity,
-    status_label: Label
-) -> void:
-    var result: Error = session_auth_request.accept(identity)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Accept accepted."
-```

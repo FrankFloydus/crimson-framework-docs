@@ -25,16 +25,3 @@ var steam_id: String = ""
 | Access | Read only |
 | Default | `""` |
 | Getter | [`get_steam_id()`](/api/classes/SteamPublisherPurchaseOrder/methods/get_steam_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_steam_id(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_steam_id: Callable
-) -> void:
-    var steam_id: String = steam_publisher_purchase_order.steam_id
-    apply_steam_id.call(steam_id)
-```

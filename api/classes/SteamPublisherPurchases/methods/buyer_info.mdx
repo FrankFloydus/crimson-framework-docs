@@ -32,30 +32,3 @@ Await the call to receive [`SteamPurchaseBuyerInfoResult`](/api/classes/SteamPur
 ## Description
 
 The identity must come from this exact publisher. Uses the configured live or sandbox environment. Read this before quoting a localized price. The game keeps ownership of its catalog, pricing, and eligibility policy.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_buyer_info(
-    steam_publisher: SteamPublisher,
-    player: SteamIdentity,
-    apply_buyer_info: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_purchases: SteamPublisherPurchases = steam_publisher.purchases()
-    if steam_publisher_purchases == null:
-        return
-    var result: SteamPurchaseBuyerInfoResult = await steam_publisher_purchases.buyer_info(player)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamPurchaseBuyerInfo = result.value
-    if payload == null:
-        return
-    apply_buyer_info.call(payload)
-```

@@ -20,15 +20,3 @@ get_endpoint() -> SteamSocketEndpoint
 ## Return value
 
 [`SteamSocketEndpoint`](/api/classes/SteamSocketEndpoint)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_endpoint(steam_socket_offer: SteamSocketOffer, apply_endpoint: Callable) -> void:
-    var result: SteamSocketEndpoint = steam_socket_offer.get_endpoint()
-    if result == null:
-        return
-    apply_endpoint.call(result)
-```

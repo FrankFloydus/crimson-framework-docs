@@ -20,17 +20,3 @@ get_granted() -> SteamItemInstance[]
 ## Return value
 
 `SteamItemInstance[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_granted(
-    steam_inventory_change: SteamInventoryChange,
-    add_granted_entry: Callable
-) -> void:
-    var result: Array[SteamItemInstance] = steam_inventory_change.get_granted()
-    for entry: SteamItemInstance in result:
-        add_granted_entry.call(entry)
-```

@@ -30,19 +30,3 @@ register_migration(id: String, from_version: int, migration: Callable) -> bool
 ## Description
 
 The synchronous callback accepts the old data and returns a dictionary with `ok` and, on success, `value` containing the upgraded data. Register every required step before the first admitted save or load.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_register_migration(
-    save_coordinator: SaveCoordinator,
-    id: String,
-    from_version: int,
-    migration: Callable,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.register_migration(id, from_version, migration)
-    status_label.text = "Register migration: yes" if result else "Register migration: no"
-```

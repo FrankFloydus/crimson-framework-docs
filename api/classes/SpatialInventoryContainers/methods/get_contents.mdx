@@ -24,19 +24,3 @@ get_contents(container_id: StringName) -> SpatialInventory
 ## Return value
 
 [`SpatialInventory`](/api/classes/SpatialInventory)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_contents(
-    spatial_inventory_containers: SpatialInventoryContainers,
-    container_id: StringName,
-    apply_contents: Callable
-) -> void:
-    var result: SpatialInventory = spatial_inventory_containers.get_contents(container_id)
-    if result == null:
-        return
-    apply_contents.call(result)
-```

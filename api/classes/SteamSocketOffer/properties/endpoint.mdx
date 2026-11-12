@@ -22,15 +22,3 @@ var endpoint: SteamSocketEndpoint
 | Type | [`SteamSocketEndpoint`](/api/classes/SteamSocketEndpoint) |
 | Access | Read only |
 | Getter | [`get_endpoint()`](/api/classes/SteamSocketOffer/methods/get_endpoint) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_endpoint(steam_socket_offer: SteamSocketOffer, apply_endpoint: Callable) -> void:
-    var endpoint: SteamSocketEndpoint = steam_socket_offer.endpoint
-    if endpoint == null:
-        return
-    apply_endpoint.call(endpoint)
-```

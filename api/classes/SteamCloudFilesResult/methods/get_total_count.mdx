@@ -24,16 +24,3 @@ get_total_count() -> int
 ## Description
 
 Returns zero on failure.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_total_count(
-    steam_cloud_files_result: SteamCloudFilesResult,
-    total_count_label: Label
-) -> void:
-    var result: int = steam_cloud_files_result.get_total_count()
-    total_count_label.text = "Total count: %s" % str(result)
-```

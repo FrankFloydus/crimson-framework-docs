@@ -22,16 +22,3 @@ start() -> Error
 ## Description
 
 Call after the player opts in and explicitly starts push-to-talk. Another owner or native tail cleanup returns `ERR_BUSY`. Repeating an active start from the same owner is harmless.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_start(steam_voice_capture: SteamVoiceCapture, status_label: Label) -> void:
-    var result: Error = steam_voice_capture.start()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Start accepted."
-```

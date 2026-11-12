@@ -29,20 +29,3 @@ request(url: String, method: SteamHttpOptions.Method = 1) -> SteamHttpRequest
 ## Description
 
 The default method is GET.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_request(
-    steam_http_options: SteamHttpOptions,
-    url: String,
-    method: SteamHttpOptions.Method,
-    apply_request: Callable
-) -> void:
-    var result: SteamHttpRequest = steam_http_options.request(url, method)
-    if result == null:
-        return
-    apply_request.call(result)
-```

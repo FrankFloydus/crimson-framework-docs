@@ -25,15 +25,4 @@ get_server_steam_id() -> String
 
 Lobby locators return an empty string.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_server_steam_id(
-    steam_listing: SteamListing,
-    apply_server_steam_id: Callable
-) -> void:
-    var result: String = steam_listing.get_server_steam_id()
-    apply_server_steam_id.call(result)
-```
+[See gameplay examples for `SteamListing`](/api/classes/SteamListing#examples).

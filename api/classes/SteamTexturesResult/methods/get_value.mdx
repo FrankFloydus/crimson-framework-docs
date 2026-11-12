@@ -20,22 +20,3 @@ get_value() -> Texture2D[]
 ## Return value
 
 `Texture2D[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_textures_result: SteamTexturesResult,
-    add_value_entry: Callable
-) -> void:
-    if steam_textures_result == null:
-        return
-    if not steam_textures_result.ok:
-        push_warning(steam_textures_result.message)
-        return
-    var result: Array[Texture2D] = steam_textures_result.get_value()
-    for entry: Texture2D in result:
-        add_value_entry.call(entry)
-```

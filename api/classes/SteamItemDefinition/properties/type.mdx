@@ -22,13 +22,3 @@ var type: StringName
 | Type | `StringName` |
 | Access | Read only |
 | Getter | [`get_type()`](/api/classes/SteamItemDefinition/methods/get_type) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_type(steam_item_definition: SteamItemDefinition, type_label: Label) -> void:
-    var type: StringName = steam_item_definition.type
-    type_label.text = "Type: %s" % str(type)
-```

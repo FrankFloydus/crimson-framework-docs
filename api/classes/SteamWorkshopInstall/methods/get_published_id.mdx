@@ -20,16 +20,3 @@ get_published_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_published_id(
-    steam_workshop_install: SteamWorkshopInstall,
-    published_id_label: Label
-) -> void:
-    var result: String = steam_workshop_install.get_published_id()
-    published_id_label.text = "Published id: %s" % str(result)
-```

@@ -20,13 +20,3 @@ get_type() -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_type(steam_item_definition: SteamItemDefinition, type_label: Label) -> void:
-    var result: StringName = steam_item_definition.get_type()
-    type_label.text = "Type: %s" % str(result)
-```

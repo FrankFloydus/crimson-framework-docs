@@ -20,16 +20,3 @@ get_beacon_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_beacon_id(
-    steam_party_reservation: SteamPartyReservation,
-    beacon_id_label: Label
-) -> void:
-    var result: String = steam_party_reservation.get_beacon_id()
-    beacon_id_label.text = "Beacon id: %s" % str(result)
-```

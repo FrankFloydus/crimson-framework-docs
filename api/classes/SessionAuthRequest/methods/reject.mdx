@@ -22,16 +22,3 @@ reject() -> Error
 ## Description
 
 Returns OK when recorded, ERR\_BUSY off the scene thread, or ERR\_DOES\_NOT\_EXIST when the request has expired or already settled.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_reject(session_auth_request: SessionAuthRequest, status_label: Label) -> void:
-    var result: Error = session_auth_request.reject()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Reject accepted."
-```

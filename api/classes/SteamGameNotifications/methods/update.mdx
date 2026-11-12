@@ -32,35 +32,3 @@ update(session_id: String, spec: SteamNotificationSessionSpec, operation_key: St
 ## Description
 
 Supply all users who should remain in the session and a stable operation key. The creation context remains as it was.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_update(
-    steam_publisher: SteamPublisher,
-    session_id: String,
-    spec: SteamNotificationSessionSpec,
-    operation_key: String,
-    apply_update: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_game_notifications: SteamGameNotifications = steam_publisher.game_notifications()
-    if steam_game_notifications == null:
-        return
-    var result: SteamNotificationSessionOperation = steam_game_notifications.update(session_id, spec, operation_key)
-    if result == null:
-        return
-    var result_value: SteamNotificationSessionResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamNotificationSession = result_value.value
-    if payload == null:
-        return
-    apply_update.call(payload)
-```

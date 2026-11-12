@@ -21,23 +21,4 @@ get_value() -> SteamWorkshopItem
 
 [`SteamWorkshopItem`](/api/classes/SteamWorkshopItem)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_workshop_item_result: SteamWorkshopItemResult,
-    title_label: Label
-) -> void:
-    if steam_workshop_item_result == null:
-        return
-    if not steam_workshop_item_result.ok:
-        push_warning(steam_workshop_item_result.message)
-        return
-    var result: SteamWorkshopItem = steam_workshop_item_result.get_value()
-    if result == null:
-        return
-    var title: String = result.title
-    title_label.text = "Title: %s" % str(title)
-```
+[See gameplay examples for `SteamWorkshopItemResult`](/api/classes/SteamWorkshopItemResult#examples).

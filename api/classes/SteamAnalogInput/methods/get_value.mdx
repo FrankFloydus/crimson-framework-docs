@@ -24,13 +24,3 @@ get_value() -> Vector2
 ## Description
 
 Inactive actions return `Vector2.ZERO`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_analog_input: SteamAnalogInput, value_label: Label) -> void:
-    var result: Vector2 = steam_analog_input.get_value()
-    value_label.text = "Value: %s" % str(result)
-```

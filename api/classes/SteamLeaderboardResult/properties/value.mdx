@@ -26,23 +26,3 @@ var value: SteamLeaderboard
 ## Description
 
 The board belongs to the exact Steam client scope that requested it.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_leaderboard_result: SteamLeaderboardResult,
-    apply_value: Callable
-) -> void:
-    if steam_leaderboard_result == null:
-        return
-    if not steam_leaderboard_result.ok:
-        push_warning(steam_leaderboard_result.message)
-        return
-    var value: SteamLeaderboard = steam_leaderboard_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

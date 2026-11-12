@@ -20,13 +20,3 @@ get_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_id(online_listing: OnlineListing, id_label: Label) -> void:
-    var result: String = online_listing.get_id()
-    id_label.text = "Id: %s" % str(result)
-```

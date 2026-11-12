@@ -28,32 +28,3 @@ with_content(directory: String) -> SteamWorkshopPublishRequest
 ## Description
 
 Use an existing absolute local directory or a Godot path that resolves to one. Steam uploads the directory's contents.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_with_content(
-    steam_workshop_publish_request: SteamWorkshopPublishRequest,
-    directory: String,
-    confirmed: bool,
-    published_id_label: Label
-) -> void:
-    var result: SteamWorkshopPublishRequest = steam_workshop_publish_request.with_content(directory)
-    if result == null:
-        return
-    if not confirmed:
-        return
-    var completion: SteamWorkshopPublicationResult = await result.submit()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamWorkshopPublication = completion.value
-    if payload == null:
-        return
-    var published_id: String = payload.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```

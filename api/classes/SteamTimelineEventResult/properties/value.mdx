@@ -22,23 +22,3 @@ var value: SteamTimelineEvent
 | Type | [`SteamTimelineEvent`](/api/classes/SteamTimelineEvent) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamTimelineEventResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_timeline_event_result: SteamTimelineEventResult,
-    apply_value: Callable
-) -> void:
-    if steam_timeline_event_result == null:
-        return
-    if not steam_timeline_event_result.ok:
-        push_warning(steam_timeline_event_result.message)
-        return
-    var value: SteamTimelineEvent = steam_timeline_event_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

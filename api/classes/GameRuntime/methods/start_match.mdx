@@ -29,18 +29,4 @@ start_match(world: StringName = &"") -> GameOperation
 
 An empty world uses the definition's starting world. Bind all admitted peers before calling it and await world readiness.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_start_match(game_runtime: GameRuntime, world: StringName, status_label: Label) -> void:
-    var result: GameOperation = game_runtime.start_match(world)
-    if result == null:
-        return
-    var result_value: Dictionary = await result.wait()
-    if not result_value.get("ok", false):
-        status_label.text = str(result_value.get("message", "Operation failed."))
-        return
-    status_label.text = "Start match completed."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

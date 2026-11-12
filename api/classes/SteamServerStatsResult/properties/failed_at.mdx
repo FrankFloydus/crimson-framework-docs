@@ -27,16 +27,3 @@ var failed_at: int = -1
 ## Description
 
 Defaults to -1.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_failed_at(
-    steam_server_stats_result: SteamServerStatsResult,
-    failed_at_label: Label
-) -> void:
-    var failed_at: int = steam_server_stats_result.failed_at
-    failed_at_label.text = "Failed at: %s" % str(failed_at)
-```

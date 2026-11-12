@@ -28,20 +28,3 @@ configure(size: Vector2i) -> Error
 ## Description
 
 Return `ERR_BUSY` when trying to resize a tray with recorded items.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_configure(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    size: Vector2i,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_staging.configure(size)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Configure accepted."
-```

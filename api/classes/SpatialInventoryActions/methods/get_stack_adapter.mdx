@@ -20,18 +20,3 @@ get_stack_adapter() -> SpatialInventoryStackAdapter
 ## Return value
 
 [`SpatialInventoryStackAdapter`](/api/classes/SpatialInventoryStackAdapter)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_stack_adapter(
-    spatial_inventory_actions: SpatialInventoryActions,
-    apply_stack_adapter: Callable
-) -> void:
-    var result: SpatialInventoryStackAdapter = spatial_inventory_actions.get_stack_adapter()
-    if result == null:
-        return
-    apply_stack_adapter.call(result)
-```

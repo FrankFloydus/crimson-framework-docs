@@ -25,13 +25,36 @@ Returns `null` when the scope is inactive or overlay support is unavailable. Che
 
 ## Example
 
-```gdscript
-extends Node
+### Open the player's achievements from the pause menu
 
-func run_overlay(steam_client: SteamClient, status_label: Label) -> void:
-    var result: SteamOverlay = steam_client.overlay()
-    if result == null:
+Press Achievements in the pause menu to open this game's achievement pane. [Enable the Steam Overlay](/steam/testing#check-the-overlay-and-achievements) before testing.
+
+```gdscript
+extends Control
+
+@export var steam_client: SteamClient
+@export var achievements_button: Button
+@export var status_label: Label
+
+func _ready() -> void:
+    if achievements_button == null or status_label == null:
+        push_error("Assign the Achievements button and status label.")
         return
-    var overlay_ready: bool = result.is_ready()
-    status_label.text = "Overlay ready: yes" if overlay_ready else "Overlay ready: no"
+    achievements_button.pressed.connect(_show_achievements)
+
+func _show_achievements() -> void:
+    if not is_instance_valid(steam_client) or not steam_client.is_ready():
+        status_label.text = "Steam is unavailable."
+        return
+
+    var overlay: SteamOverlay = steam_client.overlay()
+    if overlay == null or not overlay.is_ready():
+        status_label.text = "The Steam Overlay is unavailable or still loading."
+        return
+
+    var status: Error = overlay.open_achievements()
+    if status == OK:
+        status_label.text = ""
+    else:
+        status_label.text = "Could not open achievements. %s" % error_string(status)
 ```

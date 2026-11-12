@@ -22,16 +22,3 @@ var version: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_version()`](/api/classes/SteamWorkshopLegalAgreementStatus/methods/get_version) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_version(
-    steam_workshop_legal_agreement_status: SteamWorkshopLegalAgreementStatus,
-    version_label: Label
-) -> void:
-    var version: int = steam_workshop_legal_agreement_status.version
-    version_label.text = "Version: %s" % str(version)
-```

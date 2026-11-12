@@ -26,13 +26,3 @@ var handle: String
 ## Description
 
 Keep its unsigned decimal representation intact.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_handle(steam_shared_cloud_file: SteamSharedCloudFile, handle_label: Label) -> void:
-    var handle: String = steam_shared_cloud_file.handle
-    handle_label.text = "Handle: %s" % str(handle)
-```

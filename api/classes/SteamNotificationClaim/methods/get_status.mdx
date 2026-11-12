@@ -22,16 +22,3 @@ get_status() -> SteamNotificationClaim.Status
 ## Return value
 
 `SteamNotificationClaim.Status`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_status(
-    steam_notification_claim: SteamNotificationClaim,
-    apply_status: Callable
-) -> void:
-    var result: SteamNotificationClaim.Status = steam_notification_claim.get_status()
-    apply_status.call(result)
-```

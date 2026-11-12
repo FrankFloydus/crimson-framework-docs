@@ -31,15 +31,3 @@ static server(match_id: String, reason_code: int) -> SteamCheatEvidence
 ## Description
 
 The game policy verifies the server and match context before approving the report.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_server(match_id: String, reason_code: int, apply_server: Callable) -> void:
-    var result: SteamCheatEvidence = SteamCheatEvidence.server(match_id, reason_code)
-    if result == null:
-        return
-    apply_server.call(result)
-```

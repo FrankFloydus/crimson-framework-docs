@@ -22,19 +22,3 @@ json() -> SteamJsonResult
 ## Description
 
 Check the parsing outcome independently of the response status.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_json(steam_http_response: SteamHttpResponse, apply_json: Callable) -> void:
-    var result: SteamJsonResult = steam_http_response.json()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: Variant = result.value
-    apply_json.call(payload)
-```

@@ -26,13 +26,3 @@ var api_name: StringName
 ## Description
 
 Use it in lookups and stat drafts.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_api_name(steam_achievement: SteamAchievement, api_name_label: Label) -> void:
-    var api_name: StringName = steam_achievement.api_name
-    api_name_label.text = "Api name: %s" % str(api_name)
-```

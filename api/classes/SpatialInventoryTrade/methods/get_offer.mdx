@@ -28,19 +28,3 @@ get_offer(actor: int) -> SpatialInventory
 ## Description
 
 Use it as a projection for UI and route mutations through the trade methods.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_offer(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    apply_offer: Callable
-) -> void:
-    var result: SpatialInventory = spatial_inventory_trade.get_offer(actor)
-    if result == null:
-        return
-    apply_offer.call(result)
-```

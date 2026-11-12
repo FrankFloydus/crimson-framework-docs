@@ -29,15 +29,3 @@ static opaque(transport: StringName, route: PackedByteArray) -> SessionEndpoint
 ## Description
 
 The adapter name must begin with a lowercase ASCII letter, contain at most 32 lowercase ASCII letters, digits, or underscores, and differ from `enet`. Invalid input returns null. Keep authentication credentials separate from the route.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_opaque(transport: StringName, route: PackedByteArray, apply_opaque: Callable) -> void:
-    var result: SessionEndpoint = SessionEndpoint.opaque(transport, route)
-    if result == null:
-        return
-    apply_opaque.call(result)
-```

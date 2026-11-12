@@ -22,17 +22,3 @@ var granted: SteamItemInstance[]
 | Type | `SteamItemInstance[]` |
 | Access | Read only |
 | Getter | [`get_granted()`](/api/classes/SteamInventoryChange/methods/get_granted) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_granted(
-    steam_inventory_change: SteamInventoryChange,
-    add_granted_entry: Callable
-) -> void:
-    var granted: Array[SteamItemInstance] = steam_inventory_change.granted
-    for entry: SteamItemInstance in granted:
-        add_granted_entry.call(entry)
-```

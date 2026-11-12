@@ -23,17 +23,4 @@ export_snapshot() -> Dictionary
 
 The placement dictionaries use the fields documented in `get_placement()`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_export_snapshot(
-    spatial_inventory: SpatialInventory,
-    apply_export_snapshot: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory.export_snapshot()
-    if result.is_empty():
-        return
-    apply_export_snapshot.call(result)
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

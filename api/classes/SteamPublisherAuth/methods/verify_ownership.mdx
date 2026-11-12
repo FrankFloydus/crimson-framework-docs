@@ -32,32 +32,3 @@ verify_ownership(ticket: PackedByteArray, expected_challenge: PackedByteArray, d
 ## Description
 
 Checks the fresh ticket and consumes the one-time challenge through the trusted store before issuing an identity. Returns a typed error for invalid tickets, replay, or unavailable configuration.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_verify_ownership(
-    steam_publisher: SteamPublisher,
-    ticket: PackedByteArray,
-    expected_challenge: PackedByteArray,
-    dlc_ids: PackedInt64Array,
-    apply_verify_ownership: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_auth: SteamPublisherAuth = steam_publisher.auth()
-    if steam_publisher_auth == null:
-        return
-    var result: SteamOwnershipResult = steam_publisher_auth.verify_ownership(ticket, expected_challenge, dlc_ids)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamOwnership = result.value
-    if payload == null:
-        return
-    apply_verify_ownership.call(payload)
-```

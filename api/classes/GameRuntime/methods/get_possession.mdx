@@ -21,14 +21,4 @@ get_possession() -> PlayerPossession
 
 [`PlayerPossession`](/api/classes/PlayerPossession)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_possession(game_runtime: GameRuntime, apply_possession: Callable) -> void:
-    var result: PlayerPossession = game_runtime.get_possession()
-    if result == null:
-        return
-    apply_possession.call(result)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

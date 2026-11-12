@@ -22,16 +22,3 @@ get_state() -> SteamNotificationUserState.State
 ## Return value
 
 `SteamNotificationUserState.State`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_state(
-    steam_notification_user_state: SteamNotificationUserState,
-    apply_state: Callable
-) -> void:
-    var result: SteamNotificationUserState.State = steam_notification_user_state.get_state()
-    apply_state.call(result)
-```

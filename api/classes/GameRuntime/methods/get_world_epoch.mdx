@@ -23,12 +23,4 @@ get_world_epoch() -> int
 
 Epochs distinguish successive activations, including visits to the same world ID.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_world_epoch(game_runtime: GameRuntime, world_epoch_label: Label) -> void:
-    var result: int = game_runtime.get_world_epoch()
-    world_epoch_label.text = "World epoch: %s" % str(result)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

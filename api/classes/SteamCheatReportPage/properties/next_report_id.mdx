@@ -24,16 +24,3 @@ var next_report_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_next_report_id()`](/api/classes/SteamCheatReportPage/methods/get_next_report_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_next_report_id(
-    steam_cheat_report_page: SteamCheatReportPage,
-    apply_next_report_id: Callable
-) -> void:
-    var next_report_id: String = steam_cheat_report_page.next_report_id
-    apply_next_report_id.call(next_report_id)
-```

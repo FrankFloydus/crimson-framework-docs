@@ -31,18 +31,4 @@ get_swap_target(footprint: Vector2i, origin: Vector2i, rotated: bool = false) ->
 
 Returns an empty `StringName` if the footprint covers free cells only, overlaps multiple items, or has invalid geometry.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_swap_target(
-    spatial_inventory: SpatialInventory,
-    footprint: Vector2i,
-    origin: Vector2i,
-    rotated: bool,
-    swap_target_label: Label
-) -> void:
-    var result: StringName = spatial_inventory.get_swap_target(footprint, origin, rotated)
-    swap_target_label.text = "Swap target: %s" % str(result)
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

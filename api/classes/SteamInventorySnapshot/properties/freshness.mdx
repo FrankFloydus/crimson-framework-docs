@@ -22,16 +22,3 @@ var freshness: SteamInventorySnapshot.Freshness
 | Type | `SteamInventorySnapshot.Freshness` |
 | Access | Read only |
 | Getter | [`get_freshness()`](/api/classes/SteamInventorySnapshot/methods/get_freshness) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_freshness(
-    steam_inventory_snapshot: SteamInventorySnapshot,
-    freshness_label: Label
-) -> void:
-    var freshness: SteamInventorySnapshot.Freshness = steam_inventory_snapshot.freshness
-    freshness_label.text = "Freshness: %s" % str(freshness)
-```

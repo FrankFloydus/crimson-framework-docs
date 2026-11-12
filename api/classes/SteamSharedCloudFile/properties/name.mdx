@@ -22,13 +22,3 @@ var name: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_name()`](/api/classes/SteamSharedCloudFile/methods/get_name) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_name(steam_shared_cloud_file: SteamSharedCloudFile, name_label: Label) -> void:
-    var name: String = steam_shared_cloud_file.name
-    name_label.text = "Name: %s" % str(name)
-```

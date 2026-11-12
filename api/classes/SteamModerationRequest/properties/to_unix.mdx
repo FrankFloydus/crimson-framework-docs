@@ -24,16 +24,3 @@ var to_unix: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_to_unix()`](/api/classes/SteamModerationRequest/methods/get_to_unix) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_to_unix(
-    steam_moderation_request: SteamModerationRequest,
-    apply_to_unix: Callable
-) -> void:
-    var to_unix: int = steam_moderation_request.to_unix
-    apply_to_unix.call(to_unix)
-```

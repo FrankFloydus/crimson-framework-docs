@@ -26,20 +26,3 @@ set_stack_adapter(value: SpatialInventoryStackAdapter) -> void
 ## Description
 
 Pass null to clear it.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_stack_adapter(
-    spatial_inventory_actions: SpatialInventoryActions,
-    value: SpatialInventoryStackAdapter,
-    apply_stack_adapter: Callable
-) -> void:
-    spatial_inventory_actions.set_stack_adapter(value)
-    var active_stack_adapter: SpatialInventoryStackAdapter = spatial_inventory_actions.stack_adapter
-    if active_stack_adapter == null:
-        return
-    apply_stack_adapter.call(active_stack_adapter)
-```

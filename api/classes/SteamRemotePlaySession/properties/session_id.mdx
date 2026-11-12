@@ -27,16 +27,3 @@ var session_id: int = 0
 ## Description
 
 Use it to match input and disconnect signals to the active seat.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_session_id(
-    steam_remote_play_session: SteamRemotePlaySession,
-    session_id_label: Label
-) -> void:
-    var session_id: int = steam_remote_play_session.session_id
-    session_id_label.text = "Session id: %s" % str(session_id)
-```

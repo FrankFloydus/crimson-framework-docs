@@ -24,15 +24,4 @@ var listed: bool = false
 | Default | `false` |
 | Getter | [`is_listed()`](/api/classes/SteamServerStatus/methods/is_listed) |
 
-## Example
-
-```gdscript
-extends Node
-
-func refresh_listed(steam_dedicated_server: SteamDedicatedServer, status_label: Label) -> void:
-    var steam_server_status: SteamServerStatus = steam_dedicated_server.status()
-    if steam_server_status == null:
-        return
-    var listed: bool = steam_server_status.listed
-    status_label.text = "Listed: yes" if listed else "Listed: no"
-```
+[See gameplay examples for `SteamServerStatus`](/api/classes/SteamServerStatus#examples).

@@ -26,18 +26,3 @@ set_allow_rotation(value: bool) -> void
 ## Description
 
 Explicit placement arguments still control explicit moves.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_allow_rotation(
-    spatial_inventory_actions: SpatialInventoryActions,
-    value: bool,
-    status_label: Label
-) -> void:
-    spatial_inventory_actions.set_allow_rotation(value)
-    var active_allow_rotation: bool = spatial_inventory_actions.allow_rotation
-    status_label.text = "Allow rotation: yes" if active_allow_rotation else "Allow rotation: no"
-```

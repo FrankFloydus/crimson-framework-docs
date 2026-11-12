@@ -22,16 +22,3 @@ var directory: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_directory()`](/api/classes/SteamWorkshopInstall/methods/get_directory) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_directory(
-    steam_workshop_install: SteamWorkshopInstall,
-    directory_label: Label
-) -> void:
-    var directory: String = steam_workshop_install.directory
-    directory_label.text = "Directory: %s" % str(directory)
-```

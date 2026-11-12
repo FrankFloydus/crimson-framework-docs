@@ -26,20 +26,3 @@ var value: SteamDlcInfo[]
 ## Description
 
 Reading this property gives a separate array, and an error result has an empty payload.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_dlc_list_result: SteamDlcListResult, results_list: ItemList) -> void:
-    if steam_dlc_list_result == null:
-        return
-    if not steam_dlc_list_result.ok:
-        push_warning(steam_dlc_list_result.message)
-        return
-    var value: Array[SteamDlcInfo] = steam_dlc_list_result.value
-    results_list.clear()
-    for entry: SteamDlcInfo in value:
-        results_list.add_item(str(entry.display_name))
-```

@@ -29,20 +29,4 @@ open_web(url: String) -> Error
 
 Supply an absolute HTTP or HTTPS URL without embedded credentials and at most 2048 UTF-8 bytes.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_open_web(steam_client: SteamClient, url: String, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_overlay: SteamOverlay = steam_client.overlay()
-    if steam_overlay == null:
-        return
-    var result: Error = steam_overlay.open_web(url)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Open web accepted."
-```
+[See gameplay examples for `SteamOverlay`](/api/classes/SteamOverlay#examples).

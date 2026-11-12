@@ -24,16 +24,3 @@ var reason: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_reason()`](/api/classes/SteamModerationRequest/methods/get_reason) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_reason(
-    steam_moderation_request: SteamModerationRequest,
-    apply_reason: Callable
-) -> void:
-    var reason: String = steam_moderation_request.reason
-    apply_reason.call(reason)
-```

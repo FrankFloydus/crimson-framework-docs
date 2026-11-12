@@ -29,18 +29,4 @@ get_placement(id: StringName) -> Dictionary
 
 The footprint is the size before rotation. An unknown ID returns an empty dictionary.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_placement(
-    spatial_inventory: SpatialInventory,
-    id: StringName,
-    apply_placement: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory.get_placement(id)
-    if result.is_empty():
-        return
-    apply_placement.call(result)
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

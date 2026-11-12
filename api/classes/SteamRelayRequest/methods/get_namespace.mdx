@@ -18,13 +18,3 @@ get_namespace() -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_namespace(steam_relay_request: SteamRelayRequest, namespace_label: Label) -> void:
-    var result: StringName = steam_relay_request.get_namespace()
-    namespace_label.text = "Namespace: %s" % str(result)
-```

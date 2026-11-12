@@ -30,16 +30,3 @@ request_save(profile: String, slot: String, metadata: Dictionary = {}) -> int
 ## Description
 
 Pass optional data-only metadata up to 8 KiB. After admission, call `capture_pending()` at a committed gameplay boundary.
-
-## Example
-
-```gdscript
-const PLAYER_PROFILE: String = "player-1"
-const CAMPAIGN_SLOT: String = "campaign"
-
-func queue_manual_save(saves: SaveCoordinator) -> int:
-    var ticket: int = saves.request_save(PLAYER_PROFILE, CAMPAIGN_SLOT, {"label": "Harbor"})
-    # After the next authoritative commit, capture with capture_pending().
-    # Observe operation_finished and match its ticket before reporting success.
-    return ticket
-```

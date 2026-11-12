@@ -20,13 +20,3 @@ get_total() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_total(steam_purchase_outcome: SteamPurchaseOutcome, total_label: Label) -> void:
-    var result: int = steam_purchase_outcome.get_total()
-    total_label.text = "Total: %s" % str(result)
-```

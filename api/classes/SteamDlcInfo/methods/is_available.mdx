@@ -20,13 +20,3 @@ is_available() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_available(steam_dlc_info: SteamDlcInfo, action_button: Button) -> void:
-    var result: bool = steam_dlc_info.is_available()
-    action_button.disabled = not result
-```

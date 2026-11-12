@@ -28,20 +28,3 @@ set_focused(focused: bool) -> Error
 ## Description
 
 Passing false stops new forwarded events and releases keys and buttons held by the page.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_focused(
-    steam_browser_page: SteamBrowserPage,
-    focused: bool,
-    status_label: Label
-) -> void:
-    var result: Error = steam_browser_page.set_focused(focused)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set focused accepted."
-```

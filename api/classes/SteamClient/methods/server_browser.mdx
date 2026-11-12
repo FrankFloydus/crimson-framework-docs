@@ -19,15 +19,4 @@ server_browser() -> SteamServerBrowser
 
 [`SteamServerBrowser`](/api/classes/SteamServerBrowser)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_server_browser(steam_client: SteamClient, action_button: Button) -> void:
-    var result: SteamServerBrowser = steam_client.server_browser()
-    if result == null:
-        return
-    var available: bool = result.is_available()
-    action_button.disabled = not available
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

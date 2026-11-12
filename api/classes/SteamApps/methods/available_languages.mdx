@@ -18,20 +18,3 @@ available_languages() -> PackedStringArray
 ## Return value
 
 `PackedStringArray`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_available_languages(steam_client: SteamClient, results_list: ItemList) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_apps: SteamApps = steam_client.apps()
-    if steam_apps == null:
-        return
-    var result: PackedStringArray = steam_apps.available_languages()
-    results_list.clear()
-    for entry: String in result:
-        results_list.add_item(str(entry))
-```

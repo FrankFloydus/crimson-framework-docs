@@ -19,15 +19,4 @@ get_revision() -> int
 
 `int`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_revision(game_runtime: GameRuntime, revision_label: Label) -> void:
-    var transaction_coordinator: TransactionCoordinator = game_runtime.get_transactions()
-    if transaction_coordinator == null:
-        return
-    var result: int = transaction_coordinator.get_revision()
-    revision_label.text = "Revision: %s" % str(result)
-```
+[See gameplay examples for `TransactionCoordinator`](/api/classes/TransactionCoordinator#examples).

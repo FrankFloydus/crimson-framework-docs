@@ -22,13 +22,3 @@ texture() -> Texture2D
 ## Description
 
 Returns null after the page or its client scope closes.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_texture(steam_browser_page: SteamBrowserPage, preview: TextureRect) -> void:
-    var result: Texture2D = steam_browser_page.texture()
-    preview.texture = result
-```

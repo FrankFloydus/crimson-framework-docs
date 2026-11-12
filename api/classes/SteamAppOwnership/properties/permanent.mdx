@@ -24,13 +24,3 @@ var permanent: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`get_permanent()`](/api/classes/SteamAppOwnership/methods/get_permanent) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_permanent(steam_app_ownership: SteamAppOwnership, status_label: Label) -> void:
-    var permanent: bool = steam_app_ownership.permanent
-    status_label.text = "Permanent: yes" if permanent else "Permanent: no"
-```

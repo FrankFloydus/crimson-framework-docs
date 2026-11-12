@@ -29,16 +29,3 @@ static make(instance_id: String, quantity: int) -> SteamItemQuantity
 ## Description
 
 `SteamInventory.craft()` validates both fields before submitting an exchange.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_make(instance_id: String, quantity: int, quantity_label: Label) -> void:
-    var result: SteamItemQuantity = SteamItemQuantity.make(instance_id, quantity)
-    if result == null:
-        return
-    var quantity_value: int = result.quantity
-    quantity_label.text = "Quantity: %s" % str(quantity_value)
-```

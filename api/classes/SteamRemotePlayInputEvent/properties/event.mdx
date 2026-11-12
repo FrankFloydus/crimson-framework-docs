@@ -26,18 +26,3 @@ var event: InputEvent
 ## Description
 
 Relative motion stays in the units reported by Steam. Map normalized absolute motion to the intended viewport before dispatching to a UI. Button and wheel samples carry no pointer position.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_event(
-    steam_remote_play_input_event: SteamRemotePlayInputEvent,
-    apply_event: Callable
-) -> void:
-    var event: InputEvent = steam_remote_play_input_event.event
-    if event == null:
-        return
-    apply_event.call(event)
-```

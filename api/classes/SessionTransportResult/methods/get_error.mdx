@@ -22,19 +22,3 @@ get_error() -> Error
 ## Description
 
 A result created without either factory reports ERR\_UNCONFIGURED.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_error(
-    session_transport_result: SessionTransportResult,
-    status_label: Label
-) -> void:
-    var result: Error = session_transport_result.get_error()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Get error accepted."
-```

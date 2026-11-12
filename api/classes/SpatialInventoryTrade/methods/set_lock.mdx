@@ -29,20 +29,3 @@ set_lock(actor: int, locked: bool) -> Dictionary
 ## Description
 
 Locking the second offer attempts settlement immediately. Inspect `completed` and `error` to distinguish a settled trade from an offer that is waiting or failed validation.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_lock(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    locked: bool,
-    apply_lock: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_trade.set_lock(actor, locked)
-    if result.is_empty():
-        return
-    apply_lock.call(result)
-```

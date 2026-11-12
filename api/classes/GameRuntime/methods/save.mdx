@@ -35,14 +35,43 @@ Pass display metadata as a dictionary and set autosave to use autosave admission
 ## Example
 
 ```gdscript
-const PLAYER_PROFILE: String = "player-1"
-const CAMPAIGN_SLOT: String = "campaign"
+extends Node
 
-func save_at_the_harbor(game: GameRuntime) -> void:
-    # Run this on the authority after committed gameplay has started.
-    var result: Dictionary = await game.save(PLAYER_PROFILE, CAMPAIGN_SLOT, {"label": "Harbor"}).wait()
-    if not result.ok:
-        push_error(result.message)
+const PROFILE_ID: String = "local-player"
+const SLOT_ID: String = "campaign"
+const CHECKPOINT_NAME: String = "Harbor"
+
+# Assign the running, save-enabled GameRuntime on the authority.
+# The pause menu needs Save Checkpoint and Continue from Checkpoint
+# buttons plus a status label.
+@export var game: GameRuntime
+@export var save_button: Button
+@export var continue_button: Button
+@export var checkpoint_status: Label
+
+func _ready() -> void:
+    if game == null or save_button == null or continue_button == null or checkpoint_status == null:
+        push_error("Assign the running campaign and its checkpoint menu.")
         return
-    print("Published generation: ", result.value)
+    save_button.pressed.connect(_save_checkpoint)
+    continue_button.pressed.connect(_continue_campaign)
+
+func _save_checkpoint() -> void:
+    _set_buttons_disabled(true)
+    checkpoint_status.text = "Saving checkpoint…"
+    var metadata: Dictionary = {"label": CHECKPOINT_NAME}
+    var saved: Dictionary = await game.save(PROFILE_ID, SLOT_ID, metadata).wait()
+    checkpoint_status.text = "Checkpoint saved." if saved.ok else String(saved.message)
+    _set_buttons_disabled(false)
+
+func _continue_campaign() -> void:
+    _set_buttons_disabled(true)
+    checkpoint_status.text = "Loading checkpoint…"
+    var restored: Dictionary = await game.restore(PROFILE_ID, SLOT_ID).wait()
+    checkpoint_status.text = "Checkpoint restored." if restored.ok else String(restored.message)
+    _set_buttons_disabled(false)
+
+func _set_buttons_disabled(disabled: bool) -> void:
+    save_button.disabled = disabled
+    continue_button.disabled = disabled
 ```

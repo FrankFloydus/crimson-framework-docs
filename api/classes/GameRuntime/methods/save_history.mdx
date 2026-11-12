@@ -33,26 +33,4 @@ save_history(profile: String, slot: String, before_sequence: String = "", before
 
 Supply both before\_sequence and before\_id to continue from an exclusive cursor. A successful result includes rows in value, the slot status, a truncated flag, and a next cursor when more rows exist.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_save_history(
-    game_runtime: GameRuntime,
-    profile: String,
-    slot: String,
-    before_sequence: String,
-    before_id: String,
-    limit: int,
-    status_label: Label
-) -> void:
-    var result: GameOperation = game_runtime.save_history(profile, slot, before_sequence, before_id, limit)
-    if result == null:
-        return
-    var result_value: Dictionary = await result.wait()
-    if not result_value.get("ok", false):
-        status_label.text = str(result_value.get("message", "Operation failed."))
-        return
-    status_label.text = "Save history completed."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

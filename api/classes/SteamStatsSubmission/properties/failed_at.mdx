@@ -27,15 +27,4 @@ var failed_at: int
 
 Use -1 as the sentinel for an outcome without an individual failed edit.
 
-## Example
-
-```gdscript
-extends Node
-
-func refresh_failed_at(
-    steam_stats_submission: SteamStatsSubmission,
-    failed_at_label: Label
-) -> void:
-    var failed_at: int = steam_stats_submission.failed_at
-    failed_at_label.text = "Failed at: %s" % str(failed_at)
-```
+[See gameplay examples for `SteamStatsSubmission`](/api/classes/SteamStatsSubmission#examples).

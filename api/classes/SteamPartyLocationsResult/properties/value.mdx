@@ -26,22 +26,3 @@ var value: SteamPartyLocation[]
 ## Description
 
 An empty array can be a successful response.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_party_locations_result: SteamPartyLocationsResult,
-    add_value_entry: Callable
-) -> void:
-    if steam_party_locations_result == null:
-        return
-    if not steam_party_locations_result.ok:
-        push_warning(steam_party_locations_result.message)
-        return
-    var value: Array[SteamPartyLocation] = steam_party_locations_result.value
-    for entry: SteamPartyLocation in value:
-        add_value_entry.call(entry)
-```

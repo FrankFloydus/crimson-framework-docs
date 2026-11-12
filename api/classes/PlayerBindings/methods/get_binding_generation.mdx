@@ -24,17 +24,3 @@ get_binding_generation(peer_id: int) -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_binding_generation(
-    player_bindings: PlayerBindings,
-    peer_id: int,
-    binding_generation_label: Label
-) -> void:
-    var result: int = player_bindings.get_binding_generation(peer_id)
-    binding_generation_label.text = "Binding generation: %s" % str(result)
-```

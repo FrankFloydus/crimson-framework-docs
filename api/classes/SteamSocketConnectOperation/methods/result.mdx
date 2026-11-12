@@ -18,24 +18,3 @@ result() -> SteamSocketConnectionResult
 ## Return value
 
 [`SteamSocketConnectionResult`](/api/classes/SteamSocketConnectionResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_socket_connect_operation: SteamSocketConnectOperation,
-    apply_result: Callable
-) -> void:
-    var result: SteamSocketConnectionResult = steam_socket_connect_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamSocketConnection = result.value
-    if payload == null:
-        return
-    apply_result.call(payload)
-```

@@ -22,16 +22,3 @@ get_session_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_session_id(
-    steam_notification_claim: SteamNotificationClaim,
-    apply_session_id: Callable
-) -> void:
-    var result: String = steam_notification_claim.get_session_id()
-    apply_session_id.call(result)
-```

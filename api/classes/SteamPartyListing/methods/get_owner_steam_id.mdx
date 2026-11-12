@@ -20,16 +20,3 @@ get_owner_steam_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_owner_steam_id(
-    steam_party_listing: SteamPartyListing,
-    apply_owner_steam_id: Callable
-) -> void:
-    var result: String = steam_party_listing.get_owner_steam_id()
-    apply_owner_steam_id.call(result)
-```

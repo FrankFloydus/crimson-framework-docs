@@ -19,14 +19,4 @@ leaderboards() -> SteamLeaderboards
 
 [`SteamLeaderboards`](/api/classes/SteamLeaderboards)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_leaderboards(steam_client: SteamClient, apply_leaderboards: Callable) -> void:
-    var result: SteamLeaderboards = steam_client.leaderboards()
-    if result == null:
-        return
-    apply_leaderboards.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

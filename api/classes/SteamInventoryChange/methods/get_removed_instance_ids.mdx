@@ -20,18 +20,3 @@ get_removed_instance_ids() -> PackedStringArray
 ## Return value
 
 `PackedStringArray`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_removed_instance_ids(
-    steam_inventory_change: SteamInventoryChange,
-    results_list: ItemList
-) -> void:
-    var result: PackedStringArray = steam_inventory_change.get_removed_instance_ids()
-    results_list.clear()
-    for entry: String in result:
-        results_list.add_item(str(entry))
-```

@@ -23,18 +23,4 @@ cancel() -> Error
 
 A settled query returns `ERR_DOES_NOT_EXIST`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(
-    steam_server_details_operation: SteamServerDetailsOperation,
-    status_label: Label
-) -> void:
-    var result: Error = steam_server_details_operation.cancel()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Cancel accepted."
-```
+[See gameplay examples for `SteamServerDetailsOperation`](/api/classes/SteamServerDetailsOperation#examples).

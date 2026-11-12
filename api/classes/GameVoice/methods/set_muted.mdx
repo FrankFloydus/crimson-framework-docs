@@ -29,24 +29,3 @@ set_muted(peer_id: int, muted: bool = true) -> Error
 ## Description
 
 Muting removes queued frames and ends its displayed speaking state.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_muted(
-    game_runtime: GameRuntime,
-    peer_id: int,
-    muted: bool,
-    status_label: Label
-) -> void:
-    var game_voice: GameVoice = game_runtime.voice()
-    if game_voice == null:
-        return
-    var result: Error = game_voice.set_muted(peer_id, muted)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set muted accepted."
-```

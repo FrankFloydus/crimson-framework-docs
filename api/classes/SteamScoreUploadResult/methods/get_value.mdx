@@ -20,24 +20,3 @@ get_value() -> SteamScoreUpload
 ## Return value
 
 [`SteamScoreUpload`](/api/classes/SteamScoreUpload)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_score_upload_result: SteamScoreUploadResult,
-    score_label: Label
-) -> void:
-    if steam_score_upload_result == null:
-        return
-    if not steam_score_upload_result.ok:
-        push_warning(steam_score_upload_result.message)
-        return
-    var result: SteamScoreUpload = steam_score_upload_result.get_value()
-    if result == null:
-        return
-    var score: int = result.score
-    score_label.text = "Score: %s" % str(score)
-```

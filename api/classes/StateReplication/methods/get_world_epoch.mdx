@@ -22,13 +22,3 @@ get_world_epoch() -> int
 ## Description
 
 Returns zero when the transport is no longer current.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_world_epoch(state_replication: StateReplication, world_epoch_label: Label) -> void:
-    var result: int = state_replication.get_world_epoch()
-    world_epoch_label.text = "World epoch: %s" % str(result)
-```

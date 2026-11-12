@@ -26,13 +26,3 @@ var id: String
 ## Description
 
 The identifier remains readable after closure.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_id(steam_party_beacon: SteamPartyBeacon, id_label: Label) -> void:
-    var id: String = steam_party_beacon.id
-    id_label.text = "Id: %s" % str(id)
-```

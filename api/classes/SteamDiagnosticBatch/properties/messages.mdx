@@ -22,17 +22,3 @@ var messages: SteamDiagnosticMessage[]
 | Type | `SteamDiagnosticMessage[]` |
 | Access | Read only |
 | Getter | [`get_messages()`](/api/classes/SteamDiagnosticBatch/methods/get_messages) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_messages(
-    steam_diagnostic_batch: SteamDiagnosticBatch,
-    add_messages_entry: Callable
-) -> void:
-    var messages: Array[SteamDiagnosticMessage] = steam_diagnostic_batch.messages
-    for entry: SteamDiagnosticMessage in messages:
-        add_messages_entry.call(entry)
-```

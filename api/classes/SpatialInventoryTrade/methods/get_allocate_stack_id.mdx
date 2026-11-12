@@ -20,16 +20,3 @@ get_allocate_stack_id() -> Callable
 ## Return value
 
 `Callable`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_allocate_stack_id(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    action_button: Button
-) -> void:
-    var result: Callable = spatial_inventory_trade.get_allocate_stack_id()
-    action_button.disabled = not result.is_valid()
-```

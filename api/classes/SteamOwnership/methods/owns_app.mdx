@@ -22,13 +22,3 @@ owns_app() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_owns_app(steam_ownership: SteamOwnership, status_label: Label) -> void:
-    var result: bool = steam_ownership.owns_app()
-    status_label.text = "Owns app: yes" if result else "Owns app: no"
-```

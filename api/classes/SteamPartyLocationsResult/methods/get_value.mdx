@@ -20,22 +20,3 @@ get_value() -> SteamPartyLocation[]
 ## Return value
 
 `SteamPartyLocation[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_party_locations_result: SteamPartyLocationsResult,
-    add_value_entry: Callable
-) -> void:
-    if steam_party_locations_result == null:
-        return
-    if not steam_party_locations_result.ok:
-        push_warning(steam_party_locations_result.message)
-        return
-    var result: Array[SteamPartyLocation] = steam_party_locations_result.get_value()
-    for entry: SteamPartyLocation in result:
-        add_value_entry.call(entry)
-```

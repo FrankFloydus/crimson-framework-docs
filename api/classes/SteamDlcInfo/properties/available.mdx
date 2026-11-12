@@ -26,13 +26,3 @@ var available: bool
 ## Description
 
 Use `SteamApps.owns_dlc()` to query local ownership.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_available(steam_dlc_info: SteamDlcInfo, action_button: Button) -> void:
-    var available: bool = steam_dlc_info.available
-    action_button.disabled = not available
-```

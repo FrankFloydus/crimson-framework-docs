@@ -18,27 +18,3 @@ accept_json() -> SteamHttpRequest
 ## Return value
 
 [`SteamHttpRequest`](/api/classes/SteamHttpRequest)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_accept_json(steam_http_request: SteamHttpRequest, apply_send: Callable) -> void:
-    var result: SteamHttpRequest = steam_http_request.accept_json()
-    if result == null:
-        return
-    var completion: SteamHttpResponseOperation = result.send()
-    if completion == null:
-        return
-    var result_value: SteamHttpResponseResult = await completion.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamHttpResponse = result_value.value
-    if payload == null:
-        return
-    apply_send.call(payload)
-```

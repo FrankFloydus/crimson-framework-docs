@@ -28,29 +28,3 @@ find(name: String) -> SteamLeaderboardOperation
 ## Description
 
 On success, the typed result contains a [`SteamLeaderboard`](/api/classes/SteamLeaderboard). An unknown board returns `@GlobalScope.ERR_DOES_NOT_EXIST`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_find(steam_client: SteamClient, name: String, apply_find: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_leaderboards: SteamLeaderboards = steam_client.leaderboards()
-    if steam_leaderboards == null:
-        return
-    var result: SteamLeaderboardOperation = steam_leaderboards.find(name)
-    if result == null:
-        return
-    var result_value: SteamLeaderboardResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamLeaderboard = result_value.value
-    if payload == null:
-        return
-    apply_find.call(payload)
-```

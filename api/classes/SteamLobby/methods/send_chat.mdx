@@ -29,15 +29,4 @@ send_chat(text: String) -> Error
 
 `OK` acknowledges submission. Use `chat_received` to observe delivery.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_send_chat(steam_lobby: SteamLobby, text: String, status_label: Label) -> void:
-    var result: Error = steam_lobby.send_chat(text)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Send chat accepted."
-```
+[See gameplay examples for `SteamLobby`](/api/classes/SteamLobby#examples).

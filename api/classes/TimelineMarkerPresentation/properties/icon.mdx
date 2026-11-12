@@ -24,18 +24,3 @@ var icon: String = "steam_marker"
 | Default | `"steam_marker"` |
 | Getter | [`get_icon()`](/api/classes/TimelineMarkerPresentation/methods/get_icon) |
 | Setter | [`set_icon()`](/api/classes/TimelineMarkerPresentation/methods/set_icon) |
-
-## Example
-
-```gdscript
-extends Node
-
-func update_icon(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    new_icon: String,
-    icon_label: Label
-) -> void:
-    timeline_marker_presentation.icon = new_icon
-    var active_icon: String = timeline_marker_presentation.icon
-    icon_label.text = "Icon: %s" % str(active_icon)
-```

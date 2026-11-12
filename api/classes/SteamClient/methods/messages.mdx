@@ -23,14 +23,4 @@ messages() -> SteamMessages
 
 Standalone peers require explicit authorization. Returns null after the scope ends.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_messages(steam_client: SteamClient, apply_messages: Callable) -> void:
-    var result: SteamMessages = steam_client.messages()
-    if result == null:
-        return
-    apply_messages.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

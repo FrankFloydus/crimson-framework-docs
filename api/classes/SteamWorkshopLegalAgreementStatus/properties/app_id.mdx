@@ -22,16 +22,3 @@ var app_id: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_app_id()`](/api/classes/SteamWorkshopLegalAgreementStatus/methods/get_app_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_app_id(
-    steam_workshop_legal_agreement_status: SteamWorkshopLegalAgreementStatus,
-    app_id_label: Label
-) -> void:
-    var app_id: int = steam_workshop_legal_agreement_status.app_id
-    app_id_label.text = "App id: %s" % str(app_id)
-```

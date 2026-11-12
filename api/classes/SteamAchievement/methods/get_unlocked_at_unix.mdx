@@ -20,16 +20,3 @@ get_unlocked_at_unix() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_unlocked_at_unix(
-    steam_achievement: SteamAchievement,
-    unlocked_at_unix_label: Label
-) -> void:
-    var result: int = steam_achievement.get_unlocked_at_unix()
-    unlocked_at_unix_label.text = "Unlocked at unix: %s" % str(result)
-```

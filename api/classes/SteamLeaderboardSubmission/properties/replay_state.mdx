@@ -27,16 +27,3 @@ var replay_state: SteamLeaderboardSubmission.ReplayState = 0
 ## Description
 
 Check this even when the result reports an attachment failure.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_replay_state(
-    steam_leaderboard_submission: SteamLeaderboardSubmission,
-    replay_state_label: Label
-) -> void:
-    var replay_state: SteamLeaderboardSubmission.ReplayState = steam_leaderboard_submission.replay_state
-    replay_state_label.text = "Replay state: %s" % str(replay_state)
-```

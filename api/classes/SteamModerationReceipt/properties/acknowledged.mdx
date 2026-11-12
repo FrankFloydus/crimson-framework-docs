@@ -24,16 +24,3 @@ var acknowledged: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`get_acknowledged()`](/api/classes/SteamModerationReceipt/methods/get_acknowledged) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_acknowledged(
-    steam_moderation_receipt: SteamModerationReceipt,
-    apply_acknowledged: Callable
-) -> void:
-    var acknowledged: bool = steam_moderation_receipt.acknowledged
-    apply_acknowledged.call(acknowledged)
-```

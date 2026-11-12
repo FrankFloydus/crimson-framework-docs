@@ -26,15 +26,3 @@ var items: SteamWorkshopItem[]
 ## Description
 
 A page contains up to 50 items.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_items(steam_workshop_page: SteamWorkshopPage, results_list: ItemList) -> void:
-    var items: Array[SteamWorkshopItem] = steam_workshop_page.items
-    results_list.clear()
-    for entry: SteamWorkshopItem in items:
-        results_list.add_item(str(entry.title))
-```

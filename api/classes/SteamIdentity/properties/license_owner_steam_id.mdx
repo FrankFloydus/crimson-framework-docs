@@ -28,16 +28,3 @@ var license_owner_steam_id: String
 ## Description
 
 Empty when omitted.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_license_owner_steam_id(
-    steam_identity: SteamIdentity,
-    apply_license_owner_steam_id: Callable
-) -> void:
-    var license_owner_steam_id: String = steam_identity.license_owner_steam_id
-    apply_license_owner_steam_id.call(license_owner_steam_id)
-```

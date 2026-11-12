@@ -26,16 +26,3 @@ var downloaded_bytes: int
 ## Description
 
 Zero while inactive.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_downloaded_bytes(
-    steam_dlc_progress: SteamDlcProgress,
-    downloaded_bytes_label: Label
-) -> void:
-    var downloaded_bytes: int = steam_dlc_progress.downloaded_bytes
-    downloaded_bytes_label.text = "Downloaded bytes: %s" % str(downloaded_bytes)
-```

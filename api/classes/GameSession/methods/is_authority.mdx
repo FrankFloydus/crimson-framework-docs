@@ -22,13 +22,3 @@ is_authority() -> bool
 ## Description
 
 Authority assignments for individual Godot nodes still follow the project's multiplayer configuration.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_authority(game_session: GameSession, status_label: Label) -> void:
-    var result: bool = game_session.is_authority()
-    status_label.text = "Authority: yes" if result else "Authority: no"
-```

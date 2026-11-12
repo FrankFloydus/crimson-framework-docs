@@ -24,13 +24,3 @@ var owns_app: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`get_owns_app()`](/api/classes/SteamAppOwnership/methods/get_owns_app) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_owns_app(steam_app_ownership: SteamAppOwnership, status_label: Label) -> void:
-    var owns_app: bool = steam_app_ownership.owns_app
-    status_label.text = "Owns app: yes" if owns_app else "Owns app: no"
-```

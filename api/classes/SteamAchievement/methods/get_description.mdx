@@ -20,13 +20,3 @@ get_description() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_description(steam_achievement: SteamAchievement, description_label: Label) -> void:
-    var result: String = steam_achievement.get_description()
-    description_label.text = "Description: %s" % str(result)
-```

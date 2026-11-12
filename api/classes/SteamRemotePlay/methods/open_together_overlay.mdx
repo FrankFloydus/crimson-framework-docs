@@ -22,21 +22,3 @@ open_together_overlay() -> Error
 ## Description
 
 Return `OK` if Steam accepts, `ERR_BUSY` if its overlay is still unavailable for display, or `ERR_UNAVAILABLE` if the feature or live scope is unavailable. Use the session signals to observe actual streams.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_open_together_overlay(steam_client: SteamClient, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_remote_play: SteamRemotePlay = steam_client.remote_play()
-    if steam_remote_play == null:
-        return
-    var result: Error = steam_remote_play.open_together_overlay()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Open together overlay accepted."
-```

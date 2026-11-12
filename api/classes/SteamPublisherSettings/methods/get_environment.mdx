@@ -26,16 +26,3 @@ get_environment() -> SteamPublisherSettings.Environment
 ## Description
 
 The default is `LIVE`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_environment(
-    steam_publisher_settings: SteamPublisherSettings,
-    apply_environment: Callable
-) -> void:
-    var result: SteamPublisherSettings.Environment = steam_publisher_settings.get_environment()
-    apply_environment.call(result)
-```

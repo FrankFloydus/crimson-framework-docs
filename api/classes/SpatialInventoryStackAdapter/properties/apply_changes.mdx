@@ -28,18 +28,3 @@ var apply_changes: Callable = Callable()
 ## Description
 
 Each row has `id`, `before`, and `after`, with optional `source_id` on creation. An empty record means absence. Validate the expected records and roll back on commit failure.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_apply_changes(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    new_apply_changes: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_stack_adapter.apply_changes = new_apply_changes
-    var active_apply_changes: Callable = spatial_inventory_stack_adapter.apply_changes
-    action_button.disabled = not active_apply_changes.is_valid()
-```

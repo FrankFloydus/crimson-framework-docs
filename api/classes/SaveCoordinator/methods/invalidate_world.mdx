@@ -22,13 +22,3 @@ invalidate_world() -> bool
 ## Description
 
 If active work is past its cancellation gate, wait for it to finish and try again.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_invalidate_world(save_coordinator: SaveCoordinator, status_label: Label) -> void:
-    var result: bool = save_coordinator.invalidate_world()
-    status_label.text = "Invalidate world: yes" if result else "Invalidate world: no"
-```

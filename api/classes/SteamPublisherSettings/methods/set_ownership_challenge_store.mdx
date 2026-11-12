@@ -28,20 +28,3 @@ set_ownership_challenge_store(store: SteamOwnershipChallengeStore) -> void
 ## Description
 
 The default null leaves encrypted ownership verification unavailable.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_ownership_challenge_store(
-    steam_publisher_settings: SteamPublisherSettings,
-    store: SteamOwnershipChallengeStore,
-    apply_ownership_challenge_store: Callable
-) -> void:
-    steam_publisher_settings.set_ownership_challenge_store(store)
-    var active_ownership_challenge_store: SteamOwnershipChallengeStore = steam_publisher_settings.ownership_challenge_store
-    if active_ownership_challenge_store == null:
-        return
-    apply_ownership_challenge_store.call(active_ownership_challenge_store)
-```

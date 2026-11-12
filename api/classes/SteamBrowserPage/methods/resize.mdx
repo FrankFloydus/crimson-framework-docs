@@ -28,20 +28,3 @@ resize(size: Vector2i) -> Error
 ## Description
 
 Both sides must be in the range 1 to 4096 with at most 4194304 total pixels. The texture updates after Steam provides a frame at the new size.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_resize(
-    steam_browser_page: SteamBrowserPage,
-    size: Vector2i,
-    status_label: Label
-) -> void:
-    var result: Error = steam_browser_page.resize(size)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Resize accepted."
-```

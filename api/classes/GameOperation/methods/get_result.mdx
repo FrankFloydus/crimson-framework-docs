@@ -21,14 +21,4 @@ get_result() -> Dictionary
 
 `Dictionary`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_result(game_operation: GameOperation, apply_result: Callable) -> void:
-    var result: Dictionary = game_operation.get_result()
-    if result.is_empty():
-        return
-    apply_result.call(result)
-```
+[See gameplay examples for `GameOperation`](/api/classes/GameOperation#examples).

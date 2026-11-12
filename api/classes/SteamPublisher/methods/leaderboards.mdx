@@ -20,15 +20,3 @@ leaderboards() -> SteamPublisherLeaderboards
 ## Return value
 
 [`SteamPublisherLeaderboards`](/api/classes/SteamPublisherLeaderboards)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_leaderboards(steam_publisher: SteamPublisher, apply_leaderboards: Callable) -> void:
-    var result: SteamPublisherLeaderboards = steam_publisher.leaderboards()
-    if result == null:
-        return
-    apply_leaderboards.call(result)
-```

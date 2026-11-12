@@ -22,16 +22,3 @@ stop() -> Error
 ## Description
 
 The exact owner may read final frames for up to 300 milliseconds. Scope teardown discards those frames immediately. A detached or inactive owner returns `ERR_UNAVAILABLE`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_stop(steam_voice_capture: SteamVoiceCapture, status_label: Label) -> void:
-    var result: Error = steam_voice_capture.stop()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Stop accepted."
-```

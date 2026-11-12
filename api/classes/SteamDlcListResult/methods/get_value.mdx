@@ -20,20 +20,3 @@ get_value() -> SteamDlcInfo[]
 ## Return value
 
 `SteamDlcInfo[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_dlc_list_result: SteamDlcListResult, results_list: ItemList) -> void:
-    if steam_dlc_list_result == null:
-        return
-    if not steam_dlc_list_result.ok:
-        push_warning(steam_dlc_list_result.message)
-        return
-    var result: Array[SteamDlcInfo] = steam_dlc_list_result.get_value()
-    results_list.clear()
-    for entry: SteamDlcInfo in result:
-        results_list.add_item(str(entry.display_name))
-```

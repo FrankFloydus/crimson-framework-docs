@@ -22,18 +22,3 @@ hardware_type() -> SteamUtils.HardwareType
 ## Description
 
 Returns `HARDWARE_UNAVAILABLE` when Steam cannot supply the query.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_hardware_type(steam_client: SteamClient, hardware_type_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_utils: SteamUtils = steam_client.utils()
-    if steam_utils == null:
-        return
-    var result: SteamUtils.HardwareType = steam_utils.hardware_type()
-    hardware_type_label.text = "Hardware type: %s" % str(result)
-```

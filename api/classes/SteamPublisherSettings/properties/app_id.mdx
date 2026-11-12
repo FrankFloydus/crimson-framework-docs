@@ -26,18 +26,3 @@ var app_id: int = 0
 | Default | `0` |
 | Getter | [`get_app_id()`](/api/classes/SteamPublisherSettings/methods/get_app_id) |
 | Setter | [`set_app_id()`](/api/classes/SteamPublisherSettings/methods/set_app_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func update_app_id(
-    steam_publisher_settings: SteamPublisherSettings,
-    new_app_id: int,
-    apply_app_id: Callable
-) -> void:
-    steam_publisher_settings.app_id = new_app_id
-    var active_app_id: int = steam_publisher_settings.app_id
-    apply_app_id.call(active_app_id)
-```

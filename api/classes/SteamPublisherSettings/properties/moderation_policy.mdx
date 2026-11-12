@@ -29,20 +29,3 @@ var moderation_policy: SteamModerationPolicy
 ## Description
 
 The default null leaves moderation unavailable.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_moderation_policy(
-    steam_publisher_settings: SteamPublisherSettings,
-    new_moderation_policy: SteamModerationPolicy,
-    apply_moderation_policy: Callable
-) -> void:
-    steam_publisher_settings.moderation_policy = new_moderation_policy
-    var active_moderation_policy: SteamModerationPolicy = steam_publisher_settings.moderation_policy
-    if active_moderation_policy == null:
-        return
-    apply_moderation_policy.call(active_moderation_policy)
-```

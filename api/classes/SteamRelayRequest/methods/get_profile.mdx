@@ -18,13 +18,3 @@ get_profile() -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_profile(steam_relay_request: SteamRelayRequest, profile_label: Label) -> void:
-    var result: StringName = steam_relay_request.get_profile()
-    profile_label.text = "Profile: %s" % str(result)
-```

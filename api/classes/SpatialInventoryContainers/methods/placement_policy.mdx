@@ -28,17 +28,3 @@ placement_policy(context: Dictionary) -> String
 ## Description
 
 Rejects duplicate ownership, nesting cycles, and container splits or merges. Returns an empty String to allow the action, or a reason to deny it.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_placement_policy(
-    spatial_inventory_containers: SpatialInventoryContainers,
-    context: Dictionary,
-    placement_policy_label: Label
-) -> void:
-    var result: String = spatial_inventory_containers.placement_policy(context)
-    placement_policy_label.text = "Placement policy: %s" % str(result)
-```

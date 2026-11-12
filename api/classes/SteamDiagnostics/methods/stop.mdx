@@ -18,18 +18,3 @@ stop() -> void
 ## Description
 
 Repeated calls and calls by other scopes leave the hook state as it is.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_stop(steam_client: SteamClient, capture_indicator: Control) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_diagnostics: SteamDiagnostics = steam_client.diagnostics()
-    if steam_diagnostics == null:
-        return
-    steam_diagnostics.stop()
-    capture_indicator.hide()
-```

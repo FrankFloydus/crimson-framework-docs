@@ -24,18 +24,4 @@ var world_scene: PackedScene
 | Getter | [`get_world_scene()`](/api/classes/WorldSessionDefinition/methods/get_world_scene) |
 | Setter | [`set_world_scene()`](/api/classes/WorldSessionDefinition/methods/set_world_scene) |
 
-## Example
-
-```gdscript
-extends Node
-
-func update_world_scene(
-    world_session_definition: WorldSessionDefinition,
-    new_world_scene: PackedScene,
-    session: WorldSession
-) -> void:
-    if world_session_definition == null:
-        return
-    world_session_definition.world_scene = new_world_scene
-    session.definition = world_session_definition
-```
+[See gameplay examples for `WorldSessionDefinition`](/api/classes/WorldSessionDefinition#examples).

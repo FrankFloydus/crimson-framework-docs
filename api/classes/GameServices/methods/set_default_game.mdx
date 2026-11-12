@@ -28,16 +28,3 @@ static set_default_game(game: GameRuntime) -> Error
 ## Description
 
 Pass null to clear the explicit selection. Returns a Godot Error.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_default_game(game: GameRuntime, status_label: Label) -> void:
-    var result: Error = GameServices.set_default_game(game)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set default game accepted."
-```

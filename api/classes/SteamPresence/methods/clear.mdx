@@ -22,21 +22,3 @@ clear() -> Error
 ## Description
 
 A non-owning scope can call this without changing another scope's status. Explicit Friends overrides and unrelated presence keys are preserved. Stopping the owning scope also attempts to clear its keys.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_clear(steam_client: SteamClient, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_presence: SteamPresence = steam_client.presence()
-    if steam_presence == null:
-        return
-    var result: Error = steam_presence.clear()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Clear accepted."
-```

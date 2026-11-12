@@ -23,26 +23,4 @@ social() -> SteamLobbyQuery
 
 Use a standalone [`SteamLobbies`](/api/classes/SteamLobbies) scope. Gameplay map filters do not apply to social searches.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_social(steam_lobbies: SteamLobbies, results_list: ItemList) -> void:
-    var steam_lobby_query: SteamLobbyQuery = steam_lobbies.query()
-    if steam_lobby_query == null:
-        return
-    var result: SteamLobbyQuery = steam_lobby_query.social()
-    if result == null:
-        return
-    var completion: SteamListingsResult = await result.fetch()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: Array[SteamListing] = completion.value
-    results_list.clear()
-    for entry: SteamListing in payload:
-        results_list.add_item(str(entry.name))
-```
+[See gameplay examples for `SteamLobbyQuery`](/api/classes/SteamLobbyQuery#examples).

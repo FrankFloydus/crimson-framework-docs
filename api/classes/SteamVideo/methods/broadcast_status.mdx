@@ -18,26 +18,3 @@ broadcast_status() -> SteamBroadcastStatusResult
 ## Return value
 
 [`SteamBroadcastStatusResult`](/api/classes/SteamBroadcastStatusResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_broadcast_status(steam_client: SteamClient, apply_broadcast_status: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_video: SteamVideo = steam_client.video()
-    if steam_video == null:
-        return
-    var result: SteamBroadcastStatusResult = steam_video.broadcast_status()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamBroadcastStatus = result.value
-    if payload == null:
-        return
-    apply_broadcast_status.call(payload)
-```

@@ -20,13 +20,3 @@ is_unlocked() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_unlocked(steam_achievement: SteamAchievement, status_label: Label) -> void:
-    var result: bool = steam_achievement.is_unlocked()
-    status_label.text = "Unlocked: yes" if result else "Unlocked: no"
-```

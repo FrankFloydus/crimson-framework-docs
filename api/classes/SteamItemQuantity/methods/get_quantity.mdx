@@ -20,13 +20,3 @@ get_quantity() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_quantity(steam_item_quantity: SteamItemQuantity, quantity_label: Label) -> void:
-    var result: int = steam_item_quantity.get_quantity()
-    quantity_label.text = "Quantity: %s" % str(result)
-```

@@ -22,16 +22,3 @@ var total_count: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_total_count()`](/api/classes/SteamCloudFilesResult/methods/get_total_count) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_total_count(
-    steam_cloud_files_result: SteamCloudFilesResult,
-    total_count_label: Label
-) -> void:
-    var total_count: int = steam_cloud_files_result.total_count
-    total_count_label.text = "Total count: %s" % str(total_count)
-```

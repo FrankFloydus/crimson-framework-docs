@@ -22,13 +22,3 @@ var path_type: SteamCloudChange.PathType
 | Type | `SteamCloudChange.PathType` |
 | Access | Read only |
 | Getter | [`get_path_type()`](/api/classes/SteamCloudChange/methods/get_path_type) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_path_type(steam_cloud_change: SteamCloudChange, path_type_label: Label) -> void:
-    var path_type: SteamCloudChange.PathType = steam_cloud_change.path_type
-    path_type_label.text = "Path type: %s" % str(path_type)
-```

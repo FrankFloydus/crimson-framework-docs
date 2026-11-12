@@ -19,14 +19,4 @@ sockets() -> SteamSockets
 
 [`SteamSockets`](/api/classes/SteamSockets)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_sockets(steam_scope: SteamScope, apply_sockets: Callable) -> void:
-    var result: SteamSockets = steam_scope.sockets()
-    if result == null:
-        return
-    apply_sockets.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

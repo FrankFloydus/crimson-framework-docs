@@ -18,16 +18,3 @@ is_finished() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_finished(
-    steam_socket_connect_operation: SteamSocketConnectOperation,
-    action_button: Button
-) -> void:
-    var result: bool = steam_socket_connect_operation.is_finished()
-    action_button.disabled = not result
-```

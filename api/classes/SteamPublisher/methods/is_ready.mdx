@@ -20,13 +20,3 @@ is_ready() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_ready(steam_publisher: SteamPublisher, apply_ready: Callable) -> void:
-    var result: bool = steam_publisher.is_ready()
-    apply_ready.call(result)
-```

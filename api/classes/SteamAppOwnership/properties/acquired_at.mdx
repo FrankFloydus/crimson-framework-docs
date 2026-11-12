@@ -24,16 +24,3 @@ var acquired_at: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_acquired_at()`](/api/classes/SteamAppOwnership/methods/get_acquired_at) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_acquired_at(
-    steam_app_ownership: SteamAppOwnership,
-    acquired_at_label: Label
-) -> void:
-    var acquired_at: String = steam_app_ownership.acquired_at
-    acquired_at_label.text = "Acquired at: %s" % str(acquired_at)
-```

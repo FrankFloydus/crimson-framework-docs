@@ -18,15 +18,3 @@ static scenes() -> SceneService
 ## Return value
 
 [`SceneService`](/api/classes/SceneService)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_scenes(apply_scenes: Callable) -> void:
-    var result: SceneService = GameServices.scenes()
-    if result == null:
-        return
-    apply_scenes.call(result)
-```

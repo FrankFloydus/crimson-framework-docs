@@ -20,13 +20,3 @@ is_active() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_active(steam_analog_input: SteamAnalogInput, status_label: Label) -> void:
-    var result: bool = steam_analog_input.is_active()
-    status_label.text = "Active: yes" if result else "Active: no"
-```

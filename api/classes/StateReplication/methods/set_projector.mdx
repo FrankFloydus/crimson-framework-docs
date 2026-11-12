@@ -28,20 +28,3 @@ set_projector(callback: Callable) -> Error
 ## Description
 
 Return a dictionary with `ok` set to `true` and `view` set to a bounded dictionary of records visible to that player. Configure before registering peers and keep the callback free of side effects.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_projector(
-    state_replication: StateReplication,
-    callback: Callable,
-    status_label: Label
-) -> void:
-    var result: Error = state_replication.set_projector(callback)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set projector accepted."
-```

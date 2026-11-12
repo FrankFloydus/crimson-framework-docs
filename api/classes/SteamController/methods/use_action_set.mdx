@@ -28,20 +28,3 @@ use_action_set(name: StringName) -> Error
 ## Description
 
 Returns `ERR_DOES_NOT_EXIST` if the published name is unknown, `ERR_INVALID_PARAMETER` if it is empty or exceeds 128 UTF-8 bytes, or `ERR_UNAVAILABLE` when this view or native capability is unavailable.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_use_action_set(
-    steam_controller: SteamController,
-    name: StringName,
-    status_label: Label
-) -> void:
-    var result: Error = steam_controller.use_action_set(name)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Use action set accepted."
-```

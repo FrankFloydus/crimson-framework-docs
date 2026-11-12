@@ -22,13 +22,3 @@ var unlocked: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`is_unlocked()`](/api/classes/SteamAchievement/methods/is_unlocked) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_unlocked(steam_achievement: SteamAchievement, status_label: Label) -> void:
-    var unlocked: bool = steam_achievement.unlocked
-    status_label.text = "Unlocked: yes" if unlocked else "Unlocked: no"
-```

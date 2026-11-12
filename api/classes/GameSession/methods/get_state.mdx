@@ -22,13 +22,3 @@ get_state() -> GameSession.State
 ## Description
 
 CONNECTING lasts until the host confirms admission, even if the underlying transport has connected.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_state(game_session: GameSession, state_label: Label) -> void:
-    var result: GameSession.State = game_session.get_state()
-    state_label.text = "State: %s" % str(result)
-```

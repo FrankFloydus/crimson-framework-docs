@@ -22,18 +22,3 @@ var value: Texture2D
 | Type | `Texture2D` |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamTextureResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_texture_result: SteamTextureResult, preview: TextureRect) -> void:
-    if steam_texture_result == null:
-        return
-    if not steam_texture_result.ok:
-        push_warning(steam_texture_result.message)
-        return
-    var value: Texture2D = steam_texture_result.value
-    preview.texture = value
-```

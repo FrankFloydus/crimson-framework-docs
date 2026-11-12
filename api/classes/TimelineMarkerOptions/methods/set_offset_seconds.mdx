@@ -22,18 +22,3 @@ set_offset_seconds(value: float) -> void
 | Parameter | Type | Default |
 | --- | --- | --- |
 | `value` | `float` | — |
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_offset_seconds(
-    timeline_marker_options: TimelineMarkerOptions,
-    value: float,
-    offset_seconds_label: Label
-) -> void:
-    timeline_marker_options.set_offset_seconds(value)
-    var active_offset_seconds: float = timeline_marker_options.offset_seconds
-    offset_seconds_label.text = "Offset seconds: %s" % str(active_offset_seconds)
-```

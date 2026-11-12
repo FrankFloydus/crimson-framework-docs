@@ -28,23 +28,3 @@ open_client(endpoint: SessionEndpoint) -> SessionTransportResult
 ## Description
 
 The adapter accepts its versioned Steam P2P, dedicated direct, or coordinator-authorized hosted endpoint and checks the remote identity against the expected certificate.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_open_client(
-    steam_session_transport: SteamSessionTransport,
-    endpoint: SessionEndpoint,
-    install_peer: Callable
-) -> void:
-    var result: SessionTransportResult = steam_session_transport.open_client(endpoint)
-    if result == null:
-        return
-    if result.get_error() != OK:
-        push_warning(error_string(result.get_error()))
-        return
-    var peer: MultiplayerPeer = result.get_peer()
-    install_peer.call(peer)
-```

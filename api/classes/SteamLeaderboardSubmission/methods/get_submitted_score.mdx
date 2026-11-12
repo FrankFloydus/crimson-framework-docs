@@ -20,16 +20,3 @@ get_submitted_score() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_submitted_score(
-    steam_leaderboard_submission: SteamLeaderboardSubmission,
-    submitted_score_label: Label
-) -> void:
-    var result: int = steam_leaderboard_submission.get_submitted_score()
-    submitted_score_label.text = "Submitted score: %s" % str(result)
-```

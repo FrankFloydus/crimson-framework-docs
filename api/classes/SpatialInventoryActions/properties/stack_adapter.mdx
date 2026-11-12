@@ -27,20 +27,3 @@ var stack_adapter: SpatialInventoryStackAdapter
 ## Description
 
 Assign it before using split or merge actions.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_stack_adapter(
-    spatial_inventory_actions: SpatialInventoryActions,
-    new_stack_adapter: SpatialInventoryStackAdapter,
-    apply_stack_adapter: Callable
-) -> void:
-    spatial_inventory_actions.stack_adapter = new_stack_adapter
-    var active_stack_adapter: SpatialInventoryStackAdapter = spatial_inventory_actions.stack_adapter
-    if active_stack_adapter == null:
-        return
-    apply_stack_adapter.call(active_stack_adapter)
-```

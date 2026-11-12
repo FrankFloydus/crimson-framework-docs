@@ -20,18 +20,3 @@ get_properties() -> Dictionary[String, String]
 ## Return value
 
 `Dictionary[String, String]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_properties(
-    steam_item_definition: SteamItemDefinition,
-    apply_properties: Callable
-) -> void:
-    var result: Dictionary[String, String] = steam_item_definition.get_properties()
-    if result.is_empty():
-        return
-    apply_properties.call(result)
-```

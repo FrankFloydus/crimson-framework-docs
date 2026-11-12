@@ -23,14 +23,4 @@ stats() -> SteamStats
 
 Returns null when this generation has ended.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_stats(steam_scope: SteamScope, apply_stats: Callable) -> void:
-    var result: SteamStats = steam_scope.stats()
-    if result == null:
-        return
-    apply_stats.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

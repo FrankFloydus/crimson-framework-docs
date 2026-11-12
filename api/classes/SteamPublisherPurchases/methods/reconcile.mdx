@@ -33,31 +33,3 @@ Await the call to receive [`SteamPurchaseReconciliationResult`](/api/classes/Ste
 ## Description
 
 `max_results` must be from 1 to 1000 and defaults to 1000. A reply larger than 4 MiB fails validation. Applies known receipts and exact item reversals in order. A failing event leaves the original cursor available for replay. A full page whose last timestamp equals the input cursor returns `ERR_BUSY`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_reconcile(
-    steam_publisher: SteamPublisher,
-    since_unix: int,
-    max_results: int,
-    apply_reconcile: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_purchases: SteamPublisherPurchases = steam_publisher.purchases()
-    if steam_publisher_purchases == null:
-        return
-    var result: SteamPurchaseReconciliationResult = await steam_publisher_purchases.reconcile(since_unix, max_results)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamPurchaseReconciliation = result.value
-    if payload == null:
-        return
-    apply_reconcile.call(payload)
-```

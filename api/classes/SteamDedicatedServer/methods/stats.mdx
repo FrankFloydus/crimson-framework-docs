@@ -29,18 +29,4 @@ stats(peer_id: int) -> SteamServerPlayerStats
 
 Returns null for the local authority, unknown or retired peers, a Game outside its dedicated Steam session, or calls off the scene thread. The returned service is bound to this exact authenticated admission.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_stats(
-    steam_dedicated_server: SteamDedicatedServer,
-    peer_id: int,
-    apply_stats: Callable
-) -> void:
-    var result: SteamServerPlayerStats = steam_dedicated_server.stats(peer_id)
-    if result == null:
-        return
-    apply_stats.call(result)
-```
+[See gameplay examples for `SteamDedicatedServer`](/api/classes/SteamDedicatedServer#examples).

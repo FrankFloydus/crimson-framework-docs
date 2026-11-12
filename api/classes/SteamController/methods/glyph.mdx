@@ -29,24 +29,3 @@ glyph(action: StringName, size: SteamController.GlyphSize = 1) -> SteamTextureRe
 ## Description
 
 An unbound action, unavailable glyph, or retired view returns `ERR_UNAVAILABLE`. An invalid size or action name returns `ERR_INVALID_PARAMETER`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_glyph(
-    steam_controller: SteamController,
-    action: StringName,
-    size: SteamController.GlyphSize,
-    preview: TextureRect
-) -> void:
-    var result: SteamTextureResult = steam_controller.glyph(action, size)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: Texture2D = result.value
-    preview.texture = payload
-```

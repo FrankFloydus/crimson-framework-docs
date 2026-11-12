@@ -31,26 +31,4 @@ show_progress(name: String, current: int, maximum: int) -> Error
 
 The current count must be positive and below the maximum, which fits an unsigned 32-bit integer. The popup leaves the cached unlock state unchanged.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_show_progress(
-    steam_client: SteamClient,
-    name: String,
-    current: int,
-    maximum: int,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: Error = steam_stats.show_progress(name, current, maximum)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Show progress accepted."
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

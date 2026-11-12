@@ -22,23 +22,3 @@ var value: SteamInventoryChange
 | Type | [`SteamInventoryChange`](/api/classes/SteamInventoryChange) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamInventoryChangeResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_inventory_change_result: SteamInventoryChangeResult,
-    apply_value: Callable
-) -> void:
-    if steam_inventory_change_result == null:
-        return
-    if not steam_inventory_change_result.ok:
-        push_warning(steam_inventory_change_result.message)
-        return
-    var value: SteamInventoryChange = steam_inventory_change_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

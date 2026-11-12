@@ -20,13 +20,3 @@ is_enabled() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_enabled(steam_music_status: SteamMusicStatus, action_button: Button) -> void:
-    var result: bool = steam_music_status.is_enabled()
-    action_button.disabled = not result
-```

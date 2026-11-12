@@ -28,19 +28,3 @@ get_peer_identity(peer_id: int) -> SessionIdentity
 ## Description
 
 A host can read verified guests and a guest can read its verified host.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_peer_identity(
-    game_session: GameSession,
-    peer_id: int,
-    apply_peer_identity: Callable
-) -> void:
-    var result: SessionIdentity = game_session.get_peer_identity(peer_id)
-    if result == null:
-        return
-    apply_peer_identity.call(result)
-```

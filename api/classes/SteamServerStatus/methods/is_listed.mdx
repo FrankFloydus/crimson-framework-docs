@@ -21,15 +21,4 @@ is_listed() -> bool
 
 `bool`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_is_listed(steam_dedicated_server: SteamDedicatedServer, status_label: Label) -> void:
-    var steam_server_status: SteamServerStatus = steam_dedicated_server.status()
-    if steam_server_status == null:
-        return
-    var result: bool = steam_server_status.is_listed()
-    status_label.text = "Listed: yes" if result else "Listed: no"
-```
+[See gameplay examples for `SteamServerStatus`](/api/classes/SteamServerStatus#examples).

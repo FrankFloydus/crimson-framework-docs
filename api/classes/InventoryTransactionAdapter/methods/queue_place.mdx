@@ -32,30 +32,3 @@ queue_place(transaction: GameTransaction, item_id: String, footprint: Vector2i, 
 ## Description
 
 Returns a Godot Error. The authority validates the placement when the transaction commits.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_queue_place(
-    inventory_transaction_adapter: InventoryTransactionAdapter,
-    transaction: GameTransaction,
-    item_id: String,
-    footprint: Vector2i,
-    origin: Vector2i,
-    rotated: bool,
-    status_label: Label
-) -> void:
-    var result: Error = inventory_transaction_adapter.queue_place(
-        transaction,
-        item_id,
-        footprint,
-        origin,
-        rotated,
-    )
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Queue place accepted."
-```

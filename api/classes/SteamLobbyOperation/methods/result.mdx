@@ -19,20 +19,4 @@ result() -> SteamLobbyResult
 
 [`SteamLobbyResult`](/api/classes/SteamLobbyResult)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_result(steam_lobby_operation: SteamLobbyOperation, apply_result: Callable) -> void:
-    var result: SteamLobbyResult = steam_lobby_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamLobby = result.value
-    if payload == null:
-        return
-    apply_result.call(payload)
-```
+[See gameplay examples for `SteamLobbyOperation`](/api/classes/SteamLobbyOperation#examples).

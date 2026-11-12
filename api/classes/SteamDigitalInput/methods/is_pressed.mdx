@@ -20,13 +20,3 @@ is_pressed() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_pressed(steam_digital_input: SteamDigitalInput, status_label: Label) -> void:
-    var result: bool = steam_digital_input.is_pressed()
-    status_label.text = "Pressed: yes" if result else "Pressed: no"
-```

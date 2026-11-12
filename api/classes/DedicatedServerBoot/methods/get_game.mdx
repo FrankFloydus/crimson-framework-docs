@@ -21,14 +21,4 @@ get_game() -> GameRuntime
 
 [`GameRuntime`](/api/classes/GameRuntime)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_game(dedicated_server_boot: DedicatedServerBoot, apply_game: Callable) -> void:
-    var result: GameRuntime = dedicated_server_boot.get_game()
-    if result == null:
-        return
-    apply_game.call(result)
-```
+[See gameplay examples for `DedicatedServerBoot`](/api/classes/DedicatedServerBoot#examples).

@@ -25,16 +25,3 @@ var item_id: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_item_id()`](/api/classes/SteamPublisherPurchaseLine/methods/get_item_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_item_id(
-    steam_publisher_purchase_line: SteamPublisherPurchaseLine,
-    apply_item_id: Callable
-) -> void:
-    var item_id: int = steam_publisher_purchase_line.item_id
-    apply_item_id.call(item_id)
-```

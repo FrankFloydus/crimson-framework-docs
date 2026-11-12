@@ -22,16 +22,3 @@ var definition_id: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_definition_id()`](/api/classes/SteamItemInstance/methods/get_definition_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_definition_id(
-    steam_item_instance: SteamItemInstance,
-    definition_id_label: Label
-) -> void:
-    var definition_id: int = steam_item_instance.definition_id
-    definition_id_label.text = "Definition id: %s" % str(definition_id)
-```

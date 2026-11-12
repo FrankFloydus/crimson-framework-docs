@@ -30,22 +30,3 @@ set_balance(actor: int, currency: StringName, amount: int) -> Error
 ## Description
 
 Amounts must be nonnegative, and setting 0 clears the stored amount in the default wallet.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_balance(
-    spatial_inventory_wallet: SpatialInventoryWallet,
-    actor: int,
-    currency: StringName,
-    amount: int,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_wallet.set_balance(actor, currency, amount)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set balance accepted."
-```

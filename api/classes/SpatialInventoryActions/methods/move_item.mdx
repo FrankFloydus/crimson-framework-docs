@@ -35,35 +35,3 @@ move_item(source: SpatialInventory, id: StringName, destination: SpatialInventor
 ## Description
 
 Supply `swap_id` to exchange with the expected occupant, and optionally pass exact `expected_source` and `expected_swap` placement dictionaries to guard against stale UI state. A failed validation preserves the affected placements.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_move_item(
-    spatial_inventory_actions: SpatialInventoryActions,
-    source: SpatialInventory,
-    id: StringName,
-    destination: SpatialInventory,
-    origin: Vector2i,
-    rotated: bool,
-    swap_id: StringName,
-    expected_source: Dictionary,
-    expected_swap: Dictionary,
-    apply_move_item: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_actions.move_item(
-        source,
-        id,
-        destination,
-        origin,
-        rotated,
-        swap_id,
-        expected_source,
-        expected_swap,
-    )
-    if result.is_empty():
-        return
-    apply_move_item.call(result)
-```

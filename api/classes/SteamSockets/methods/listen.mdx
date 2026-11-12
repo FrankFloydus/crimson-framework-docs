@@ -29,31 +29,3 @@ listen(endpoint: SteamSocketEndpoint, remote_limit: int = 8) -> SteamSocketListe
 ## Description
 
 Set `remote_limit` from 1 to 64 to cap pending and accepted connections together. A direct listener cannot have an outgoing peer pin.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_listen(
-    steam_client: SteamClient,
-    endpoint: SteamSocketEndpoint,
-    remote_limit: int,
-    apply_listen: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_sockets: SteamSockets = steam_client.sockets()
-    if steam_sockets == null:
-        return
-    var result: SteamSocketListenerResult = steam_sockets.listen(endpoint, remote_limit)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamSocketListener = result.value
-    if payload == null:
-        return
-    apply_listen.call(payload)
-```

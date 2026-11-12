@@ -22,16 +22,3 @@ get_description() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_description(
-    steam_publisher_purchase_line: SteamPublisherPurchaseLine,
-    apply_description: Callable
-) -> void:
-    var result: String = steam_publisher_purchase_line.get_description()
-    apply_description.call(result)
-```

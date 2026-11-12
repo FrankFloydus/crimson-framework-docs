@@ -30,21 +30,3 @@ set_currency_offer(actor: int, currency: StringName, amount: int) -> Dictionary
 ## Description
 
 Use 0 to remove an offer. Positive amounts require a wallet and sufficient current funds. The wallet changes during settlement, and a changed offer clears both locks.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_currency_offer(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    currency: StringName,
-    amount: int,
-    apply_currency_offer: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_trade.set_currency_offer(actor, currency, amount)
-    if result.is_empty():
-        return
-    apply_currency_offer.call(result)
-```

@@ -18,13 +18,3 @@ get_status() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_status(steam_http_response: SteamHttpResponse, status_label: Label) -> void:
-    var result: int = steam_http_response.get_status()
-    status_label.text = "Status: %s" % str(result)
-```

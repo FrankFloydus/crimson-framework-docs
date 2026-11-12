@@ -26,18 +26,3 @@ set_describe_stack(value: Callable) -> void
 ## Description
 
 Return an empty dictionary if the ID has no stack record.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_describe_stack(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    value: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_trade.set_describe_stack(value)
-    var active_describe_stack: Callable = spatial_inventory_trade.describe_stack
-    action_button.disabled = not active_describe_stack.is_valid()
-```

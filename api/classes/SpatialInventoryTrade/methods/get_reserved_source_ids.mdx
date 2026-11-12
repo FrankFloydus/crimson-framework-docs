@@ -24,19 +24,3 @@ get_reserved_source_ids(actor: int) -> StringName[]
 ## Return value
 
 `StringName[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_reserved_source_ids(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    results_list: ItemList
-) -> void:
-    var result: Array[StringName] = spatial_inventory_trade.get_reserved_source_ids(actor)
-    results_list.clear()
-    for entry: StringName in result:
-        results_list.add_item(str(entry))
-```

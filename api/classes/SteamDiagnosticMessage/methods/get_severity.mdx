@@ -24,16 +24,3 @@ get_severity() -> int
 ## Description
 
 Steam uses `0` for an informational message and `1` for a warning.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_severity(
-    steam_diagnostic_message: SteamDiagnosticMessage,
-    apply_severity: Callable
-) -> void:
-    var result: int = steam_diagnostic_message.get_severity()
-    apply_severity.call(result)
-```

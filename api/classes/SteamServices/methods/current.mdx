@@ -19,15 +19,4 @@ static current() -> SteamScope
 
 [`SteamScope`](/api/classes/SteamScope)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_current(app_id_label: Label) -> void:
-    var result: SteamScope = SteamServices.current()
-    if result == null:
-        return
-    var app_id: int = result.get_app_id()
-    app_id_label.text = "App id: %s" % str(app_id)
-```
+[See gameplay examples for `SteamServices`](/api/classes/SteamServices#examples).

@@ -18,13 +18,3 @@ is_cancelled() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_cancelled(steam_relay_request: SteamRelayRequest, status_label: Label) -> void:
-    var result: bool = steam_relay_request.is_cancelled()
-    status_label.text = "Cancelled: yes" if result else "Cancelled: no"
-```

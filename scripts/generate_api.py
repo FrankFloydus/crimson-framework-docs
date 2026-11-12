@@ -503,6 +503,7 @@ def render_class(
     members: dict[str, dict[str, MemberDoc]],
     supplemental: str,
     known_classes: set[str],
+    workflow_links: dict[str, str],
 ) -> str:
     """Render one class and its Godot-visible API as Mintlify MDX."""
     root = doc.reflected if doc.reflected is not None else doc.authored
@@ -535,6 +536,9 @@ def render_class(
         lines.extend(["Crimson creates this class internally. You can use the instances exposed by the framework.", ""])
     if description and description != brief:
         lines.extend(["## Description", "", prose(description, known_classes), ""])
+    if workflow_links:
+        lines.extend(["## Examples", "", *[f"- [{plain(title)}](/{route}#example)"
+                                            for title, route in workflow_links.items()], ""])
     lines.extend(render_member_index(doc.name, members, known_classes))
     lines.extend(render_signals(members["signals"], known_classes))
     lines.extend(render_constants(members["constants"], known_classes))
@@ -829,9 +833,18 @@ def render_member_property(class_name: str, element: ET.Element, methods: dict[s
             *["| " + " | ".join(map(table_cell, row)) + " |" for row in rows], ""]
 
 
+@dataclass(frozen=True)
+class MemberExample:
+    """One authored use of a binding, optionally with a shared gameplay scenario."""
+
+    script: str
+    title: str = ""
+    setup: str = ""
+
+
 def render_member_page(doc: ClassDoc, category: str, name: str, member: MemberDoc,
                        class_members: dict[str, dict[str, MemberDoc]], known_classes: set[str],
-                       example: str) -> str:
+                       example: MemberExample | None, has_class_workflows: bool) -> str:
     """Render one documented binding as its own Mintlify page."""
     is_method = category == "methods"
     element = member.element
@@ -877,43 +890,40 @@ def render_member_page(doc: ClassDoc, category: str, name: str, member: MemberDo
         lines.extend(render_member_property(doc.name, element, class_members["methods"], known_classes))
     if len(summary_parts) > 1:
         lines.extend(["## Description", "", prose(summary_parts[1], known_classes), ""])
-    lines.extend(["## Example", "", "```gdscript", example.rstrip(), "```", ""])
+    if example is not None:
+        lines.extend(["## Example", ""])
+        if example.title:
+            lines.extend([f"### {plain(example.title)}", "", example.setup.strip(), ""])
+        lines.extend(["```gdscript", example.script.rstrip(), "```", ""])
+    elif has_class_workflows:
+        lines.extend([f"[See gameplay examples for {code(doc.name)}](/{CLASS_ROUTE}/{doc.name}#examples).", ""])
     return "\n".join(lines).rstrip() + "\n"
 
 
-def example_factories(members: dict[str, dict[str, dict[str, MemberDoc]]]) -> dict[str, tuple[str, str]]:
-    """Find safe service accessors and builders that can supply an example receiver."""
-    sources = {
-        "SteamScope": {"messages", "networking", "purchases"},
-        "SteamClient": set("""
-            apps auth browser cloud device diagnostics friends http input inventory leaderboards lobbies
-            music overlay parties presence remote_play screenshots server_browser sockets stats timeline
-            utils video voice workshop
-        """.split()),
-        "SteamPublisher": {"auth", "game_notifications", "inventory", "leaderboards", "moderation", "purchases"},
-        "GameRuntime": {"get_possession", "get_transactions", "invites", "voice"},
-        "SteamDedicatedServer": {"status"},
-        "SteamLobbies": {"query"},
-        "SteamServerBrowser": {"query"},
-        "SteamLobby": {"edit"},
-        "SteamStats": {"edit"},
-        "SteamServerPlayerStats": {"edit"},
-    }
-    factories = {}
-    for owner, names in sources.items():
-        for name, member in sorted(members.get(owner, {}).get("methods", {}).items()):
-            if name not in names:
-                continue
-            element = member.element
-            qualifiers = element.get("qualifiers", "").split()
-            if "static" in qualifiers or "virtual" in qualifiers:
-                continue
-            if any("default" not in param.attrib for param in element.findall("param")):
-                continue
-            result = element.find("return")
-            if result is not None and result.get("type") in members and result.get("type") != owner:
-                factories.setdefault(result.attrib["type"], (owner, name))
-    return factories
+def load_member_examples(example_keys: set[str]) -> dict[str, MemberExample]:
+    """Load authored examples and let shared gameplay workflows take precedence."""
+    scripts = DOCS_ROOT / "scripts"
+    overrides = json.loads((scripts / "api-member-examples.json").read_text(encoding="utf-8-sig"))
+    examples = {key: MemberExample(script) for key, script in overrides.items()}
+    workflows = {}
+    for path in sorted((scripts / "api-workflow-examples").glob("*.json")):
+        for workflow in json.loads(path.read_text(encoding="utf-8-sig")):
+            example = MemberExample(workflow["code"], workflow["title"], workflow["setup"])
+            if not workflow["members"] or not all(value.strip() for value in (example.script, example.title, example.setup)):
+                raise ValueError(f"Incomplete gameplay example in {path.name}.")
+            for key in workflow["members"]:
+                if key not in example_keys:
+                    raise ValueError(f"Unknown member example {key} in {path.name}.")
+                _, category, name = key.split(".")
+                pattern = rf"(?:\.|\bfunc\s+){re.escape(name)}\b"
+                if category == "methods":
+                    pattern += r"\s*\("
+                if not re.search(pattern, example.script):
+                    raise ValueError(f"Gameplay example {example.title!r} does not use {key}.")
+                workflows.setdefault(key, example)
+    if obsolete := examples.keys() - example_keys:
+        raise ValueError(f"Unknown member example overrides: {', '.join(sorted(obsolete))}.")
+    return examples | workflows
 
 
 def main() -> None:
@@ -956,36 +966,35 @@ def main() -> None:
             return
         if missing:
             raise ValueError(f"{len(missing)} classes have missing prose. Run with --gaps for the exact entries.")
+        example_keys = {f"{name}.{category}.{member_name}"
+                        for name in classes for category in ("methods", "properties")
+                        for member_name in members[name][category]}
+        examples = load_member_examples(example_keys)
+        workflow_links = defaultdict(dict)
+        for key, example in sorted(examples.items()):
+            if example.title:
+                owner, category, member_name = key.split(".")
+                workflow_links[owner].setdefault(example.title, member_route(owner, category, member_name))
         class_pages = {
-            f"{CLASS_ROUTE}/{name}": render_class(doc, members[name], descriptions.get(name, ""), classes.keys())
+            f"{CLASS_ROUTE}/{name}": render_class(doc, members[name], descriptions.get(name, ""),
+                                                  classes.keys(), workflow_links[name])
             for name, doc in sorted(classes.items())
         }
-        from api_examples import render_example
-
-        examples_path = DOCS_ROOT / "scripts" / "api-member-examples.json"
-        overrides = json.loads(examples_path.read_text(encoding="utf-8-sig")) if examples_path.is_file() else {}
-        factories = example_factories(members)
-        parents = {name: (doc.reflected if doc.reflected is not None else doc.authored).get("inherits", "")
-                   for name, doc in classes.items()}
-        example_keys = set()
         member_pages = {}
         for name, doc in sorted(classes.items()):
             for category in ("methods", "properties"):
                 for member_name, member in sorted(members[name][category].items()):
-                    example_keys.add(f"{name}.{category}.{member_name}")
-                    example = render_example(name, category, member.element, member.description, overrides,
-                                             catalog=members, factories=factories, parents=parents)
                     member_pages[member_route(name, category, member_name)] = render_member_page(
-                        doc, category, member_name, member, members[name], classes.keys(), example,
+                        doc, category, member_name, member, members[name], classes.keys(),
+                        examples.get(f"{name}.{category}.{member_name}"), bool(workflow_links[name]),
                     )
-        if obsolete_examples := overrides.keys() - example_keys:
-            raise ValueError(f"Unknown member example overrides: {', '.join(sorted(obsolete_examples))}.")
         module_pages = render_module_pages(classes, members, descriptions)
         sync_pages(CLASS_ROUTE, class_pages | member_pages, args.check)
         sync_pages("api/modules", module_pages, args.check)
         sync_navigation(classes, members, args.check)
         print(f"{'Verified' if args.check else 'Generated'} {len(class_pages)} class pages, {len(member_pages)} member pages, and "
               f"{len(module_pages)} module and service area pages for {args.ref}.")
+        print(f"{len(examples)} member pages have authored examples.")
     except (OSError, ValueError, KeyError, ET.ParseError, subprocess.SubprocessError) as error:
         parser.exit(1, f"{error}\n")
 

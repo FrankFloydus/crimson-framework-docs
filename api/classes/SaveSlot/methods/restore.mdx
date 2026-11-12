@@ -30,23 +30,4 @@ restore(sequence: String, id: String) -> GameOperation
 
 Pass both the sequence and ID returned by save or history. Await the operation to observe whether the saved scene and stores became active.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_restore(
-    save_slot: SaveSlot,
-    sequence: String,
-    id: String,
-    status_label: Label
-) -> void:
-    var result: GameOperation = save_slot.restore(sequence, id)
-    if result == null:
-        return
-    var result_value: Dictionary = await result.wait()
-    if not result_value.get("ok", false):
-        status_label.text = str(result_value.get("message", "Operation failed."))
-        return
-    status_label.text = "Restore completed."
-```
+[See gameplay examples for `SaveSlot`](/api/classes/SaveSlot#examples).

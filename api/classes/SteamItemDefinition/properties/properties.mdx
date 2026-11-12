@@ -22,18 +22,3 @@ var properties: Dictionary[String, String]
 | Type | `Dictionary[String, String]` |
 | Access | Read only |
 | Getter | [`get_properties()`](/api/classes/SteamItemDefinition/methods/get_properties) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_properties(
-    steam_item_definition: SteamItemDefinition,
-    apply_properties: Callable
-) -> void:
-    var properties: Dictionary[String, String] = steam_item_definition.properties
-    if properties.is_empty():
-        return
-    apply_properties.call(properties)
-```

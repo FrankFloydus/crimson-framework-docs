@@ -28,17 +28,3 @@ get_remote_steam_id(peer_id: int) -> int
 ## Description
 
 Gameplay admission also validates its Session identity.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_remote_steam_id(
-    steam_session_transport: SteamSessionTransport,
-    peer_id: int,
-    apply_remote_steam_id: Callable
-) -> void:
-    var result: int = steam_session_transport.get_remote_steam_id(peer_id)
-    apply_remote_steam_id.call(result)
-```

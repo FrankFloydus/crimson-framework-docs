@@ -18,13 +18,3 @@ get_peer_id() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_peer_id(session_auth_request: SessionAuthRequest, peer_id_label: Label) -> void:
-    var result: int = session_auth_request.get_peer_id()
-    peer_id_label.text = "Peer id: %s" % str(result)
-```

@@ -19,15 +19,4 @@ is_available() -> bool
 
 `bool`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_is_available(game_runtime: GameRuntime, action_button: Button) -> void:
-    var game_invites: GameInvites = game_runtime.invites()
-    if game_invites == null:
-        return
-    var result: bool = game_invites.is_available()
-    action_button.disabled = not result
-```
+[See gameplay examples for `GameInvites`](/api/classes/GameInvites#examples).

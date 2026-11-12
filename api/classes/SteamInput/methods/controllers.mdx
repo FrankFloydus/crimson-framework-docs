@@ -22,19 +22,3 @@ controllers() -> SteamController[]
 ## Description
 
 Before start and after stop, returns an empty array.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_controllers(steam_client: SteamClient, add_controllers_entry: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_input: SteamInput = steam_client.input()
-    if steam_input == null:
-        return
-    var result: Array[SteamController] = steam_input.controllers()
-    for entry: SteamController in result:
-        add_controllers_entry.call(entry)
-```

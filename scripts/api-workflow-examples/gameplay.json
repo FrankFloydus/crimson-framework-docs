@@ -1,0 +1,73 @@
+[
+  {
+    "title": "Pick up a keycard and open the airlock",
+    "setup": "Walking over the keycard with a body in the `player` group puts it in the first position with enough space. Press **Open Airlock** to consume the card and clear the exit.",
+    "code": "extends Node3D\n\nconst GRID_SIZE: Vector2i = Vector2i(4, 3)\nconst KEYCARD_SIZE: Vector2i = Vector2i(2, 1)\nconst NO_FIT: Vector2i = Vector2i(-1, -1)\nconst KEYCARD: StringName = &\"cargo_airlock_keycard\"\nconst PLAYER_GROUP: StringName = &\"player\"\n\n@export var keycard_pickup: Node3D\n@export var pickup_area: Area3D\n@export var airlock: Node3D\n@export var open_airlock_button: Button\n@export var inventory_status: Label\n\nvar _inventory: SpatialInventory = SpatialInventory.new()\n\n\nfunc _ready() -> void:\n    open_airlock_button.disabled = true\n    var error: Error = _inventory.configure(GRID_SIZE)\n    if error != OK:\n        inventory_status.text = error_string(error)\n        return\n    pickup_area.body_entered.connect(_on_pickup_entered)\n    open_airlock_button.pressed.connect(_open_airlock)\n    inventory_status.text = \"Find the cargo keycard.\"\n\n\nfunc _on_pickup_entered(body: Node3D) -> void:\n    if not body.is_in_group(PLAYER_GROUP):\n        return\n    var cell: Vector2i = _inventory.find_first_fit(KEYCARD_SIZE)\n    if cell == NO_FIT:\n        inventory_status.text = \"Free two adjacent cells to pick up the card.\"\n        return\n    var error: Error = _inventory.try_place(KEYCARD, KEYCARD_SIZE, cell)\n    if error != OK:\n        return\n    keycard_pickup.queue_free()\n    open_airlock_button.disabled = false\n    inventory_status.text = \"Keycard stored. The cargo airlock can now open.\"\n\n\nfunc _open_airlock() -> void:\n    if _inventory.remove(KEYCARD) != OK:\n        return\n    open_airlock_button.disabled = true\n    airlock.queue_free()\n    inventory_status.text = \"Keycard used. The cargo route is open.\"\n",
+    "members": [
+      "SpatialInventory.methods.configure",
+      "SpatialInventory.methods.find_first_fit",
+      "SpatialInventory.methods.try_place",
+      "SpatialInventory.methods.remove"
+    ]
+  },
+  {
+    "title": "Spend scrap to repair a bridge",
+    "setup": "Press **Repair Bridge** to commit the scrap cost and the repair together. On success, the barricade disappears and the supply label shows the remaining scrap.",
+    "code": "extends Node3D\n\nconst SUPPLIES: String = \"supplies\"\nconst BRIDGES: String = \"bridges\"\nconst STARTING_SCRAP: int = 10\nconst REPAIR_COST: int = 6\n\n@export var repair_button: Button\n@export var barricade: Node3D\n@export var supply_status: Label\n\nvar _stores: TransactionCoordinator = TransactionCoordinator.new()\n\n\nfunc _ready() -> void:\n    repair_button.disabled = true\n    var error: Error = _stores.register_store(\n        SUPPLIES, {\"scrap\": STARTING_SCRAP}, _prepare_supplies\n    )\n    if error == OK:\n        error = _stores.register_store(BRIDGES, {\"repaired\": false}, _prepare_bridge)\n    if error != OK:\n        supply_status.text = error_string(error)\n        return\n    repair_button.pressed.connect(_repair_bridge)\n    repair_button.disabled = false\n    supply_status.text = \"Repair the bridge for %d scrap.\" % REPAIR_COST\n\n\nfunc _repair_bridge() -> void:\n    var transaction: GameTransaction = _stores.begin()\n    var error: Error = transaction.add_change(\n        SUPPLIES, {\"cost\": REPAIR_COST}, _stores.get_store_revision(SUPPLIES)\n    )\n    if error == OK:\n        error = transaction.add_change(\n            BRIDGES, {\"repair\": true}, _stores.get_store_revision(BRIDGES)\n        )\n    if error != OK:\n        supply_status.text = error_string(error)\n        return\n    var result: Dictionary = _stores.commit(transaction)\n    if not result.ok:\n        supply_status.text = result.message\n        return\n\n    var supplies: Dictionary = _stores.read_store(SUPPLIES)\n    barricade.queue_free()\n    repair_button.disabled = true\n    supply_status.text = \"Bridge open. Scrap remaining: %d\" % int(supplies.scrap)\n\n\nfunc _prepare_supplies(current: Dictionary, operations: Array, _context: Dictionary) -> Dictionary:\n    for operation: Dictionary in operations:\n        var cost: int = operation.get(\"cost\", 0)\n        if cost <= 0 or cost > int(current.scrap):\n            return {\"ok\": false, \"message\": \"You need more scrap to repair the bridge.\"}\n        current.scrap -= cost\n    return {\"ok\": true, \"state\": current}\n\n\nfunc _prepare_bridge(current: Dictionary, operations: Array, _context: Dictionary) -> Dictionary:\n    for operation: Dictionary in operations:\n        if current.repaired or not operation.get(\"repair\", false):\n            return {\"ok\": false, \"message\": \"The bridge is already repaired.\"}\n        current.repaired = true\n    return {\"ok\": true, \"state\": current}\n",
+    "members": [
+      "TransactionCoordinator.methods.register_store",
+      "TransactionCoordinator.methods.begin",
+      "TransactionCoordinator.methods.get_store_revision",
+      "TransactionCoordinator.methods.commit",
+      "TransactionCoordinator.methods.read_store",
+      "GameTransaction.methods.add_change"
+    ]
+  },
+  {
+    "title": "Rest at a checkpoint and retry after leaving the safe room",
+    "setup": "Press **Rest** in the safe room, then **Enter Mines** and **Retry** to return to the saved room. Keep the campaign controller outside both world scenes so it survives the swap.",
+    "code": "extends Node\n\nconst SAFE_ROOM: StringName = &\"safe_room\"\nconst MINES: StringName = &\"mines\"\nconst PROFILE: String = \"campaign\"\nconst SLOT: String = \"checkpoint\"\nconst SAVE_APP: String = \"demo.mine_campaign\"\n\n@export_file(\"*.tscn\") var safe_room_scene: String\n@export_file(\"*.tscn\") var mines_scene: String\n@export var rest_button: Button\n@export var enter_mines_button: Button\n@export var retry_button: Button\n@export var status: Label\n\nvar _game: GameRuntime\nvar _checkpoint: SaveSlot\n\n\nfunc _ready() -> void:\n    _set_busy(true)\n    var definition: GameDefinition = GameRuntime.configure().with_worlds({\n        SAFE_ROOM: {\"scene_id\": SAFE_ROOM, \"path\": safe_room_scene},\n        MINES: {\"scene_id\": MINES, \"path\": mines_scene},\n    }).starting_in(SAFE_ROOM).with_saves(SAVE_APP)\n    _game = definition.boot(self)\n    if _game == null:\n        status.text = \"Could not start the campaign.\"\n        return\n    var result: Dictionary = await _game.start_offline().wait()\n    if not result.ok:\n        status.text = result.message\n        return\n    _checkpoint = _game.save_slot(PROFILE, SLOT)\n    rest_button.pressed.connect(_rest)\n    enter_mines_button.pressed.connect(_enter_mines)\n    retry_button.pressed.connect(_retry)\n    _set_busy(false)\n    status.text = \"Safe room. Rest before entering the mines.\"\n\n\nfunc _rest() -> void:\n    _set_busy(true)\n    var request: SaveRequest = _checkpoint.save().named(\"Mine entrance\")\n    request = request.with_context({\"region\": \"Safe room\"}).as_autosave()\n    var result: Dictionary = await request.submit().wait()\n    status.text = \"Checkpoint saved.\" if result.ok else result.message\n    _set_busy(false)\n\n\nfunc _enter_mines() -> void:\n    _set_busy(true)\n    var result: Dictionary = await _game.travel_to(MINES).wait()\n    status.text = \"Mines. Retry to return to your last rest.\" if result.ok else result.message\n    _set_busy(false)\n\n\nfunc _retry() -> void:\n    _set_busy(true)\n    var result: Dictionary = await _checkpoint.restore_latest().wait()\n    status.text = \"Returned to the saved room.\" if result.ok else result.message\n    _set_busy(false)\n\n\nfunc _set_busy(busy: bool) -> void:\n    rest_button.disabled = busy\n    enter_mines_button.disabled = busy\n    retry_button.disabled = busy\n    if not busy:\n        rest_button.disabled = _game.get_world_id() != SAFE_ROOM\n",
+    "members": [
+      "GameDefinition.methods.with_worlds",
+      "GameDefinition.methods.starting_in",
+      "GameDefinition.methods.with_saves",
+      "GameRuntime.methods.start_offline",
+      "GameRuntime.methods.get_world_id",
+      "GameRuntime.methods.save_slot",
+      "GameRuntime.methods.travel_to",
+      "SaveSlot.methods.save",
+      "SaveSlot.methods.restore_latest",
+      "SaveRequest.methods.named",
+      "SaveRequest.methods.with_context",
+      "SaveRequest.methods.as_autosave",
+      "SaveRequest.methods.submit"
+    ]
+  },
+  {
+    "title": "Load the caves when the player crosses the village gate",
+    "setup": "When a body in the `player` group crosses the village gate, the loader swaps the village for the caves. Keep the player, camera, and gate outside the world container.",
+    "code": "extends Node3D\n\nconst VILLAGE: StringName = &\"village\"\nconst CAVES: StringName = &\"caves\"\nconst PLAYER_GROUP: StringName = &\"player\"\n\n@export var world_container: Node3D\n@export_file(\"*.tscn\") var village_scene: String\n@export_file(\"*.tscn\") var caves_scene: String\n@export var village_gate: Area3D\n@export var zone_label: Label\n\nvar _loader: SceneLoadManager\n\n\nfunc _ready() -> void:\n    _loader = SceneLoadManager.new()\n    add_child(_loader)\n\n    var error: Error = _loader.set_world_container(world_container)\n    if error == OK:\n        error = _loader.register_scene(VILLAGE, village_scene)\n    if error == OK:\n        error = _loader.register_scene(CAVES, caves_scene)\n    if error != OK:\n        zone_label.text = error_string(error)\n        return\n\n    _loader.load_completed.connect(_on_load_completed)\n    _loader.load_failed.connect(_on_load_failed)\n    village_gate.body_entered.connect(_on_gate_entered)\n    _load(VILLAGE)\n\n\nfunc _on_gate_entered(body: Node3D) -> void:\n    if not body.is_in_group(PLAYER_GROUP) or _loader.is_loading():\n        return\n    if _loader.get_current_scene_id() == VILLAGE:\n        _load(CAVES)\n\n\nfunc _load(scene_id: StringName) -> void:\n    var error: Error = _loader.request_load(scene_id)\n    zone_label.text = \"Loading…\" if error == OK else error_string(error)\n\n\nfunc _on_load_completed(scene_id: StringName) -> void:\n    zone_label.text = \"Caves\" if scene_id == CAVES else \"Village\"\n\n\nfunc _on_load_failed(_scene_id: StringName, _error: int, message: String) -> void:\n    zone_label.text = message\n",
+    "members": [
+      "SceneLoadManager.methods.set_world_container",
+      "SceneLoadManager.methods.register_scene",
+      "SceneLoadManager.methods.is_loading",
+      "SceneLoadManager.methods.get_current_scene_id",
+      "SceneLoadManager.methods.request_load"
+    ]
+  },
+  {
+    "title": "Control a repair drone's work light",
+    "setup": "Press **Toggle Work Light** while controlling the pilot to see the command rejected. Switch to the repair drone and press it again to turn on the light.",
+    "code": "extends Node\n\nconst MATCH_ID: String = \"hangar_training\"\nconst HANGAR_EPOCH: int = 1\nconst PLAYERS: String = \"players\"\nconst CHARACTERS: String = \"characters\"\nconst LOCAL_PLAYER: String = \"trainee\"\nconst PILOT: String = \"pilot\"\nconst DRONE: String = \"repair_drone\"\nconst TOGGLE_LIGHT: String = \"toggle_work_light\"\n\n@export var pilot_button: Button\n@export var drone_button: Button\n@export var light_button: Button\n@export var drone_light: SpotLight3D\n@export var status: Label\n\nvar _stores: TransactionCoordinator = TransactionCoordinator.new()\nvar _possession: PlayerPossession = PlayerPossession.new()\nvar _router: CommandRouter = CommandRouter.new()\nvar _sequence: int = 0\n\n\nfunc _ready() -> void:\n    drone_light.visible = false\n    var error: Error = _configure_training()\n    if error != OK:\n        status.text = error_string(error)\n        return\n    if not _switch_to(PILOT):\n        return\n    pilot_button.pressed.connect(_switch_to.bind(PILOT))\n    drone_button.pressed.connect(_switch_to.bind(DRONE))\n    light_button.pressed.connect(_request_light_toggle)\n\n\nfunc _configure_training() -> Error:\n    var error: Error = _stores.register_store(PLAYERS, {LOCAL_PLAYER: {}}, _keep_roster)\n    if error != OK:\n        return error\n    error = _stores.register_store(CHARACTERS, {PILOT: {}, DRONE: {}}, _keep_roster)\n    if error != OK:\n        return error\n    error = _possession.configure(_stores, PLAYERS, CHARACTERS)\n    if error != OK:\n        return error\n    error = _router.configure(MATCH_ID, HANGAR_EPOCH, _possession)\n    if error != OK:\n        return error\n    error = _router.register_handler(TOGGLE_LIGHT, _toggle_light, true)\n    if error != OK:\n        return error\n    return _router.set_accepting_commands(true)\n\n\nfunc _keep_roster(current: Dictionary, _operations: Array, _context: Dictionary) -> Dictionary:\n    return {\"ok\": true, \"state\": current}\n\n\nfunc _switch_to(character: String) -> bool:\n    var revision: int = _possession.get_revision(LOCAL_PLAYER)\n    var result: Dictionary = _possession.try_set_primary(LOCAL_PLAYER, character, revision)\n    if result.ok:\n        status.text = \"Controlling the repair drone.\" if character == DRONE else \"Controlling the pilot.\"\n    else:\n        status.text = result.message\n    return result.ok\n\n\nfunc _request_light_toggle() -> void:\n    _sequence += 1\n    var result: Dictionary = _router.submit(LOCAL_PLAYER, {\n        \"match_id\": MATCH_ID,\n        \"world_epoch\": HANGAR_EPOCH,\n        \"sequence\": _sequence,\n        \"type\": TOGGLE_LIGHT,\n        \"payload\": {},\n        \"character_id\": _possession.get_primary(LOCAL_PLAYER),\n        \"possession_revision\": _possession.get_revision(LOCAL_PLAYER),\n    })\n    status.text = result.message\n\n\nfunc _toggle_light(_player_id: String, intent: Dictionary) -> Dictionary:\n    if intent.character_id != DRONE:\n        return {\"ok\": false, \"message\": \"Take control of the drone to use its work light.\"}\n    drone_light.visible = not drone_light.visible\n    return {\"ok\": true, \"message\": \"Drone light on.\" if drone_light.visible else \"Drone light off.\"}\n",
+    "members": [
+      "CommandRouter.methods.configure",
+      "CommandRouter.methods.register_handler",
+      "CommandRouter.methods.set_accepting_commands",
+      "CommandRouter.methods.submit",
+      "PlayerPossession.methods.configure",
+      "PlayerPossession.methods.try_set_primary",
+      "PlayerPossession.methods.get_primary",
+      "PlayerPossession.methods.get_revision"
+    ]
+  }
+]

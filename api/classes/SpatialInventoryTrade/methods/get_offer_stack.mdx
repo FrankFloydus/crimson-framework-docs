@@ -29,20 +29,3 @@ get_offer_stack(actor: int, offer_id: StringName) -> Dictionary
 ## Description
 
 Returns an empty dictionary if the placement has no escrow stack.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_offer_stack(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    offer_id: StringName,
-    apply_offer_stack: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_trade.get_offer_stack(actor, offer_id)
-    if result.is_empty():
-        return
-    apply_offer_stack.call(result)
-```

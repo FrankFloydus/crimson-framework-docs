@@ -23,17 +23,4 @@ capture_snapshot() -> Dictionary
 
 On success, read the detached store map from the result's `stores` field. The result also carries `ok`, `code`, `message`, and `revision`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_capture_snapshot(game_runtime: GameRuntime, apply_capture_snapshot: Callable) -> void:
-    var transaction_coordinator: TransactionCoordinator = game_runtime.get_transactions()
-    if transaction_coordinator == null:
-        return
-    var result: Dictionary = transaction_coordinator.capture_snapshot()
-    if result.is_empty():
-        return
-    apply_capture_snapshot.call(result)
-```
+[See gameplay examples for `TransactionCoordinator`](/api/classes/TransactionCoordinator#examples).

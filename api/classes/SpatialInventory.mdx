@@ -14,6 +14,10 @@ description: "A native grid inventory keyed by game-supplied item instance IDs."
 
 Stores rectangular footprints, their zero-based top-left cells, and rotation. The game owns the item records and provides a stable, nonempty `StringName` instance ID for each placement. A rotated footprint swaps width and height. Call `configure()` or `import_snapshot()` before placing items. Use the grid from the main thread.
 
+## Examples
+
+- [Pick up a keycard and open the airlock](/api/classes/SpatialInventory/methods/configure#example)
+
 ## Methods
 
 ### Static methods

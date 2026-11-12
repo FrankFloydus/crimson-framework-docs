@@ -18,21 +18,3 @@ result() -> SteamServerStatsResult
 ## Return value
 
 [`SteamServerStatsResult`](/api/classes/SteamServerStatsResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_server_stats_operation: SteamServerStatsOperation,
-    status_label: Label
-) -> void:
-    var result: SteamServerStatsResult = steam_server_stats_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    status_label.text = "Result succeeded."
-```

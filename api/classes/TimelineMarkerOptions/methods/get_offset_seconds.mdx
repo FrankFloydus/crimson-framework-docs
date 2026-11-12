@@ -20,16 +20,3 @@ get_offset_seconds() -> float
 ## Return value
 
 `float`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_offset_seconds(
-    timeline_marker_options: TimelineMarkerOptions,
-    offset_seconds_label: Label
-) -> void:
-    var result: float = timeline_marker_options.get_offset_seconds()
-    offset_seconds_label.text = "Offset seconds: %s" % str(result)
-```

@@ -20,13 +20,3 @@ get_flags() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_flags(steam_item_instance: SteamItemInstance, flags_label: Label) -> void:
-    var result: int = steam_item_instance.get_flags()
-    flags_label.text = "Flags: %s" % str(result)
-```

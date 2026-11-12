@@ -28,18 +28,3 @@ var pickup_policy: Callable = Callable()
 ## Description
 
 Return an empty String to allow pickup.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_pickup_policy(
-    spatial_inventory_actions: SpatialInventoryActions,
-    new_pickup_policy: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_actions.pickup_policy = new_pickup_policy
-    var active_pickup_policy: Callable = spatial_inventory_actions.pickup_policy
-    action_button.disabled = not active_pickup_policy.is_valid()
-```

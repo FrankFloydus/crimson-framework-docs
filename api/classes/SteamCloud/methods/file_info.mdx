@@ -29,26 +29,4 @@ file_info(name: String) -> SteamCloudFileResult
 
 An absent file reports `ERR_FILE_NOT_FOUND`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_file_info(steam_client: SteamClient, name: String, name_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_cloud: SteamCloud = steam_client.cloud()
-    if steam_cloud == null:
-        return
-    var result: SteamCloudFileResult = steam_cloud.file_info(name)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamCloudFile = result.value
-    if payload == null:
-        return
-    var name_value: String = payload.name
-    name_label.text = "Name: %s" % str(name_value)
-```
+[See gameplay examples for `SteamCloud`](/api/classes/SteamCloud#examples).

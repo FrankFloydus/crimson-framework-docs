@@ -18,13 +18,3 @@ get_address() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_address(session_endpoint: SessionEndpoint, address_label: Label) -> void:
-    var result: String = session_endpoint.get_address()
-    address_label.text = "Address: %s" % str(result)
-```

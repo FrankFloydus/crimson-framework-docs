@@ -20,13 +20,3 @@ get_bytes() -> PackedByteArray
 ## Return value
 
 `PackedByteArray`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_bytes(steam_voice_frame: SteamVoiceFrame, byte_count_label: Label) -> void:
-    var result: PackedByteArray = steam_voice_frame.get_bytes()
-    byte_count_label.text = "%d bytes" % result.size()
-```

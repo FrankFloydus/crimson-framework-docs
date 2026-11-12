@@ -31,31 +31,3 @@ start_trade(player: SteamIdentity, partner: SteamIdentity) -> Variant
 ## Description
 
 Verify the distinct `player` and `partner` in the same publisher and confirm their consent in the game before calling. A recognized Steam acknowledgment identifies both accounts. The participants confirm any transfer through Steam.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_start_trade(
-    steam_publisher: SteamPublisher,
-    player: SteamIdentity,
-    partner: SteamIdentity,
-    apply_start_trade: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_inventory: SteamPublisherInventory = steam_publisher.inventory()
-    if steam_publisher_inventory == null:
-        return
-    var result: SteamTradeSessionResult = await steam_publisher_inventory.start_trade(player, partner)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamTradeSession = result.value
-    if payload == null:
-        return
-    apply_start_trade.call(payload)
-```

@@ -23,15 +23,4 @@ get_placement_revision() -> int
 
 Actual changes to its placements or dimensions advance the counter before change signals run. Compare revisions on the same grid to detect edits. The counter is independent of snapshots.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_placement_revision(
-    spatial_inventory: SpatialInventory,
-    placement_revision_label: Label
-) -> void:
-    var result: int = spatial_inventory.get_placement_revision()
-    placement_revision_label.text = "Placement revision: %s" % str(result)
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

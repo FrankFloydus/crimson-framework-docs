@@ -22,16 +22,3 @@ get_last_admission_error() -> String
 ## Description
 
 Call immediately after a request returns 0. A rejected request produces no ticket events.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_last_admission_error(
-    save_coordinator: SaveCoordinator,
-    last_admission_error_label: Label
-) -> void:
-    var result: String = save_coordinator.get_last_admission_error()
-    last_admission_error_label.text = "Last admission error: %s" % str(result)
-```

@@ -29,21 +29,3 @@ commit_detached_split(plan: Dictionary, claim_cursor: Callable) -> Error
 ## Description
 
 The `claim_cursor` callable receives no arguments and returns a Godot Error. Use it to claim the newly created stack in the game's cursor or held-item model.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_commit_detached_split(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    plan: Dictionary,
-    claim_cursor: Callable,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_stack_adapter.commit_detached_split(plan, claim_cursor)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Commit detached split accepted."
-```

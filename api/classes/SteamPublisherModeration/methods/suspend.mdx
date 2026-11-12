@@ -32,32 +32,3 @@ suspend(report_id: String, seconds: int, reason: String) -> Variant
 ## Description
 
 `seconds` must be from 1 through 31535999. Valve treats durations under one year as suspensions hidden from the player's public profile. Supply the reviewed `reason`. Returns [`SteamModerationReceiptResult`](/api/classes/SteamModerationReceiptResult). An invalid duration returns `ERR_INVALID_PARAMETER` before invoking the policy. The exact game policy must authorize the request and reserve the audit record before Steam receives it. An expired or closed observation can leave the remote outcome unresolved.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_suspend(
-    steam_publisher: SteamPublisher,
-    report_id: String,
-    seconds: int,
-    reason: String,
-    apply_suspend: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_moderation: SteamPublisherModeration = steam_publisher.moderation()
-    if steam_publisher_moderation == null:
-        return
-    var result: SteamModerationReceiptResult = await steam_publisher_moderation.suspend(report_id, seconds, reason)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamModerationReceipt = result.value
-    if payload == null:
-        return
-    apply_suspend.call(payload)
-```

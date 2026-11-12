@@ -29,22 +29,4 @@ notify_restore_published(published_revision: int) -> Error
 
 Mutation remains gated until observers return. An absent or mismatched pending revision returns `ERR\_INVALID\_PARAMETER`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_notify_restore_published(
-    game_runtime: GameRuntime,
-    published_revision: int,
-    status_label: Label
-) -> void:
-    var transaction_coordinator: TransactionCoordinator = game_runtime.get_transactions()
-    if transaction_coordinator == null:
-        return
-    var result: Error = transaction_coordinator.notify_restore_published(published_revision)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Notify restore published accepted."
-```
+[See gameplay examples for `TransactionCoordinator`](/api/classes/TransactionCoordinator#examples).

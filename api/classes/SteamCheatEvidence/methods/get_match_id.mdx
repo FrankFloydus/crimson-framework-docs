@@ -22,13 +22,3 @@ get_match_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_match_id(steam_cheat_evidence: SteamCheatEvidence, match_id_label: Label) -> void:
-    var result: String = steam_cheat_evidence.get_match_id()
-    match_id_label.text = "Match id: %s" % str(result)
-```

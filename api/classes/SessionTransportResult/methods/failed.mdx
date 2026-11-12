@@ -28,19 +28,3 @@ static failed(error: Error) -> SessionTransportResult
 ## Description
 
 Passing OK produces ERR\_INVALID\_PARAMETER.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_failed(error: Error, install_peer: Callable) -> void:
-    var result: SessionTransportResult = SessionTransportResult.failed(error)
-    if result == null:
-        return
-    if result.get_error() != OK:
-        push_warning(error_string(result.get_error()))
-        return
-    var peer: MultiplayerPeer = result.get_peer()
-    install_peer.call(peer)
-```

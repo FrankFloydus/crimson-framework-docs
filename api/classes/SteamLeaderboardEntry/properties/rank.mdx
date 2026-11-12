@@ -22,13 +22,3 @@ var rank: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_rank()`](/api/classes/SteamLeaderboardEntry/methods/get_rank) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_rank(steam_leaderboard_entry: SteamLeaderboardEntry, rank_label: Label) -> void:
-    var rank: int = steam_leaderboard_entry.rank
-    rank_label.text = "Rank: %s" % str(rank)
-```

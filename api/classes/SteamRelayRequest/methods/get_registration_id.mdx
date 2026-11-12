@@ -22,16 +22,3 @@ get_registration_id() -> String
 ## Description
 
 The backend signs this value into the relay ticket's `crimson_registration` fixed64 extra field.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_registration_id(
-    steam_relay_request: SteamRelayRequest,
-    registration_id_label: Label
-) -> void:
-    var result: String = steam_relay_request.get_registration_id()
-    registration_id_label.text = "Registration id: %s" % str(result)
-```

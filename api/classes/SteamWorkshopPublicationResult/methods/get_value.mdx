@@ -24,24 +24,3 @@ get_value() -> SteamWorkshopPublication
 ## Description
 
 Inspect `SteamResult.ok` for completion and retain the ID for a retry through `SteamWorkshopItemRef.edit()`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_workshop_publication_result: SteamWorkshopPublicationResult,
-    published_id_label: Label
-) -> void:
-    if steam_workshop_publication_result == null:
-        return
-    if not steam_workshop_publication_result.ok:
-        push_warning(steam_workshop_publication_result.message)
-        return
-    var result: SteamWorkshopPublication = steam_workshop_publication_result.get_value()
-    if result == null:
-        return
-    var published_id: String = result.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```

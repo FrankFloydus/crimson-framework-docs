@@ -26,28 +26,3 @@ recording_exists(event: SteamTimelineEvent) -> Variant
 `Variant`
 
 Await the call to receive [`SteamBoolResult`](/api/classes/SteamBoolResult).
-
-## Example
-
-```gdscript
-extends Node
-
-func run_recording_exists(
-    steam_client: SteamClient,
-    event: SteamTimelineEvent,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: SteamBoolResult = await steam_timeline.recording_exists(event)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: bool = result.value
-    status_label.text = "Recording exists: yes" if payload else "Recording exists: no"
-```

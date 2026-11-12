@@ -20,13 +20,3 @@ get_rank() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_rank(steam_leaderboard_entry: SteamLeaderboardEntry, rank_label: Label) -> void:
-    var result: int = steam_leaderboard_entry.get_rank()
-    rank_label.text = "Rank: %s" % str(result)
-```

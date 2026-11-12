@@ -30,27 +30,3 @@ update_range(event: SteamTimelineEvent, title: String, presentation: TimelineMar
 ## Description
 
 Null presentation selects the default details.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_update_range(
-    steam_client: SteamClient,
-    event: SteamTimelineEvent,
-    title: String,
-    presentation: TimelineMarkerPresentation,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: Error = steam_timeline.update_range(event, title, presentation)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Update range accepted."
-```

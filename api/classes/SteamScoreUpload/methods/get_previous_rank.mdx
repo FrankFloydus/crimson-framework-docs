@@ -24,16 +24,3 @@ get_previous_rank() -> int
 ## Description
 
 Zero means the player had no previous entry.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_previous_rank(
-    steam_score_upload: SteamScoreUpload,
-    previous_rank_label: Label
-) -> void:
-    var result: int = steam_score_upload.get_previous_rank()
-    previous_rank_label.text = "Previous rank: %s" % str(result)
-```

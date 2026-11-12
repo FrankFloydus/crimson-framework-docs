@@ -22,16 +22,3 @@ start_offline() -> Error
 ## Description
 
 Returns OK on success or an error if the node cannot claim the multiplayer scope.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_start_offline(game_session: GameSession, status_label: Label) -> void:
-    var result: Error = game_session.start_offline()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Start offline accepted."
-```

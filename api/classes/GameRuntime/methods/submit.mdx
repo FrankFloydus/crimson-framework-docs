@@ -33,11 +33,60 @@ The returned operation reports the authority's command result. Observe projectio
 ## Example
 
 ```gdscript
-const USE_DOOR_COMMAND: String = "use_door"
+extends Node
 
-func use_door(game: GameRuntime, door_id: StringName) -> void:
-    # The authority must register this command before clients submit it.
-    var result: Dictionary = await game.submit(USE_DOOR_COMMAND, {"door_id": door_id}).wait()
-    if not result.ok:
-        push_warning(result.message)
+const AIRLOCK_WORLD: StringName = &"airlock"
+const OPEN_GATE: String = "airlock.open_gate"
+const GATE_PATH: NodePath = ^"Gate"
+const GATE_COLLISION_PATH: NodePath = ^"Gate/CollisionShape3D"
+
+# Assign the airlock scene file, a control panel's Open Airlock button,
+# and its status label. In the airlock scene, give Gate a visible mesh
+# and a CollisionShape3D. The solo controller opens the mounted gate
+# through the same command path used by a ready participant.
+@export_file("*.tscn") var airlock_scene: String
+@export var open_airlock: Button
+@export var status_label: Label
+
+var _game: GameRuntime
+
+func _ready() -> void:
+    if airlock_scene.is_empty() or open_airlock == null or status_label == null:
+        push_error("Assign the airlock scene and its panel controls.")
+        return
+    open_airlock.disabled = true
+    var worlds: Dictionary = {
+        AIRLOCK_WORLD: {"scene_id": AIRLOCK_WORLD, "path": airlock_scene},
+    }
+    var definition: GameDefinition = GameRuntime.configure().with_worlds(worlds).starting_in(AIRLOCK_WORLD)
+    _game = definition.boot(self)
+    if _game == null:
+        return
+
+    var registered: Error = _game.register_command(OPEN_GATE, _open_gate)
+    if registered != OK:
+        status_label.text = error_string(registered)
+        return
+    var started: Dictionary = await _game.start_offline().wait()
+    if not started.ok:
+        status_label.text = started.message
+        return
+    open_airlock.pressed.connect(_request_open)
+    open_airlock.disabled = false
+
+func _request_open() -> void:
+    open_airlock.disabled = true
+    var outcome: Dictionary = await _game.submit(OPEN_GATE).wait()
+    status_label.text = "Airlock open." if outcome.ok else String(outcome.message)
+    open_airlock.disabled = outcome.ok
+
+func _open_gate(_player_id: String, _intent: Dictionary) -> Dictionary:
+    var world: Node = _game.get_world()
+    var gate: Node3D = world.get_node_or_null(GATE_PATH) as Node3D
+    var collision: CollisionShape3D = world.get_node_or_null(GATE_COLLISION_PATH) as CollisionShape3D
+    if gate == null or collision == null:
+        return {"ok": false, "code": "AirlockMissing", "message": "The airlock gate could not be found."}
+    gate.hide()
+    collision.set_deferred(&"disabled", true)
+    return {"ok": true, "code": "AirlockOpened"}
 ```

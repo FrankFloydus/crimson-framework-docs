@@ -26,18 +26,3 @@ set_slot_requirements(value: Callable) -> void
 ## Description
 
 Return the full array of occupied slots, including the requested slot, or a denial string.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_slot_requirements(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    value: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_equipment.set_slot_requirements(value)
-    var active_slot_requirements: Callable = spatial_inventory_equipment.slot_requirements
-    action_button.disabled = not active_slot_requirements.is_valid()
-```

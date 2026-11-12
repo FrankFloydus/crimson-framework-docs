@@ -20,16 +20,3 @@ get_failed_at() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_failed_at(
-    steam_server_stats_result: SteamServerStatsResult,
-    failed_at_label: Label
-) -> void:
-    var result: int = steam_server_stats_result.get_failed_at()
-    failed_at_label.text = "Failed at: %s" % str(result)
-```

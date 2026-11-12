@@ -20,13 +20,3 @@ get_volume() -> float
 ## Return value
 
 `float`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_volume(steam_music_status: SteamMusicStatus, volume_label: Label) -> void:
-    var result: float = steam_music_status.get_volume()
-    volume_label.text = "Volume: %s" % str(result)
-```

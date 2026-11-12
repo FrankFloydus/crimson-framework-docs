@@ -24,16 +24,3 @@ var player_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_player_id()`](/api/classes/SteamModerationRequest/methods/get_player_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_player_id(
-    steam_moderation_request: SteamModerationRequest,
-    apply_player_id: Callable
-) -> void:
-    var player_id: String = steam_moderation_request.player_id
-    apply_player_id.call(player_id)
-```

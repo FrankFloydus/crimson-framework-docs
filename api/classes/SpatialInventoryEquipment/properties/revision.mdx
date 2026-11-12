@@ -26,16 +26,3 @@ var revision: int
 ## Description
 
 Compare it with a prior preview revision to detect changes.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_revision(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    revision_label: Label
-) -> void:
-    var revision: int = spatial_inventory_equipment.revision
-    revision_label.text = "Revision: %s" % str(revision)
-```

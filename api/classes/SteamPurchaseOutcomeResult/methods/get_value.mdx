@@ -20,23 +20,3 @@ get_value() -> SteamPurchaseOutcome
 ## Return value
 
 [`SteamPurchaseOutcome`](/api/classes/SteamPurchaseOutcome)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_purchase_outcome_result: SteamPurchaseOutcomeResult,
-    apply_value: Callable
-) -> void:
-    if steam_purchase_outcome_result == null:
-        return
-    if not steam_purchase_outcome_result.ok:
-        push_warning(steam_purchase_outcome_result.message)
-        return
-    var result: SteamPurchaseOutcome = steam_purchase_outcome_result.get_value()
-    if result == null:
-        return
-    apply_value.call(result)
-```

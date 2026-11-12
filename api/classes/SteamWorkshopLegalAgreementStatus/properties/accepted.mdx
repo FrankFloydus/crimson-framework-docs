@@ -22,16 +22,3 @@ var accepted: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`is_accepted()`](/api/classes/SteamWorkshopLegalAgreementStatus/methods/is_accepted) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_accepted(
-    steam_workshop_legal_agreement_status: SteamWorkshopLegalAgreementStatus,
-    status_label: Label
-) -> void:
-    var accepted: bool = steam_workshop_legal_agreement_status.accepted
-    status_label.text = "Accepted: yes" if accepted else "Accepted: no"
-```

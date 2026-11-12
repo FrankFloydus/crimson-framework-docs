@@ -26,13 +26,3 @@ var active: bool
 ## Description
 
 Both byte counts are zero for an inactive transfer.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_active(steam_dlc_progress: SteamDlcProgress, status_label: Label) -> void:
-    var active: bool = steam_dlc_progress.active
-    status_label.text = "Active: yes" if active else "Active: no"
-```

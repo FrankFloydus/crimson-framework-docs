@@ -25,19 +25,4 @@ get_controller(character_id: String) -> String
 
 `String`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_controller(
-    game_runtime: GameRuntime,
-    character_id: String,
-    controller_label: Label
-) -> void:
-    var player_possession: PlayerPossession = game_runtime.get_possession()
-    if player_possession == null:
-        return
-    var result: String = player_possession.get_controller(character_id)
-    controller_label.text = "Controller: %s" % str(result)
-```
+[See gameplay examples for `PlayerPossession`](/api/classes/PlayerPossession#examples).

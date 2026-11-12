@@ -20,13 +20,3 @@ get_sort() -> SteamLeaderboards.Sort
 ## Return value
 
 `SteamLeaderboards.Sort`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_sort(steam_leaderboard_info: SteamLeaderboardInfo, sort_label: Label) -> void:
-    var result: SteamLeaderboards.Sort = steam_leaderboard_info.get_sort()
-    sort_label.text = "Sort: %s" % str(result)
-```

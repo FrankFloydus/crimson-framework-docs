@@ -28,20 +28,3 @@ send_input(event: InputEvent) -> Error
 ## Description
 
 Convert pointer coordinates to browser-local pixels first. Out-of-bounds input returns `ERR_INVALID_PARAMETER`, except release of a previously pressed button. Return `ERR_UNAUTHORIZED` until the game gives this page input focus.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_send_input(
-    steam_browser_page: SteamBrowserPage,
-    event: InputEvent,
-    status_label: Label
-) -> void:
-    var result: Error = steam_browser_page.send_input(event)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Send input accepted."
-```

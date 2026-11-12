@@ -19,15 +19,4 @@ get_load_timeout_msec() -> int
 
 `int`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_load_timeout_msec(
-    scene_load_manager: SceneLoadManager,
-    load_timeout_msec_label: Label
-) -> void:
-    var result: int = scene_load_manager.get_load_timeout_msec()
-    load_timeout_msec_label.text = "Load timeout msec: %s" % str(result)
-```
+[See gameplay examples for `SceneLoadManager`](/api/classes/SceneLoadManager#examples).

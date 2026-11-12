@@ -25,16 +25,3 @@ var environment: SteamPublisherSettings.Environment = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_environment()`](/api/classes/SteamPublisherPurchaseOrder/methods/get_environment) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_environment(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_environment: Callable
-) -> void:
-    var environment: SteamPublisherSettings.Environment = steam_publisher_purchase_order.environment
-    apply_environment.call(environment)
-```

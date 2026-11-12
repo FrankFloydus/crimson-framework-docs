@@ -18,28 +18,3 @@ accept_json() -> SteamHttpOptions
 ## Return value
 
 [`SteamHttpOptions`](/api/classes/SteamHttpOptions)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_accept_json(
-    steam_http_options: SteamHttpOptions,
-    url: String,
-    apply_response: Callable
-) -> void:
-    var result: SteamHttpOptions = steam_http_options.accept_json()
-    if result == null:
-        return
-    var response: SteamHttpResponseResult = await result.fetch(url)
-    if response == null:
-        return
-    if not response.ok:
-        push_warning(response.message)
-        return
-    var payload: SteamHttpResponse = response.value
-    if payload == null:
-        return
-    apply_response.call(payload)
-```

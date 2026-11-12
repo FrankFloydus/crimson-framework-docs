@@ -18,18 +18,3 @@ get_projection() -> Dictionary
 ## Return value
 
 `Dictionary`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_projection(
-    state_replication: StateReplication,
-    apply_projection: Callable
-) -> void:
-    var result: Dictionary = state_replication.get_projection()
-    if result.is_empty():
-        return
-    apply_projection.call(result)
-```

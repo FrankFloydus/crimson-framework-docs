@@ -20,16 +20,3 @@ get_name_or_path() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_name_or_path(
-    steam_cloud_change: SteamCloudChange,
-    name_or_path_label: Label
-) -> void:
-    var result: String = steam_cloud_change.get_name_or_path()
-    name_or_path_label.text = "Name or path: %s" % str(result)
-```

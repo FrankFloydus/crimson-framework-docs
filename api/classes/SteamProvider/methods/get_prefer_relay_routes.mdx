@@ -21,25 +21,4 @@ get_prefer_relay_routes() -> bool
 
 `bool`
 
-## Example
-
-```gdscript
-extends Node
-
-const STEAM_APP_ID: int = 480
-const LOBBY_NAMESPACE: String = "crimson-harbor"
-
-@export var lobby_details: Label
-
-# Attach to the lobby settings screen and assign its summary label.
-func _ready() -> void:
-    if lobby_details == null:
-        return
-    var provider: SteamProvider = SteamProvider.configure().for_app(STEAM_APP_ID)
-    provider = provider.with_lobby_namespace(LOBBY_NAMESPACE)
-    provider = provider.prefer_relay()
-    if provider.get_prefer_relay_routes():
-        lobby_details.text = "Steam relays are preferred for incoming connections."
-    else:
-        lobby_details.text = "Use the default Steam route preference."
-```
+[See gameplay examples for `SteamProvider`](/api/classes/SteamProvider#examples).

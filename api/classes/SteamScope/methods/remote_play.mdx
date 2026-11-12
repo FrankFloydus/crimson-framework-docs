@@ -23,14 +23,4 @@ remote_play() -> SteamRemotePlay
 
 Returns null after the attachment ends.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_remote_play(steam_scope: SteamScope, apply_remote_play: Callable) -> void:
-    var result: SteamRemotePlay = steam_scope.remote_play()
-    if result == null:
-        return
-    apply_remote_play.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

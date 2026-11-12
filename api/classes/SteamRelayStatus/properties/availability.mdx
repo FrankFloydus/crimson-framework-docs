@@ -23,16 +23,3 @@ var availability: SteamRelayStatus.Availability = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_availability()`](/api/classes/SteamRelayStatus/methods/get_availability) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_availability(
-    steam_relay_status: SteamRelayStatus,
-    availability_label: Label
-) -> void:
-    var availability: SteamRelayStatus.Availability = steam_relay_status.availability
-    availability_label.text = "Availability: %s" % str(availability)
-```

@@ -29,20 +29,4 @@ delete_file(name: String) -> Error
 
 Steam propagates the deletion through its sync lifecycle. Returns `ERR_BUSY` if a submitted transfer still reserves the name, or `ERR_FILE_NOT_FOUND` if the file is absent.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_delete_file(steam_client: SteamClient, name: String, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_cloud: SteamCloud = steam_client.cloud()
-    if steam_cloud == null:
-        return
-    var result: Error = steam_cloud.delete_file(name)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Delete file accepted."
-```
+[See gameplay examples for `SteamCloud`](/api/classes/SteamCloud#examples).

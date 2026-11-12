@@ -29,21 +29,3 @@ configure(source: SpatialInventory, slot_ids: Array) -> Error
 ## Description
 
 Reconfiguration with different slots or a different backpack returns `ERR_BUSY` while items are equipped.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_configure(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    source: SpatialInventory,
-    slot_ids: Array,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_equipment.configure(source, slot_ids)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Configure accepted."
-```

@@ -21,17 +21,4 @@ get_player_scene() -> PackedScene
 
 `PackedScene`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_player_scene(
-    game_definition: GameDefinition,
-    apply_player_scene: Callable
-) -> void:
-    var result: PackedScene = game_definition.get_player_scene()
-    if result == null:
-        return
-    apply_player_scene.call(result)
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

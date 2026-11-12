@@ -24,18 +24,3 @@ get_value() -> float
 ## Description
 
 Check `SteamResult.ok` to distinguish the outcomes.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_float_result: SteamFloatResult, value_label: Label) -> void:
-    if steam_float_result == null:
-        return
-    if not steam_float_result.ok:
-        push_warning(steam_float_result.message)
-        return
-    var result: float = steam_float_result.get_value()
-    value_label.text = "Value: %s" % str(result)
-```

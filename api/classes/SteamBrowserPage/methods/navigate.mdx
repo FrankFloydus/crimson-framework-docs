@@ -28,20 +28,3 @@ navigate(url: String) -> Error
 ## Description
 
 Return `ERR_UNAUTHORIZED` and emit `navigation_blocked` for a rejected URL. Steam callbacks check later requests and the final document. An unexpected document closes the browser before displaying its frame.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_navigate(
-    steam_browser_page: SteamBrowserPage,
-    url: String,
-    status_label: Label
-) -> void:
-    var result: Error = steam_browser_page.navigate(url)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Navigate accepted."
-```

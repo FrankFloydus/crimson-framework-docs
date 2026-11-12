@@ -21,22 +21,4 @@ get_value() -> SteamLobby
 
 [`SteamLobby`](/api/classes/SteamLobby)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_lobby_result: SteamLobbyResult, results_list: ItemList) -> void:
-    if steam_lobby_result == null:
-        return
-    if not steam_lobby_result.ok:
-        push_warning(steam_lobby_result.message)
-        return
-    var result: SteamLobby = steam_lobby_result.get_value()
-    if result == null:
-        return
-    var members: Array[SteamLobbyMember] = result.members()
-    results_list.clear()
-    for entry: SteamLobbyMember in members:
-        results_list.add_item(str(entry.display_name))
-```
+[See gameplay examples for `SteamLobbyResult`](/api/classes/SteamLobbyResult#examples).

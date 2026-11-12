@@ -20,24 +20,3 @@ result() -> SteamNotificationSessionResult
 ## Return value
 
 [`SteamNotificationSessionResult`](/api/classes/SteamNotificationSessionResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_notification_session_operation: SteamNotificationSessionOperation,
-    apply_result: Callable
-) -> void:
-    var result: SteamNotificationSessionResult = steam_notification_session_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamNotificationSession = result.value
-    if payload == null:
-        return
-    apply_result.call(payload)
-```

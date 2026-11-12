@@ -28,28 +28,3 @@ users(steam_ids: PackedStringArray) -> SteamLeaderboardQuery
 ## Description
 
 Only players with scores appear in the page. Steam accepts one selected-user download at a time across the shared runtime. An overlapping download returns `@GlobalScope.ERR_BUSY`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_users(
-    steam_leaderboard_query: SteamLeaderboardQuery,
-    steam_ids: PackedStringArray,
-    apply_completion: Callable
-) -> void:
-    var result: SteamLeaderboardQuery = steam_leaderboard_query.users(steam_ids)
-    if result == null:
-        return
-    var completion: SteamLeaderboardPageResult = await result.fetch()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamLeaderboardPage = completion.value
-    if payload == null:
-        return
-    apply_completion.call(payload)
-```

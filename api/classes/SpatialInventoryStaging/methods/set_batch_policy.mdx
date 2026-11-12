@@ -26,18 +26,3 @@ set_batch_policy(value: Callable) -> void
 ## Description
 
 Return an empty String to allow the batch or a reason to reject it.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_batch_policy(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    value: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_staging.set_batch_policy(value)
-    var active_batch_policy: Callable = spatial_inventory_staging.batch_policy
-    action_button.disabled = not active_batch_policy.is_valid()
-```

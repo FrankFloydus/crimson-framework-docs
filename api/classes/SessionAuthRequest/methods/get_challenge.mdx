@@ -18,16 +18,3 @@ get_challenge() -> PackedByteArray
 ## Return value
 
 `PackedByteArray`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_challenge(
-    session_auth_request: SessionAuthRequest,
-    byte_count_label: Label
-) -> void:
-    var result: PackedByteArray = session_auth_request.get_challenge()
-    byte_count_label.text = "%d bytes" % result.size()
-```

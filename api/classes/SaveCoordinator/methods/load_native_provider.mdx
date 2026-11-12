@@ -29,18 +29,3 @@ load_native_provider(path: String, configuration: String = "") -> bool
 ## Description
 
 Pass an absolute DLL path or a Godot path resolving to an on-disk DLL. The provider-defined UTF-8 configuration is limited to 64 KiB. A provider can supply storage, a codec, or both.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_load_native_provider(
-    save_coordinator: SaveCoordinator,
-    path: String,
-    configuration: String,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.load_native_provider(path, configuration)
-    status_label.text = "Load native provider: yes" if result else "Load native provider: no"
-```

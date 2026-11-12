@@ -18,13 +18,3 @@ leave() -> void
 ## Description
 
 Restore the previous multiplayer peer if this session still owns the slot. Calling while idle has no effect.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_leave(game_session: GameSession, session_controls: Control) -> void:
-    game_session.leave()
-    session_controls.hide()
-```

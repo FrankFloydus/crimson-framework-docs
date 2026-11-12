@@ -28,28 +28,3 @@ tagged(tag: String) -> SteamWorkshopQuery
 ## Description
 
 A branch supports up to 16 tags, each between 1 and 255 UTF-8 bytes.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_tagged(
-    steam_workshop_query: SteamWorkshopQuery,
-    tag: String,
-    apply_completion: Callable
-) -> void:
-    var result: SteamWorkshopQuery = steam_workshop_query.tagged(tag)
-    if result == null:
-        return
-    var completion: SteamWorkshopPageResult = await result.fetch()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamWorkshopPage = completion.value
-    if payload == null:
-        return
-    apply_completion.call(payload)
-```

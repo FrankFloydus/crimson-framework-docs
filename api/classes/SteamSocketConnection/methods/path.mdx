@@ -18,15 +18,3 @@ path() -> SteamConnectionPath
 ## Return value
 
 [`SteamConnectionPath`](/api/classes/SteamConnectionPath)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_path(steam_socket_connection: SteamSocketConnection, apply_path: Callable) -> void:
-    var result: SteamConnectionPath = steam_socket_connection.path()
-    if result == null:
-        return
-    apply_path.call(result)
-```

@@ -22,18 +22,3 @@ get_title() -> SteamLocalizedText
 ## Return value
 
 [`SteamLocalizedText`](/api/classes/SteamLocalizedText)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_title(
-    steam_notification_session_spec: SteamNotificationSessionSpec,
-    apply_title: Callable
-) -> void:
-    var result: SteamLocalizedText = steam_notification_session_spec.get_title()
-    if result == null:
-        return
-    apply_title.call(result)
-```

@@ -22,13 +22,3 @@ var total: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_total()`](/api/classes/SteamPurchaseOutcome/methods/get_total) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_total(steam_purchase_outcome: SteamPurchaseOutcome, total_label: Label) -> void:
-    var total: int = steam_purchase_outcome.total
-    total_label.text = "Total: %s" % str(total)
-```

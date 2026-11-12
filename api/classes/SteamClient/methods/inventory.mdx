@@ -23,14 +23,4 @@ inventory() -> SteamInventory
 
 Returns null while the scope is inactive.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_inventory(steam_client: SteamClient, apply_inventory: Callable) -> void:
-    var result: SteamInventory = steam_client.inventory()
-    if result == null:
-        return
-    apply_inventory.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

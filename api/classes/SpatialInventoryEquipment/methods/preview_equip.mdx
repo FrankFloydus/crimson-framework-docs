@@ -29,20 +29,3 @@ preview_equip(id: StringName, slot: StringName) -> Dictionary
 ## Description
 
 The result includes `error`, `reason`, `slots`, `displaced`, placement `changes`, and both model revisions.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_preview_equip(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    id: StringName,
-    slot: StringName,
-    apply_preview_equip: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_equipment.preview_equip(id, slot)
-    if result.is_empty():
-        return
-    apply_preview_equip.call(result)
-```

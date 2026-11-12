@@ -29,19 +29,4 @@ set_projector(projector: Callable) -> Error
 
 It receives peer ID, player ID, world epoch, and committed revision, and returns a dictionary with ok and view. Its per-recipient view takes precedence over the shared-store list. Returns a Godot Error.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_projector(
-    game_runtime: GameRuntime,
-    projector: Callable,
-    status_label: Label
-) -> void:
-    var result: Error = game_runtime.set_projector(projector)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set projector accepted."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

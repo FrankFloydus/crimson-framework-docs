@@ -22,13 +22,3 @@ var value: Vector2
 | Type | `Vector2` |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamAnalogInput/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_analog_input: SteamAnalogInput, value_label: Label) -> void:
-    var value: Vector2 = steam_analog_input.value
-    value_label.text = "Value: %s" % str(value)
-```

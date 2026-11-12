@@ -29,15 +29,3 @@ static p2p(steam_id: String, virtual_port: int = 0) -> SteamSocketEndpoint
 ## Description
 
 Use your own ID for a listener and the remote account for a connection. The virtual port is from 0 to 65535. Returns `null` for invalid input.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_p2p(steam_id: String, virtual_port: int, apply_p2p: Callable) -> void:
-    var result: SteamSocketEndpoint = SteamSocketEndpoint.p2p(steam_id, virtual_port)
-    if result == null:
-        return
-    apply_p2p.call(result)
-```

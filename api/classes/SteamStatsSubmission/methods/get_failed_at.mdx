@@ -21,15 +21,4 @@ get_failed_at() -> int
 
 `int`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_failed_at(
-    steam_stats_submission: SteamStatsSubmission,
-    failed_at_label: Label
-) -> void:
-    var result: int = steam_stats_submission.get_failed_at()
-    failed_at_label.text = "Failed at: %s" % str(result)
-```
+[See gameplay examples for `SteamStatsSubmission`](/api/classes/SteamStatsSubmission#examples).

@@ -25,17 +25,4 @@ get_value() -> PackedByteArray
 
 An empty array can also be a successful zero-byte result. Check `SteamResult.ok` for the outcome.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_bytes_result: SteamBytesResult, byte_count_label: Label) -> void:
-    if steam_bytes_result == null:
-        return
-    if not steam_bytes_result.ok:
-        push_warning(steam_bytes_result.message)
-        return
-    var result: PackedByteArray = steam_bytes_result.get_value()
-    byte_count_label.text = "%d bytes" % result.size()
-```
+[See gameplay examples for `SteamBytesResult`](/api/classes/SteamBytesResult#examples).

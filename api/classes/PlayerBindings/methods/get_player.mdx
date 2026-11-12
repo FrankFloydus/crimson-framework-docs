@@ -24,13 +24,3 @@ get_player(peer_id: int) -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_player(player_bindings: PlayerBindings, peer_id: int, player_label: Label) -> void:
-    var result: String = player_bindings.get_player(peer_id)
-    player_label.text = "Player: %s" % str(result)
-```

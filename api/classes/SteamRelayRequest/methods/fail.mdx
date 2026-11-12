@@ -22,16 +22,3 @@ fail() -> Error
 ## Description
 
 A settled or unconfigured request returns `ERR_ALREADY_IN_USE`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_fail(steam_relay_request: SteamRelayRequest, status_label: Label) -> void:
-    var result: Error = steam_relay_request.fail()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Fail accepted."
-```

@@ -24,13 +24,3 @@ var site_license: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`get_site_license()`](/api/classes/SteamAppOwnership/methods/get_site_license) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_site_license(steam_app_ownership: SteamAppOwnership, status_label: Label) -> void:
-    var site_license: bool = steam_app_ownership.site_license
-    status_label.text = "Site license: yes" if site_license else "Site license: no"
-```

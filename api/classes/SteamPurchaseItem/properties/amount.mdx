@@ -22,13 +22,3 @@ var amount: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_amount()`](/api/classes/SteamPurchaseItem/methods/get_amount) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_amount(steam_purchase_item: SteamPurchaseItem, amount_label: Label) -> void:
-    var amount: int = steam_purchase_item.amount
-    amount_label.text = "Amount: %s" % str(amount)
-```

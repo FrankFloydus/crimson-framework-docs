@@ -29,24 +29,4 @@ unlock_achievement(name: String) -> Error
 
 Call `store()` to request persistence and the unlock notification.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_unlock_achievement(
-    steam_client: SteamClient,
-    name: String,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: Error = steam_stats.unlock_achievement(name)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Unlock achievement accepted."
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

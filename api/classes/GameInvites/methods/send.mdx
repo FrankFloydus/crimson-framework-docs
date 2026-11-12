@@ -29,18 +29,4 @@ send(steam_id: String) -> Error
 
 `OK` means the request was submitted to Steam.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_send(game_runtime: GameRuntime, steam_id: String, status_label: Label) -> void:
-    var game_invites: GameInvites = game_runtime.invites()
-    if game_invites == null:
-        return
-    var result: Error = game_invites.send(steam_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Send accepted."
-```
+[See gameplay examples for `GameInvites`](/api/classes/GameInvites#examples).

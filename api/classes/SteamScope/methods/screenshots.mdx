@@ -23,14 +23,4 @@ screenshots() -> SteamScreenshots
 
 Returns null after the attachment ends.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_screenshots(steam_scope: SteamScope, apply_screenshots: Callable) -> void:
-    var result: SteamScreenshots = steam_scope.screenshots()
-    if result == null:
-        return
-    apply_screenshots.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

@@ -18,19 +18,3 @@ wait() -> Variant
 ## Return value
 
 `Variant`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_wait(steam_timeline_operation: SteamTimelineOperation, status_label: Label) -> void:
-    var result: SteamBoolResult = await steam_timeline_operation.wait()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: bool = result.value
-    status_label.text = "Wait: yes" if payload else "Wait: no"
-```

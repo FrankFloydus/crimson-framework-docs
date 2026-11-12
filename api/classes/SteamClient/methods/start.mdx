@@ -29,15 +29,4 @@ start(expected_app_id: int = 0) -> Error
 
 An expected AppID of `0` uses the Steam launch AppID. Starting an active client again with its current AppID succeeds. A conflicting AppID returns `ERR_ALREADY_IN_USE`. Inspect `get_initialization_error()` for Steam initialization details.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_start(steam_client: SteamClient, expected_app_id: int, status_label: Label) -> void:
-    var result: Error = steam_client.start(expected_app_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Start accepted."
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

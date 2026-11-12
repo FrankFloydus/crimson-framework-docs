@@ -22,16 +22,3 @@ var recording_ms: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_recording_ms()`](/api/classes/TimelinePhaseRecording/methods/get_recording_ms) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_recording_ms(
-    timeline_phase_recording: TimelinePhaseRecording,
-    recording_ms_label: Label
-) -> void:
-    var recording_ms: int = timeline_phase_recording.recording_ms
-    recording_ms_label.text = "Recording ms: %s" % str(recording_ms)
-```

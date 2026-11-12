@@ -20,13 +20,3 @@ get_ping_ms() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_ping_ms(steam_connection_path: SteamConnectionPath, ping_ms_label: Label) -> void:
-    var result: int = steam_connection_path.get_ping_ms()
-    ping_ms_label.text = "Ping ms: %s" % str(result)
-```

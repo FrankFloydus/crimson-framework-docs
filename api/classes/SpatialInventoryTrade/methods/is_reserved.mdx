@@ -29,18 +29,3 @@ is_reserved(actor: int, id: StringName) -> bool
 ## Description
 
 The host should keep reserved items out of unrelated moves or record edits.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_reserved(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    id: StringName,
-    status_label: Label
-) -> void:
-    var result: bool = spatial_inventory_trade.is_reserved(actor, id)
-    status_label.text = "Reserved: yes" if result else "Reserved: no"
-```

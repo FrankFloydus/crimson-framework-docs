@@ -22,18 +22,3 @@ get_proof() -> PackedByteArray
 ## Description
 
 Keep proof bytes out of logs and persisted data.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_proof(
-    session_auth_request: SessionAuthRequest,
-    process_private_payload: Callable
-) -> void:
-    var result: PackedByteArray = session_auth_request.get_proof()
-    if result.is_empty():
-        return
-    process_private_payload.call(result)
-```

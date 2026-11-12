@@ -20,16 +20,3 @@ get_allow_rotation() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_allow_rotation(
-    spatial_inventory_actions: SpatialInventoryActions,
-    status_label: Label
-) -> void:
-    var result: bool = spatial_inventory_actions.get_allow_rotation()
-    status_label.text = "Allow rotation: yes" if result else "Allow rotation: no"
-```

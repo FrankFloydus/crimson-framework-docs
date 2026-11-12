@@ -22,20 +22,3 @@ drain() -> SteamDiagnosticBatch
 ## Description
 
 Returns an empty snapshot for an inactive scope, a caller without ownership, or a call from outside the main thread.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_drain(steam_client: SteamClient, apply_drain: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_diagnostics: SteamDiagnostics = steam_client.diagnostics()
-    if steam_diagnostics == null:
-        return
-    var result: SteamDiagnosticBatch = steam_diagnostics.drain()
-    if result == null:
-        return
-    apply_drain.call(result)
-```

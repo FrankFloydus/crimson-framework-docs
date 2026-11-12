@@ -28,31 +28,3 @@ tag(steam_id: String) -> SteamScreenshotRequest
 ## Description
 
 Submission rejects a malformed ID or more than 32 user tag requests. Duplicate IDs are submitted once.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_tag(
-    steam_screenshot_request: SteamScreenshotRequest,
-    steam_id: String,
-    confirmed: bool,
-    apply_completion: Callable
-) -> void:
-    var result: SteamScreenshotRequest = steam_screenshot_request.tag(steam_id)
-    if result == null:
-        return
-    if not confirmed:
-        return
-    var completion: SteamScreenshotResult = await result.submit()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamScreenshot = completion.value
-    if payload == null:
-        return
-    apply_completion.call(payload)
-```

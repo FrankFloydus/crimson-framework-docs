@@ -26,13 +26,3 @@ var bytes: PackedByteArray
 ## Description
 
 Send these through a game-authorized voice route. Keep the frame intact for decoding and discard it after use.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_bytes(steam_voice_frame: SteamVoiceFrame, byte_count_label: Label) -> void:
-    var bytes: PackedByteArray = steam_voice_frame.bytes
-    byte_count_label.text = "%d bytes" % bytes.size()
-```

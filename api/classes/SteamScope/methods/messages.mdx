@@ -23,14 +23,4 @@ messages() -> SteamMessages
 
 Returns null after the attachment ends.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_messages(steam_scope: SteamScope, apply_messages: Callable) -> void:
-    var result: SteamMessages = steam_scope.messages()
-    if result == null:
-        return
-    apply_messages.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

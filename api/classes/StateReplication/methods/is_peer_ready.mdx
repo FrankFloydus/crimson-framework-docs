@@ -29,18 +29,3 @@ is_peer_ready(peer_id: int, binding_generation: int = 0) -> bool
 ## Description
 
 Pass its admitted `binding\_generation` when gating input. Zero accepts the current generation.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_peer_ready(
-    state_replication: StateReplication,
-    peer_id: int,
-    binding_generation: int,
-    status_label: Label
-) -> void:
-    var result: bool = state_replication.is_peer_ready(peer_id, binding_generation)
-    status_label.text = "Peer ready: yes" if result else "Peer ready: no"
-```

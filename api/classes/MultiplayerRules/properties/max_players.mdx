@@ -31,30 +31,84 @@ Listen hosting uses one seat for the host and requires at least two seats. Dedic
 
 ## Example
 
+### Host a duo or squad from the co-op menu
+
+Turn **Squad** on before hosting a training room to open three guest seats. Leave it off to host a duo with one guest seat.
+
+[Set up a local multiplayer test](/multiplayer-quickstart)
+
 ```gdscript
 extends Node
 
+const TRAINING_ROOM: StringName = &"training_room"
+const DUO_CAPACITY: int = 2
+const SQUAD_CAPACITY: int = 4
 const COOP_PORT: int = 7017
-const TOTAL_SEATS: int = 4
+const LOCAL_ADDRESS: String = "127.0.0.1"
 
-@export var game_definition: GameDefinition
+@export var training_room: PackedScene
+@export var player_scene: PackedScene
+@export var menu: Control
+@export var squad_mode: CheckButton
+@export var host_button: Button
+@export var join_button: Button
+@export var status: Label
 
-# Connect the Host button. Assign a player scene and a world with at least four player spawn points.
-func host_coop() -> void:
-    if game_definition == null:
-        push_error("Assign a game definition.")
+var _game: GameRuntime
+
+
+func _ready() -> void:
+    host_button.pressed.connect(_open_session.bind(true))
+    join_button.pressed.connect(_open_session.bind(false))
+    if training_room == null or player_scene == null:
+        status.text = "Assign the training room and player scenes."
+        _set_menu_busy(true)
+
+
+func _open_session(hosting: bool) -> void:
+    if _game != null:
         return
+
+    _set_menu_busy(true)
+    var capacity: int = SQUAD_CAPACITY if squad_mode.button_pressed else DUO_CAPACITY
     var rules: MultiplayerRules = MultiplayerRules.listen_coop()
+    rules.max_players = capacity
     rules.port = COOP_PORT
-    rules.max_players = TOTAL_SEATS
-    var definition: GameDefinition = game_definition.with_multiplayer(rules)
-    var game: GameRuntime = definition.boot(self)
-    if game == null:
+    rules.join_in_progress = true
+
+    var definition: GameDefinition = GameRuntime.configure()
+    definition.starting_world = TRAINING_ROOM
+    definition.starting_world_scene = training_room
+    definition.player_scene = player_scene
+    definition.multiplayer_rules = rules
+    _game = definition.boot(self)
+    if _game == null:
+        status.text = "Could not create the game."
+        _set_menu_busy(false)
         return
-    var hosted: Dictionary = await game.host_game().wait()
-    if not hosted.ok:
-        push_error(hosted.message)
-        game.queue_free()
+
+    var operation: GameOperation
+    if hosting:
+        status.text = "Opening a %d-player training room..." % capacity
+        operation = _game.host_game(LOCAL_ADDRESS)
+    else:
+        status.text = "Joining the training room..."
+        operation = _game.join_game(LOCAL_ADDRESS)
+
+    var result: Dictionary = await operation.wait()
+    if not result.ok:
+        status.text = "Could not enter the training room: %s" % result.message
+        _game.queue_free()
+        await _game.tree_exited
+        _game = null
+        _set_menu_busy(false)
         return
-    print("Total seats including host: ", rules.max_players, ". UDP port: ", rules.port)
+
+    menu.hide()
+
+
+func _set_menu_busy(busy: bool) -> void:
+    host_button.disabled = busy
+    join_button.disabled = busy
+    squad_mode.disabled = busy
 ```

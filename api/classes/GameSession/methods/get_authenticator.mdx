@@ -18,15 +18,3 @@ get_authenticator() -> SessionAuthenticator
 ## Return value
 
 [`SessionAuthenticator`](/api/classes/SessionAuthenticator)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_authenticator(game_session: GameSession, apply_authenticator: Callable) -> void:
-    var result: SessionAuthenticator = game_session.get_authenticator()
-    if result == null:
-        return
-    apply_authenticator.call(result)
-```

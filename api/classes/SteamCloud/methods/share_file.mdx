@@ -29,26 +29,4 @@ share_file(name: String) -> SteamCloudShareOperation
 
 Returns the retained typed share operation. An absent local file reports `ERR_FILE_NOT_FOUND`. Steam can still publish the file after the caller cancels observation.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_share_file(steam_client: SteamClient, name: String, share_file_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_cloud: SteamCloud = steam_client.cloud()
-    if steam_cloud == null:
-        return
-    var result: SteamCloudShareOperation = steam_cloud.share_file(name)
-    if result == null:
-        return
-    var result_value: SteamStringResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: String = result_value.value
-    share_file_label.text = "Share file: %s" % str(payload)
-```
+[See gameplay examples for `SteamCloud`](/api/classes/SteamCloud#examples).

@@ -23,16 +23,3 @@ var steam_result: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_steam_result()`](/api/classes/SteamServerStatsResult/methods/get_steam_result) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_steam_result(
-    steam_server_stats_result: SteamServerStatsResult,
-    steam_result_label: Label
-) -> void:
-    var steam_result: int = steam_server_stats_result.steam_result
-    steam_result_label.text = "Steam result: %s" % str(steam_result)
-```

@@ -25,24 +25,4 @@ achievement(name: StringName) -> SteamAchievement
 
 [`SteamAchievement`](/api/classes/SteamAchievement)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_achievement(
-    steam_client: SteamClient,
-    name: StringName,
-    display_name_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: SteamAchievement = steam_stats.achievement(name)
-    if result == null:
-        return
-    var display_name: String = result.display_name
-    display_name_label.text = "Display name: %s" % str(display_name)
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

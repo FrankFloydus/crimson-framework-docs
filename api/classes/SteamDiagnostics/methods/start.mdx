@@ -22,21 +22,3 @@ start() -> Error
 ## Description
 
 Returns `OK` for a new capture or if this service already owns it. Returns `ERR_BUSY` when another scope owns it or a caller invokes this method outside the main thread. Returns `ERR_UNAVAILABLE` when the scope or SDK hook is unavailable.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_start(steam_client: SteamClient, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_diagnostics: SteamDiagnostics = steam_client.diagnostics()
-    if steam_diagnostics == null:
-        return
-    var result: Error = steam_diagnostics.start()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Start accepted."
-```

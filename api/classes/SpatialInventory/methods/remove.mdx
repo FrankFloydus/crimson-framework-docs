@@ -27,17 +27,58 @@ remove(id: StringName) -> Error
 
 ## Example
 
-```gdscript
-extends Node
+### Pick up a keycard and open the airlock
 
-func run_remove(
-    spatial_inventory: SpatialInventory,
-    id: StringName,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory.remove(id)
-    if result != OK:
-        status_label.text = error_string(result)
+Walking over the keycard with a body in the `player` group puts it in the first position with enough space. Press **Open Airlock** to consume the card and clear the exit.
+
+```gdscript
+extends Node3D
+
+const GRID_SIZE: Vector2i = Vector2i(4, 3)
+const KEYCARD_SIZE: Vector2i = Vector2i(2, 1)
+const NO_FIT: Vector2i = Vector2i(-1, -1)
+const KEYCARD: StringName = &"cargo_airlock_keycard"
+const PLAYER_GROUP: StringName = &"player"
+
+@export var keycard_pickup: Node3D
+@export var pickup_area: Area3D
+@export var airlock: Node3D
+@export var open_airlock_button: Button
+@export var inventory_status: Label
+
+var _inventory: SpatialInventory = SpatialInventory.new()
+
+
+func _ready() -> void:
+    open_airlock_button.disabled = true
+    var error: Error = _inventory.configure(GRID_SIZE)
+    if error != OK:
+        inventory_status.text = error_string(error)
         return
-    status_label.text = "Remove accepted."
+    pickup_area.body_entered.connect(_on_pickup_entered)
+    open_airlock_button.pressed.connect(_open_airlock)
+    inventory_status.text = "Find the cargo keycard."
+
+
+func _on_pickup_entered(body: Node3D) -> void:
+    if not body.is_in_group(PLAYER_GROUP):
+        return
+    var cell: Vector2i = _inventory.find_first_fit(KEYCARD_SIZE)
+    if cell == NO_FIT:
+        inventory_status.text = "Free two adjacent cells to pick up the card."
+        return
+    var error: Error = _inventory.try_place(KEYCARD, KEYCARD_SIZE, cell)
+    if error != OK:
+        return
+    keycard_pickup.queue_free()
+    open_airlock_button.disabled = false
+    inventory_status.text = "Keycard stored. The cargo airlock can now open."
+
+
+func _open_airlock() -> void:
+    if _inventory.remove(KEYCARD) != OK:
+        return
+    open_airlock_button.disabled = true
+    airlock.queue_free()
+    inventory_status.text = "Keycard used. The cargo route is open."
 ```

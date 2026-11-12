@@ -20,16 +20,3 @@ get_clip() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_clip(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    clip_label: Label
-) -> void:
-    var result: int = timeline_marker_presentation.get_clip()
-    clip_label.text = "Clip: %s" % str(result)
-```

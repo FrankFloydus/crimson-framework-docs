@@ -20,21 +20,3 @@ wait() -> Variant
 `Variant`
 
 Await the call to receive [`SteamServerStatsResult`](/api/classes/SteamServerStatsResult).
-
-## Example
-
-```gdscript
-extends Node
-
-func run_wait(
-    steam_server_stats_operation: SteamServerStatsOperation,
-    status_label: Label
-) -> void:
-    var result: SteamServerStatsResult = await steam_server_stats_operation.wait()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    status_label.text = "Wait succeeded."
-```

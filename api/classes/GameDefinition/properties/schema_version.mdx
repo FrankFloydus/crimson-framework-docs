@@ -29,20 +29,4 @@ var schema_version: int = 1
 
 Update it when the persisted data format changes.
 
-## Example
-
-```gdscript
-extends Node
-
-func update_schema_version(
-    game_definition: GameDefinition,
-    new_schema_version: int,
-    game: GameRuntime
-) -> void:
-    if game_definition == null:
-        return
-    if game.is_inside_tree():
-        return
-    game_definition.schema_version = new_schema_version
-    game.definition = game_definition
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

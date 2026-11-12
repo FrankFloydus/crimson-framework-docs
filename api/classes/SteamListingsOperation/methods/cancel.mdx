@@ -22,16 +22,3 @@ cancel() -> Error
 ## Description
 
 The search lane remains occupied until the Steam callback drains or reaches its deadline.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(steam_listings_operation: SteamListingsOperation, status_label: Label) -> void:
-    var result: Error = steam_listings_operation.cancel()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Cancel accepted."
-```

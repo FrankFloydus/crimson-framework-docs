@@ -22,16 +22,3 @@ get_report_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_report_id(
-    steam_moderation_request: SteamModerationRequest,
-    apply_report_id: Callable
-) -> void:
-    var result: String = steam_moderation_request.get_report_id()
-    apply_report_id.call(result)
-```

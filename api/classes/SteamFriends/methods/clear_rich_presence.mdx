@@ -28,25 +28,3 @@ clear_rich_presence(key: String) -> Error
 ## Description
 
 Returns `@GlobalScope.OK` when Steam accepts the update. The Game provider reserves the `connect` key for its join route.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_clear_rich_presence(
-    steam_client: SteamClient,
-    key: String,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_friends: SteamFriends = steam_client.friends()
-    if steam_friends == null:
-        return
-    var result: Error = steam_friends.clear_rich_presence(key)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Clear rich presence accepted."
-```

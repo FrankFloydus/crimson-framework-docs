@@ -31,31 +31,3 @@ Await the call to receive [`SteamLeaderboardPageResult`](/api/classes/SteamLeade
 ## Description
 
 The count must be between 1 and 100. Use `await` to receive a [`SteamLeaderboardPageResult`](/api/classes/SteamLeaderboardPageResult). See `query()` for other rank ranges and cancellable queries.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_top(
-    steam_client: SteamClient,
-    board_name: String,
-    count: int,
-    apply_top: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_leaderboards: SteamLeaderboards = steam_client.leaderboards()
-    if steam_leaderboards == null:
-        return
-    var result: SteamLeaderboardPageResult = await steam_leaderboards.top(board_name, count)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamLeaderboardPage = result.value
-    if payload == null:
-        return
-    apply_top.call(payload)
-```

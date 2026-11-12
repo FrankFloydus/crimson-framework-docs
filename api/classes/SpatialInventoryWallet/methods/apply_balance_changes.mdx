@@ -29,21 +29,3 @@ apply_balance_changes(changes: Array, commit: Callable = Callable()) -> Error
 ## Description
 
 A stale expected balance returns `ERR_BUSY`. Stage the full batch before the optional no-argument commit callback. A callback error rolls all balances back.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_apply_balance_changes(
-    spatial_inventory_wallet: SpatialInventoryWallet,
-    changes: Array,
-    commit: Callable,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_wallet.apply_balance_changes(changes, commit)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Apply balance changes accepted."
-```

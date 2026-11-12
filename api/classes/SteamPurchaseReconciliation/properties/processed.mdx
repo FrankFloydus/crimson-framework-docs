@@ -25,16 +25,3 @@ var processed: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_processed()`](/api/classes/SteamPurchaseReconciliation/methods/get_processed) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_processed(
-    steam_purchase_reconciliation: SteamPurchaseReconciliation,
-    processed_label: Label
-) -> void:
-    var processed: int = steam_purchase_reconciliation.processed
-    processed_label.text = "Processed: %s" % str(processed)
-```

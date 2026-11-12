@@ -18,16 +18,3 @@ get_host_remote_limit() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_host_remote_limit(
-    steam_session_transport: SteamSessionTransport,
-    host_remote_limit_label: Label
-) -> void:
-    var result: int = steam_session_transport.get_host_remote_limit()
-    host_remote_limit_label.text = "Host remote limit: %s" % str(result)
-```

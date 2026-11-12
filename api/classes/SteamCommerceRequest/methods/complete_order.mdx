@@ -28,20 +28,3 @@ complete_order(result: SteamPurchaseOutcomeResult) -> Error
 ## Description
 
 Confirm the order through the game backend before responding. Repeated or retired completions return an error.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_complete_order(
-    steam_commerce_request: SteamCommerceRequest,
-    result: SteamPurchaseOutcomeResult,
-    status_label: Label
-) -> void:
-    var result_value: Error = steam_commerce_request.complete_order(result)
-    if result_value != OK:
-        status_label.text = error_string(result_value)
-        return
-    status_label.text = "Complete order accepted."
-```

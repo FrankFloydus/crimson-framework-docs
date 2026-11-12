@@ -24,19 +24,3 @@ cancel() -> Error
 ## Description
 
 An already submitted request can still reach Steam and commit its durable receipt. Returns `ERR_DOES_NOT_EXIST` if observation has ended.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(
-    steam_notification_sessions_operation: SteamNotificationSessionsOperation,
-    report_status: Callable
-) -> void:
-    var result: Error = steam_notification_sessions_operation.cancel()
-    if result != OK:
-        push_warning(error_string(result))
-        return
-    report_status.call(result)
-```

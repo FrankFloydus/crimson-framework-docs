@@ -24,25 +24,3 @@ open_phase_in_overlay(phase_id: String) -> Error
 ## Return value
 
 `Error`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_open_phase_in_overlay(
-    steam_client: SteamClient,
-    phase_id: String,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: Error = steam_timeline.open_phase_in_overlay(phase_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Open phase in overlay accepted."
-```

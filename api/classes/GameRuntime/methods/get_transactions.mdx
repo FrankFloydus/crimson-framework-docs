@@ -21,14 +21,4 @@ get_transactions() -> TransactionCoordinator
 
 [`TransactionCoordinator`](/api/classes/TransactionCoordinator)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_transactions(game_runtime: GameRuntime, apply_transactions: Callable) -> void:
-    var result: TransactionCoordinator = game_runtime.get_transactions()
-    if result == null:
-        return
-    apply_transactions.call(result)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

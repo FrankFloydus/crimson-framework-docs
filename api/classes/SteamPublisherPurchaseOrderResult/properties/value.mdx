@@ -24,23 +24,3 @@ var value: SteamPublisherPurchaseOrder
 | Type | [`SteamPublisherPurchaseOrder`](/api/classes/SteamPublisherPurchaseOrder) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamPublisherPurchaseOrderResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_publisher_purchase_order_result: SteamPublisherPurchaseOrderResult,
-    apply_value: Callable
-) -> void:
-    if steam_publisher_purchase_order_result == null:
-        return
-    if not steam_publisher_purchase_order_result.ok:
-        push_warning(steam_publisher_purchase_order_result.message)
-        return
-    var value: SteamPublisherPurchaseOrder = steam_publisher_purchase_order_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

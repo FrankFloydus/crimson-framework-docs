@@ -22,16 +22,3 @@ can_undo() -> bool
 ## Description
 
 Intervening edits can still make undo fail.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_can_undo(
-    spatial_inventory_sorter: SpatialInventorySorter,
-    status_label: Label
-) -> void:
-    var result: bool = spatial_inventory_sorter.can_undo()
-    status_label.text = "Undo: yes" if result else "Undo: no"
-```

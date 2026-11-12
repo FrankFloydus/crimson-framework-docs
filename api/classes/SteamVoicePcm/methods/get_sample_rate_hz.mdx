@@ -20,16 +20,3 @@ get_sample_rate_hz() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_sample_rate_hz(
-    steam_voice_pcm: SteamVoicePcm,
-    sample_rate_hz_label: Label
-) -> void:
-    var result: int = steam_voice_pcm.get_sample_rate_hz()
-    sample_rate_hz_label.text = "Sample rate hz: %s" % str(result)
-```

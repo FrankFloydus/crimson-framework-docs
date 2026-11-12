@@ -25,16 +25,3 @@ var description: String = ""
 | Access | Read only |
 | Default | `""` |
 | Getter | [`get_description()`](/api/classes/SteamPublisherPurchaseLine/methods/get_description) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_description(
-    steam_publisher_purchase_line: SteamPublisherPurchaseLine,
-    apply_description: Callable
-) -> void:
-    var description: String = steam_publisher_purchase_line.description
-    apply_description.call(description)
-```

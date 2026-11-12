@@ -24,16 +24,3 @@ get_next_cursor() -> String
 ## Description
 
 An empty cursor marks the end.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_next_cursor(
-    steam_workshop_page: SteamWorkshopPage,
-    next_cursor_label: Label
-) -> void:
-    var result: String = steam_workshop_page.get_next_cursor()
-    next_cursor_label.text = "Next cursor: %s" % str(result)
-```

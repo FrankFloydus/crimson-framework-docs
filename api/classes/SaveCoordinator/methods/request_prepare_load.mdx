@@ -31,20 +31,3 @@ request_prepare_load(profile: String, slot: String, sequence: String = "", gener
 ## Description
 
 Wait for `load_prepared` and call `activate_prepared_load()` when the host is ready to publish the candidate.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_request_prepare_load(
-    save_coordinator: SaveCoordinator,
-    profile: String,
-    slot: String,
-    sequence: String,
-    generation_id: String,
-    request_prepare_load_label: Label
-) -> void:
-    var result: int = save_coordinator.request_prepare_load(profile, slot, sequence, generation_id)
-    request_prepare_load_label.text = "Request prepare load: %s" % str(result)
-```

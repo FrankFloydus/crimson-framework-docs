@@ -28,20 +28,3 @@ import_snapshot(snapshot: Dictionary) -> Error
 ## Description
 
 Invalid data leaves the model unchanged.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_import_snapshot(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    snapshot: Dictionary,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_equipment.import_snapshot(snapshot)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Import snapshot accepted."
-```

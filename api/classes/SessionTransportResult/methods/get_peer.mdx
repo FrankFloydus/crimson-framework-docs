@@ -18,18 +18,3 @@ get_peer() -> MultiplayerPeer
 ## Return value
 
 `MultiplayerPeer`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_peer(
-    session_transport_result: SessionTransportResult,
-    apply_peer: Callable
-) -> void:
-    var result: MultiplayerPeer = session_transport_result.get_peer()
-    if result == null:
-        return
-    apply_peer.call(result)
-```

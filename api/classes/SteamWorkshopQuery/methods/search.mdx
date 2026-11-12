@@ -28,28 +28,3 @@ search(text: String) -> SteamWorkshopQuery
 ## Description
 
 An empty string clears the text filter. `text` supports up to 255 UTF-8 bytes.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_search(
-    steam_workshop_query: SteamWorkshopQuery,
-    text: String,
-    apply_completion: Callable
-) -> void:
-    var result: SteamWorkshopQuery = steam_workshop_query.search(text)
-    if result == null:
-        return
-    var completion: SteamWorkshopPageResult = await result.fetch()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamWorkshopPage = completion.value
-    if payload == null:
-        return
-    apply_completion.call(payload)
-```

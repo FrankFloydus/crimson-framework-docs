@@ -22,24 +22,3 @@ send() -> SteamScreenshotOperation
 ## Description
 
 The scope validates all input before writing, waits up to 15 seconds for the exact save confirmation, and then applies requested metadata. A timeout does not cancel the Steam write.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_send(steam_screenshot_request: SteamScreenshotRequest, apply_send: Callable) -> void:
-    var result: SteamScreenshotOperation = steam_screenshot_request.send()
-    if result == null:
-        return
-    var result_value: SteamScreenshotResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamScreenshot = result_value.value
-    if payload == null:
-        return
-    apply_send.call(payload)
-```

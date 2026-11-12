@@ -28,32 +28,35 @@ set_int(name: String, value: int) -> SteamStatsEdit
 
 ## Example
 
-```gdscript
-extends Node
+### Update Steam progression after a match victory
 
-func run_set_int(
-    steam_stats: SteamStats,
-    name: String,
-    value: int,
-    confirmed: bool,
-    apply_completion: Callable
-) -> void:
-    var steam_stats_edit: SteamStatsEdit = steam_stats.edit()
-    if steam_stats_edit == null:
+After a match victory, update the player's lifetime win count and unlock the first-win achievement using [keys published in Steamworks](/steam/client-services#record-progression). The victory screen reports whether Steam accepted the update.
+
+```gdscript
+extends Control
+
+const WINS_STAT: String = "total_wins"
+const FIRST_WIN_ACHIEVEMENT: String = "first_win"
+const FIRST_WIN_COUNT: int = 1
+
+@export var steam_client: SteamClient
+@export var steam_status: Label
+
+
+func record_victory(total_wins: int) -> void:
+    if not is_instance_valid(steam_client) or not steam_client.is_online():
+        steam_status.text = "Victory! Steam progression is unavailable."
         return
-    var result: SteamStatsEdit = steam_stats_edit.set_int(name, value)
-    if result == null:
+
+    var stats: SteamStats = steam_client.stats()
+    var edit: SteamStatsEdit = stats.edit().set_int(WINS_STAT, total_wins)
+    if total_wins == FIRST_WIN_COUNT:
+        edit = edit.unlock(FIRST_WIN_ACHIEVEMENT)
+
+    var result: SteamStatsSubmissionResult = edit.submit()
+    if not result.ok:
+        steam_status.text = "Victory! Steam progression update failed: %s" % result.message
         return
-    if not confirmed:
-        return
-    var completion: SteamStatsSubmissionResult = result.submit()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamStatsSubmission = completion.value
-    if payload == null:
-        return
-    apply_completion.call(payload)
+
+    steam_status.text = "Victory! Steam accepted %d progression updates." % result.value.applied
 ```

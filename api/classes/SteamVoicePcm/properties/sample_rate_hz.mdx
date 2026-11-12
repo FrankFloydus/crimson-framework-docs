@@ -22,16 +22,3 @@ var sample_rate_hz: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_sample_rate_hz()`](/api/classes/SteamVoicePcm/methods/get_sample_rate_hz) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_sample_rate_hz(
-    steam_voice_pcm: SteamVoicePcm,
-    sample_rate_hz_label: Label
-) -> void:
-    var sample_rate_hz: int = steam_voice_pcm.sample_rate_hz
-    sample_rate_hz_label.text = "Sample rate hz: %s" % str(sample_rate_hz)
-```

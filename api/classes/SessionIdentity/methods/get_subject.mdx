@@ -18,13 +18,3 @@ get_subject() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_subject(session_identity: SessionIdentity, subject_label: Label) -> void:
-    var result: String = session_identity.get_subject()
-    subject_label.text = "Subject: %s" % str(result)
-```

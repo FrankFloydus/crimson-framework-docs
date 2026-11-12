@@ -28,18 +28,3 @@ var allow_rotation: bool = true
 ## Description
 
 Defaults to true.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_allow_rotation(
-    spatial_inventory_actions: SpatialInventoryActions,
-    new_allow_rotation: bool,
-    status_label: Label
-) -> void:
-    spatial_inventory_actions.allow_rotation = new_allow_rotation
-    var active_allow_rotation: bool = spatial_inventory_actions.allow_rotation
-    status_label.text = "Allow rotation: yes" if active_allow_rotation else "Allow rotation: no"
-```

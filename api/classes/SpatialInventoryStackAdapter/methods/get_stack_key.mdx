@@ -24,17 +24,3 @@ get_stack_key(id: StringName) -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_stack_key(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    id: StringName,
-    stack_key_label: Label
-) -> void:
-    var result: StringName = spatial_inventory_stack_adapter.get_stack_key(id)
-    stack_key_label.text = "Stack key: %s" % str(result)
-```

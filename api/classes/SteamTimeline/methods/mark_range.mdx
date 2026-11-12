@@ -26,32 +26,3 @@ mark_range(title: String, duration_seconds: float, options: TimelineMarkerOption
 ## Return value
 
 [`SteamTimelineEventResult`](/api/classes/SteamTimelineEventResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_mark_range(
-    steam_client: SteamClient,
-    title: String,
-    duration_seconds: float,
-    options: TimelineMarkerOptions,
-    apply_mark_range: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: SteamTimelineEventResult = steam_timeline.mark_range(title, duration_seconds, options)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamTimelineEvent = result.value
-    if payload == null:
-        return
-    apply_mark_range.call(payload)
-```

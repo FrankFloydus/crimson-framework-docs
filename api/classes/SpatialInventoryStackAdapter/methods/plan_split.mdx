@@ -30,21 +30,3 @@ plan_split(source_id: StringName, new_id: StringName, amount: int) -> Dictionary
 ## Description
 
 The amount must be positive and less than the source quantity. Returns an `error` code and, on success, a plan for one of the split commit methods.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_plan_split(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    source_id: StringName,
-    new_id: StringName,
-    amount: int,
-    apply_plan_split: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_stack_adapter.plan_split(source_id, new_id, amount)
-    if result.is_empty():
-        return
-    apply_plan_split.call(result)
-```

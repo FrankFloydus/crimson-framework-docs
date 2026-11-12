@@ -30,21 +30,3 @@ static boot(settings: SteamPublisherSettings) -> SteamPublisherResult
 ## Description
 
 Resolves the credential on the first request.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_boot(settings: SteamPublisherSettings, apply_boot: Callable) -> void:
-    var result: SteamPublisherResult = SteamPublisher.boot(settings)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamPublisher = result.value
-    if payload == null:
-        return
-    apply_boot.call(payload)
-```

@@ -33,32 +33,4 @@ Await the call to receive [`SteamSharedCloudFileResult`](/api/classes/SteamShare
 
 `handle` is a canonical unsigned decimal UGC handle, such as one returned by `share()`. `max_bytes` limits bytes copied into the result and must be between 1 and `MAX_FILE_BYTES`. Steam may download the content to its own cache before its size can be validated. Supply `expected_name` to require an exact filename match. A valid portable filename is required for every download. Use `download_shared_file()` to retain an operation for cancellation.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_download_shared(
-    steam_client: SteamClient,
-    handle: String,
-    max_bytes: int,
-    expected_name: String,
-    name_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_cloud: SteamCloud = steam_client.cloud()
-    if steam_cloud == null:
-        return
-    var result: SteamSharedCloudFileResult = await steam_cloud.download_shared(handle, max_bytes, expected_name)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamSharedCloudFile = result.value
-    if payload == null:
-        return
-    var name: String = payload.name
-    name_label.text = "Name: %s" % str(name)
-```
+[See gameplay examples for `SteamCloud`](/api/classes/SteamCloud#examples).

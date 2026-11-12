@@ -31,35 +31,4 @@ download_shared_file(handle: String, max_bytes: int = 16777216, expected_name: S
 
 The handle remains reserved until Steam reports completion and the local Steam cache entry is closed.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_download_shared_file(
-    steam_client: SteamClient,
-    handle: String,
-    max_bytes: int,
-    expected_name: String,
-    name_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_cloud: SteamCloud = steam_client.cloud()
-    if steam_cloud == null:
-        return
-    var result: SteamSharedCloudFileOperation = steam_cloud.download_shared_file(handle, max_bytes, expected_name)
-    if result == null:
-        return
-    var result_value: SteamSharedCloudFileResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamSharedCloudFile = result_value.value
-    if payload == null:
-        return
-    var name: String = payload.name
-    name_label.text = "Name: %s" % str(name)
-```
+[See gameplay examples for `SteamCloud`](/api/classes/SteamCloud#examples).

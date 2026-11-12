@@ -26,24 +26,3 @@ var value: SteamDlcProgress
 ## Description
 
 An error result has a `null` payload.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_dlc_progress_result: SteamDlcProgressResult,
-    total_bytes_label: Label
-) -> void:
-    if steam_dlc_progress_result == null:
-        return
-    if not steam_dlc_progress_result.ok:
-        push_warning(steam_dlc_progress_result.message)
-        return
-    var value: SteamDlcProgress = steam_dlc_progress_result.value
-    if value == null:
-        return
-    var total_bytes: int = value.total_bytes
-    total_bytes_label.text = "Total bytes: %s" % str(total_bytes)
-```

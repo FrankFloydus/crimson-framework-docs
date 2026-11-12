@@ -32,32 +32,3 @@ Await the call to receive [`SteamPartyBeaconResult`](/api/classes/SteamPartyBeac
 ## Description
 
 The listing must be this Game scope's live owned non-private Steam lobby. Choose a currently eligible location and one to 64 unreserved seats within authority capacity. A process can publish one beacon at a time.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_publish(
-    steam_client: SteamClient,
-    listing: SteamListing,
-    location: SteamPartyLocation,
-    open_slots: int,
-    apply_publish: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_parties: SteamParties = steam_client.parties()
-    if steam_parties == null:
-        return
-    var result: SteamPartyBeaconResult = await steam_parties.publish(listing, location, open_slots)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamPartyBeacon = result.value
-    if payload == null:
-        return
-    apply_publish.call(payload)
-```

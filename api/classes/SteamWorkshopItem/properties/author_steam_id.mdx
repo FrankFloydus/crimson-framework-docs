@@ -27,15 +27,4 @@ var author_steam_id: String
 
 An empty string indicates that Steam supplied no author.
 
-## Example
-
-```gdscript
-extends Node
-
-func refresh_author_steam_id(
-    steam_workshop_item: SteamWorkshopItem,
-    apply_author_steam_id: Callable
-) -> void:
-    var author_steam_id: String = steam_workshop_item.author_steam_id
-    apply_author_steam_id.call(author_steam_id)
-```
+[See gameplay examples for `SteamWorkshopItem`](/api/classes/SteamWorkshopItem#examples).

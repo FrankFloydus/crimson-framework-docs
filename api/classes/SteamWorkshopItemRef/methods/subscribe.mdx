@@ -25,24 +25,4 @@ Await the call to receive [`SteamWorkshopSubscriptionResult`](/api/classes/Steam
 
 The result confirms the subscription. Use `install()` to wait for a current local directory.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_subscribe(
-    steam_workshop_item_ref: SteamWorkshopItemRef,
-    published_id_label: Label
-) -> void:
-    var result: SteamWorkshopSubscriptionResult = await steam_workshop_item_ref.subscribe()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamWorkshopSubscription = result.value
-    if payload == null:
-        return
-    var published_id: String = payload.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```
+[See gameplay examples for `SteamWorkshopItemRef`](/api/classes/SteamWorkshopItemRef#examples).

@@ -22,16 +22,3 @@ get_identity() -> SteamIdentity
 ## Return value
 
 [`SteamIdentity`](/api/classes/SteamIdentity)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_identity(steam_ownership: SteamOwnership, app_id_label: Label) -> void:
-    var result: SteamIdentity = steam_ownership.get_identity()
-    if result == null:
-        return
-    var app_id: int = result.app_id
-    app_id_label.text = "App id: %s" % str(app_id)
-```

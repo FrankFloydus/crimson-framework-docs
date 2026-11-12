@@ -32,27 +32,3 @@ request_list(profile: String, slot: String, before_sequence: String = "", before
 ## Description
 
 The terminal result includes `value` for entries, `status` for the head, `truncated`, and `next`. For the next page, pass both identity strings from `next`. The limit must be positive. The coordinator caps the page size at 16.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_request_list(
-    save_coordinator: SaveCoordinator,
-    profile: String,
-    slot: String,
-    before_sequence: String,
-    before_generation_id: String,
-    limit: int,
-    request_list_label: Label
-) -> void:
-    var result: int = save_coordinator.request_list(
-        profile,
-        slot,
-        before_sequence,
-        before_generation_id,
-        limit,
-    )
-    request_list_label.text = "Request list: %s" % str(result)
-```

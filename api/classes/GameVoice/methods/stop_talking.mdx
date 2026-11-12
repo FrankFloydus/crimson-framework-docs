@@ -22,19 +22,3 @@ stop_talking() -> Error
 ## Description
 
 Any final native audio is discarded by the capture scope.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_stop_talking(game_runtime: GameRuntime, status_label: Label) -> void:
-    var game_voice: GameVoice = game_runtime.voice()
-    if game_voice == null:
-        return
-    var result: Error = game_voice.stop_talking()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Stop talking accepted."
-```

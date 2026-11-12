@@ -19,14 +19,4 @@ http() -> SteamHttp
 
 [`SteamHttp`](/api/classes/SteamHttp)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_http(steam_client: SteamClient, apply_http: Callable) -> void:
-    var result: SteamHttp = steam_client.http()
-    if result == null:
-        return
-    apply_http.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

@@ -31,21 +31,3 @@ static make_metadata(label: String, saved_at_utc: int, context: Dictionary, scre
 ## Description
 
 Pass an optional `Image` from your game to include a compact RGB565 preview when it fits the metadata budget. Pass the result to a [`SaveCoordinator`](/api/classes/SaveCoordinator) save request.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_make_metadata(
-    label: String,
-    saved_at_utc: int,
-    context: Dictionary,
-    screenshot: Image,
-    apply_make_metadata: Callable
-) -> void:
-    var result: Dictionary = SavePresentation.make_metadata(label, saved_at_utc, context, screenshot)
-    if result.is_empty():
-        return
-    apply_make_metadata.call(result)
-```

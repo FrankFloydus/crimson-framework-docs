@@ -28,19 +28,3 @@ expect_peer(steam_id: String) -> SteamSocketEndpoint
 ## Description
 
 Returns `null` for an invalid account or P2P route. Apply the returned route to `SteamSockets.connect_to()`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_expect_peer(
-    steam_socket_endpoint: SteamSocketEndpoint,
-    steam_id: String,
-    apply_expect_peer: Callable
-) -> void:
-    var result: SteamSocketEndpoint = steam_socket_endpoint.expect_peer(steam_id)
-    if result == null:
-        return
-    apply_expect_peer.call(result)
-```

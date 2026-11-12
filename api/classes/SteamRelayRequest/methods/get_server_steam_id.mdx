@@ -18,16 +18,3 @@ get_server_steam_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_server_steam_id(
-    steam_relay_request: SteamRelayRequest,
-    apply_server_steam_id: Callable
-) -> void:
-    var result: String = steam_relay_request.get_server_steam_id()
-    apply_server_steam_id.call(result)
-```

@@ -25,20 +25,108 @@ var value: SteamServerDetails
 
 ## Example
 
-```gdscript
-extends Node
+### Let the player pick a nearby arena server
 
-func refresh_value(
-    steam_server_details_result: SteamServerDetailsResult,
-    apply_value: Callable
-) -> void:
-    if steam_server_details_result == null:
+In the arena menu, refresh to find nearby servers with an open seat, then select an arena and join it. Use the AppID, namespace, and game definition of your [advertised server](/steam/dedicated-servers#list-the-server-in-steam).
+
+```gdscript
+extends Control
+
+const APP_ID: int = 480
+const SESSION_NAMESPACE: String = "my-studio-arena"
+const MAX_PING_MS: int = 120
+const MIN_FREE_SEATS: int = 1
+
+@export var game_definition: GameDefinition
+@export var refresh_button: Button
+@export var join_button: Button
+@export var server_rows: ItemList
+@export var status_label: Label
+
+var _game: GameRuntime
+var _browser: SteamServerBrowser
+var _listings: Array[SteamListing] = []
+
+
+func _ready() -> void:
+    refresh_button.disabled = true
+    join_button.disabled = true
+    var provider: SteamProvider = SteamProvider.configure().for_app(APP_ID)
+    provider = provider.with_lobby_namespace(SESSION_NAMESPACE)
+    _game = game_definition.with_provider(provider).boot(self)
+    if _game == null:
+        status_label.text = "Could not prepare the arena session."
         return
-    if not steam_server_details_result.ok:
-        push_warning(steam_server_details_result.message)
+
+    var steam: SteamScope = SteamServices.for_game(_game)
+    if steam == null or not steam.is_ready():
+        status_label.text = "Start Steam and launch the game again."
         return
-    var value: SteamServerDetails = steam_server_details_result.value
-    if value == null:
+    _browser = steam.server_browser()
+    if _browser == null or not _browser.is_available():
+        status_label.text = "The Steam server browser is unavailable."
         return
-    apply_value.call(value)
+
+    refresh_button.pressed.connect(_refresh)
+    join_button.pressed.connect(_join_selected)
+    server_rows.item_selected.connect(_on_server_selected)
+    refresh_button.disabled = false
+    status_label.text = "Refresh to find nearby arenas."
+
+
+func _refresh() -> void:
+    refresh_button.disabled = true
+    join_button.disabled = true
+    server_rows.clear()
+    _listings.clear()
+    status_label.text = "Finding nearby arenas…"
+
+    var query: SteamServerQuery = _browser.query()
+    query = query.on_map(game_definition.starting_world)
+    query = query.with_room_for(MIN_FREE_SEATS).under_latency(MAX_PING_MS)
+    var found: SteamListingsResult = await query.fetch()
+    refresh_button.disabled = false
+    if not found.ok:
+        status_label.text = found.message
+        return
+
+    for listing: SteamListing in found.value:
+        _listings.append(listing)
+        server_rows.add_item("%s (%d ms)" % [listing.name, listing.ping_ms])
+    if _listings.is_empty():
+        status_label.text = "No nearby arenas with an open seat."
+    else:
+        status_label.text = "Select an arena to join."
+
+
+func _on_server_selected(_row: int) -> void:
+    join_button.disabled = refresh_button.disabled
+
+
+func _join_selected() -> void:
+    var selected_rows: PackedInt32Array = server_rows.get_selected_items()
+    if selected_rows.is_empty():
+        return
+    refresh_button.disabled = true
+    join_button.disabled = true
+    status_label.text = "Checking the selected arena…"
+
+    var selected: SteamListing = _listings[selected_rows[0]]
+    var checked: SteamServerDetailsResult = await _browser.inspect(selected).wait()
+    if not checked.ok:
+        status_label.text = checked.message
+        refresh_button.disabled = false
+        join_button.disabled = false
+        return
+
+    status_label.text = "Joining %s (%d ms)…" % [
+        checked.value.listing.name, checked.value.ping_ms
+    ]
+    var joined: Dictionary = await _game.join_listing(checked.value.listing).wait()
+    if not joined.ok:
+        status_label.text = joined.message
+        refresh_button.disabled = false
+        join_button.disabled = false
+        return
+    status_label.text = "Joined the arena."
 ```

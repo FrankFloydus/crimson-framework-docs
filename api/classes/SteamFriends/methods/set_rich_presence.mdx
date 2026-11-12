@@ -29,26 +29,3 @@ set_rich_presence(key: String, value: String) -> Error
 ## Description
 
 Both must be nonempty UTF-8 strings within Steam's byte limits. Returns `@GlobalScope.OK` when Steam accepts the update. Setting a managed key explicitly removes it from [`SteamPresence`](/api/classes/SteamPresence) ownership. Use `clear_rich_presence()` to remove a key. The Game provider reserves `connect`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_rich_presence(
-    steam_client: SteamClient,
-    key: String,
-    value: String,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_friends: SteamFriends = steam_client.friends()
-    if steam_friends == null:
-        return
-    var result: Error = steam_friends.set_rich_presence(key, value)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set rich presence accepted."
-```

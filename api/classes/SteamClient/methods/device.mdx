@@ -19,15 +19,4 @@ device() -> SteamDevice
 
 [`SteamDevice`](/api/classes/SteamDevice)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_device(steam_client: SteamClient, hardware_label: Label) -> void:
-    var result: SteamDevice = steam_client.device()
-    if result == null:
-        return
-    var hardware: SteamDevice.Hardware = result.hardware()
-    hardware_label.text = "Hardware: %s" % str(hardware)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

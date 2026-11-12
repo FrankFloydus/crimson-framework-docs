@@ -20,18 +20,3 @@ get_backpack() -> SpatialInventory
 ## Return value
 
 [`SpatialInventory`](/api/classes/SpatialInventory)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_backpack(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    apply_backpack: Callable
-) -> void:
-    var result: SpatialInventory = spatial_inventory_equipment.get_backpack()
-    if result == null:
-        return
-    apply_backpack.call(result)
-```

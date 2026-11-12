@@ -22,18 +22,3 @@ current_language() -> String
 ## Description
 
 For the Steam client interface language, use `SteamUtils.ui_language()`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_current_language(steam_client: SteamClient, current_language_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_apps: SteamApps = steam_client.apps()
-    if steam_apps == null:
-        return
-    var result: String = steam_apps.current_language()
-    current_language_label.text = "Current language: %s" % str(result)
-```

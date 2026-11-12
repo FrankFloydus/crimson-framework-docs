@@ -31,23 +31,4 @@ Await the call to receive [`SteamStringResult`](/api/classes/SteamStringResult).
 
 Use this with bytes intended to be shared, such as a leaderboard replay. A published handle can remain usable after local file deletion. Use `share_file()` to retain an operation for cancellation.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_share(steam_client: SteamClient, name: String, share_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_cloud: SteamCloud = steam_client.cloud()
-    if steam_cloud == null:
-        return
-    var result: SteamStringResult = await steam_cloud.share(name)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: String = result.value
-    share_label.text = "Share: %s" % str(payload)
-```
+[See gameplay examples for `SteamCloud`](/api/classes/SteamCloud#examples).

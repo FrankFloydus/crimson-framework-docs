@@ -32,32 +32,3 @@ grant(player: SteamIdentity, definition_ids: PackedInt32Array, request_id: Strin
 ## Description
 
 Supply 1 to 256 published `definition_ids` and a nonzero unsigned decimal `request_id`. The result contains the actual item rows Steam reports after bundle and generator expansion. Repeat the same request ID and definitions for a retry of this award.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_grant(
-    steam_publisher: SteamPublisher,
-    player: SteamIdentity,
-    definition_ids: PackedInt32Array,
-    request_id: String,
-    apply_grant: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_inventory: SteamPublisherInventory = steam_publisher.inventory()
-    if steam_publisher_inventory == null:
-        return
-    var result: SteamInventoryChangeResult = await steam_publisher_inventory.grant(player, definition_ids, request_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventoryChange = result.value
-    if payload == null:
-        return
-    apply_grant.call(payload)
-```

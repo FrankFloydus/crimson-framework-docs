@@ -22,26 +22,3 @@ definitions() -> Variant
 ## Description
 
 Requests in the same scope share an in-flight load. A successful catalog may be empty.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_definitions(steam_client: SteamClient, results_list: ItemList) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_inventory: SteamInventory = steam_client.inventory()
-    if steam_inventory == null:
-        return
-    var result: SteamItemDefinitionsResult = await steam_inventory.definitions()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: Array[SteamItemDefinition] = result.value
-    results_list.clear()
-    for entry: SteamItemDefinition in payload:
-        results_list.add_item(str(entry.display_name))
-```

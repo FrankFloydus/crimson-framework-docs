@@ -28,18 +28,3 @@ var batch_policy: Callable = Callable()
 ## Description
 
 Return an empty String to approve the batch.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_batch_policy(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    new_batch_policy: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_staging.batch_policy = new_batch_policy
-    var active_batch_policy: Callable = spatial_inventory_staging.batch_policy
-    action_button.disabled = not active_batch_policy.is_valid()
-```

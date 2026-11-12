@@ -22,13 +22,3 @@ var total_bytes: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_total_bytes()`](/api/classes/SteamCloudQuota/methods/get_total_bytes) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_total_bytes(steam_cloud_quota: SteamCloudQuota, total_bytes_label: Label) -> void:
-    var total_bytes: int = steam_cloud_quota.total_bytes
-    total_bytes_label.text = "Total bytes: %s" % str(total_bytes)
-```

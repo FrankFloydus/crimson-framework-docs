@@ -33,31 +33,3 @@ Await the call to receive [`SteamIdentityResult`](/api/classes/SteamIdentityResu
 ## Description
 
 Use `await` to receive [`SteamIdentityResult`](/api/classes/SteamIdentityResult). Only an accepted ticket with a valid individual SteamID issues an identity.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_verify(
-    steam_publisher: SteamPublisher,
-    ticket_bytes: PackedByteArray,
-    audience: String,
-    apply_verify: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_auth: SteamPublisherAuth = steam_publisher.auth()
-    if steam_publisher_auth == null:
-        return
-    var result: SteamIdentityResult = await steam_publisher_auth.verify(ticket_bytes, audience)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamIdentity = result.value
-    if payload == null:
-        return
-    apply_verify.call(payload)
-```

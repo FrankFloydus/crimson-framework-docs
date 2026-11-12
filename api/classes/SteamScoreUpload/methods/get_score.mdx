@@ -20,13 +20,3 @@ get_score() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_score(steam_score_upload: SteamScoreUpload, score_label: Label) -> void:
-    var result: int = steam_score_upload.get_score()
-    score_label.text = "Score: %s" % str(result)
-```

@@ -26,36 +26,3 @@ update_average_rate(name: StringName, count: float, seconds: float) -> SteamServ
 ## Return value
 
 [`SteamServerStatsEdit`](/api/classes/SteamServerStatsEdit)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_update_average_rate(
-    steam_server_player_stats: SteamServerPlayerStats,
-    name: StringName,
-    count: float,
-    seconds: float,
-    confirmed: bool,
-    status_label: Label
-) -> void:
-    var steam_server_stats_edit: SteamServerStatsEdit = steam_server_player_stats.edit()
-    if steam_server_stats_edit == null:
-        return
-    var result: SteamServerStatsEdit = steam_server_stats_edit.update_average_rate(name, count, seconds)
-    if result == null:
-        return
-    if not confirmed:
-        return
-    var completion: SteamServerStatsOperation = result.submit()
-    if completion == null:
-        return
-    var result_value: SteamServerStatsResult = await completion.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    status_label.text = "Submit succeeded."
-```

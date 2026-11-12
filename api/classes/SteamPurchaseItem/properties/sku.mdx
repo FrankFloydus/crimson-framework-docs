@@ -22,13 +22,3 @@ var sku: StringName
 | Type | `StringName` |
 | Access | Read only |
 | Getter | [`get_sku()`](/api/classes/SteamPurchaseItem/methods/get_sku) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_sku(steam_purchase_item: SteamPurchaseItem, sku_label: Label) -> void:
-    var sku: StringName = steam_purchase_item.sku
-    sku_label.text = "Sku: %s" % str(sku)
-```

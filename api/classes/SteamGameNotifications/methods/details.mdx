@@ -26,33 +26,3 @@ details(session_id: String) -> SteamNotificationSessionOperation
 ## Return value
 
 [`SteamNotificationSessionOperation`](/api/classes/SteamNotificationSessionOperation)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_details(
-    steam_publisher: SteamPublisher,
-    session_id: String,
-    apply_details: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_game_notifications: SteamGameNotifications = steam_publisher.game_notifications()
-    if steam_game_notifications == null:
-        return
-    var result: SteamNotificationSessionOperation = steam_game_notifications.details(session_id)
-    if result == null:
-        return
-    var result_value: SteamNotificationSessionResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamNotificationSession = result_value.value
-    if payload == null:
-        return
-    apply_details.call(payload)
-```

@@ -19,15 +19,4 @@ get_local_character_id() -> String
 
 `String`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_local_character_id(
-    game_runtime: GameRuntime,
-    local_character_id_label: Label
-) -> void:
-    var result: String = game_runtime.get_local_character_id()
-    local_character_id_label.text = "Local character id: %s" % str(result)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

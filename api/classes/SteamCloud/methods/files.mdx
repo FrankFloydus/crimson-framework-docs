@@ -30,30 +30,4 @@ files(offset: int = 0, limit: int = 64) -> SteamCloudFilesResult
 
 `offset` is a nonnegative zero-based index. `limit` must be between 1 and `MAX_PAGE_FILES`. An offset at or beyond the last file returns an empty successful page. The file list can change between requests.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_files(
-    steam_client: SteamClient,
-    offset: int,
-    limit: int,
-    results_list: ItemList
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_cloud: SteamCloud = steam_client.cloud()
-    if steam_cloud == null:
-        return
-    var result: SteamCloudFilesResult = steam_cloud.files(offset, limit)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: Array[SteamCloudFile] = result.value
-    results_list.clear()
-    for entry: SteamCloudFile in payload:
-        results_list.add_item(str(entry.name))
-```
+[See gameplay examples for `SteamCloud`](/api/classes/SteamCloud#examples).

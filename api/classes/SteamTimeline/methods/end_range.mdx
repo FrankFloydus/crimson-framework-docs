@@ -25,26 +25,3 @@ end_range(event: SteamTimelineEvent, offset_seconds: float = 0.0) -> Error
 ## Return value
 
 `Error`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_end_range(
-    steam_client: SteamClient,
-    event: SteamTimelineEvent,
-    offset_seconds: float,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: Error = steam_timeline.end_range(event, offset_seconds)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "End range accepted."
-```

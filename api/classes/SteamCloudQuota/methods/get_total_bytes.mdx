@@ -20,13 +20,3 @@ get_total_bytes() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_total_bytes(steam_cloud_quota: SteamCloudQuota, total_bytes_label: Label) -> void:
-    var result: int = steam_cloud_quota.get_total_bytes()
-    total_bytes_label.text = "Total bytes: %s" % str(result)
-```

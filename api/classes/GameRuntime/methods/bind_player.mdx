@@ -30,20 +30,4 @@ bind_player(peer: int, player_id: String) -> Error
 
 The caller supplies the verified identity. Returns a Godot Error.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_bind_player(
-    game_runtime: GameRuntime,
-    peer: int,
-    player_id: String,
-    status_label: Label
-) -> void:
-    var result: Error = game_runtime.bind_player(peer, player_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Bind player accepted."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

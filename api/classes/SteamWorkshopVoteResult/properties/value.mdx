@@ -22,24 +22,3 @@ var value: SteamWorkshopVote
 | Type | [`SteamWorkshopVote`](/api/classes/SteamWorkshopVote) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamWorkshopVoteResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_workshop_vote_result: SteamWorkshopVoteResult,
-    published_id_label: Label
-) -> void:
-    if steam_workshop_vote_result == null:
-        return
-    if not steam_workshop_vote_result.ok:
-        push_warning(steam_workshop_vote_result.message)
-        return
-    var value: SteamWorkshopVote = steam_workshop_vote_result.value
-    if value == null:
-        return
-    var published_id: String = value.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```

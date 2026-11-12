@@ -28,19 +28,3 @@ cancel(actor: int) -> Dictionary
 ## Description
 
 Active cancellation attempts to return offers to the owners, with recovery grids available when a backpack cannot accept the return.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    apply_cancel: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_trade.cancel(actor)
-    if result.is_empty():
-        return
-    apply_cancel.call(result)
-```

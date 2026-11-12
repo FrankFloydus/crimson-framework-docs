@@ -23,15 +23,4 @@ leave() -> Error
 
 Observe session\_ended after leaving an active session. If cancelling an online lookup before the session starts, observe the startup operation. Returns a Godot Error.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_leave(game_runtime: GameRuntime, status_label: Label) -> void:
-    var result: Error = game_runtime.leave()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Leave accepted."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

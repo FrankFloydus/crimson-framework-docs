@@ -27,13 +27,3 @@ var steam_id: String = ""
 ## Description
 
 Read `SteamSocketConnection.steam_id` after authentication for the certified account.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_steam_id(steam_socket_offer: SteamSocketOffer, apply_steam_id: Callable) -> void:
-    var steam_id: String = steam_socket_offer.steam_id
-    apply_steam_id.call(steam_id)
-```

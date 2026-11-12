@@ -18,13 +18,3 @@ is_client_ready() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_client_ready(state_replication: StateReplication, status_label: Label) -> void:
-    var result: bool = state_replication.is_client_ready()
-    status_label.text = "Client ready: yes" if result else "Client ready: no"
-```

@@ -27,21 +27,4 @@ check_placement(footprint: Vector2i, origin: Vector2i, rotated: bool = false) ->
 
 `Error`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_check_placement(
-    spatial_inventory: SpatialInventory,
-    footprint: Vector2i,
-    origin: Vector2i,
-    rotated: bool,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory.check_placement(footprint, origin, rotated)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Check placement accepted."
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

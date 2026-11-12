@@ -22,21 +22,3 @@ var value: SteamListing
 | Type | [`SteamListing`](/api/classes/SteamListing) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamListingResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_listing_result: SteamListingResult, name_label: Label) -> void:
-    if steam_listing_result == null:
-        return
-    if not steam_listing_result.ok:
-        push_warning(steam_listing_result.message)
-        return
-    var value: SteamListing = steam_listing_result.value
-    if value == null:
-        return
-    var name: String = value.name
-    name_label.text = "Name: %s" % str(name)
-```

@@ -31,23 +31,3 @@ stage_from(source: SpatialInventory, id: StringName, origin: Vector2i, rotated: 
 ## Description
 
 Returns an error if the item is missing, already tracked, blocked by a policy, or does not fit.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_stage_from(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    source: SpatialInventory,
-    id: StringName,
-    origin: Vector2i,
-    rotated: bool,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_staging.stage_from(source, id, origin, rotated)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Stage from accepted."
-```

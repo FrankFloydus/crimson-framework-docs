@@ -22,18 +22,3 @@ is_available() -> bool
 ## Description
 
 The Steam app must enable Together features for invites and separate input.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_available(steam_client: SteamClient, action_button: Button) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_remote_play: SteamRemotePlay = steam_client.remote_play()
-    if steam_remote_play == null:
-        return
-    var result: bool = steam_remote_play.is_available()
-    action_button.disabled = not result
-```

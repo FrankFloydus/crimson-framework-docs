@@ -26,16 +26,3 @@ var total_count: int
 ## Description
 
 Use `SteamLeaderboard.metadata()` for the board's total entry count.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_total_count(
-    steam_leaderboard_page: SteamLeaderboardPage,
-    total_count_label: Label
-) -> void:
-    var total_count: int = steam_leaderboard_page.total_count
-    total_count_label.text = "Total count: %s" % str(total_count)
-```

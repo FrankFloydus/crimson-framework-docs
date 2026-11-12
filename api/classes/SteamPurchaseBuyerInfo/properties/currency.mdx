@@ -25,16 +25,3 @@ var currency: String = ""
 | Access | Read only |
 | Default | `""` |
 | Getter | [`get_currency()`](/api/classes/SteamPurchaseBuyerInfo/methods/get_currency) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_currency(
-    steam_purchase_buyer_info: SteamPurchaseBuyerInfo,
-    currency_label: Label
-) -> void:
-    var currency: String = steam_purchase_buyer_info.currency
-    currency_label.text = "Currency: %s" % str(currency)
-```

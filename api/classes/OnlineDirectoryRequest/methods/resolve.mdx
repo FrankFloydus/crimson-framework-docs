@@ -28,20 +28,3 @@ resolve(target: SessionEndpoint) -> Error
 ## Description
 
 Returns a Godot Error when the request is invalid or no longer pending.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_resolve(
-    online_directory_request: OnlineDirectoryRequest,
-    target: SessionEndpoint,
-    status_label: Label
-) -> void:
-    var result: Error = online_directory_request.resolve(target)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Resolve accepted."
-```

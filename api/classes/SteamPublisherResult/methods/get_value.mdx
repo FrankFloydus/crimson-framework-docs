@@ -22,20 +22,3 @@ get_value() -> SteamPublisher
 ## Return value
 
 [`SteamPublisher`](/api/classes/SteamPublisher)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_publisher_result: SteamPublisherResult, apply_value: Callable) -> void:
-    if steam_publisher_result == null:
-        return
-    if not steam_publisher_result.ok:
-        push_warning(steam_publisher_result.message)
-        return
-    var result: SteamPublisher = steam_publisher_result.get_value()
-    if result == null:
-        return
-    apply_value.call(result)
-```

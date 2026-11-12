@@ -28,20 +28,3 @@ set_transport_adapter(adapter: SessionTransport) -> Error
 ## Description
 
 Pass null to use ENet. Offline startup always uses Godot's offline peer. Returns ERR\_BUSY unless the session is idle and no start or teardown is in progress.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_transport_adapter(
-    game_session: GameSession,
-    adapter: SessionTransport,
-    status_label: Label
-) -> void:
-    var result: Error = game_session.set_transport_adapter(adapter)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set transport adapter accepted."
-```

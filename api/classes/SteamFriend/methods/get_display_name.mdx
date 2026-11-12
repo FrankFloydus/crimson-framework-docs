@@ -20,13 +20,3 @@ get_display_name() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_display_name(steam_friend: SteamFriend, display_name_label: Label) -> void:
-    var result: String = steam_friend.get_display_name()
-    display_name_label.text = "Display name: %s" % str(result)
-```

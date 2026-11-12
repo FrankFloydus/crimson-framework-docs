@@ -28,18 +28,3 @@ var slot_requirements: Callable = Callable()
 ## Description
 
 Return all occupied slot IDs or a denial string. By default an item occupies just the requested slot.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_slot_requirements(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    new_slot_requirements: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_equipment.slot_requirements = new_slot_requirements
-    var active_slot_requirements: Callable = spatial_inventory_equipment.slot_requirements
-    action_button.disabled = not active_slot_requirements.is_valid()
-```

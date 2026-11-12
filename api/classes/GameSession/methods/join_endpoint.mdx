@@ -29,21 +29,3 @@ join_endpoint(endpoint: SessionEndpoint, timeout_seconds: float = 10.0) -> Error
 ## Description
 
 The timeout is in seconds and must be greater than 0 and at most 120. A null endpoint or invalid timeout returns ERR\_INVALID\_PARAMETER. OK means the attempt started. Wait for session\_started to confirm admission.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_join_endpoint(
-    game_session: GameSession,
-    endpoint: SessionEndpoint,
-    timeout_seconds: float,
-    status_label: Label
-) -> void:
-    var result: Error = game_session.join_endpoint(endpoint, timeout_seconds)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Join endpoint accepted."
-```

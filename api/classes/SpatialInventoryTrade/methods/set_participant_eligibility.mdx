@@ -26,18 +26,3 @@ set_participant_eligibility(value: Callable) -> void
 ## Description
 
 Return an empty string to allow the action or a reason to deny it.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_participant_eligibility(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    value: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_trade.set_participant_eligibility(value)
-    var active_participant_eligibility: Callable = spatial_inventory_trade.participant_eligibility
-    action_button.disabled = not active_participant_eligibility.is_valid()
-```

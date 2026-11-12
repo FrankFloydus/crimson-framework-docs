@@ -26,23 +26,3 @@ var value: SteamVoiceFrame
 ## Description
 
 Empty polls and errors leave the value null.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_voice_frame_result: SteamVoiceFrameResult,
-    apply_value: Callable
-) -> void:
-    if steam_voice_frame_result == null:
-        return
-    if not steam_voice_frame_result.ok:
-        push_warning(steam_voice_frame_result.message)
-        return
-    var value: SteamVoiceFrame = steam_voice_frame_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

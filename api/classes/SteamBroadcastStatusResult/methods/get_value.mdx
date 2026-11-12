@@ -20,24 +20,3 @@ get_value() -> SteamBroadcastStatus
 ## Return value
 
 [`SteamBroadcastStatus`](/api/classes/SteamBroadcastStatus)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_broadcast_status_result: SteamBroadcastStatusResult,
-    viewers_label: Label
-) -> void:
-    if steam_broadcast_status_result == null:
-        return
-    if not steam_broadcast_status_result.ok:
-        push_warning(steam_broadcast_status_result.message)
-        return
-    var result: SteamBroadcastStatus = steam_broadcast_status_result.get_value()
-    if result == null:
-        return
-    var viewers: int = result.get_viewers()
-    viewers_label.text = "Viewers: %s" % str(viewers)
-```

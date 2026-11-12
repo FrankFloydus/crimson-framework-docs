@@ -24,16 +24,3 @@ var app_id: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_app_id()`](/api/classes/SteamModerationReceipt/methods/get_app_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_app_id(
-    steam_moderation_receipt: SteamModerationReceipt,
-    apply_app_id: Callable
-) -> void:
-    var app_id: int = steam_moderation_receipt.app_id
-    apply_app_id.call(app_id)
-```

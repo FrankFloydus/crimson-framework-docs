@@ -28,23 +28,3 @@ poll_input(limit: int = 64) -> SteamRemotePlayInputEvent[]
 ## Description
 
 The owner that enabled separate input can consume up to the requested limit, capped at 256. A nonpositive limit or unavailable scope yields an empty batch. Unknown SDK events are skipped.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_poll_input(
-    steam_client: SteamClient,
-    limit: int,
-    add_poll_input_entry: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_remote_play: SteamRemotePlay = steam_client.remote_play()
-    if steam_remote_play == null:
-        return
-    var result: Array[SteamRemotePlayInputEvent] = steam_remote_play.poll_input(limit)
-    for entry: SteamRemotePlayInputEvent in result:
-        add_poll_input_entry.call(entry)
-```

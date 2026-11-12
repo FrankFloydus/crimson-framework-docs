@@ -31,19 +31,3 @@ static create(status: SteamNotificationClaim.Status, session_id: String = "") ->
 ## Description
 
 A committed decision includes the original provider session ID.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    status: SteamNotificationClaim.Status,
-    session_id: String,
-    apply_create: Callable
-) -> void:
-    var result: SteamNotificationClaim = SteamNotificationClaim.create(status, session_id)
-    if result == null:
-        return
-    apply_create.call(result)
-```

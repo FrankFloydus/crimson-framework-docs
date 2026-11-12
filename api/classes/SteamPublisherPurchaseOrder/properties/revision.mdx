@@ -29,16 +29,3 @@ var revision: int = 0
 ## Description
 
 The reservation begins at zero.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_revision(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_revision: Callable
-) -> void:
-    var revision: int = steam_publisher_purchase_order.revision
-    apply_revision.call(revision)
-```

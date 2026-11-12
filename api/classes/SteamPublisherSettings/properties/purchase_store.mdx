@@ -29,20 +29,3 @@ var purchase_store: SteamPurchaseStore
 ## Description
 
 The default null leaves Steam Wallet actions unavailable.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_purchase_store(
-    steam_publisher_settings: SteamPublisherSettings,
-    new_purchase_store: SteamPurchaseStore,
-    apply_purchase_store: Callable
-) -> void:
-    steam_publisher_settings.purchase_store = new_purchase_store
-    var active_purchase_store: SteamPurchaseStore = steam_publisher_settings.purchase_store
-    if active_purchase_store == null:
-        return
-    apply_purchase_store.call(active_purchase_store)
-```

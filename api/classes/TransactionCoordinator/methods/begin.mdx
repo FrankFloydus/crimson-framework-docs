@@ -31,15 +31,76 @@ Returns `null` if called from another thread, during protected mutation, or with
 
 ## Example
 
-```gdscript
-extends Node
+### Spend scrap to repair a bridge
 
-func run_begin(game_runtime: GameRuntime, context: Dictionary, apply_begin: Callable) -> void:
-    var transaction_coordinator: TransactionCoordinator = game_runtime.get_transactions()
-    if transaction_coordinator == null:
+Press **Repair Bridge** to commit the scrap cost and the repair together. On success, the barricade disappears and the supply label shows the remaining scrap.
+
+```gdscript
+extends Node3D
+
+const SUPPLIES: String = "supplies"
+const BRIDGES: String = "bridges"
+const STARTING_SCRAP: int = 10
+const REPAIR_COST: int = 6
+
+@export var repair_button: Button
+@export var barricade: Node3D
+@export var supply_status: Label
+
+var _stores: TransactionCoordinator = TransactionCoordinator.new()
+
+
+func _ready() -> void:
+    repair_button.disabled = true
+    var error: Error = _stores.register_store(
+        SUPPLIES, {"scrap": STARTING_SCRAP}, _prepare_supplies
+    )
+    if error == OK:
+        error = _stores.register_store(BRIDGES, {"repaired": false}, _prepare_bridge)
+    if error != OK:
+        supply_status.text = error_string(error)
         return
-    var result: GameTransaction = transaction_coordinator.begin(context)
-    if result == null:
+    repair_button.pressed.connect(_repair_bridge)
+    repair_button.disabled = false
+    supply_status.text = "Repair the bridge for %d scrap." % REPAIR_COST
+
+
+func _repair_bridge() -> void:
+    var transaction: GameTransaction = _stores.begin()
+    var error: Error = transaction.add_change(
+        SUPPLIES, {"cost": REPAIR_COST}, _stores.get_store_revision(SUPPLIES)
+    )
+    if error == OK:
+        error = transaction.add_change(
+            BRIDGES, {"repair": true}, _stores.get_store_revision(BRIDGES)
+        )
+    if error != OK:
+        supply_status.text = error_string(error)
         return
-    apply_begin.call(result)
+    var result: Dictionary = _stores.commit(transaction)
+    if not result.ok:
+        supply_status.text = result.message
+        return
+
+    var supplies: Dictionary = _stores.read_store(SUPPLIES)
+    barricade.queue_free()
+    repair_button.disabled = true
+    supply_status.text = "Bridge open. Scrap remaining: %d" % int(supplies.scrap)
+
+
+func _prepare_supplies(current: Dictionary, operations: Array, _context: Dictionary) -> Dictionary:
+    for operation: Dictionary in operations:
+        var cost: int = operation.get("cost", 0)
+        if cost <= 0 or cost > int(current.scrap):
+            return {"ok": false, "message": "You need more scrap to repair the bridge."}
+        current.scrap -= cost
+    return {"ok": true, "state": current}
+
+
+func _prepare_bridge(current: Dictionary, operations: Array, _context: Dictionary) -> Dictionary:
+    for operation: Dictionary in operations:
+        if current.repaired or not operation.get("repair", false):
+            return {"ok": false, "message": "The bridge is already repaired."}
+        current.repaired = true
+    return {"ok": true, "state": current}
 ```

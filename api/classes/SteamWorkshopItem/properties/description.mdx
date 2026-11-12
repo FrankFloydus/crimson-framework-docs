@@ -23,15 +23,4 @@ var description: String
 | Access | Read only |
 | Getter | [`get_description()`](/api/classes/SteamWorkshopItem/methods/get_description) |
 
-## Example
-
-```gdscript
-extends Node
-
-func refresh_description(
-    steam_workshop_item: SteamWorkshopItem,
-    description_label: Label
-) -> void:
-    var description: String = steam_workshop_item.description
-    description_label.text = "Description: %s" % str(description)
-```
+[See gameplay examples for `SteamWorkshopItem`](/api/classes/SteamWorkshopItem#examples).

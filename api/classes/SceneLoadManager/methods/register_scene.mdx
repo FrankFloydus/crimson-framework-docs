@@ -32,45 +32,61 @@ IDs are 1 to 64 ASCII characters, begin with a letter or digit, and can contain 
 
 ## Example
 
+### Load the caves when the player crosses the village gate
+
+When a body in the `player` group crosses the village gate, the loader swaps the village for the caves. Keep the player, camera, and gate outside the world container.
+
 ```gdscript
-extends Node
+extends Node3D
 
-const TRAINING_ROOM_ID: StringName = &"training_room"
+const VILLAGE: StringName = &"village"
+const CAVES: StringName = &"caves"
+const PLAYER_GROUP: StringName = &"player"
 
-# Assign a persistent node for the mounted World and select a local scene.
-@export var world_container: Node
-@export_file("*.tscn", "*.scn") var training_room_path: String = ""
+@export var world_container: Node3D
+@export_file("*.tscn") var village_scene: String
+@export_file("*.tscn") var caves_scene: String
+@export var village_gate: Area3D
+@export var zone_label: Label
 
 var _loader: SceneLoadManager
 
-func _ready() -> void:
-    if world_container == null or training_room_path.is_empty():
-        push_error("Assign the world container and a local training-room scene.")
-        return
 
+func _ready() -> void:
     _loader = SceneLoadManager.new()
     add_child(_loader)
-    var container_status: Error = _loader.set_world_container(world_container)
-    if container_status != OK:
-        push_error(error_string(container_status))
-        return
 
-    var registered: Error = _loader.register_scene(TRAINING_ROOM_ID, training_room_path)
-    if registered != OK:
-        push_error(error_string(registered))
+    var error: Error = _loader.set_world_container(world_container)
+    if error == OK:
+        error = _loader.register_scene(VILLAGE, village_scene)
+    if error == OK:
+        error = _loader.register_scene(CAVES, caves_scene)
+    if error != OK:
+        zone_label.text = error_string(error)
         return
 
     _loader.load_completed.connect(_on_load_completed)
     _loader.load_failed.connect(_on_load_failed)
-    var admitted: Error = _loader.request_load(TRAINING_ROOM_ID)
-    if admitted != OK:
-        push_warning(error_string(admitted))
+    village_gate.body_entered.connect(_on_gate_entered)
+    _load(VILLAGE)
+
+
+func _on_gate_entered(body: Node3D) -> void:
+    if not body.is_in_group(PLAYER_GROUP) or _loader.is_loading():
+        return
+    if _loader.get_current_scene_id() == VILLAGE:
+        _load(CAVES)
+
+
+func _load(scene_id: StringName) -> void:
+    var error: Error = _loader.request_load(scene_id)
+    zone_label.text = "Loading…" if error == OK else error_string(error)
+
 
 func _on_load_completed(scene_id: StringName) -> void:
-    var world: Node = _loader.get_current_scene()
-    if world != null:
-        print("Mounted ", scene_id, " under ", world.get_parent().name)
+    zone_label.text = "Caves" if scene_id == CAVES else "Village"
+
 
 func _on_load_failed(_scene_id: StringName, _error: int, message: String) -> void:
-    push_warning(message)
+    zone_label.text = message
 ```

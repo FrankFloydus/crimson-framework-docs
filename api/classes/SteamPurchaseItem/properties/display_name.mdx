@@ -22,16 +22,3 @@ var display_name: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_display_name()`](/api/classes/SteamPurchaseItem/methods/get_display_name) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_display_name(
-    steam_purchase_item: SteamPurchaseItem,
-    display_name_label: Label
-) -> void:
-    var display_name: String = steam_purchase_item.display_name
-    display_name_label.text = "Display name: %s" % str(display_name)
-```

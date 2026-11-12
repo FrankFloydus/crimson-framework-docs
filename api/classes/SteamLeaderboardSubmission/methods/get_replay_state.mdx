@@ -24,16 +24,3 @@ get_replay_state() -> SteamLeaderboardSubmission.ReplayState
 ## Description
 
 Check this even when the result reports an attachment failure.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_replay_state(
-    steam_leaderboard_submission: SteamLeaderboardSubmission,
-    replay_state_label: Label
-) -> void:
-    var result: SteamLeaderboardSubmission.ReplayState = steam_leaderboard_submission.get_replay_state()
-    replay_state_label.text = "Replay state: %s" % str(result)
-```

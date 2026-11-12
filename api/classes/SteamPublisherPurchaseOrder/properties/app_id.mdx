@@ -25,16 +25,3 @@ var app_id: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_app_id()`](/api/classes/SteamPublisherPurchaseOrder/methods/get_app_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_app_id(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_app_id: Callable
-) -> void:
-    var app_id: int = steam_publisher_purchase_order.app_id
-    apply_app_id.call(app_id)
-```

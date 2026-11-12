@@ -24,20 +24,3 @@ set_host(host: SteamPublisherHost) -> void
 | Parameter | Type | Default |
 | --- | --- | --- |
 | `host` | [`SteamPublisherHost`](/api/classes/SteamPublisherHost) | — |
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_host(
-    steam_publisher_settings: SteamPublisherSettings,
-    host: SteamPublisherHost,
-    apply_host: Callable
-) -> void:
-    steam_publisher_settings.set_host(host)
-    var active_host: SteamPublisherHost = steam_publisher_settings.host
-    if active_host == null:
-        return
-    apply_host.call(active_host)
-```

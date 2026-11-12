@@ -25,16 +25,3 @@ var action: SteamModerationRequest.Action = 3
 | Access | Read only |
 | Default | `3` |
 | Getter | [`get_action()`](/api/classes/SteamModerationReceipt/methods/get_action) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_action(
-    steam_moderation_receipt: SteamModerationReceipt,
-    apply_action: Callable
-) -> void:
-    var action: SteamModerationRequest.Action = steam_moderation_receipt.action
-    apply_action.call(action)
-```

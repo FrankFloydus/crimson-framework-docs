@@ -24,16 +24,3 @@ var report_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_report_id()`](/api/classes/SteamModerationRequest/methods/get_report_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_report_id(
-    steam_moderation_request: SteamModerationRequest,
-    apply_report_id: Callable
-) -> void:
-    var report_id: String = steam_moderation_request.report_id
-    apply_report_id.call(report_id)
-```

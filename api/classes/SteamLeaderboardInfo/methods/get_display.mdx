@@ -20,16 +20,3 @@ get_display() -> SteamLeaderboards.Display
 ## Return value
 
 `SteamLeaderboards.Display`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_display(
-    steam_leaderboard_info: SteamLeaderboardInfo,
-    display_label: Label
-) -> void:
-    var result: SteamLeaderboards.Display = steam_leaderboard_info.get_display()
-    display_label.text = "Display: %s" % str(result)
-```

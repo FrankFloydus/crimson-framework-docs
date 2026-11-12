@@ -34,36 +34,3 @@ static create(app_id: int, environment: SteamPublisherSettings.Environment, orde
 ## Return value
 
 [`SteamPublisherPurchaseOrder`](/api/classes/SteamPublisherPurchaseOrder)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    app_id: int,
-    environment: SteamPublisherSettings.Environment,
-    order_id: String,
-    steam_id: String,
-    checkout_id: String,
-    currency: String,
-    language: String,
-    lines: Array[SteamPublisherPurchaseLine],
-    tax_basis: SteamPublisherPurchaseOrder.TaxBasis,
-    apply_create: Callable
-) -> void:
-    var result: SteamPublisherPurchaseOrder = SteamPublisherPurchaseOrder.create(
-        app_id,
-        environment,
-        order_id,
-        steam_id,
-        checkout_id,
-        currency,
-        language,
-        lines,
-        tax_basis,
-    )
-    if result == null:
-        return
-    apply_create.call(result)
-```

@@ -26,19 +26,3 @@ var upload: SteamScoreUpload
 ## Description
 
 Publisher acknowledgments can leave this null.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_upload(
-    steam_leaderboard_submission: SteamLeaderboardSubmission,
-    score_label: Label
-) -> void:
-    var upload: SteamScoreUpload = steam_leaderboard_submission.upload
-    if upload == null:
-        return
-    var score: int = upload.score
-    score_label.text = "Score: %s" % str(score)
-```

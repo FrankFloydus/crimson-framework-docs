@@ -22,19 +22,3 @@ start_talking() -> Error
 ## Description
 
 Requires a ready Steam participant in an online world. An occupied process microphone returns `ERR_BUSY`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_start_talking(game_runtime: GameRuntime, status_label: Label) -> void:
-    var game_voice: GameVoice = game_runtime.voice()
-    if game_voice == null:
-        return
-    var result: Error = game_voice.start_talking()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Start talking accepted."
-```

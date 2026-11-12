@@ -22,20 +22,3 @@ relay_status() -> SteamRelayStatus
 ## Description
 
 An inactive or unsupported scope returns an unknown snapshot.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_relay_status(steam_scope: SteamScope, apply_relay_status: Callable) -> void:
-    if not steam_scope.is_ready():
-        return
-    var steam_networking: SteamNetworking = steam_scope.networking()
-    if steam_networking == null:
-        return
-    var result: SteamRelayStatus = steam_networking.relay_status()
-    if result == null:
-        return
-    apply_relay_status.call(result)
-```

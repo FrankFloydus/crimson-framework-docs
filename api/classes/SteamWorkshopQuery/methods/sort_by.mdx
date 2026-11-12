@@ -28,28 +28,3 @@ sort_by(sort: SteamWorkshopQuery.Sort) -> SteamWorkshopQuery
 ## Description
 
 Browsing defaults to `RATING`, and a text search defaults to `RELEVANCE`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_sort_by(
-    steam_workshop_query: SteamWorkshopQuery,
-    sort: SteamWorkshopQuery.Sort,
-    apply_completion: Callable
-) -> void:
-    var result: SteamWorkshopQuery = steam_workshop_query.sort_by(sort)
-    if result == null:
-        return
-    var completion: SteamWorkshopPageResult = await result.fetch()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamWorkshopPage = completion.value
-    if payload == null:
-        return
-    apply_completion.call(payload)
-```

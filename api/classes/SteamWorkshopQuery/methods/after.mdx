@@ -28,28 +28,3 @@ after(cursor: String) -> SteamWorkshopQuery
 ## Description
 
 An empty cursor starts from the first page. `cursor` supports up to 255 UTF-8 bytes.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_after(
-    steam_workshop_query: SteamWorkshopQuery,
-    cursor: String,
-    apply_completion: Callable
-) -> void:
-    var result: SteamWorkshopQuery = steam_workshop_query.after(cursor)
-    if result == null:
-        return
-    var completion: SteamWorkshopPageResult = await result.fetch()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamWorkshopPage = completion.value
-    if payload == null:
-        return
-    apply_completion.call(payload)
-```

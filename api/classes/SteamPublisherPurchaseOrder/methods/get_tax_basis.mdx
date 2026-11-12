@@ -26,16 +26,3 @@ get_tax_basis() -> SteamPublisherPurchaseOrder.TaxBasis
 ## Description
 
 Defaults to `NET`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_tax_basis(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_tax_basis: Callable
-) -> void:
-    var result: SteamPublisherPurchaseOrder.TaxBasis = steam_publisher_purchase_order.get_tax_basis()
-    apply_tax_basis.call(result)
-```

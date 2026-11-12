@@ -24,31 +24,3 @@ recording_operation(event: SteamTimelineEvent) -> SteamTimelineOperation
 ## Return value
 
 [`SteamTimelineOperation`](/api/classes/SteamTimelineOperation)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_recording_operation(
-    steam_client: SteamClient,
-    event: SteamTimelineEvent,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: SteamTimelineOperation = steam_timeline.recording_operation(event)
-    if result == null:
-        return
-    var result_value: SteamBoolResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: bool = result_value.value
-    status_label.text = "Recording operation: yes" if payload else "Recording operation: no"
-```

@@ -22,16 +22,3 @@ get_order_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_order_id(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_order_id: Callable
-) -> void:
-    var result: String = steam_publisher_purchase_order.get_order_id()
-    apply_order_id.call(result)
-```

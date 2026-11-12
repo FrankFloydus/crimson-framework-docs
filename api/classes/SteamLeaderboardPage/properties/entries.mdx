@@ -26,17 +26,3 @@ var entries: SteamLeaderboardEntry[]
 ## Description
 
 It remains readable after the Steam client stops.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_entries(
-    steam_leaderboard_page: SteamLeaderboardPage,
-    add_entries_entry: Callable
-) -> void:
-    var entries: Array[SteamLeaderboardEntry] = steam_leaderboard_page.entries
-    for entry: SteamLeaderboardEntry in entries:
-        add_entries_entry.call(entry)
-```

@@ -25,16 +25,3 @@ var phase: SteamPublisherPurchaseOrder.Phase = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_phase()`](/api/classes/SteamPublisherPurchaseOrder/methods/get_phase) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_phase(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_phase: Callable
-) -> void:
-    var phase: SteamPublisherPurchaseOrder.Phase = steam_publisher_purchase_order.phase
-    apply_phase.call(phase)
-```

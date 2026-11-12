@@ -28,25 +28,3 @@ set_separate_input(enabled: bool) -> Error
 ## Description
 
 Return `ERR_BUSY` while another scope owns the process input mode. Stopping the owner also restores merged input.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_separate_input(
-    steam_client: SteamClient,
-    enabled: bool,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_remote_play: SteamRemotePlay = steam_client.remote_play()
-    if steam_remote_play == null:
-        return
-    var result: Error = steam_remote_play.set_separate_input(enabled)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set separate input accepted."
-```

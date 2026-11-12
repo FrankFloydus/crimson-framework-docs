@@ -23,15 +23,46 @@ get_multiplayer_rules() -> MultiplayerRules
 
 ## Example
 
-```gdscript
-extends Node
+### Show the rules in a co-op pause menu
 
-func run_get_multiplayer_rules(
-    game_definition: GameDefinition,
-    apply_multiplayer_rules: Callable
-) -> void:
-    var result: MultiplayerRules = game_definition.get_multiplayer_rules()
-    if result == null:
+Open the pause menu in a running co-op game to see how many seats the host configured and whether guests can still join.
+
+```gdscript
+extends Control
+
+const MENU_ACTION: StringName = &"ui_cancel"
+
+@export var game: GameRuntime
+@export var rules_label: Label
+@export var resume_button: Button
+
+
+func _ready() -> void:
+    hide()
+    resume_button.pressed.connect(hide)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+    if not event.is_action_pressed(MENU_ACTION):
         return
-    apply_multiplayer_rules.call(result)
+    if not is_instance_valid(game) or game.get_local_player() == null:
+        return
+
+    get_viewport().set_input_as_handled()
+    if visible:
+        hide()
+        return
+
+    var definition: GameDefinition = game.get_definition()
+    var rules: MultiplayerRules = definition.get_multiplayer_rules()
+    if rules == null:
+        rules_label.text = "Solo session"
+    else:
+        var drop_in: String = "Open" if rules.get_join_in_progress() else "Closed"
+        rules_label.text = "Co-op capacity: %d\nUDP port: %d\nDrop-in: %s" % [
+            rules.get_max_players(), rules.get_port(), drop_in
+        ]
+
+    show()
+    resume_button.grab_focus()
 ```

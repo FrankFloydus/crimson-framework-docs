@@ -28,19 +28,3 @@ get_split_limits(id: StringName) -> Dictionary
 ## Description
 
 A split leaves at least one unit in the source.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_split_limits(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    id: StringName,
-    apply_split_limits: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_stack_adapter.get_split_limits(id)
-    if result.is_empty():
-        return
-    apply_split_limits.call(result)
-```

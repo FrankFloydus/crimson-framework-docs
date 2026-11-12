@@ -22,16 +22,3 @@ var available_bytes: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_available_bytes()`](/api/classes/SteamCloudQuota/methods/get_available_bytes) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_available_bytes(
-    steam_cloud_quota: SteamCloudQuota,
-    available_bytes_label: Label
-) -> void:
-    var available_bytes: int = steam_cloud_quota.available_bytes
-    available_bytes_label.text = "Available bytes: %s" % str(available_bytes)
-```

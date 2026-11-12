@@ -31,21 +31,4 @@ register_command(name: String, handler: Callable, requires_primary: bool = false
 
 The handler receives the trusted player ID and the intent dictionary. Set requires\_primary to require a current primary character assignment. Returns a Godot Error.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_register_command(
-    game_runtime: GameRuntime,
-    name: String,
-    handler: Callable,
-    requires_primary: bool,
-    status_label: Label
-) -> void:
-    var result: Error = game_runtime.register_command(name, handler, requires_primary)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Register command accepted."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

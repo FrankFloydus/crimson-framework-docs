@@ -20,25 +20,3 @@ wait() -> Variant
 `Variant`
 
 Await the call to receive [`SteamSharedCloudFileResult`](/api/classes/SteamSharedCloudFileResult).
-
-## Example
-
-```gdscript
-extends Node
-
-func run_wait(
-    steam_shared_cloud_file_operation: SteamSharedCloudFileOperation,
-    name_label: Label
-) -> void:
-    var result: SteamSharedCloudFileResult = await steam_shared_cloud_file_operation.wait()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamSharedCloudFile = result.value
-    if payload == null:
-        return
-    var name: String = payload.name
-    name_label.text = "Name: %s" % str(name)
-```

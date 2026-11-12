@@ -22,16 +22,3 @@ var listing: SteamListing
 | Type | [`SteamListing`](/api/classes/SteamListing) |
 | Access | Read only |
 | Getter | [`get_listing()`](/api/classes/SteamInvite/methods/get_listing) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_listing(steam_invite: SteamInvite, name_label: Label) -> void:
-    var listing: SteamListing = steam_invite.listing
-    if listing == null:
-        return
-    var name: String = listing.name
-    name_label.text = "Name: %s" % str(name)
-```

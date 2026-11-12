@@ -28,18 +28,3 @@ set_publisher_key_ref(publisher_key_ref: StringName) -> void
 ## Description
 
 Required for Steam partner Web API calls.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_publisher_key_ref(
-    steam_publisher_settings: SteamPublisherSettings,
-    publisher_key_ref: StringName,
-    apply_publisher_key_ref: Callable
-) -> void:
-    steam_publisher_settings.set_publisher_key_ref(publisher_key_ref)
-    var active_publisher_key_ref: StringName = steam_publisher_settings.publisher_key_ref
-    apply_publisher_key_ref.call(active_publisher_key_ref)
-```

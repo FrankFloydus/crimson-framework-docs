@@ -26,16 +26,3 @@ var submitted_score: int
 ## Description
 
 Check `upload` for any native rank or change information.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_submitted_score(
-    steam_leaderboard_submission: SteamLeaderboardSubmission,
-    submitted_score_label: Label
-) -> void:
-    var submitted_score: int = steam_leaderboard_submission.submitted_score
-    submitted_score_label.text = "Submitted score: %s" % str(submitted_score)
-```

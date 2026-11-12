@@ -18,16 +18,3 @@ cancel() -> Error
 ## Return value
 
 `Error`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(steam_timeline_operation: SteamTimelineOperation, status_label: Label) -> void:
-    var result: Error = steam_timeline_operation.cancel()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Cancel accepted."
-```

@@ -23,14 +23,4 @@ diagnostics() -> SteamDiagnostics
 
 Call `SteamDiagnostics.start()` to enable capture.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_diagnostics(steam_client: SteamClient, apply_diagnostics: Callable) -> void:
-    var result: SteamDiagnostics = steam_client.diagnostics()
-    if result == null:
-        return
-    apply_diagnostics.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

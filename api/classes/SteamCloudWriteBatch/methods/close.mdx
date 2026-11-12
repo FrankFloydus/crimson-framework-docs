@@ -22,16 +22,3 @@ close() -> Error
 ## Description
 
 Returns `OK` for a closed handle. Returns `ERR_BUSY` when called from another thread while open, or `ERR_UNAVAILABLE` if Steam could not acknowledge closure.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_close(steam_cloud_write_batch: SteamCloudWriteBatch, status_label: Label) -> void:
-    var result: Error = steam_cloud_write_batch.close()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Close accepted."
-```

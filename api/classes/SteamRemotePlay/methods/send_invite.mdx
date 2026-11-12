@@ -28,21 +28,3 @@ send_invite(steam_id: String) -> Error
 ## Description
 
 A malformed or local ID returns `ERR_INVALID_PARAMETER`. Return `FAILED` when Steam declines the invitation. Successful submission does not indicate that the guest connected.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_send_invite(steam_client: SteamClient, steam_id: String, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_remote_play: SteamRemotePlay = steam_client.remote_play()
-    if steam_remote_play == null:
-        return
-    var result: Error = steam_remote_play.send_invite(steam_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Send invite accepted."
-```

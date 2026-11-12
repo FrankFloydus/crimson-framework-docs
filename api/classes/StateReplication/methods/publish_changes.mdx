@@ -28,20 +28,3 @@ publish_changes(committed_revision: int) -> Error
 ## Description
 
 Peers with a pending baseline catch up after acknowledgment. Hidden-only changes leave the recipient's delivery sequence unchanged. Returns the first delivery error and invalidates readiness for affected peers.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_publish_changes(
-    state_replication: StateReplication,
-    committed_revision: int,
-    status_label: Label
-) -> void:
-    var result: Error = state_replication.publish_changes(committed_revision)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Publish changes accepted."
-```

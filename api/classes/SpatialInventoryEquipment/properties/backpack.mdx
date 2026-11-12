@@ -22,18 +22,3 @@ var backpack: SpatialInventory
 | Type | [`SpatialInventory`](/api/classes/SpatialInventory) |
 | Access | Read only |
 | Getter | [`get_backpack()`](/api/classes/SpatialInventoryEquipment/methods/get_backpack) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_backpack(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    apply_backpack: Callable
-) -> void:
-    var backpack: SpatialInventory = spatial_inventory_equipment.backpack
-    if backpack == null:
-        return
-    apply_backpack.call(backpack)
-```

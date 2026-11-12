@@ -20,16 +20,3 @@ get_annotations_accepted() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_annotations_accepted(
-    steam_screenshot: SteamScreenshot,
-    status_label: Label
-) -> void:
-    var result: bool = steam_screenshot.get_annotations_accepted()
-    status_label.text = "Annotations accepted: yes" if result else "Annotations accepted: no"
-```

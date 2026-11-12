@@ -31,25 +31,3 @@ request_inspect_generation(profile: String, slot: String, sequence: String, gene
 ## Description
 
 An absent generation reports `NotFound` in the terminal result. Use this after a save reports `CommitUnknown` to check the returned generation identity before retrying.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_request_inspect_generation(
-    save_coordinator: SaveCoordinator,
-    profile: String,
-    slot: String,
-    sequence: String,
-    generation_id: String,
-    request_inspect_generation_label: Label
-) -> void:
-    var result: int = save_coordinator.request_inspect_generation(
-        profile,
-        slot,
-        sequence,
-        generation_id,
-    )
-    request_inspect_generation_label.text = "Request inspect generation: %s" % str(result)
-```

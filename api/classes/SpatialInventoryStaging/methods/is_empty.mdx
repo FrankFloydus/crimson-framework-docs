@@ -18,16 +18,3 @@ is_empty() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_empty(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    status_label: Label
-) -> void:
-    var result: bool = spatial_inventory_staging.is_empty()
-    status_label.text = "Empty: yes" if result else "Empty: no"
-```

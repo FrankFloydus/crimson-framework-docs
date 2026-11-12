@@ -26,13 +26,3 @@ var hidden: bool
 ## Description
 
 Defaults to `false` when Steam omits the flag. Use it with `unlocked` to decide whether to show its name and description.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_hidden(steam_achievement: SteamAchievement, status_label: Label) -> void:
-    var hidden: bool = steam_achievement.hidden
-    status_label.text = "Hidden: yes" if hidden else "Hidden: no"
-```

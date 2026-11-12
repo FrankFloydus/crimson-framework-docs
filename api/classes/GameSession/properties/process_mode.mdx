@@ -25,18 +25,3 @@ var process_mode: Node.ProcessMode = 3
 | Inherited from | `Node` |
 | Getter | `get_process_mode()` |
 | Setter | `set_process_mode()` |
-
-## Example
-
-```gdscript
-extends Node
-
-func update_process_mode(
-    game_session: GameSession,
-    new_process_mode: Node.ProcessMode,
-    process_mode_label: Label
-) -> void:
-    game_session.process_mode = new_process_mode
-    var active_process_mode: Node.ProcessMode = game_session.process_mode
-    process_mode_label.text = "Process mode: %s" % str(active_process_mode)
-```

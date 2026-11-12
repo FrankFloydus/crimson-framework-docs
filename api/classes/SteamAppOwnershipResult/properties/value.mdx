@@ -28,24 +28,3 @@ var value: SteamAppOwnership
 ## Description
 
 Null when the request failed.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_app_ownership_result: SteamAppOwnershipResult,
-    app_id_label: Label
-) -> void:
-    if steam_app_ownership_result == null:
-        return
-    if not steam_app_ownership_result.ok:
-        push_warning(steam_app_ownership_result.message)
-        return
-    var value: SteamAppOwnership = steam_app_ownership_result.value
-    if value == null:
-        return
-    var app_id: int = value.app_id
-    app_id_label.text = "App id: %s" % str(app_id)
-```

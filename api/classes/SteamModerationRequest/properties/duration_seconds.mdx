@@ -24,16 +24,3 @@ var duration_seconds: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_duration_seconds()`](/api/classes/SteamModerationRequest/methods/get_duration_seconds) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_duration_seconds(
-    steam_moderation_request: SteamModerationRequest,
-    apply_duration_seconds: Callable
-) -> void:
-    var duration_seconds: int = steam_moderation_request.duration_seconds
-    apply_duration_seconds.call(duration_seconds)
-```

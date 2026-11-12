@@ -30,22 +30,3 @@ configure(coordinator: TransactionCoordinator, store_id: String, initial_snapsho
 ## Description
 
 Returns a Godot Error.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_configure(
-    inventory_transaction_adapter: InventoryTransactionAdapter,
-    coordinator: TransactionCoordinator,
-    store_id: String,
-    initial_snapshot: Dictionary,
-    status_label: Label
-) -> void:
-    var result: Error = inventory_transaction_adapter.configure(coordinator, store_id, initial_snapshot)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Configure accepted."
-```

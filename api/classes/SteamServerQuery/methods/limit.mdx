@@ -29,30 +29,4 @@ limit(count: int) -> SteamServerQuery
 
 The default is 50.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_limit(
-    steam_server_browser: SteamServerBrowser,
-    count: int,
-    results_list: ItemList
-) -> void:
-    var steam_server_query: SteamServerQuery = steam_server_browser.query()
-    if steam_server_query == null:
-        return
-    var result: SteamServerQuery = steam_server_query.limit(count)
-    if result == null:
-        return
-    var completion: SteamListingsResult = await result.fetch()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: Array[SteamListing] = completion.value
-    results_list.clear()
-    for entry: SteamListing in payload:
-        results_list.add_item(str(entry.name))
-```
+[See gameplay examples for `SteamServerQuery`](/api/classes/SteamServerQuery#examples).

@@ -28,26 +28,3 @@ change_open_slots(slots: int) -> SteamPartySlotsOperation
 ## Description
 
 The count cannot exceed current authority capacity after outstanding reservations. Await the operation to observe Steam's response.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_change_open_slots(
-    steam_party_beacon: SteamPartyBeacon,
-    slots: int,
-    status_label: Label
-) -> void:
-    var result: SteamPartySlotsOperation = steam_party_beacon.change_open_slots(slots)
-    if result == null:
-        return
-    var result_value: SteamBoolResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: bool = result_value.value
-    status_label.text = "Change open slots: yes" if payload else "Change open slots: no"
-```

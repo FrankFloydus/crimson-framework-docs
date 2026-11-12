@@ -27,16 +27,3 @@ var has_absolute_position: bool = false
 ## Description
 
 Values range from 0 to 1 in each dimension. False for relative-only motion and all other samples.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_absolute_position(
-    steam_remote_play_input_event: SteamRemotePlayInputEvent,
-    status_label: Label
-) -> void:
-    var absolute_position: bool = steam_remote_play_input_event.has_absolute_position
-    status_label.text = "Absolute position: yes" if absolute_position else "Absolute position: no"
-```

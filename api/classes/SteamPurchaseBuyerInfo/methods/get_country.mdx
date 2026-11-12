@@ -22,16 +22,3 @@ get_country() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_country(
-    steam_purchase_buyer_info: SteamPurchaseBuyerInfo,
-    country_label: Label
-) -> void:
-    var result: String = steam_purchase_buyer_info.get_country()
-    country_label.text = "Country: %s" % str(result)
-```

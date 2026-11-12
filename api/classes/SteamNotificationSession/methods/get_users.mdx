@@ -22,17 +22,3 @@ get_users() -> SteamNotificationParticipant[]
 ## Return value
 
 `SteamNotificationParticipant[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_users(
-    steam_notification_session: SteamNotificationSession,
-    add_users_entry: Callable
-) -> void:
-    var result: Array[SteamNotificationParticipant] = steam_notification_session.get_users()
-    for entry: SteamNotificationParticipant in result:
-        add_users_entry.call(entry)
-```

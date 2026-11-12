@@ -20,16 +20,3 @@ get_priority() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_priority(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    priority_label: Label
-) -> void:
-    var result: int = timeline_marker_presentation.get_priority()
-    priority_label.text = "Priority: %s" % str(result)
-```

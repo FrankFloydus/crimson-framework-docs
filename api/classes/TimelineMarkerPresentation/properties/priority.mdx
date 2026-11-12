@@ -28,18 +28,3 @@ var priority: int = 0
 ## Description
 
 Higher values are more prominent.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_priority(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    new_priority: int,
-    priority_label: Label
-) -> void:
-    timeline_marker_presentation.priority = new_priority
-    var active_priority: int = timeline_marker_presentation.priority
-    priority_label.text = "Priority: %s" % str(active_priority)
-```

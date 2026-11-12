@@ -22,16 +22,3 @@ var order_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_order_id()`](/api/classes/SteamPurchaseOutcome/methods/get_order_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_order_id(
-    steam_purchase_outcome: SteamPurchaseOutcome,
-    order_id_label: Label
-) -> void:
-    var order_id: String = steam_purchase_outcome.order_id
-    order_id_label.text = "Order id: %s" % str(order_id)
-```

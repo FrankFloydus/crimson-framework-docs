@@ -20,13 +20,3 @@ get_submitted() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_submitted(steam_text_entry: SteamTextEntry, status_label: Label) -> void:
-    var result: bool = steam_text_entry.get_submitted()
-    status_label.text = "Submitted: yes" if result else "Submitted: no"
-```

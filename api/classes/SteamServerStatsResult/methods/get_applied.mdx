@@ -20,16 +20,3 @@ get_applied() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_applied(
-    steam_server_stats_result: SteamServerStatsResult,
-    applied_label: Label
-) -> void:
-    var result: int = steam_server_stats_result.get_applied()
-    applied_label.text = "Applied: %s" % str(result)
-```

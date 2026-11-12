@@ -22,16 +22,3 @@ is_loaded() -> bool
 ## Description
 
 Returns false before the first successful load and after Steam evicts the cache.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_loaded(
-    steam_server_player_stats: SteamServerPlayerStats,
-    status_label: Label
-) -> void:
-    var result: bool = steam_server_player_stats.is_loaded()
-    status_label.text = "Loaded: yes" if result else "Loaded: no"
-```

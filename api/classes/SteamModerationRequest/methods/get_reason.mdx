@@ -22,16 +22,3 @@ get_reason() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_reason(
-    steam_moderation_request: SteamModerationRequest,
-    apply_reason: Callable
-) -> void:
-    var result: String = steam_moderation_request.get_reason()
-    apply_reason.call(result)
-```

@@ -22,18 +22,3 @@ beta_branch() -> String
 ## Description
 
 An empty string indicates the default branch or unavailable data.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_beta_branch(steam_client: SteamClient, beta_branch_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_apps: SteamApps = steam_client.apps()
-    if steam_apps == null:
-        return
-    var result: String = steam_apps.beta_branch()
-    beta_branch_label.text = "Beta branch: %s" % str(result)
-```

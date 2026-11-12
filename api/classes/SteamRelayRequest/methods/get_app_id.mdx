@@ -18,13 +18,3 @@ get_app_id() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_app_id(steam_relay_request: SteamRelayRequest, app_id_label: Label) -> void:
-    var result: int = steam_relay_request.get_app_id()
-    app_id_label.text = "App id: %s" % str(result)
-```

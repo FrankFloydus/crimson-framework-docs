@@ -28,23 +28,3 @@ achievement(name: StringName) -> SteamBoolResult
 ## Description
 
 A locked achievement is a successful false result. A missing definition returns `ERR_DOES_NOT_EXIST`, and an unloaded cache returns `ERR_UNCONFIGURED`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_achievement(
-    steam_server_player_stats: SteamServerPlayerStats,
-    name: StringName,
-    status_label: Label
-) -> void:
-    var result: SteamBoolResult = steam_server_player_stats.achievement(name)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: bool = result.value
-    status_label.text = "Achievement: yes" if payload else "Achievement: no"
-```

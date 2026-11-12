@@ -21,17 +21,4 @@ get_starting_world_scene() -> PackedScene
 
 `PackedScene`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_starting_world_scene(
-    game_definition: GameDefinition,
-    apply_starting_world_scene: Callable
-) -> void:
-    var result: PackedScene = game_definition.get_starting_world_scene()
-    if result == null:
-        return
-    apply_starting_world_scene.call(result)
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

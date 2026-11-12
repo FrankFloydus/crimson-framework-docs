@@ -32,22 +32,4 @@ check_transfer(id: StringName, destination: SpatialInventory, origin: Vector2i, 
 
 The destination needs room for the footprint and an unused instance ID. A transfer to this grid uses `check_move()`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_check_transfer(
-    spatial_inventory: SpatialInventory,
-    id: StringName,
-    destination: SpatialInventory,
-    origin: Vector2i,
-    rotated: bool,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory.check_transfer(id, destination, origin, rotated)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Check transfer accepted."
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

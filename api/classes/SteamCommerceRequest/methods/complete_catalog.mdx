@@ -28,20 +28,3 @@ complete_catalog(result: SteamPurchaseCatalogResult) -> Error
 ## Description
 
 Repeated or retired completions return an error.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_complete_catalog(
-    steam_commerce_request: SteamCommerceRequest,
-    result: SteamPurchaseCatalogResult,
-    status_label: Label
-) -> void:
-    var result_value: Error = steam_commerce_request.complete_catalog(result)
-    if result_value != OK:
-        status_label.text = error_string(result_value)
-        return
-    status_label.text = "Complete catalog accepted."
-```

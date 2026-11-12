@@ -25,14 +25,4 @@ get_player(peer_id: int) -> Node3D
 
 `Node3D`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_player(game_runtime: GameRuntime, peer_id: int, player_label: Label) -> void:
-    var result: Node3D = game_runtime.get_player(peer_id)
-    if result == null:
-        return
-    player_label.text = str(result.name)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

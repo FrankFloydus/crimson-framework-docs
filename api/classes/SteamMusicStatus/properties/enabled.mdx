@@ -22,13 +22,3 @@ var enabled: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`is_enabled()`](/api/classes/SteamMusicStatus/methods/is_enabled) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_enabled(steam_music_status: SteamMusicStatus, action_button: Button) -> void:
-    var enabled: bool = steam_music_status.enabled
-    action_button.disabled = not enabled
-```

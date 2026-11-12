@@ -22,18 +22,3 @@ export_snapshot() -> Dictionary
 ## Description
 
 Save it alongside the backpacks and game-owned item records. Returns an empty dictionary while a change is committing.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_export_snapshot(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    apply_export_snapshot: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_trade.export_snapshot()
-    if result.is_empty():
-        return
-    apply_export_snapshot.call(result)
-```

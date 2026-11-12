@@ -22,16 +22,3 @@ fail() -> Error
 ## Description
 
 Returns a Godot Error if the request can no longer accept completion.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_fail(online_directory_request: OnlineDirectoryRequest, status_label: Label) -> void:
-    var result: Error = online_directory_request.fail()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Fail accepted."
-```

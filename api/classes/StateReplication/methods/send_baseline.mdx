@@ -28,20 +28,3 @@ send_baseline(peer_id: int) -> Error
 ## Description
 
 Returns immediate errors. Wait for `peer\_ready` before admitting that peer's commands.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_send_baseline(
-    state_replication: StateReplication,
-    peer_id: int,
-    status_label: Label
-) -> void:
-    var result: Error = state_replication.send_baseline(peer_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Send baseline accepted."
-```

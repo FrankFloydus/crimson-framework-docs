@@ -20,16 +20,3 @@ get_screenshot_count() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_screenshot_count(
-    timeline_phase_recording: TimelinePhaseRecording,
-    screenshot_count_label: Label
-) -> void:
-    var result: int = timeline_phase_recording.get_screenshot_count()
-    screenshot_count_label.text = "Screenshot count: %s" % str(result)
-```

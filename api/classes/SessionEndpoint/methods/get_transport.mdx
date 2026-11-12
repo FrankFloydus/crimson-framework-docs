@@ -22,13 +22,3 @@ get_transport() -> StringName
 ## Description
 
 Direct endpoints use `enet`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_transport(session_endpoint: SessionEndpoint, transport_label: Label) -> void:
-    var result: StringName = session_endpoint.get_transport()
-    transport_label.text = "Transport: %s" % str(result)
-```

@@ -28,19 +28,3 @@ with_checkout_id(checkout_id: String) -> SteamPurchaseCart
 ## Description
 
 Returns null if the ID is invalid.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_with_checkout_id(
-    steam_purchase_cart: SteamPurchaseCart,
-    checkout_id: String,
-    apply_checkout_id: Callable
-) -> void:
-    var result: SteamPurchaseCart = steam_purchase_cart.with_checkout_id(checkout_id)
-    if result == null:
-        return
-    apply_checkout_id.call(result)
-```

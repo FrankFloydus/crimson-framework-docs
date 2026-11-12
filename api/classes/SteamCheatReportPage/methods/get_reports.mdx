@@ -22,17 +22,3 @@ get_reports() -> SteamCheatReport[]
 ## Return value
 
 `SteamCheatReport[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_reports(
-    steam_cheat_report_page: SteamCheatReportPage,
-    add_reports_entry: Callable
-) -> void:
-    var result: Array[SteamCheatReport] = steam_cheat_report_page.get_reports()
-    for entry: SteamCheatReport in result:
-        add_reports_entry.call(entry)
-```

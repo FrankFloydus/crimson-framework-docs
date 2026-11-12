@@ -18,25 +18,3 @@ result() -> SteamItemDefinitionResult
 ## Return value
 
 [`SteamItemDefinitionResult`](/api/classes/SteamItemDefinitionResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_item_definition_operation: SteamItemDefinitionOperation,
-    display_name_label: Label
-) -> void:
-    var result: SteamItemDefinitionResult = steam_item_definition_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamItemDefinition = result.value
-    if payload == null:
-        return
-    var display_name: String = payload.display_name
-    display_name_label.text = "Display name: %s" % str(display_name)
-```

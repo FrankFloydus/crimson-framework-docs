@@ -22,16 +22,3 @@ get_acquired_at() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_acquired_at(
-    steam_app_ownership: SteamAppOwnership,
-    acquired_at_label: Label
-) -> void:
-    var result: String = steam_app_ownership.get_acquired_at()
-    acquired_at_label.text = "Acquired at: %s" % str(result)
-```

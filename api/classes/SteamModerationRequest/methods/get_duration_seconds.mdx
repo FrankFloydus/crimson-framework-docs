@@ -22,16 +22,3 @@ get_duration_seconds() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_duration_seconds(
-    steam_moderation_request: SteamModerationRequest,
-    apply_duration_seconds: Callable
-) -> void:
-    var result: int = steam_moderation_request.get_duration_seconds()
-    apply_duration_seconds.call(result)
-```

@@ -28,24 +28,3 @@ with_details(details: PackedInt32Array) -> SteamScoreOptions
 ## Description
 
 A submission accepts at most 64 signed 32-bit integers.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_with_details(
-    steam_client: SteamClient,
-    details: PackedInt32Array,
-    apply_details: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_leaderboards: SteamLeaderboards = steam_client.leaderboards()
-    if steam_leaderboards == null:
-        return
-    var result: SteamScoreOptions = steam_leaderboards.with_details(details)
-    if result == null:
-        return
-    apply_details.call(result)
-```

@@ -22,13 +22,3 @@ var state: SteamPurchaseOutcome.State
 | Type | `SteamPurchaseOutcome.State` |
 | Access | Read only |
 | Getter | [`get_state()`](/api/classes/SteamPurchaseOutcome/methods/get_state) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_state(steam_purchase_outcome: SteamPurchaseOutcome, state_label: Label) -> void:
-    var state: SteamPurchaseOutcome.State = steam_purchase_outcome.state
-    state_label.text = "State: %s" % str(state)
-```

@@ -23,15 +23,4 @@ open_offline() -> Error
 
 Use it before restore to continue from a menu without loading the default world first. Returns a Godot Error.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_open_offline(game_runtime: GameRuntime, status_label: Label) -> void:
-    var result: Error = game_runtime.open_offline()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Open offline accepted."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

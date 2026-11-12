@@ -22,16 +22,3 @@ var last_reason: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_last_reason()`](/api/classes/SpatialInventoryStaging/methods/get_last_reason) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_last_reason(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    last_reason_label: Label
-) -> void:
-    var last_reason: String = spatial_inventory_staging.last_reason
-    last_reason_label.text = "Last reason: %s" % str(last_reason)
-```

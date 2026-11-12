@@ -20,13 +20,3 @@ get_kind() -> SteamSocketEndpoint.Kind
 ## Return value
 
 `SteamSocketEndpoint.Kind`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_kind(steam_socket_endpoint: SteamSocketEndpoint, kind_label: Label) -> void:
-    var result: SteamSocketEndpoint.Kind = steam_socket_endpoint.get_kind()
-    kind_label.text = "Kind: %s" % str(result)
-```

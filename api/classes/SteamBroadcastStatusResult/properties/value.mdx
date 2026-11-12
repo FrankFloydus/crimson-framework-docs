@@ -22,23 +22,3 @@ var value: SteamBroadcastStatus
 | Type | [`SteamBroadcastStatus`](/api/classes/SteamBroadcastStatus) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamBroadcastStatusResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_broadcast_status_result: SteamBroadcastStatusResult,
-    apply_value: Callable
-) -> void:
-    if steam_broadcast_status_result == null:
-        return
-    if not steam_broadcast_status_result.ok:
-        push_warning(steam_broadcast_status_result.message)
-        return
-    var value: SteamBroadcastStatus = steam_broadcast_status_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

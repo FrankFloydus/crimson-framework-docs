@@ -29,20 +29,35 @@ Available for successful, failed, and partially applied drafts.
 
 ## Example
 
-```gdscript
-extends Node
+### Update Steam progression after a match victory
 
-func refresh_value(
-    steam_stats_submission_result: SteamStatsSubmissionResult,
-    apply_value: Callable
-) -> void:
-    if steam_stats_submission_result == null:
+After a match victory, update the player's lifetime win count and unlock the first-win achievement using [keys published in Steamworks](/steam/client-services#record-progression). The victory screen reports whether Steam accepted the update.
+
+```gdscript
+extends Control
+
+const WINS_STAT: String = "total_wins"
+const FIRST_WIN_ACHIEVEMENT: String = "first_win"
+const FIRST_WIN_COUNT: int = 1
+
+@export var steam_client: SteamClient
+@export var steam_status: Label
+
+
+func record_victory(total_wins: int) -> void:
+    if not is_instance_valid(steam_client) or not steam_client.is_online():
+        steam_status.text = "Victory! Steam progression is unavailable."
         return
-    if not steam_stats_submission_result.ok:
-        push_warning(steam_stats_submission_result.message)
+
+    var stats: SteamStats = steam_client.stats()
+    var edit: SteamStatsEdit = stats.edit().set_int(WINS_STAT, total_wins)
+    if total_wins == FIRST_WIN_COUNT:
+        edit = edit.unlock(FIRST_WIN_ACHIEVEMENT)
+
+    var result: SteamStatsSubmissionResult = edit.submit()
+    if not result.ok:
+        steam_status.text = "Victory! Steam progression update failed: %s" % result.message
         return
-    var value: SteamStatsSubmission = steam_stats_submission_result.value
-    if value == null:
-        return
-    apply_value.call(value)
+
+    steam_status.text = "Victory! Steam accepted %d progression updates." % result.value.applied
 ```

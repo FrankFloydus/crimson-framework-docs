@@ -28,23 +28,3 @@ set_recipient_policy(policy: Callable) -> Error
 ## Description
 
 An empty callable enables group delivery to eligible peers only. Supply authority-owned team or proximity state when filtering those channels.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_recipient_policy(
-    game_runtime: GameRuntime,
-    policy: Callable,
-    status_label: Label
-) -> void:
-    var game_voice: GameVoice = game_runtime.voice()
-    if game_voice == null:
-        return
-    var result: Error = game_voice.set_recipient_policy(policy)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set recipient policy accepted."
-```

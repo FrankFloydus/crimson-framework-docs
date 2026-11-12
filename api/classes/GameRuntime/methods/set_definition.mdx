@@ -23,20 +23,4 @@ set_definition(definition: GameDefinition) -> void
 | --- | --- | --- |
 | `definition` | [`GameDefinition`](/api/classes/GameDefinition) | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_definition(
-    game_runtime: GameRuntime,
-    definition: GameDefinition,
-    starting_world_label: Label
-) -> void:
-    game_runtime.set_definition(definition)
-    var active_definition: GameDefinition = game_runtime.definition
-    if active_definition == null:
-        return
-    var starting_world: StringName = active_definition.starting_world
-    starting_world_label.text = "Starting world: %s" % str(starting_world)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

@@ -22,15 +22,3 @@ get_connected_peer_ids() -> PackedInt32Array
 ## Description
 
 The scope's relay configuration determines which other guests a client sees.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_connected_peer_ids(game_session: GameSession, results_list: ItemList) -> void:
-    var result: PackedInt32Array = game_session.get_connected_peer_ids()
-    results_list.clear()
-    for entry: int in result:
-        results_list.add_item(str(entry))
-```

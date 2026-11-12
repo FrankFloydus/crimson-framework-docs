@@ -22,13 +22,3 @@ is_idle() -> bool
 ## Description
 
 Check before reconfiguring or freeing the coordinator.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_idle(save_coordinator: SaveCoordinator, status_label: Label) -> void:
-    var result: bool = save_coordinator.is_idle()
-    status_label.text = "Idle: yes" if result else "Idle: no"
-```

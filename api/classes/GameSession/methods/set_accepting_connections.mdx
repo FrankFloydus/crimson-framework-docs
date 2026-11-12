@@ -28,20 +28,3 @@ set_accepting_connections(enabled: bool) -> Error
 ## Description
 
 Returns ERR\_UNAUTHORIZED outside the host role, ERR\_BUSY if ownership changes during the call, or ERR\_UNAVAILABLE when the peer cannot apply the requested flag.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_accepting_connections(
-    game_session: GameSession,
-    enabled: bool,
-    status_label: Label
-) -> void:
-    var result: Error = game_session.set_accepting_connections(enabled)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set accepting connections accepted."
-```

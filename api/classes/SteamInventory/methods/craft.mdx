@@ -29,31 +29,3 @@ craft(output_definition_id: int, ingredients: SteamItemQuantity[]) -> Variant
 ## Description
 
 Steam validates the recipe and quantities before changing either side. Returns [`SteamInventoryChangeResult`](/api/classes/SteamInventoryChangeResult). Refresh inventory before retrying after a timeout.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_craft(
-    steam_client: SteamClient,
-    output_definition_id: int,
-    ingredients: Array[SteamItemQuantity],
-    apply_craft: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_inventory: SteamInventory = steam_client.inventory()
-    if steam_inventory == null:
-        return
-    var result: SteamInventoryChangeResult = await steam_inventory.craft(output_definition_id, ingredients)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventoryChange = result.value
-    if payload == null:
-        return
-    apply_craft.call(payload)
-```

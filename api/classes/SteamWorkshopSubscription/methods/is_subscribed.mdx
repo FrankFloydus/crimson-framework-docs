@@ -20,16 +20,3 @@ is_subscribed() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_subscribed(
-    steam_workshop_subscription: SteamWorkshopSubscription,
-    status_label: Label
-) -> void:
-    var result: bool = steam_workshop_subscription.is_subscribed()
-    status_label.text = "Subscribed: yes" if result else "Subscribed: no"
-```

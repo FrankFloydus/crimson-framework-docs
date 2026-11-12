@@ -19,17 +19,4 @@ is_available() -> bool
 
 `bool`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_is_available(steam_client: SteamClient, action_button: Button) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: bool = steam_stats.is_available()
-    action_button.disabled = not result
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

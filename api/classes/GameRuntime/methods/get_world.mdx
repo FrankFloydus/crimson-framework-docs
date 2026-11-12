@@ -23,14 +23,4 @@ get_world() -> Node
 
 Reacquire the node after travel, restore, or teardown.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_world(game_runtime: GameRuntime, world_label: Label) -> void:
-    var result: Node = game_runtime.get_world()
-    if result == null:
-        return
-    world_label.text = str(result.name)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

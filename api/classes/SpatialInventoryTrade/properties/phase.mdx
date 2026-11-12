@@ -27,13 +27,3 @@ var phase: int = 0
 ## Description
 
 Use `IDLE`, `REQUESTED`, and `ACTIVE` to check the lifecycle.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_phase(spatial_inventory_trade: SpatialInventoryTrade, phase_label: Label) -> void:
-    var phase: int = spatial_inventory_trade.phase
-    phase_label.text = "Phase: %s" % str(phase)
-```

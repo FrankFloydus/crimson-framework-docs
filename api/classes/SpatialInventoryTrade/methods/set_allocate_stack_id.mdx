@@ -22,18 +22,3 @@ set_allocate_stack_id(value: Callable) -> void
 | Parameter | Type | Default |
 | --- | --- | --- |
 | `value` | `Callable` | — |
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_allocate_stack_id(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    value: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_trade.set_allocate_stack_id(value)
-    var active_allocate_stack_id: Callable = spatial_inventory_trade.allocate_stack_id
-    action_button.disabled = not active_allocate_stack_id.is_valid()
-```

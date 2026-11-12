@@ -20,13 +20,3 @@ get_api_name() -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_api_name(steam_achievement: SteamAchievement, api_name_label: Label) -> void:
-    var result: StringName = steam_achievement.get_api_name()
-    api_name_label.text = "Api name: %s" % str(result)
-```

@@ -20,16 +20,3 @@ get_move_policy() -> Callable
 ## Return value
 
 `Callable`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_move_policy(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    action_button: Button
-) -> void:
-    var result: Callable = spatial_inventory_equipment.get_move_policy()
-    action_button.disabled = not result.is_valid()
-```

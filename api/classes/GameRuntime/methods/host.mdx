@@ -31,21 +31,4 @@ host(port: int, max_clients: int = 32, bind_address: String = "*") -> Error
 
 With ENet, port is the UDP port and \* binds all interfaces. A successful return opens the lobby for admission and player binding before start\_match.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_host(
-    game_runtime: GameRuntime,
-    port: int,
-    max_clients: int,
-    bind_address: String,
-    status_label: Label
-) -> void:
-    var result: Error = game_runtime.host(port, max_clients, bind_address)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Host accepted."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

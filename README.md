@@ -25,7 +25,9 @@ npx mint@latest broken-links --check-anchors
 
 The reference generator combines the framework's class XML prose with signatures exported by Godot from the release addon. The `scripts/api-prose/` files supply descriptions that have yet to be added to the framework's class XML. Update descriptions in the framework XML when you change a binding there. Remove any overlapping supplement when you regenerate this site.
 
-Keep the guides and the generated reference tied to the same framework release. Update affected examples, regenerate the reference, and review class and navigation changes together. Edit guides and `api/overview.mdx` directly. Edit module and service descriptions in `scripts/api-module-prose.json`. Put member examples that need setup, lifecycle steps, or a script override in `scripts/api-member-examples.json`.
+Keep the guides and the generated reference tied to the same framework release. Update affected examples, regenerate the reference, and review class and navigation changes together. Edit guides and `api/overview.mdx` directly. Edit module and service descriptions in `scripts/api-module-prose.json`.
+
+For a shared gameplay example, add an entry to `scripts/api-workflow-examples/` with a task title, a short description of the trigger and result, a complete GDScript script, and the member keys used in the script. Link to a guide if the reader needs editor steps. Member keys use the form `GameDefinition.properties.multiplayer_rules` or `GameRuntime.methods.host_game`. Shared examples take precedence over individual examples in `scripts/api-member-examples.json`.
 
 For maintenance, use a local framework checkout with the matching release tag, the Godot 4.7 console executable, and the trusted Debug publisher DLL for that release. Run from the docs repository. Here `..` is the local framework checkout.
 
@@ -35,4 +37,4 @@ $publisher = 'C:\path\to\trusted\crimson_framework.windows.template_debug.x86_64
 python scripts/generate_api.py --framework .. --ref v0.0.3 --godot $godot --publisher-dll $publisher
 ```
 
-The generator writes the module indexes, class and member pages, and sidebar navigation. It derives signatures and examples from the binding declarations. Examples use the result in a game or UI step, and authored examples cover workflows that need specific setup. Add `--check` to compare the checkout with the expected output. Add `--gaps` to list descriptions that still need prose. Use `--binding-docs` and `--publisher-binding-docs` if you already exported the Godot class XML for both builds. Run `python scripts/generate_api.py --help` for all options.
+The generator writes the module indexes, class and member pages, and sidebar navigation. It derives signatures from the binding declarations and includes authored examples where available. Add `--check` to compare the checkout with the expected output. Add `--gaps` to list descriptions that still need prose. Use `--binding-docs` and `--publisher-binding-docs` if you already exported the Godot class XML for both builds. Run `python scripts/generate_api.py --help` for all options.

@@ -22,23 +22,3 @@ var value: SteamPurchaseCatalog
 | Type | [`SteamPurchaseCatalog`](/api/classes/SteamPurchaseCatalog) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamPurchaseCatalogResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_purchase_catalog_result: SteamPurchaseCatalogResult,
-    apply_value: Callable
-) -> void:
-    if steam_purchase_catalog_result == null:
-        return
-    if not steam_purchase_catalog_result.ok:
-        push_warning(steam_purchase_catalog_result.message)
-        return
-    var value: SteamPurchaseCatalog = steam_purchase_catalog_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

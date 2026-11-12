@@ -24,18 +24,3 @@ var message: SteamLocalizedText
 | Type | [`SteamLocalizedText`](/api/classes/SteamLocalizedText) |
 | Access | Read only |
 | Getter | [`get_message()`](/api/classes/SteamNotificationParticipant/methods/get_message) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_message(
-    steam_notification_participant: SteamNotificationParticipant,
-    apply_message: Callable
-) -> void:
-    var message: SteamLocalizedText = steam_notification_participant.message
-    if message == null:
-        return
-    apply_message.call(message)
-```

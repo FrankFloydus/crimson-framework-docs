@@ -31,28 +31,3 @@ show(display_token: StringName, values: Dictionary[String, String] = {}, party_i
 ## Description
 
 To group players, provide both a nonempty `party_id` and a positive `party_size`. Use the defaults for no grouping. Replacement keys must fit Steam's byte and key limits and must avoid `connect`, `status`, and names beginning with `steam_`. Returns `@GlobalScope.ERR_BUSY` when another scope owns the status or unrelated keys leave insufficient capacity. Steam applies each key separately. `@GlobalScope.OK` acknowledges local acceptance. Configure the token in Steamworks to display the label for other players.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_show(
-    steam_client: SteamClient,
-    display_token: StringName,
-    values: Dictionary[String, String],
-    party_id: String,
-    party_size: int,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_presence: SteamPresence = steam_client.presence()
-    if steam_presence == null:
-        return
-    var result: Error = steam_presence.show(display_token, values, party_id, party_size)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Show accepted."
-```

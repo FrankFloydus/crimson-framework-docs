@@ -20,13 +20,3 @@ is_up() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_up(steam_workshop_vote: SteamWorkshopVote, status_label: Label) -> void:
-    var result: bool = steam_workshop_vote.is_up()
-    status_label.text = "Up: yes" if result else "Up: no"
-```

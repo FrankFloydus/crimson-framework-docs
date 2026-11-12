@@ -22,13 +22,3 @@ get_token() -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_token(steam_localized_text: SteamLocalizedText, apply_token: Callable) -> void:
-    var result: StringName = steam_localized_text.get_token()
-    apply_token.call(result)
-```

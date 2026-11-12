@@ -22,16 +22,3 @@ var entry_count: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_entry_count()`](/api/classes/SteamLeaderboardInfo/methods/get_entry_count) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_entry_count(
-    steam_leaderboard_info: SteamLeaderboardInfo,
-    entry_count_label: Label
-) -> void:
-    var entry_count: int = steam_leaderboard_info.entry_count
-    entry_count_label.text = "Entry count: %s" % str(entry_count)
-```

@@ -23,19 +23,4 @@ set_game(game: GameRuntime) -> void
 | --- | --- | --- |
 | `game` | [`GameRuntime`](/api/classes/GameRuntime) | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_game(
-    dedicated_server_boot: DedicatedServerBoot,
-    game: GameRuntime,
-    apply_game: Callable
-) -> void:
-    dedicated_server_boot.set_game(game)
-    var active_game: GameRuntime = dedicated_server_boot.game
-    if active_game == null:
-        return
-    apply_game.call(active_game)
-```
+[See gameplay examples for `DedicatedServerBoot`](/api/classes/DedicatedServerBoot#examples).

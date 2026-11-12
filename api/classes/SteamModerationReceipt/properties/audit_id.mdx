@@ -24,16 +24,3 @@ var audit_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_audit_id()`](/api/classes/SteamModerationReceipt/methods/get_audit_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_audit_id(
-    steam_moderation_receipt: SteamModerationReceipt,
-    apply_audit_id: Callable
-) -> void:
-    var audit_id: String = steam_moderation_receipt.audit_id
-    apply_audit_id.call(audit_id)
-```

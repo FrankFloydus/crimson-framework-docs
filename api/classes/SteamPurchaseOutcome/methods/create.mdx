@@ -31,21 +31,3 @@ static create(order_id: String, currency: String, total: int, state: SteamPurcha
 ## Description
 
 Provide a canonical nonzero 64-bit decimal order ID, a valid currency code, and a positive total in Steam's units. Invalid data returns null.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    order_id: String,
-    currency: String,
-    total: int,
-    state: SteamPurchaseOutcome.State,
-    apply_create: Callable
-) -> void:
-    var result: SteamPurchaseOutcome = SteamPurchaseOutcome.create(order_id, currency, total, state)
-    if result == null:
-        return
-    apply_create.call(result)
-```

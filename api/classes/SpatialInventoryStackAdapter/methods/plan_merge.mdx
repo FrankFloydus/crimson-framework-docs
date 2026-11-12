@@ -30,21 +30,3 @@ plan_merge(source_id: StringName, target_id: StringName, limit: int = 0) -> Dict
 ## Description
 
 A positive `limit` caps the units moved. Returns an `error` code and, on success, a plan with `moved`, `remaining`, and `changes`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_plan_merge(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    source_id: StringName,
-    target_id: StringName,
-    limit: int,
-    apply_plan_merge: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_stack_adapter.plan_merge(source_id, target_id, limit)
-    if result.is_empty():
-        return
-    apply_plan_merge.call(result)
-```

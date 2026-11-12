@@ -26,13 +26,3 @@ var id: String
 ## Description
 
 Join through the game to resolve the current route.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_id(online_listing: OnlineListing, id_label: Label) -> void:
-    var id: String = online_listing.id
-    id_label.text = "Id: %s" % str(id)
-```

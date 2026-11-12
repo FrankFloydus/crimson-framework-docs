@@ -23,14 +23,4 @@ http() -> SteamHttp
 
 Returns null when this generation has ended.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_http(steam_scope: SteamScope, apply_http: Callable) -> void:
-    var result: SteamHttp = steam_scope.http()
-    if result == null:
-        return
-    apply_http.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

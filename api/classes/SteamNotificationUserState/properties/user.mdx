@@ -24,18 +24,3 @@ var user: SteamIdentity
 | Type | [`SteamIdentity`](/api/classes/SteamIdentity) |
 | Access | Read only |
 | Getter | [`get_user()`](/api/classes/SteamNotificationUserState/methods/get_user) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_user(
-    steam_notification_user_state: SteamNotificationUserState,
-    apply_user: Callable
-) -> void:
-    var user: SteamIdentity = steam_notification_user_state.user
-    if user == null:
-        return
-    apply_user.call(user)
-```

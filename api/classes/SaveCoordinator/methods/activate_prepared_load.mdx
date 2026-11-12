@@ -28,17 +28,3 @@ activate_prepared_load(ticket: int) -> bool
 ## Description
 
 Returns true when publication succeeds. A valid prepared ticket queues a terminal `operation_finished` result.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_activate_prepared_load(
-    save_coordinator: SaveCoordinator,
-    ticket: int,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.activate_prepared_load(ticket)
-    status_label.text = "Activate prepared load: yes" if result else "Activate prepared load: no"
-```

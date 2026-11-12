@@ -20,16 +20,3 @@ get_longest_clip_ms() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_longest_clip_ms(
-    timeline_phase_recording: TimelinePhaseRecording,
-    longest_clip_ms_label: Label
-) -> void:
-    var result: int = timeline_phase_recording.get_longest_clip_ms()
-    longest_clip_ms_label.text = "Longest clip ms: %s" % str(result)
-```

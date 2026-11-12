@@ -22,16 +22,3 @@ get_sku() -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_sku(
-    steam_publisher_purchase_line: SteamPublisherPurchaseLine,
-    apply_sku: Callable
-) -> void:
-    var result: StringName = steam_publisher_purchase_line.get_sku()
-    apply_sku.call(result)
-```

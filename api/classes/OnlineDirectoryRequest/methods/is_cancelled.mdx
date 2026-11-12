@@ -22,16 +22,3 @@ is_cancelled() -> bool
 ## Description
 
 Use it to release provider resources.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_cancelled(
-    online_directory_request: OnlineDirectoryRequest,
-    status_label: Label
-) -> void:
-    var result: bool = online_directory_request.is_cancelled()
-    status_label.text = "Cancelled: yes" if result else "Cancelled: no"
-```

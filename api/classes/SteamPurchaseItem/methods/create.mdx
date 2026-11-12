@@ -31,22 +31,3 @@ static create(sku: StringName, display_name: String, amount: int, currency: Stri
 ## Description
 
 Amount must be positive in Steam's units for the three-letter uppercase currency code. Invalid offers return null.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    sku: StringName,
-    display_name: String,
-    amount: int,
-    currency: String,
-    display_name_label: Label
-) -> void:
-    var result: SteamPurchaseItem = SteamPurchaseItem.create(sku, display_name, amount, currency)
-    if result == null:
-        return
-    var display_name_value: String = result.display_name
-    display_name_label.text = "Display name: %s" % str(display_name_value)
-```

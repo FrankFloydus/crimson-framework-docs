@@ -23,18 +23,4 @@ installed() -> SteamWorkshopInstall
 
 An unknown, pending, legacy, or out-of-date install returns `null`. Steam can record this inspection in the signed-in player's used items.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_installed(
-    steam_workshop_item_ref: SteamWorkshopItemRef,
-    size_bytes_label: Label
-) -> void:
-    var result: SteamWorkshopInstall = steam_workshop_item_ref.installed()
-    if result == null:
-        return
-    var size_bytes: int = result.size_bytes
-    size_bytes_label.text = "Size bytes: %s" % str(size_bytes)
-```
+[See gameplay examples for `SteamWorkshopItemRef`](/api/classes/SteamWorkshopItemRef#examples).

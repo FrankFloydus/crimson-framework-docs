@@ -22,16 +22,3 @@ get_action() -> SteamModerationRequest.Action
 ## Return value
 
 `SteamModerationRequest.Action`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_action(
-    steam_moderation_receipt: SteamModerationReceipt,
-    apply_action: Callable
-) -> void:
-    var result: SteamModerationRequest.Action = steam_moderation_receipt.get_action()
-    apply_action.call(result)
-```

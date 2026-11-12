@@ -22,16 +22,3 @@ open_binding_panel() -> Error
 ## Description
 
 `OK` acknowledges the request. Returns `ERR_UNAVAILABLE` if Steam declines or the controller is disconnected.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_open_binding_panel(steam_controller: SteamController, status_label: Label) -> void:
-    var result: Error = steam_controller.open_binding_panel()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Open binding panel accepted."
-```

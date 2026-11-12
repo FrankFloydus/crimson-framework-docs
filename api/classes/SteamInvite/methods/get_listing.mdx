@@ -20,16 +20,3 @@ get_listing() -> SteamListing
 ## Return value
 
 [`SteamListing`](/api/classes/SteamListing)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_listing(steam_invite: SteamInvite, name_label: Label) -> void:
-    var result: SteamListing = steam_invite.get_listing()
-    if result == null:
-        return
-    var name: String = result.name
-    name_label.text = "Name: %s" % str(name)
-```

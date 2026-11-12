@@ -20,15 +20,3 @@ auth() -> SteamPublisherAuth
 ## Return value
 
 [`SteamPublisherAuth`](/api/classes/SteamPublisherAuth)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_auth(steam_publisher: SteamPublisher, apply_auth: Callable) -> void:
-    var result: SteamPublisherAuth = steam_publisher.auth()
-    if result == null:
-        return
-    apply_auth.call(result)
-```

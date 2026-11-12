@@ -20,16 +20,3 @@ get_drop_policy() -> Callable
 ## Return value
 
 `Callable`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_drop_policy(
-    spatial_inventory_actions: SpatialInventoryActions,
-    action_button: Button
-) -> void:
-    var result: Callable = spatial_inventory_actions.get_drop_policy()
-    action_button.disabled = not result.is_valid()
-```

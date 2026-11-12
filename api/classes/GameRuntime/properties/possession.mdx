@@ -27,14 +27,4 @@ var possession: PlayerPossession
 
 Use it to inspect or change player control assignments through its public API.
 
-## Example
-
-```gdscript
-extends Node
-
-func refresh_possession(game_runtime: GameRuntime, apply_possession: Callable) -> void:
-    var possession: PlayerPossession = game_runtime.possession
-    if possession == null:
-        return
-    apply_possession.call(possession)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

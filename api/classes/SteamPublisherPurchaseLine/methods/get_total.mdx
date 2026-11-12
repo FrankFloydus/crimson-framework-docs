@@ -22,16 +22,3 @@ get_total() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_total(
-    steam_publisher_purchase_line: SteamPublisherPurchaseLine,
-    apply_total: Callable
-) -> void:
-    var result: int = steam_publisher_purchase_line.get_total()
-    apply_total.call(result)
-```

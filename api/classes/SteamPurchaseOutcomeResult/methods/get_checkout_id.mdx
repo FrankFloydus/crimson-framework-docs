@@ -20,16 +20,3 @@ get_checkout_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_checkout_id(
-    steam_purchase_outcome_result: SteamPurchaseOutcomeResult,
-    checkout_id_label: Label
-) -> void:
-    var result: String = steam_purchase_outcome_result.get_checkout_id()
-    checkout_id_label.text = "Checkout id: %s" % str(result)
-```

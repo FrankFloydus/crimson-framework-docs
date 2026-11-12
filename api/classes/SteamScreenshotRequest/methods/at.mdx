@@ -28,31 +28,3 @@ at(location: String) -> SteamScreenshotRequest
 ## Description
 
 Pass empty text to omit it. Steam accepts at most 255 UTF-8 bytes without embedded NUL characters.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_at(
-    steam_screenshot_request: SteamScreenshotRequest,
-    location: String,
-    confirmed: bool,
-    apply_completion: Callable
-) -> void:
-    var result: SteamScreenshotRequest = steam_screenshot_request.at(location)
-    if result == null:
-        return
-    if not confirmed:
-        return
-    var completion: SteamScreenshotResult = await result.submit()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamScreenshot = completion.value
-    if payload == null:
-        return
-    apply_completion.call(payload)
-```

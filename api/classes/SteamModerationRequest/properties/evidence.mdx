@@ -24,18 +24,3 @@ var evidence: SteamCheatEvidence
 | Type | [`SteamCheatEvidence`](/api/classes/SteamCheatEvidence) |
 | Access | Read only |
 | Getter | [`get_evidence()`](/api/classes/SteamModerationRequest/methods/get_evidence) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_evidence(
-    steam_moderation_request: SteamModerationRequest,
-    apply_evidence: Callable
-) -> void:
-    var evidence: SteamCheatEvidence = steam_moderation_request.evidence
-    if evidence == null:
-        return
-    apply_evidence.call(evidence)
-```

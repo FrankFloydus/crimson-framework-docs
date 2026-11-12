@@ -20,16 +20,3 @@ get_observed_at_unix() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_observed_at_unix(
-    steam_inventory_snapshot: SteamInventorySnapshot,
-    observed_at_unix_label: Label
-) -> void:
-    var result: int = steam_inventory_snapshot.get_observed_at_unix()
-    observed_at_unix_label.text = "Observed at unix: %s" % str(result)
-```

@@ -30,18 +30,3 @@ var publisher_key_ref: StringName = &""
 ## Description
 
 Required for Steam partner Web API calls.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_publisher_key_ref(
-    steam_publisher_settings: SteamPublisherSettings,
-    new_publisher_key_ref: StringName,
-    apply_publisher_key_ref: Callable
-) -> void:
-    steam_publisher_settings.publisher_key_ref = new_publisher_key_ref
-    var active_publisher_key_ref: StringName = steam_publisher_settings.publisher_key_ref
-    apply_publisher_key_ref.call(active_publisher_key_ref)
-```

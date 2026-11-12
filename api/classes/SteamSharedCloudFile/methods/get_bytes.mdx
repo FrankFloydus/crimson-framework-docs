@@ -20,18 +20,3 @@ get_bytes() -> PackedByteArray
 ## Return value
 
 `PackedByteArray`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_bytes(
-    steam_shared_cloud_file: SteamSharedCloudFile,
-    load_file_bytes: Callable
-) -> void:
-    var result: PackedByteArray = steam_shared_cloud_file.get_bytes()
-    if result.is_empty():
-        return
-    load_file_bytes.call(result)
-```

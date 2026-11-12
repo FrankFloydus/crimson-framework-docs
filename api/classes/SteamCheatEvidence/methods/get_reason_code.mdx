@@ -22,16 +22,3 @@ get_reason_code() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_reason_code(
-    steam_cheat_evidence: SteamCheatEvidence,
-    reason_code_label: Label
-) -> void:
-    var result: int = steam_cheat_evidence.get_reason_code()
-    reason_code_label.text = "Reason code: %s" % str(result)
-```

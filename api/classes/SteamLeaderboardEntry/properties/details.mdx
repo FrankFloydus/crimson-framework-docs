@@ -26,18 +26,3 @@ var details: PackedInt32Array
 ## Description
 
 Editing a returned packed array leaves the entry unchanged.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_details(
-    steam_leaderboard_entry: SteamLeaderboardEntry,
-    results_list: ItemList
-) -> void:
-    var details: PackedInt32Array = steam_leaderboard_entry.details
-    results_list.clear()
-    for entry: int in details:
-        results_list.add_item(str(entry))
-```

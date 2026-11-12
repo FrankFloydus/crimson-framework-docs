@@ -22,13 +22,3 @@ var provider: StringName
 | Type | `StringName` |
 | Access | Read only |
 | Getter | [`get_provider()`](/api/classes/OnlineListing/methods/get_provider) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_provider(online_listing: OnlineListing, provider_label: Label) -> void:
-    var provider: StringName = online_listing.provider
-    provider_label.text = "Provider: %s" % str(provider)
-```

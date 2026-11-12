@@ -22,16 +22,3 @@ var observed_at_unix: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_observed_at_unix()`](/api/classes/SteamInventorySnapshot/methods/get_observed_at_unix) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_observed_at_unix(
-    steam_inventory_snapshot: SteamInventorySnapshot,
-    observed_at_unix_label: Label
-) -> void:
-    var observed_at_unix: int = steam_inventory_snapshot.observed_at_unix
-    observed_at_unix_label.text = "Observed at unix: %s" % str(observed_at_unix)
-```

@@ -32,20 +32,3 @@ static create(context: String, title: SteamLocalizedText, users: SteamNotificati
 ## Description
 
 `context` is a canonical unsigned decimal string used at creation. Supply a localized title and 1 to 16 distinct verified participants.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_create(
-    context: String,
-    title: SteamLocalizedText,
-    users: Array[SteamNotificationUserState],
-    apply_create: Callable
-) -> void:
-    var result: SteamNotificationSessionSpec = SteamNotificationSessionSpec.create(context, title, users)
-    if result == null:
-        return
-    apply_create.call(result)
-```

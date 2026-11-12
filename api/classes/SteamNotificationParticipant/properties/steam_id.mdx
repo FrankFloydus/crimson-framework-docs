@@ -28,16 +28,3 @@ var steam_id: String
 ## Description
 
 This does not grant trusted identity.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_steam_id(
-    steam_notification_participant: SteamNotificationParticipant,
-    apply_steam_id: Callable
-) -> void:
-    var steam_id: String = steam_notification_participant.steam_id
-    apply_steam_id.call(steam_id)
-```

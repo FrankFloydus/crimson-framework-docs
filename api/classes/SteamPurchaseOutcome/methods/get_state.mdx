@@ -20,13 +20,3 @@ get_state() -> SteamPurchaseOutcome.State
 ## Return value
 
 `SteamPurchaseOutcome.State`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_state(steam_purchase_outcome: SteamPurchaseOutcome, state_label: Label) -> void:
-    var result: SteamPurchaseOutcome.State = steam_purchase_outcome.get_state()
-    state_label.text = "State: %s" % str(result)
-```

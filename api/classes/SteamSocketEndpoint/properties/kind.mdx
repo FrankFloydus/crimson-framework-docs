@@ -23,13 +23,3 @@ var kind: SteamSocketEndpoint.Kind = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_kind()`](/api/classes/SteamSocketEndpoint/methods/get_kind) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_kind(steam_socket_endpoint: SteamSocketEndpoint, kind_label: Label) -> void:
-    var kind: SteamSocketEndpoint.Kind = steam_socket_endpoint.kind
-    kind_label.text = "Kind: %s" % str(kind)
-```

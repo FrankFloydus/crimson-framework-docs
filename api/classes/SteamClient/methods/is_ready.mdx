@@ -25,10 +25,51 @@ Check the relevant service for capability availability.
 
 ## Example
 
+### Enable the online menu when Steam connects
+
+The main menu enables Online Play when Steam connects and keeps Local Play available when it disconnects. Set `STEAM_APP_ID` to the ID used to [launch your game](/steam/setup#launch-with-an-appid).
+
 ```gdscript
-func show_steam_status(client: SteamClient) -> void:
-    if client.is_ready():
-        print("Steam player services are ready.")
-    else:
-        push_warning(client.get_initialization_error())
+extends Control
+
+const STEAM_APP_ID: int = 480
+const ONLINE_CHECK_SECONDS: float = 1.0
+
+@export var online_button: Button
+@export var status_label: Label
+
+var _steam: SteamClient
+var _online_timer: Timer
+
+
+func _ready() -> void:
+    online_button.disabled = true
+    _steam = SteamClient.boot(self, STEAM_APP_ID)
+    if _steam == null:
+        status_label.text = "Online play unavailable."
+        return
+    if not _steam.is_ready():
+        status_label.text = "Steam startup failed. Local play is available."
+        push_warning(_steam.get_initialization_error())
+        return
+
+    _online_timer = Timer.new()
+    _online_timer.wait_time = ONLINE_CHECK_SECONDS
+    _online_timer.timeout.connect(_update_online_menu)
+    add_child(_online_timer)
+    _steam.runtime_lost.connect(_disable_online_menu)
+    _online_timer.start()
+    _update_online_menu()
+
+
+func _update_online_menu() -> void:
+    var online: bool = _steam.is_online()
+    online_button.disabled = not online
+    status_label.text = "Online play ready." if online else "Steam offline. Local play is available."
+
+
+func _disable_online_menu() -> void:
+    _online_timer.stop()
+    online_button.disabled = true
+    status_label.text = "Steam closed. Local play is available."
 ```

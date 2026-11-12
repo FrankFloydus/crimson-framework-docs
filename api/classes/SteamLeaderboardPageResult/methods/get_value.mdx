@@ -24,23 +24,3 @@ get_value() -> SteamLeaderboardPage
 ## Description
 
 A successful query may return a page with no rows.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_leaderboard_page_result: SteamLeaderboardPageResult,
-    apply_value: Callable
-) -> void:
-    if steam_leaderboard_page_result == null:
-        return
-    if not steam_leaderboard_page_result.ok:
-        push_warning(steam_leaderboard_page_result.message)
-        return
-    var result: SteamLeaderboardPage = steam_leaderboard_page_result.get_value()
-    if result == null:
-        return
-    apply_value.call(result)
-```

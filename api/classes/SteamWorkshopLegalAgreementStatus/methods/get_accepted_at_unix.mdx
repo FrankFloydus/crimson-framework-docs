@@ -20,16 +20,3 @@ get_accepted_at_unix() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_accepted_at_unix(
-    steam_workshop_legal_agreement_status: SteamWorkshopLegalAgreementStatus,
-    accepted_at_unix_label: Label
-) -> void:
-    var result: int = steam_workshop_legal_agreement_status.get_accepted_at_unix()
-    accepted_at_unix_label.text = "Accepted at unix: %s" % str(result)
-```

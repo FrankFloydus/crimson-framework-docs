@@ -18,13 +18,3 @@ close() -> void
 ## Description
 
 Repeated calls have no effect. Ending the original Steam client scope also closes the page.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_close(steam_browser_page: SteamBrowserPage, browser_panel: Control) -> void:
-    steam_browser_page.close()
-    browser_panel.hide()
-```

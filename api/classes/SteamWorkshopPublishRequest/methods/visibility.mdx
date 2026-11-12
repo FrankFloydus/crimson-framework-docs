@@ -28,32 +28,3 @@ visibility(visibility: SteamWorkshopPublishRequest.Visibility) -> SteamWorkshopP
 ## Description
 
 Leaving visibility unset keeps a new item private and preserves an existing item's audience.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_visibility(
-    steam_workshop_publish_request: SteamWorkshopPublishRequest,
-    visibility: SteamWorkshopPublishRequest.Visibility,
-    confirmed: bool,
-    published_id_label: Label
-) -> void:
-    var result: SteamWorkshopPublishRequest = steam_workshop_publish_request.visibility(visibility)
-    if result == null:
-        return
-    if not confirmed:
-        return
-    var completion: SteamWorkshopPublicationResult = await result.submit()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamWorkshopPublication = completion.value
-    if payload == null:
-        return
-    var published_id: String = payload.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```

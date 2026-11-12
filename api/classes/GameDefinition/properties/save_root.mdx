@@ -29,20 +29,4 @@ var save_root: String = "user://crimson"
 
 Use a path under user:// so the exported game can write to it.
 
-## Example
-
-```gdscript
-extends Node
-
-func update_save_root(
-    game_definition: GameDefinition,
-    new_save_root: String,
-    game: GameRuntime
-) -> void:
-    if game_definition == null:
-        return
-    if game.is_inside_tree():
-        return
-    game_definition.save_root = new_save_root
-    game.definition = game_definition
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

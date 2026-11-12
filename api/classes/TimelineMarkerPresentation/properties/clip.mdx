@@ -28,18 +28,3 @@ var clip: int = 1
 ## Description
 
 Uses `SteamTimeline.NONE`, `SteamTimeline.STANDARD`, or `SteamTimeline.FEATURED`.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_clip(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    new_clip: int,
-    clip_label: Label
-) -> void:
-    timeline_marker_presentation.clip = new_clip
-    var active_clip: int = timeline_marker_presentation.clip
-    clip_label.text = "Clip: %s" % str(active_clip)
-```

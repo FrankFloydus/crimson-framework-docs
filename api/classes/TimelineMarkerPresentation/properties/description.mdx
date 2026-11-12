@@ -28,18 +28,3 @@ var description: String = ""
 ## Description
 
 Defaults to empty.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_description(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    new_description: String,
-    description_label: Label
-) -> void:
-    timeline_marker_presentation.description = new_description
-    var active_description: String = timeline_marker_presentation.description
-    description_label.text = "Description: %s" % str(active_description)
-```

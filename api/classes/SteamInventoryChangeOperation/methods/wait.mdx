@@ -18,24 +18,3 @@ wait() -> Variant
 ## Return value
 
 `Variant`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_wait(
-    steam_inventory_change_operation: SteamInventoryChangeOperation,
-    apply_wait: Callable
-) -> void:
-    var result: SteamInventoryChangeResult = await steam_inventory_change_operation.wait()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventoryChange = result.value
-    if payload == null:
-        return
-    apply_wait.call(payload)
-```

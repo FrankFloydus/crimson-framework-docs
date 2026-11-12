@@ -26,16 +26,3 @@ var checkout_id: String
 ## Description
 
 Empty until first checkout assigns it. Read on the main thread.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_checkout_id(
-    steam_purchase_cart: SteamPurchaseCart,
-    checkout_id_label: Label
-) -> void:
-    var checkout_id: String = steam_purchase_cart.checkout_id
-    checkout_id_label.text = "Checkout id: %s" % str(checkout_id)
-```

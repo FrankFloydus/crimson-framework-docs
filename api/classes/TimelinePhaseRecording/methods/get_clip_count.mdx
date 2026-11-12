@@ -20,16 +20,3 @@ get_clip_count() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_clip_count(
-    timeline_phase_recording: TimelinePhaseRecording,
-    clip_count_label: Label
-) -> void:
-    var result: int = timeline_phase_recording.get_clip_count()
-    clip_count_label.text = "Clip count: %s" % str(result)
-```

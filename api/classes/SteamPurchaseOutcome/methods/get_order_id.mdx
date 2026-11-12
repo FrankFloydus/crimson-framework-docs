@@ -20,16 +20,3 @@ get_order_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_order_id(
-    steam_purchase_outcome: SteamPurchaseOutcome,
-    order_id_label: Label
-) -> void:
-    var result: String = steam_purchase_outcome.get_order_id()
-    order_id_label.text = "Order id: %s" % str(result)
-```

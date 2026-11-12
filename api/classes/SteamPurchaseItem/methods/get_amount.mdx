@@ -20,13 +20,3 @@ get_amount() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_amount(steam_purchase_item: SteamPurchaseItem, amount_label: Label) -> void:
-    var result: int = steam_purchase_item.get_amount()
-    amount_label.text = "Amount: %s" % str(result)
-```

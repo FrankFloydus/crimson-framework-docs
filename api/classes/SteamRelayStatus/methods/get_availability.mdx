@@ -20,16 +20,3 @@ get_availability() -> SteamRelayStatus.Availability
 ## Return value
 
 `SteamRelayStatus.Availability`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_availability(
-    steam_relay_status: SteamRelayStatus,
-    availability_label: Label
-) -> void:
-    var result: SteamRelayStatus.Availability = steam_relay_status.get_availability()
-    availability_label.text = "Availability: %s" % str(result)
-```

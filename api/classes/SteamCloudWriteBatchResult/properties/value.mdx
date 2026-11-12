@@ -22,23 +22,3 @@ var value: SteamCloudWriteBatch
 | Type | [`SteamCloudWriteBatch`](/api/classes/SteamCloudWriteBatch) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamCloudWriteBatchResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_cloud_write_batch_result: SteamCloudWriteBatchResult,
-    apply_value: Callable
-) -> void:
-    if steam_cloud_write_batch_result == null:
-        return
-    if not steam_cloud_write_batch_result.ok:
-        push_warning(steam_cloud_write_batch_result.message)
-        return
-    var value: SteamCloudWriteBatch = steam_cloud_write_batch_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

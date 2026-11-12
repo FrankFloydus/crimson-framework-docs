@@ -19,15 +19,4 @@ utils() -> SteamUtils
 
 [`SteamUtils`](/api/classes/SteamUtils)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_utils(steam_client: SteamClient, language_label: Label) -> void:
-    var result: SteamUtils = steam_client.utils()
-    if result == null:
-        return
-    var language: String = result.ui_language()
-    language_label.text = "Language: %s" % str(language)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

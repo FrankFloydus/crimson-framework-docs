@@ -22,18 +22,3 @@ set_icon(value: String) -> void
 | Parameter | Type | Default |
 | --- | --- | --- |
 | `value` | `String` | — |
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_icon(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    value: String,
-    icon_label: Label
-) -> void:
-    timeline_marker_presentation.set_icon(value)
-    var active_icon: String = timeline_marker_presentation.icon
-    icon_label.text = "Icon: %s" % str(active_icon)
-```

@@ -22,22 +22,3 @@ var value: Texture2D[]
 | Type | `Texture2D[]` |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamTexturesResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_textures_result: SteamTexturesResult,
-    add_value_entry: Callable
-) -> void:
-    if steam_textures_result == null:
-        return
-    if not steam_textures_result.ok:
-        push_warning(steam_textures_result.message)
-        return
-    var value: Array[Texture2D] = steam_textures_result.value
-    for entry: Texture2D in value:
-        add_value_entry.call(entry)
-```

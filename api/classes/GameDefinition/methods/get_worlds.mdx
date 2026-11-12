@@ -21,14 +21,4 @@ get_worlds() -> Dictionary
 
 `Dictionary`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_worlds(game_definition: GameDefinition, apply_worlds: Callable) -> void:
-    var result: Dictionary = game_definition.get_worlds()
-    if result.is_empty():
-        return
-    apply_worlds.call(result)
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

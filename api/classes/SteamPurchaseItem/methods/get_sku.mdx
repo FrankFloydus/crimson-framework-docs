@@ -20,13 +20,3 @@ get_sku() -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_sku(steam_purchase_item: SteamPurchaseItem, sku_label: Label) -> void:
-    var result: StringName = steam_purchase_item.get_sku()
-    sku_label.text = "Sku: %s" % str(result)
-```

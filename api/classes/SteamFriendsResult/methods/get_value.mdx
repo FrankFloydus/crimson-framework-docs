@@ -20,20 +20,3 @@ get_value() -> SteamFriend[]
 ## Return value
 
 `SteamFriend[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_friends_result: SteamFriendsResult, results_list: ItemList) -> void:
-    if steam_friends_result == null:
-        return
-    if not steam_friends_result.ok:
-        push_warning(steam_friends_result.message)
-        return
-    var result: Array[SteamFriend] = steam_friends_result.get_value()
-    results_list.clear()
-    for entry: SteamFriend in result:
-        results_list.add_item(str(entry.display_name))
-```

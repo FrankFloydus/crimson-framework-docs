@@ -22,18 +22,3 @@ bytes() -> PackedByteArray
 ## Description
 
 Keep it out of saves, replays, and logs. Issuance and backend validation are separate actions.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_bytes(
-    steam_ownership_ticket: SteamOwnershipTicket,
-    process_private_payload: Callable
-) -> void:
-    var result: PackedByteArray = steam_ownership_ticket.bytes()
-    if result.is_empty():
-        return
-    process_private_payload.call(result)
-```

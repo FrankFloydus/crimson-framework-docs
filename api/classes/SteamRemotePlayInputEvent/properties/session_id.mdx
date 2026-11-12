@@ -27,16 +27,3 @@ var session_id: int = 0
 ## Description
 
 Route the sample to that stream's local seat.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_session_id(
-    steam_remote_play_input_event: SteamRemotePlayInputEvent,
-    session_id_label: Label
-) -> void:
-    var session_id: int = steam_remote_play_input_event.session_id
-    session_id_label.text = "Session id: %s" % str(session_id)
-```

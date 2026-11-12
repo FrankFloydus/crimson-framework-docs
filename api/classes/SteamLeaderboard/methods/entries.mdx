@@ -29,29 +29,3 @@ entries(first_rank: int, count: int) -> SteamLeaderboardPageOperation
 ## Description
 
 `count` must be between 1 and 100. Await the operation to receive a [`SteamLeaderboardPageResult`](/api/classes/SteamLeaderboardPageResult) containing a [`SteamLeaderboardPage`](/api/classes/SteamLeaderboardPage) on success.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_entries(
-    steam_leaderboard: SteamLeaderboard,
-    first_rank: int,
-    count: int,
-    apply_entries: Callable
-) -> void:
-    var result: SteamLeaderboardPageOperation = steam_leaderboard.entries(first_rank, count)
-    if result == null:
-        return
-    var result_value: SteamLeaderboardPageResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamLeaderboardPage = result_value.value
-    if payload == null:
-        return
-    apply_entries.call(payload)
-```

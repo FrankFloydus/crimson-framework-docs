@@ -24,13 +24,3 @@ var app_id: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_app_id()`](/api/classes/SteamAppOwnership/methods/get_app_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_app_id(steam_app_ownership: SteamAppOwnership, app_id_label: Label) -> void:
-    var app_id: int = steam_app_ownership.app_id
-    app_id_label.text = "App id: %s" % str(app_id)
-```

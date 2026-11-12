@@ -23,16 +23,3 @@ var client_size: Vector2i = Vector2i(0, 0)
 | Access | Read only |
 | Default | `Vector2i(0, 0)` |
 | Getter | [`get_client_size()`](/api/classes/SteamRemotePlaySession/methods/get_client_size) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_client_size(
-    steam_remote_play_session: SteamRemotePlaySession,
-    client_size_label: Label
-) -> void:
-    var client_size: Vector2i = steam_remote_play_session.client_size
-    client_size_label.text = "Client size: %s" % str(client_size)
-```

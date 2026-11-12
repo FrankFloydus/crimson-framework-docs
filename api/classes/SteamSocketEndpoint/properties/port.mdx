@@ -23,13 +23,3 @@ var port: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_port()`](/api/classes/SteamSocketEndpoint/methods/get_port) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_port(steam_socket_endpoint: SteamSocketEndpoint, port_label: Label) -> void:
-    var port: int = steam_socket_endpoint.port
-    port_label.text = "Port: %s" % str(port)
-```

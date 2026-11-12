@@ -28,26 +28,3 @@ peer_path(peer_id: int) -> SteamConnectionPathResult
 ## Description
 
 Returns `ERR_INVALID_PARAMETER` for an invalid ID, `ERR_UNAVAILABLE` without a live Game sampler, or `ERR_DOES_NOT_EXIST` when the peer has no matching admitted live socket.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_peer_path(steam_scope: SteamScope, peer_id: int, apply_peer_path: Callable) -> void:
-    if not steam_scope.is_ready():
-        return
-    var steam_networking: SteamNetworking = steam_scope.networking()
-    if steam_networking == null:
-        return
-    var result: SteamConnectionPathResult = steam_networking.peer_path(peer_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamConnectionPath = result.value
-    if payload == null:
-        return
-    apply_peer_path.call(payload)
-```

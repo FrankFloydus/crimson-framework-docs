@@ -23,14 +23,4 @@ get_projection() -> Dictionary
 
 Read it after projection\_updated. The authority's internal command context is omitted.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_projection(game_runtime: GameRuntime, apply_projection: Callable) -> void:
-    var result: Dictionary = game_runtime.get_projection()
-    if result.is_empty():
-        return
-    apply_projection.call(result)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

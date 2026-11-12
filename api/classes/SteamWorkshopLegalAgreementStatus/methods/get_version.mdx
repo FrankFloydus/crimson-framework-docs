@@ -20,16 +20,3 @@ get_version() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_version(
-    steam_workshop_legal_agreement_status: SteamWorkshopLegalAgreementStatus,
-    version_label: Label
-) -> void:
-    var result: int = steam_workshop_legal_agreement_status.get_version()
-    version_label.text = "Version: %s" % str(result)
-```

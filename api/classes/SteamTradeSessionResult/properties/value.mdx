@@ -24,23 +24,3 @@ var value: SteamTradeSession
 | Type | [`SteamTradeSession`](/api/classes/SteamTradeSession) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamTradeSessionResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_trade_session_result: SteamTradeSessionResult,
-    apply_value: Callable
-) -> void:
-    if steam_trade_session_result == null:
-        return
-    if not steam_trade_session_result.ok:
-        push_warning(steam_trade_session_result.message)
-        return
-    var value: SteamTradeSession = steam_trade_session_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

@@ -22,18 +22,3 @@ is_overlay_ready() -> bool
 ## Description
 
 Check again before requesting an overlay action after startup.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_overlay_ready(steam_client: SteamClient, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_utils: SteamUtils = steam_client.utils()
-    if steam_utils == null:
-        return
-    var result: bool = steam_utils.is_overlay_ready()
-    status_label.text = "Overlay ready: yes" if result else "Overlay ready: no"
-```

@@ -29,31 +29,3 @@ split(instance_id: String, quantity: int) -> Variant
 ## Description
 
 The result carries the changed or removed source and the new stack. Returns [`SteamInventoryChangeResult`](/api/classes/SteamInventoryChangeResult). Refresh inventory before retrying after a timeout.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_split(
-    steam_client: SteamClient,
-    instance_id: String,
-    quantity: int,
-    apply_split: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_inventory: SteamInventory = steam_client.inventory()
-    if steam_inventory == null:
-        return
-    var result: SteamInventoryChangeResult = await steam_inventory.split(instance_id, quantity)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventoryChange = result.value
-    if payload == null:
-        return
-    apply_split.call(payload)
-```

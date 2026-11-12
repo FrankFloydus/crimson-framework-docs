@@ -26,13 +26,3 @@ var volume: float
 ## Description
 
 Returns 0 when the player is disabled.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_volume(steam_music_status: SteamMusicStatus, volume_label: Label) -> void:
-    var volume: float = steam_music_status.volume
-    volume_label.text = "Volume: %s" % str(volume)
-```

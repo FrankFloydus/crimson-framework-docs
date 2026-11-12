@@ -23,14 +23,4 @@ var transactions: TransactionCoordinator
 | Access | Read only |
 | Getter | [`get_transactions()`](/api/classes/GameRuntime/methods/get_transactions) |
 
-## Example
-
-```gdscript
-extends Node
-
-func refresh_transactions(game_runtime: GameRuntime, apply_transactions: Callable) -> void:
-    var transactions: TransactionCoordinator = game_runtime.transactions
-    if transactions == null:
-        return
-    apply_transactions.call(transactions)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

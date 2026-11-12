@@ -28,25 +28,3 @@ accept(offer: SteamSocketOffer) -> SteamSocketConnectionResult
 ## Description
 
 Successful acceptance issues a handle that can be closed immediately. Wait for `SteamSocketConnection.connected` before using its authenticated identity or sending.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_accept(
-    steam_socket_listener: SteamSocketListener,
-    offer: SteamSocketOffer,
-    apply_accept: Callable
-) -> void:
-    var result: SteamSocketConnectionResult = steam_socket_listener.accept(offer)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamSocketConnection = result.value
-    if payload == null:
-        return
-    apply_accept.call(payload)
-```

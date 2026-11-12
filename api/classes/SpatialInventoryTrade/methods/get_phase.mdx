@@ -20,13 +20,3 @@ get_phase() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_phase(spatial_inventory_trade: SpatialInventoryTrade, phase_label: Label) -> void:
-    var result: int = spatial_inventory_trade.get_phase()
-    phase_label.text = "Phase: %s" % str(result)
-```

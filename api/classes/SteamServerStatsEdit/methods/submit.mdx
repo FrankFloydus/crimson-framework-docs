@@ -22,24 +22,3 @@ submit() -> SteamServerStatsOperation
 ## Description
 
 Repeated calls return the same operation, including after failure or cancellation. A successful edit receipt confirms Steam's native StoreUserStats response. An invalid draft settles with `ERR_INVALID_PARAMETER` before issuing Steam work. Use a new draft for a different game action.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_submit(steam_server_player_stats: SteamServerPlayerStats, status_label: Label) -> void:
-    var steam_server_stats_edit: SteamServerStatsEdit = steam_server_player_stats.edit()
-    if steam_server_stats_edit == null:
-        return
-    var result: SteamServerStatsOperation = steam_server_stats_edit.submit()
-    if result == null:
-        return
-    var result_value: SteamServerStatsResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    status_label.text = "Submit succeeded."
-```

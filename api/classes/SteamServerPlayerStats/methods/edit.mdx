@@ -22,35 +22,3 @@ edit() -> SteamServerStatsEdit
 ## Description
 
 Editing the draft has no immediate effect.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_edit(
-    steam_server_player_stats: SteamServerPlayerStats,
-    stat_name: StringName,
-    new_total: int,
-    confirmed: bool,
-    status_label: Label
-) -> void:
-    var result: SteamServerStatsEdit = steam_server_player_stats.edit()
-    if result == null:
-        return
-    var staged_edit: SteamServerStatsEdit = result.set_int(stat_name, new_total)
-    if staged_edit == null:
-        return
-    if not confirmed:
-        return
-    var completion: SteamServerStatsOperation = staged_edit.submit()
-    if completion == null:
-        return
-    var result_value: SteamServerStatsResult = await completion.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    status_label.text = "Submit succeeded."
-```

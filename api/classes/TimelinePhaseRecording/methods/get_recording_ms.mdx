@@ -20,16 +20,3 @@ get_recording_ms() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_recording_ms(
-    timeline_phase_recording: TimelinePhaseRecording,
-    recording_ms_label: Label
-) -> void:
-    var result: int = timeline_phase_recording.get_recording_ms()
-    recording_ms_label.text = "Recording ms: %s" % str(result)
-```

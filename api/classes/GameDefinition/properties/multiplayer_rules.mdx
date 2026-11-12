@@ -30,18 +30,84 @@ Leave empty for a game that starts locally.
 
 ## Example
 
+### Host a duo or squad from the co-op menu
+
+Turn **Squad** on before hosting a training room to open three guest seats. Leave it off to host a duo with one guest seat.
+
+[Set up a local multiplayer test](/multiplayer-quickstart)
+
 ```gdscript
 extends Node
 
-func update_multiplayer_rules(
-    game_definition: GameDefinition,
-    new_multiplayer_rules: MultiplayerRules,
-    game: GameRuntime
-) -> void:
-    if game_definition == null:
+const TRAINING_ROOM: StringName = &"training_room"
+const DUO_CAPACITY: int = 2
+const SQUAD_CAPACITY: int = 4
+const COOP_PORT: int = 7017
+const LOCAL_ADDRESS: String = "127.0.0.1"
+
+@export var training_room: PackedScene
+@export var player_scene: PackedScene
+@export var menu: Control
+@export var squad_mode: CheckButton
+@export var host_button: Button
+@export var join_button: Button
+@export var status: Label
+
+var _game: GameRuntime
+
+
+func _ready() -> void:
+    host_button.pressed.connect(_open_session.bind(true))
+    join_button.pressed.connect(_open_session.bind(false))
+    if training_room == null or player_scene == null:
+        status.text = "Assign the training room and player scenes."
+        _set_menu_busy(true)
+
+
+func _open_session(hosting: bool) -> void:
+    if _game != null:
         return
-    if game.is_inside_tree():
+
+    _set_menu_busy(true)
+    var capacity: int = SQUAD_CAPACITY if squad_mode.button_pressed else DUO_CAPACITY
+    var rules: MultiplayerRules = MultiplayerRules.listen_coop()
+    rules.max_players = capacity
+    rules.port = COOP_PORT
+    rules.join_in_progress = true
+
+    var definition: GameDefinition = GameRuntime.configure()
+    definition.starting_world = TRAINING_ROOM
+    definition.starting_world_scene = training_room
+    definition.player_scene = player_scene
+    definition.multiplayer_rules = rules
+    _game = definition.boot(self)
+    if _game == null:
+        status.text = "Could not create the game."
+        _set_menu_busy(false)
         return
-    game_definition.multiplayer_rules = new_multiplayer_rules
-    game.definition = game_definition
+
+    var operation: GameOperation
+    if hosting:
+        status.text = "Opening a %d-player training room..." % capacity
+        operation = _game.host_game(LOCAL_ADDRESS)
+    else:
+        status.text = "Joining the training room..."
+        operation = _game.join_game(LOCAL_ADDRESS)
+
+    var result: Dictionary = await operation.wait()
+    if not result.ok:
+        status.text = "Could not enter the training room: %s" % result.message
+        _game.queue_free()
+        await _game.tree_exited
+        _game = null
+        _set_menu_busy(false)
+        return
+
+    menu.hide()
+
+
+func _set_menu_busy(busy: bool) -> void:
+    host_button.disabled = busy
+    join_button.disabled = busy
+    squad_mode.disabled = busy
 ```

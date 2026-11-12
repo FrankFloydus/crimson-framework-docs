@@ -30,19 +30,3 @@ request_autosave(profile: String, slot: String, metadata: Dictionary = {}) -> in
 ## Description
 
 A newer intent can replace an uncaptured autosave for the same slot and world. Returns a ticket or 0 on rejection.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_request_autosave(
-    save_coordinator: SaveCoordinator,
-    profile: String,
-    slot: String,
-    metadata: Dictionary,
-    request_autosave_label: Label
-) -> void:
-    var result: int = save_coordinator.request_autosave(profile, slot, metadata)
-    request_autosave_label.text = "Request autosave: %s" % str(result)
-```

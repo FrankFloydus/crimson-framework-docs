@@ -23,16 +23,3 @@ var expires_at_msec: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_expires_at_msec()`](/api/classes/SteamSocketOffer/methods/get_expires_at_msec) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_expires_at_msec(
-    steam_socket_offer: SteamSocketOffer,
-    expires_at_msec_label: Label
-) -> void:
-    var expires_at_msec: int = steam_socket_offer.expires_at_msec
-    expires_at_msec_label.text = "Expires at msec: %s" % str(expires_at_msec)
-```

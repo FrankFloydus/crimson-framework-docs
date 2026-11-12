@@ -24,16 +24,3 @@ get_ugc_handle() -> String
 ## Description
 
 An empty string means there is no attachment.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_ugc_handle(
-    steam_leaderboard_entry: SteamLeaderboardEntry,
-    ugc_handle_label: Label
-) -> void:
-    var result: String = steam_leaderboard_entry.get_ugc_handle()
-    ugc_handle_label.text = "Ugc handle: %s" % str(result)
-```

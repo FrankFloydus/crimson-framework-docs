@@ -22,21 +22,3 @@ var value: SteamCloudFile
 | Type | [`SteamCloudFile`](/api/classes/SteamCloudFile) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamCloudFileResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_cloud_file_result: SteamCloudFileResult, name_label: Label) -> void:
-    if steam_cloud_file_result == null:
-        return
-    if not steam_cloud_file_result.ok:
-        push_warning(steam_cloud_file_result.message)
-        return
-    var value: SteamCloudFile = steam_cloud_file_result.value
-    if value == null:
-        return
-    var name: String = value.name
-    name_label.text = "Name: %s" % str(name)
-```

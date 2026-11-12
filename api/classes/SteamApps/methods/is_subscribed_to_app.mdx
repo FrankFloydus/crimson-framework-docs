@@ -28,22 +28,3 @@ is_subscribed_to_app(app_id: int) -> bool
 ## Description
 
 The AppID must be positive. Returns `false` when the query is invalid or unavailable.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_subscribed_to_app(
-    steam_client: SteamClient,
-    app_id: int,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_apps: SteamApps = steam_client.apps()
-    if steam_apps == null:
-        return
-    var result: bool = steam_apps.is_subscribed_to_app(app_id)
-    status_label.text = "Subscribed to app: yes" if result else "Subscribed to app: no"
-```

@@ -28,32 +28,3 @@ tagged(tag: String) -> SteamWorkshopPublishRequest
 ## Description
 
 Supply up to 16 distinct tags using printable characters other than commas. A tag supports up to 255 UTF-8 bytes, and Steam also bounds the combined set. Leaving tags unset on an edit preserves the existing set.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_tagged(
-    steam_workshop_publish_request: SteamWorkshopPublishRequest,
-    tag: String,
-    confirmed: bool,
-    published_id_label: Label
-) -> void:
-    var result: SteamWorkshopPublishRequest = steam_workshop_publish_request.tagged(tag)
-    if result == null:
-        return
-    if not confirmed:
-        return
-    var completion: SteamWorkshopPublicationResult = await result.submit()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamWorkshopPublication = completion.value
-    if payload == null:
-        return
-    var published_id: String = payload.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```

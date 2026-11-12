@@ -22,16 +22,3 @@ var needs_action: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`get_needs_action()`](/api/classes/SteamWorkshopLegalAgreementStatus/methods/get_needs_action) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_needs_action(
-    steam_workshop_legal_agreement_status: SteamWorkshopLegalAgreementStatus,
-    status_label: Label
-) -> void:
-    var needs_action: bool = steam_workshop_legal_agreement_status.needs_action
-    status_label.text = "Needs action: yes" if needs_action else "Needs action: no"
-```

@@ -26,18 +26,3 @@ var value: int
 ## Description
 
 Meaningful when `SteamResult.ok` is true. Zero is also the fallback for a failed read.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_int_result: SteamIntResult, value_label: Label) -> void:
-    if steam_int_result == null:
-        return
-    if not steam_int_result.ok:
-        push_warning(steam_int_result.message)
-        return
-    var value: int = steam_int_result.value
-    value_label.text = "Value: %s" % str(value)
-```

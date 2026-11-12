@@ -22,19 +22,3 @@ restore_all() -> Error
 ## Description
 
 If a placement or policy rejects the restore, read `last_reason`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_restore_all(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_staging.restore_all()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Restore all accepted."
-```

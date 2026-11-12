@@ -28,31 +28,3 @@ definition(definition_id: int) -> Variant
 ## Description
 
 A valid ID absent from the catalog returns `ERR_DOES_NOT_EXIST`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_definition(
-    steam_client: SteamClient,
-    definition_id: int,
-    display_name_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_inventory: SteamInventory = steam_client.inventory()
-    if steam_inventory == null:
-        return
-    var result: SteamItemDefinitionResult = await steam_inventory.definition(definition_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamItemDefinition = result.value
-    if payload == null:
-        return
-    var display_name: String = payload.display_name
-    display_name_label.text = "Display name: %s" % str(display_name)
-```

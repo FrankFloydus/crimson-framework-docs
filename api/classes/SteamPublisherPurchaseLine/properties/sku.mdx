@@ -25,16 +25,3 @@ var sku: StringName = &""
 | Access | Read only |
 | Default | `&""` |
 | Getter | [`get_sku()`](/api/classes/SteamPublisherPurchaseLine/methods/get_sku) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_sku(
-    steam_publisher_purchase_line: SteamPublisherPurchaseLine,
-    apply_sku: Callable
-) -> void:
-    var sku: StringName = steam_publisher_purchase_line.sku
-    apply_sku.call(sku)
-```

@@ -22,13 +22,3 @@ get_user_canceled() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_user_canceled(steam_app_ownership: SteamAppOwnership, status_label: Label) -> void:
-    var result: bool = steam_app_ownership.get_user_canceled()
-    status_label.text = "User canceled: yes" if result else "User canceled: no"
-```

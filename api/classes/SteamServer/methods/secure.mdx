@@ -19,22 +19,4 @@ secure() -> SteamServer
 
 [`SteamServer`](/api/classes/SteamServer)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_secure(
-    steam_server: SteamServer,
-    provider: SteamProvider,
-    definition: GameDefinition,
-    game: GameRuntime
-) -> void:
-    var result: SteamServer = steam_server.secure()
-    if result == null:
-        return
-    # Set the dedicated provider before adding GameRuntime to the tree.
-    if game.is_inside_tree():
-        return
-    game.definition = definition.with_provider(provider.dedicated(result))
-```
+[See gameplay examples for `SteamServer`](/api/classes/SteamServer#examples).

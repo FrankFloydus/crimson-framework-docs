@@ -27,16 +27,3 @@ var annotations_accepted: bool = true
 ## Description
 
 Ordinary screenshots and saves from other scopes have no local annotations to reject.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_annotations_accepted(
-    steam_screenshot: SteamScreenshot,
-    status_label: Label
-) -> void:
-    var annotations_accepted: bool = steam_screenshot.annotations_accepted
-    status_label.text = "Annotations accepted: yes" if annotations_accepted else "Annotations accepted: no"
-```

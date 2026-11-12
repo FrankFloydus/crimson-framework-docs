@@ -29,26 +29,4 @@ indicate_achievement_progress(name: String, current: int, maximum: int) -> Error
 
 `Error`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_indicate_achievement_progress(
-    steam_client: SteamClient,
-    name: String,
-    current: int,
-    maximum: int,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: Error = steam_stats.indicate_achievement_progress(name, current, maximum)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Indicate achievement progress accepted."
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

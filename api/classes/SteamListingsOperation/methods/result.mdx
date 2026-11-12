@@ -18,24 +18,3 @@ result() -> SteamListingsResult
 ## Return value
 
 [`SteamListingsResult`](/api/classes/SteamListingsResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_listings_operation: SteamListingsOperation,
-    results_list: ItemList
-) -> void:
-    var result: SteamListingsResult = steam_listings_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: Array[SteamListing] = result.value
-    results_list.clear()
-    for entry: SteamListing in payload:
-        results_list.add_item(str(entry.name))
-```

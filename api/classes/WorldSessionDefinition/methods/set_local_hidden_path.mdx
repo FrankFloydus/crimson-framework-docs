@@ -23,18 +23,4 @@ set_local_hidden_path(path: NodePath) -> void
 | --- | --- | --- |
 | `path` | `NodePath` | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_local_hidden_path(
-    world_session_definition: WorldSessionDefinition,
-    path: NodePath,
-    session: WorldSession
-) -> void:
-    if world_session_definition == null:
-        return
-    world_session_definition.set_local_hidden_path(path)
-    session.definition = world_session_definition
-```
+[See gameplay examples for `WorldSessionDefinition`](/api/classes/WorldSessionDefinition#examples).

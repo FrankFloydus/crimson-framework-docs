@@ -20,16 +20,3 @@ get_modified_at_unix() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_modified_at_unix(
-    steam_cloud_file: SteamCloudFile,
-    modified_at_unix_label: Label
-) -> void:
-    var result: int = steam_cloud_file.get_modified_at_unix()
-    modified_at_unix_label.text = "Modified at unix: %s" % str(result)
-```

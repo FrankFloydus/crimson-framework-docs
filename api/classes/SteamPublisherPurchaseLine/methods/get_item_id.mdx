@@ -22,16 +22,3 @@ get_item_id() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_item_id(
-    steam_publisher_purchase_line: SteamPublisherPurchaseLine,
-    apply_item_id: Callable
-) -> void:
-    var result: int = steam_publisher_purchase_line.get_item_id()
-    apply_item_id.call(result)
-```

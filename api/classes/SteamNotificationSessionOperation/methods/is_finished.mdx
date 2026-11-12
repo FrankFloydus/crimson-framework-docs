@@ -20,16 +20,3 @@ is_finished() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_finished(
-    steam_notification_session_operation: SteamNotificationSessionOperation,
-    apply_finished: Callable
-) -> void:
-    var result: bool = steam_notification_session_operation.is_finished()
-    apply_finished.call(result)
-```

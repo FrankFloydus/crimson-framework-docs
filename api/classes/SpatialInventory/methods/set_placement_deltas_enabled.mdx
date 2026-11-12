@@ -25,16 +25,4 @@ set_placement_deltas_enabled(enabled: bool) -> void
 
 Grid views enable this when bound to a model. The `changed` signal is always emitted for mutations.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_placement_deltas_enabled(
-    spatial_inventory: SpatialInventory,
-    enabled: bool,
-    after_set_placement_deltas_enabled: Callable
-) -> void:
-    spatial_inventory.set_placement_deltas_enabled(enabled)
-    after_set_placement_deltas_enabled.call()
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

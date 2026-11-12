@@ -22,16 +22,3 @@ var owner_steam_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_owner_steam_id()`](/api/classes/SteamSharedCloudFile/methods/get_owner_steam_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_owner_steam_id(
-    steam_shared_cloud_file: SteamSharedCloudFile,
-    apply_owner_steam_id: Callable
-) -> void:
-    var owner_steam_id: String = steam_shared_cloud_file.owner_steam_id
-    apply_owner_steam_id.call(owner_steam_id)
-```

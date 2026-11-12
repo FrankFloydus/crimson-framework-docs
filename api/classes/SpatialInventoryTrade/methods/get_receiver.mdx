@@ -20,16 +20,3 @@ get_receiver() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_receiver(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    receiver_label: Label
-) -> void:
-    var result: int = spatial_inventory_trade.get_receiver()
-    receiver_label.text = "Receiver: %s" % str(result)
-```

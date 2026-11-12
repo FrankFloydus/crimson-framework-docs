@@ -31,21 +31,4 @@ join(address: String, port: int, timeout_seconds: float = 10.0) -> Error
 
 With ENet, supply the host address and UDP port. timeout\_seconds bounds connection time. OK means the attempt started. Observe phase\_changed and session\_ended for the outcome.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_join(
-    game_runtime: GameRuntime,
-    address: String,
-    port: int,
-    timeout_seconds: float,
-    status_label: Label
-) -> void:
-    var result: Error = game_runtime.join(address, port, timeout_seconds)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Join accepted."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

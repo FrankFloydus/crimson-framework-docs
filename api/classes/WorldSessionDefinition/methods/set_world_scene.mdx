@@ -23,18 +23,4 @@ set_world_scene(scene: PackedScene) -> void
 | --- | --- | --- |
 | `scene` | `PackedScene` | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_world_scene(
-    world_session_definition: WorldSessionDefinition,
-    scene: PackedScene,
-    session: WorldSession
-) -> void:
-    if world_session_definition == null:
-        return
-    world_session_definition.set_world_scene(scene)
-    session.definition = world_session_definition
-```
+[See gameplay examples for `WorldSessionDefinition`](/api/classes/WorldSessionDefinition#examples).

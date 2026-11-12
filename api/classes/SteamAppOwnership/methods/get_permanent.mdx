@@ -22,13 +22,3 @@ get_permanent() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_permanent(steam_app_ownership: SteamAppOwnership, status_label: Label) -> void:
-    var result: bool = steam_app_ownership.get_permanent()
-    status_label.text = "Permanent: yes" if result else "Permanent: no"
-```

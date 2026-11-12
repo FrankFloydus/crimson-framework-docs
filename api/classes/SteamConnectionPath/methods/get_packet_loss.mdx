@@ -20,16 +20,3 @@ get_packet_loss() -> float
 ## Return value
 
 `float`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_packet_loss(
-    steam_connection_path: SteamConnectionPath,
-    packet_loss_label: Label
-) -> void:
-    var result: float = steam_connection_path.get_packet_loss()
-    packet_loss_label.text = "Packet loss: %s" % str(result)
-```

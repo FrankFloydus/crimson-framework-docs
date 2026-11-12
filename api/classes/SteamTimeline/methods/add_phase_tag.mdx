@@ -31,28 +31,3 @@ add_phase_tag(name: String, icon: String, group: String, priority: int = 0) -> E
 ## Description
 
 An empty group leaves the tag out of group filtering. Priority ranges from 0 through 1000.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_add_phase_tag(
-    steam_client: SteamClient,
-    name: String,
-    icon: String,
-    group: String,
-    priority: int,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: Error = steam_timeline.add_phase_tag(name, icon, group, priority)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Add phase tag accepted."
-```

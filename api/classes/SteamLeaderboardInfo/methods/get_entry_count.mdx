@@ -20,16 +20,3 @@ get_entry_count() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_entry_count(
-    steam_leaderboard_info: SteamLeaderboardInfo,
-    entry_count_label: Label
-) -> void:
-    var result: int = steam_leaderboard_info.get_entry_count()
-    entry_count_label.text = "Entry count: %s" % str(result)
-```

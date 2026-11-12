@@ -20,16 +20,3 @@ get_change_type() -> SteamCloudChange.ChangeType
 ## Return value
 
 `SteamCloudChange.ChangeType`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_change_type(
-    steam_cloud_change: SteamCloudChange,
-    change_type_label: Label
-) -> void:
-    var result: SteamCloudChange.ChangeType = steam_cloud_change.get_change_type()
-    change_type_label.text = "Change type: %s" % str(result)
-```

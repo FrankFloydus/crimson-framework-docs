@@ -29,31 +29,3 @@ start_range(title: String, options: TimelineMarkerOptions = null) -> SteamTimeli
 ## Description
 
 End it with `end_range()` or discard it with `remove_event()`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_start_range(
-    steam_client: SteamClient,
-    title: String,
-    options: TimelineMarkerOptions,
-    apply_start_range: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: SteamTimelineEventResult = steam_timeline.start_range(title, options)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamTimelineEvent = result.value
-    if payload == null:
-        return
-    apply_start_range.call(payload)
-```

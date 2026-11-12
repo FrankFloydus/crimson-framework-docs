@@ -20,13 +20,3 @@ get_handle() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_handle(steam_shared_cloud_file: SteamSharedCloudFile, handle_label: Label) -> void:
-    var result: String = steam_shared_cloud_file.get_handle()
-    handle_label.text = "Handle: %s" % str(result)
-```

@@ -24,13 +24,3 @@ get_score() -> int
 ## Description
 
 Interpret it using the board's configured units.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_score(steam_leaderboard_entry: SteamLeaderboardEntry, score_label: Label) -> void:
-    var result: int = steam_leaderboard_entry.get_score()
-    score_label.text = "Score: %s" % str(result)
-```

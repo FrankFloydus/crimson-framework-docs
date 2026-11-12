@@ -23,12 +23,4 @@ get_local_steam_id() -> String
 
 Returns an empty string when the client scope is inactive.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_local_steam_id(steam_client: SteamClient, apply_local_steam_id: Callable) -> void:
-    var result: String = steam_client.get_local_steam_id()
-    apply_local_steam_id.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

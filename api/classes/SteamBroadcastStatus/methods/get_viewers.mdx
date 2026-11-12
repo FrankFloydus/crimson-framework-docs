@@ -20,16 +20,3 @@ get_viewers() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_viewers(
-    steam_broadcast_status: SteamBroadcastStatus,
-    viewers_label: Label
-) -> void:
-    var result: int = steam_broadcast_status.get_viewers()
-    viewers_label.text = "Viewers: %s" % str(result)
-```

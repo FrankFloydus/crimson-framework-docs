@@ -23,17 +23,4 @@ is_active() -> bool
 
 The initial state is false until the current Steam runtime receives an activation event. A detached facade returns false.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_is_active(steam_client: SteamClient, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_overlay: SteamOverlay = steam_client.overlay()
-    if steam_overlay == null:
-        return
-    var result: bool = steam_overlay.is_active()
-    status_label.text = "Active: yes" if result else "Active: no"
-```
+[See gameplay examples for `SteamOverlay`](/api/classes/SteamOverlay#examples).

@@ -28,13 +28,3 @@ set_host(host: Object) -> bool
 ## Description
 
 It provides `save_create_candidate()` and `save_publish(candidate)` and may also validate or discard candidates. Replace the host only when there is no active or queued save or load.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_host(save_coordinator: SaveCoordinator, host: Object, status_label: Label) -> void:
-    var result: bool = save_coordinator.set_host(host)
-    status_label.text = "Host: yes" if result else "Host: no"
-```

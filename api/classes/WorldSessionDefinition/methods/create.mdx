@@ -25,15 +25,67 @@ Add it to the scene tree before starting it.
 
 ## Example
 
+### Enter and exit a solo practice range
+
+Select **Enter** to start an offline practice session with the range's player camera. Select **Leave** to return to the menu. [Build a solo scene](/quickstart)
+
 ```gdscript
 extends Node
 
-func run_create(
-    world_session_definition: WorldSessionDefinition,
-    apply_create: Callable
-) -> void:
-    var result: WorldSession = world_session_definition.create()
-    if result == null:
+const SPAWN_POINTS: NodePath = ^"SpawnPoints"
+const PLAYER_CAMERA: NodePath = ^"Camera3D"
+const PLAYER_BODY: NodePath = ^"Body"
+
+@export var practice_range: PackedScene
+@export var player_scene: PackedScene
+@export var start_practice: Button
+@export var exit_range: Button
+@export var status: Label
+
+var _session: WorldSession
+
+
+func _ready() -> void:
+    exit_range.hide()
+    start_practice.pressed.connect(_enter_range)
+    exit_range.pressed.connect(_exit_range)
+    if practice_range == null or player_scene == null:
+        status.text = "Assign the practice range and player scenes."
+        start_practice.disabled = true
         return
-    apply_create.call(result)
+
+    var definition: WorldSessionDefinition = (
+        WorldSession.configure()
+        .with_world(practice_range)
+        .with_players(player_scene, SPAWN_POINTS)
+        .with_local_view(PLAYER_CAMERA, PLAYER_BODY)
+    )
+    _session = definition.create()
+    add_child(_session)
+    _session.session_ended.connect(_on_session_ended)
+
+
+func _enter_range() -> void:
+    var error: Error = _session.start_offline()
+    if error != OK:
+        status.text = "Could not open the practice range: %s" % error_string(error)
+        return
+
+    var player: Node3D = _session.get_local_player()
+    var position: Vector3 = player.global_position
+    status.text = "Practice range | Starting position: %s" % position
+    start_practice.hide()
+    exit_range.show()
+
+
+func _exit_range() -> void:
+    var error: Error = _session.leave()
+    if error != OK:
+        status.text = "Could not exit the practice range: %s" % error_string(error)
+
+
+func _on_session_ended(_reason: StringName) -> void:
+    exit_range.hide()
+    start_practice.show()
+    status.text = "Choose Start Practice to return to the range."
 ```

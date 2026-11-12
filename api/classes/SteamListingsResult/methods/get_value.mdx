@@ -21,19 +21,4 @@ get_value() -> SteamListing[]
 
 `SteamListing[]`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_listings_result: SteamListingsResult, results_list: ItemList) -> void:
-    if steam_listings_result == null:
-        return
-    if not steam_listings_result.ok:
-        push_warning(steam_listings_result.message)
-        return
-    var result: Array[SteamListing] = steam_listings_result.get_value()
-    results_list.clear()
-    for entry: SteamListing in result:
-        results_list.add_item(str(entry.name))
-```
+[See gameplay examples for `SteamListingsResult`](/api/classes/SteamListingsResult#examples).

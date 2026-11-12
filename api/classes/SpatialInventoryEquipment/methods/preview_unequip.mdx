@@ -30,21 +30,3 @@ preview_unequip(slot: StringName, origin: Vector2i = Vector2i(-1, -1), rotated: 
 ## Description
 
 `Vector2i(-1, -1)` selects first fit, and null rotation keeps the item's stored orientation.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_preview_unequip(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    slot: StringName,
-    origin: Vector2i,
-    rotated: Variant,
-    apply_preview_unequip: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_equipment.preview_unequip(slot, origin, rotated)
-    if result.is_empty():
-        return
-    apply_preview_unequip.call(result)
-```

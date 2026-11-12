@@ -22,16 +22,3 @@ get_next_since_unix() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_next_since_unix(
-    steam_purchase_reconciliation: SteamPurchaseReconciliation,
-    next_since_unix_label: Label
-) -> void:
-    var result: int = steam_purchase_reconciliation.get_next_since_unix()
-    next_since_unix_label.text = "Next since unix: %s" % str(result)
-```

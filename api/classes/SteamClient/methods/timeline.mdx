@@ -19,14 +19,4 @@ timeline() -> SteamTimeline
 
 [`SteamTimeline`](/api/classes/SteamTimeline)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_timeline(steam_client: SteamClient, apply_timeline: Callable) -> void:
-    var result: SteamTimeline = steam_client.timeline()
-    if result == null:
-        return
-    apply_timeline.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

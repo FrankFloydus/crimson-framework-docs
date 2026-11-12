@@ -20,16 +20,3 @@ get_revision() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_revision(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    revision_label: Label
-) -> void:
-    var result: int = spatial_inventory_trade.get_revision()
-    revision_label.text = "Revision: %s" % str(result)
-```

@@ -22,16 +22,3 @@ get_next_report_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_next_report_id(
-    steam_cheat_report_page: SteamCheatReportPage,
-    apply_next_report_id: Callable
-) -> void:
-    var result: String = steam_cheat_report_page.get_next_report_id()
-    apply_next_report_id.call(result)
-```

@@ -22,17 +22,3 @@ get_lines() -> SteamPublisherPurchaseLine[]
 ## Return value
 
 `SteamPublisherPurchaseLine[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_lines(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    add_lines_entry: Callable
-) -> void:
-    var result: Array[SteamPublisherPurchaseLine] = steam_publisher_purchase_order.get_lines()
-    for entry: SteamPublisherPurchaseLine in result:
-        add_lines_entry.call(entry)
-```

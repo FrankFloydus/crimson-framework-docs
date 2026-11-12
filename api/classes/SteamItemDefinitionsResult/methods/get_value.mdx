@@ -20,23 +20,3 @@ get_value() -> SteamItemDefinition[]
 ## Return value
 
 `SteamItemDefinition[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_item_definitions_result: SteamItemDefinitionsResult,
-    results_list: ItemList
-) -> void:
-    if steam_item_definitions_result == null:
-        return
-    if not steam_item_definitions_result.ok:
-        push_warning(steam_item_definitions_result.message)
-        return
-    var result: Array[SteamItemDefinition] = steam_item_definitions_result.get_value()
-    results_list.clear()
-    for entry: SteamItemDefinition in result:
-        results_list.add_item(str(entry.display_name))
-```

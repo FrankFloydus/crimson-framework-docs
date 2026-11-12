@@ -24,16 +24,3 @@ var license_owner_steam_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_license_owner_steam_id()`](/api/classes/SteamAppOwnership/methods/get_license_owner_steam_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_license_owner_steam_id(
-    steam_app_ownership: SteamAppOwnership,
-    apply_license_owner_steam_id: Callable
-) -> void:
-    var license_owner_steam_id: String = steam_app_ownership.license_owner_steam_id
-    apply_license_owner_steam_id.call(license_owner_steam_id)
-```

@@ -30,26 +30,3 @@ Await the call to receive [`SteamWorkshopPublicationResult`](/api/classes/SteamW
 ## Description
 
 Steam uploads the chosen content and preview. Keep those paths available while Steam may still complete a submitted update. `change_notes` supports up to 7,999 UTF-8 bytes. If Steam has already created an item, an interrupted upload can return its published ID even when `SteamResult.ok` is false. When `SteamWorkshopPublication.needs_legal_agreement` is true, offer `SteamWorkshop.show_legal_agreement()` and check `SteamWorkshop.legal_agreement_status()` after the author closes the overlay. Continue a known item through `SteamWorkshopItemRef.edit()` using the original published ID.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_submit(
-    steam_workshop_publish_request: SteamWorkshopPublishRequest,
-    change_notes: String,
-    published_id_label: Label
-) -> void:
-    var result: SteamWorkshopPublicationResult = await steam_workshop_publish_request.submit(change_notes)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamWorkshopPublication = result.value
-    if payload == null:
-        return
-    var published_id: String = payload.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```

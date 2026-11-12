@@ -22,20 +22,3 @@ capture() -> SteamVoiceCapture
 ## Description
 
 A new unattached service has no capture handle. A retained handle returns `ERR_UNAVAILABLE` after its scope stops.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_capture(steam_client: SteamClient, apply_capture: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_voice: SteamVoice = steam_client.voice()
-    if steam_voice == null:
-        return
-    var result: SteamVoiceCapture = steam_voice.capture()
-    if result == null:
-        return
-    apply_capture.call(result)
-```

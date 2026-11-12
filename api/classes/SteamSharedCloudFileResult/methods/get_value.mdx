@@ -20,24 +20,3 @@ get_value() -> SteamSharedCloudFile
 ## Return value
 
 [`SteamSharedCloudFile`](/api/classes/SteamSharedCloudFile)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_shared_cloud_file_result: SteamSharedCloudFileResult,
-    name_label: Label
-) -> void:
-    if steam_shared_cloud_file_result == null:
-        return
-    if not steam_shared_cloud_file_result.ok:
-        push_warning(steam_shared_cloud_file_result.message)
-        return
-    var result: SteamSharedCloudFile = steam_shared_cloud_file_result.get_value()
-    if result == null:
-        return
-    var name: String = result.name
-    name_label.text = "Name: %s" % str(name)
-```

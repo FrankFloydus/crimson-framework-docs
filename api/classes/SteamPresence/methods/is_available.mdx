@@ -18,18 +18,3 @@ is_available() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_available(steam_client: SteamClient, action_button: Button) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_presence: SteamPresence = steam_client.presence()
-    if steam_presence == null:
-        return
-    var result: bool = steam_presence.is_available()
-    action_button.disabled = not result
-```

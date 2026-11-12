@@ -28,17 +28,3 @@ get_prepared_candidate(ticket: int) -> Variant
 ## Description
 
 Returns null when the candidate is unavailable. Release borrowed references when the ticket finishes.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_prepared_candidate(
-    save_coordinator: SaveCoordinator,
-    ticket: int,
-    apply_prepared_candidate: Callable
-) -> void:
-    var result: Variant = save_coordinator.get_prepared_candidate(ticket)
-    apply_prepared_candidate.call(result)
-```

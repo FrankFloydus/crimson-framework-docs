@@ -24,13 +24,3 @@ get_mode() -> SteamAnalogInput.Mode
 ## Description
 
 Inactive actions return `MODE_NONE`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_mode(steam_analog_input: SteamAnalogInput, mode_label: Label) -> void:
-    var result: SteamAnalogInput.Mode = steam_analog_input.get_mode()
-    mode_label.text = "Mode: %s" % str(result)
-```

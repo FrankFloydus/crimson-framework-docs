@@ -24,16 +24,3 @@ var from_unix: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_from_unix()`](/api/classes/SteamModerationRequest/methods/get_from_unix) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_from_unix(
-    steam_moderation_request: SteamModerationRequest,
-    apply_from_unix: Callable
-) -> void:
-    var from_unix: int = steam_moderation_request.from_unix
-    apply_from_unix.call(from_unix)
-```

@@ -19,14 +19,4 @@ voice() -> SteamVoice
 
 [`SteamVoice`](/api/classes/SteamVoice)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_voice(steam_scope: SteamScope, apply_voice: Callable) -> void:
-    var result: SteamVoice = steam_scope.voice()
-    if result == null:
-        return
-    apply_voice.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

@@ -20,13 +20,3 @@ is_measuring() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_measuring(steam_relay_status: SteamRelayStatus, status_label: Label) -> void:
-    var result: bool = steam_relay_status.is_measuring()
-    status_label.text = "Measuring: yes" if result else "Measuring: no"
-```

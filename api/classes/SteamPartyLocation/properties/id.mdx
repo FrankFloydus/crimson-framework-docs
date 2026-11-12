@@ -22,13 +22,3 @@ var id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_id()`](/api/classes/SteamPartyLocation/methods/get_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_id(steam_party_location: SteamPartyLocation, id_label: Label) -> void:
-    var id: String = steam_party_location.id
-    id_label.text = "Id: %s" % str(id)
-```

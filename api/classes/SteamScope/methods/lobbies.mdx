@@ -25,12 +25,55 @@ Retained services expire on tree exit.
 
 ## Example
 
+### Join the first public arena with room for a player
+
+Press Find game to join the first public arena with a free seat. The search uses the [game's Steam provider and lobby namespace](/steam/listen-servers#find-an-open-game).
+
 ```gdscript
 extends Node
 
-func run_lobbies(steam_scope: SteamScope, apply_lobbies: Callable) -> void:
-    var result: SteamLobbies = steam_scope.lobbies()
-    if result == null:
+const ARENA_ID: StringName = &"arena"
+const OPEN_SEATS: int = 1
+
+@export var game: GameRuntime
+@export var find_game_button: Button
+@export var status_label: Label
+
+func _ready() -> void:
+    if game == null or find_game_button == null or status_label == null:
+        push_error("Assign the game, Find game button, and status label.")
         return
-    apply_lobbies.call(result)
+    find_game_button.pressed.connect(_find_arena)
+
+func _find_arena() -> void:
+    var scope: SteamScope = SteamServices.for_game(game)
+    if scope == null or not scope.is_ready():
+        status_label.text = "Steam multiplayer is unavailable."
+        return
+
+    var lobbies: SteamLobbies = scope.lobbies()
+    if lobbies == null:
+        status_label.text = "Steam lobbies are unavailable."
+        return
+
+    find_game_button.disabled = true
+    status_label.text = "Looking for an open arena…"
+    var query: SteamLobbyQuery = lobbies.query().on_map(ARENA_ID).with_room_for(OPEN_SEATS)
+    var found: SteamListingsResult = await query.fetch()
+    if not found.ok:
+        status_label.text = found.message
+        find_game_button.disabled = false
+        return
+    if found.value.is_empty():
+        status_label.text = "No public arenas have a free seat."
+        find_game_button.disabled = false
+        return
+
+    var arena: SteamListing = found.value[0]
+    var joined: Dictionary = await game.join_listing(arena).wait()
+    if not joined.ok:
+        status_label.text = joined.message
+        find_game_button.disabled = false
+        return
+    status_label.text = "Joined the arena."
 ```

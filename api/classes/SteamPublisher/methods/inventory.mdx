@@ -20,15 +20,3 @@ inventory() -> SteamPublisherInventory
 ## Return value
 
 [`SteamPublisherInventory`](/api/classes/SteamPublisherInventory)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_inventory(steam_publisher: SteamPublisher, apply_inventory: Callable) -> void:
-    var result: SteamPublisherInventory = steam_publisher.inventory()
-    if result == null:
-        return
-    apply_inventory.call(result)
-```

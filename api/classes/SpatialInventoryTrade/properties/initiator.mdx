@@ -23,16 +23,3 @@ var initiator: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_initiator()`](/api/classes/SpatialInventoryTrade/methods/get_initiator) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_initiator(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    initiator_label: Label
-) -> void:
-    var initiator: int = spatial_inventory_trade.initiator
-    initiator_label.text = "Initiator: %s" % str(initiator)
-```

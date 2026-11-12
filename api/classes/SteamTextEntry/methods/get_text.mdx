@@ -20,13 +20,3 @@ get_text() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_text(steam_text_entry: SteamTextEntry, text_label: Label) -> void:
-    var result: String = steam_text_entry.get_text()
-    text_label.text = "Text: %s" % str(result)
-```

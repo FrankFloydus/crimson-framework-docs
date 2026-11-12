@@ -28,20 +28,3 @@ try_close(restore: bool = false) -> Error
 ## Description
 
 If `restore` is true, attempt to restore everything first. Otherwise an occupied tray returns `ERR_BUSY`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_try_close(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    restore: bool,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_staging.try_close(restore)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Try close accepted."
-```

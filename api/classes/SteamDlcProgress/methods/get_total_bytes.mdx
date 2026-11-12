@@ -20,16 +20,3 @@ get_total_bytes() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_total_bytes(
-    steam_dlc_progress: SteamDlcProgress,
-    total_bytes_label: Label
-) -> void:
-    var result: int = steam_dlc_progress.get_total_bytes()
-    total_bytes_label.text = "Total bytes: %s" % str(result)
-```

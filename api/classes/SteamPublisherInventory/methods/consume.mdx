@@ -33,33 +33,3 @@ consume(player: SteamIdentity, instance_id: String, quantity: int, request_id: S
 ## Description
 
 Supply the same nonzero unsigned decimal `request_id` for a retry of the same authorized operation. A recognized confirmation includes exactly one changed or removed row for the requested stack.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_consume(
-    steam_publisher: SteamPublisher,
-    player: SteamIdentity,
-    instance_id: String,
-    quantity: int,
-    request_id: String,
-    apply_consume: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_inventory: SteamPublisherInventory = steam_publisher.inventory()
-    if steam_publisher_inventory == null:
-        return
-    var result: SteamInventoryChangeResult = await steam_publisher_inventory.consume(player, instance_id, quantity, request_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventoryChange = result.value
-    if payload == null:
-        return
-    apply_consume.call(payload)
-```

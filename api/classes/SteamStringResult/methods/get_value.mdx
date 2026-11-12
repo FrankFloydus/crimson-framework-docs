@@ -20,18 +20,3 @@ get_value() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_string_result: SteamStringResult, value_label: Label) -> void:
-    if steam_string_result == null:
-        return
-    if not steam_string_result.ok:
-        push_warning(steam_string_result.message)
-        return
-    var result: String = steam_string_result.get_value()
-    value_label.text = "Value: %s" % str(result)
-```

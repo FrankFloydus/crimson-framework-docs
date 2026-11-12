@@ -22,19 +22,3 @@ cancel() -> Error
 ## Description
 
 A store already issued to Steam can still persist. Returns `ERR_DOES_NOT_EXIST` once the observer is settled.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(
-    steam_server_stats_operation: SteamServerStatsOperation,
-    status_label: Label
-) -> void:
-    var result: Error = steam_server_stats_operation.cancel()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Cancel accepted."
-```

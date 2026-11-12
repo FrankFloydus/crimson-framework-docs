@@ -30,21 +30,3 @@ quick_transfer_matching(source: SpatialInventory, id: StringName, destinations: 
 ## Description
 
 The result includes per-item `transfers` and the number of completed source stacks. Transfers commit separately, so some items can stay in the source even when the batch reports `OK`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_quick_transfer_matching(
-    spatial_inventory_actions: SpatialInventoryActions,
-    source: SpatialInventory,
-    id: StringName,
-    destinations: Array,
-    apply_quick_transfer_matching: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_actions.quick_transfer_matching(source, id, destinations)
-    if result.is_empty():
-        return
-    apply_quick_transfer_matching.call(result)
-```

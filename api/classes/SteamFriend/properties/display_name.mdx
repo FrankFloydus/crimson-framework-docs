@@ -26,13 +26,3 @@ var display_name: String
 ## Description
 
 An empty string means Steam supplied no name.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_display_name(steam_friend: SteamFriend, display_name_label: Label) -> void:
-    var display_name: String = steam_friend.display_name
-    display_name_label.text = "Display name: %s" % str(display_name)
-```

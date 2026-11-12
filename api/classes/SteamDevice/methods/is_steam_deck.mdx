@@ -18,18 +18,3 @@ is_steam_deck() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_steam_deck(steam_client: SteamClient, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_device: SteamDevice = steam_client.device()
-    if steam_device == null:
-        return
-    var result: bool = steam_device.is_steam_deck()
-    status_label.text = "Steam deck: yes" if result else "Steam deck: no"
-```

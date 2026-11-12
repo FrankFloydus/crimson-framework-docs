@@ -28,18 +28,3 @@ var move_policy: Callable = Callable()
 ## Description
 
 Return an empty string to allow the change.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_move_policy(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    new_move_policy: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_equipment.move_policy = new_move_policy
-    var active_move_policy: Callable = spatial_inventory_equipment.move_policy
-    action_button.disabled = not active_move_policy.is_valid()
-```

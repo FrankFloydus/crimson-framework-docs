@@ -29,23 +29,4 @@ stat_float(name: String) -> SteamFloatResult
 
 Check `SteamResult.ok` before using its value. The result reports an invalid name, an unavailable interface, or a missing stat of the requested type.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_stat_float(steam_client: SteamClient, name: String, stat_float_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: SteamFloatResult = steam_stats.stat_float(name)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: float = result.value
-    stat_float_label.text = "Stat float: %s" % str(payload)
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

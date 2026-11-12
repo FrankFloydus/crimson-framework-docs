@@ -28,17 +28,3 @@ validate_prepared_load_for_save(ticket: int) -> bool
 ## Description
 
 The selected generation must still be the head when checked. Wait for the terminal success result before retrying a save over that head.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_validate_prepared_load_for_save(
-    save_coordinator: SaveCoordinator,
-    ticket: int,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.validate_prepared_load_for_save(ticket)
-    status_label.text = "Validate prepared load for save: yes" if result else "Validate prepared load for save: no"
-```

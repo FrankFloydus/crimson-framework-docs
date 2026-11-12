@@ -28,20 +28,4 @@ var service_provider: GameServiceProvider
 
 Set before the game enters the scene tree. Leave empty to use Crimson's native defaults.
 
-## Example
-
-```gdscript
-extends Node
-
-func update_service_provider(
-    game_definition: GameDefinition,
-    new_service_provider: GameServiceProvider,
-    game: GameRuntime
-) -> void:
-    if game_definition == null:
-        return
-    if game.is_inside_tree():
-        return
-    game_definition.service_provider = new_service_provider
-    game.definition = game_definition
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

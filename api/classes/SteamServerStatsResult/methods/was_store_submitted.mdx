@@ -20,16 +20,3 @@ was_store_submitted() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_was_store_submitted(
-    steam_server_stats_result: SteamServerStatsResult,
-    status_label: Label
-) -> void:
-    var result: bool = steam_server_stats_result.was_store_submitted()
-    status_label.text = "Was store submitted: yes" if result else "Was store submitted: no"
-```

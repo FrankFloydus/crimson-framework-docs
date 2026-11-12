@@ -26,18 +26,3 @@ var value: float
 ## Description
 
 Meaningful when `SteamResult.ok` is true. A failed read also has a value of 0.0.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_float_result: SteamFloatResult, value_label: Label) -> void:
-    if steam_float_result == null:
-        return
-    if not steam_float_result.ok:
-        push_warning(steam_float_result.message)
-        return
-    var value: float = steam_float_result.value
-    value_label.text = "Value: %s" % str(value)
-```

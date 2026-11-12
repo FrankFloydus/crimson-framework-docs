@@ -27,25 +27,4 @@ vote(up: bool) -> Variant
 
 Await the call to receive [`SteamWorkshopVoteResult`](/api/classes/SteamWorkshopVoteResult).
 
-## Example
-
-```gdscript
-extends Node
-
-func run_vote(
-    steam_workshop_item_ref: SteamWorkshopItemRef,
-    up: bool,
-    published_id_label: Label
-) -> void:
-    var result: SteamWorkshopVoteResult = await steam_workshop_item_ref.vote(up)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamWorkshopVote = result.value
-    if payload == null:
-        return
-    var published_id: String = payload.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```
+[See gameplay examples for `SteamWorkshopItemRef`](/api/classes/SteamWorkshopItemRef#examples).

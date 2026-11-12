@@ -19,14 +19,4 @@ video() -> SteamVideo
 
 [`SteamVideo`](/api/classes/SteamVideo)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_video(steam_scope: SteamScope, apply_video: Callable) -> void:
-    var result: SteamVideo = steam_scope.video()
-    if result == null:
-        return
-    apply_video.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

@@ -22,22 +22,3 @@ metadata() -> SteamLeaderboardInfoResult
 ## Description
 
 The result reports `@GlobalScope.ERR_UNAVAILABLE` after the board scope stops.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_metadata(steam_leaderboard: SteamLeaderboard, name_label: Label) -> void:
-    var result: SteamLeaderboardInfoResult = steam_leaderboard.metadata()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamLeaderboardInfo = result.value
-    if payload == null:
-        return
-    var name: String = payload.name
-    name_label.text = "Name: %s" % str(name)
-```

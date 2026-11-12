@@ -30,28 +30,3 @@ Await the call to receive [`SteamStringResult`](/api/classes/SteamStringResult).
 ## Description
 
 Concurrent lookups of the same AppID share a single Steam request.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_projection_settings(
-    steam_client: SteamClient,
-    video_app_id: int,
-    projection_settings_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_video: SteamVideo = steam_client.video()
-    if steam_video == null:
-        return
-    var result: SteamStringResult = await steam_video.projection_settings(video_app_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: String = result.value
-    projection_settings_label.text = "Projection settings: %s" % str(payload)
-```

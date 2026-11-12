@@ -26,13 +26,3 @@ var score: int
 ## Description
 
 Interpret it using the board's configured units.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_score(steam_leaderboard_entry: SteamLeaderboardEntry, score_label: Label) -> void:
-    var score: int = steam_leaderboard_entry.score
-    score_label.text = "Score: %s" % str(score)
-```

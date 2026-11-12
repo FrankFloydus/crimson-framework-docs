@@ -22,17 +22,3 @@ get_reversed_item_ids() -> PackedInt64Array
 ## Return value
 
 `PackedInt64Array`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_reversed_item_ids(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    add_reversed_item_ids_entry: Callable
-) -> void:
-    var result: PackedInt64Array = steam_publisher_purchase_order.get_reversed_item_ids()
-    for entry: int in result:
-        add_reversed_item_ids_entry.call(entry)
-```

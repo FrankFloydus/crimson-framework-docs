@@ -29,22 +29,4 @@ join_online(listing_id: String) -> GameOperation
 
 The operation succeeds after admission, world synchronization, and local player readiness.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_join_online(
-    game_runtime: GameRuntime,
-    listing_id: String,
-    status_label: Label
-) -> void:
-    var result: GameOperation = game_runtime.join_online(listing_id)
-    if result == null:
-        return
-    var result_value: Dictionary = await result.wait()
-    if not result_value.get("ok", false):
-        status_label.text = str(result_value.get("message", "Operation failed."))
-        return
-    status_label.text = "Join online completed."
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

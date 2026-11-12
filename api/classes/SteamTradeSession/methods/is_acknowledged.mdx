@@ -22,13 +22,3 @@ is_acknowledged() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_acknowledged(steam_trade_session: SteamTradeSession, status_label: Label) -> void:
-    var result: bool = steam_trade_session.is_acknowledged()
-    status_label.text = "Acknowledged: yes" if result else "Acknowledged: no"
-```

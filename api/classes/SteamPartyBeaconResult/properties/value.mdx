@@ -22,23 +22,3 @@ var value: SteamPartyBeacon
 | Type | [`SteamPartyBeacon`](/api/classes/SteamPartyBeacon) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamPartyBeaconResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_party_beacon_result: SteamPartyBeaconResult,
-    apply_value: Callable
-) -> void:
-    if steam_party_beacon_result == null:
-        return
-    if not steam_party_beacon_result.ok:
-        push_warning(steam_party_beacon_result.message)
-        return
-    var value: SteamPartyBeacon = steam_party_beacon_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

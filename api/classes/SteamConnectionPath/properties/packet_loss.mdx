@@ -27,16 +27,3 @@ var packet_loss: float = -1.0
 ## Description
 
 Steam can count reordered packets in this metric. `-1.0` means unavailable.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_packet_loss(
-    steam_connection_path: SteamConnectionPath,
-    packet_loss_label: Label
-) -> void:
-    var packet_loss: float = steam_connection_path.packet_loss
-    packet_loss_label.text = "Packet loss: %s" % str(packet_loss)
-```

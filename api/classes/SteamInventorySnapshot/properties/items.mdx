@@ -22,17 +22,3 @@ var items: SteamItemInstance[]
 | Type | `SteamItemInstance[]` |
 | Access | Read only |
 | Getter | [`get_items()`](/api/classes/SteamInventorySnapshot/methods/get_items) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_items(
-    steam_inventory_snapshot: SteamInventorySnapshot,
-    add_items_entry: Callable
-) -> void:
-    var items: Array[SteamItemInstance] = steam_inventory_snapshot.items
-    for entry: SteamItemInstance in items:
-        add_items_entry.call(entry)
-```

@@ -20,16 +20,3 @@ get_steam_result() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_steam_result(
-    steam_server_stats_result: SteamServerStatsResult,
-    steam_result_label: Label
-) -> void:
-    var result: int = steam_server_stats_result.get_steam_result()
-    steam_result_label.text = "Steam result: %s" % str(result)
-```

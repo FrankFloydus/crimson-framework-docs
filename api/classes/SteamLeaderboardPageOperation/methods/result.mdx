@@ -18,24 +18,3 @@ result() -> SteamLeaderboardPageResult
 ## Return value
 
 [`SteamLeaderboardPageResult`](/api/classes/SteamLeaderboardPageResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_leaderboard_page_operation: SteamLeaderboardPageOperation,
-    apply_result: Callable
-) -> void:
-    var result: SteamLeaderboardPageResult = steam_leaderboard_page_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamLeaderboardPage = result.value
-    if payload == null:
-        return
-    apply_result.call(payload)
-```

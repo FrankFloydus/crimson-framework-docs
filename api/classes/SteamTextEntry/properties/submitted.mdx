@@ -27,13 +27,3 @@ var submitted: bool = false
 ## Description
 
 An accepted empty value still counts as submission. A dismissal has `submitted = false`.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_submitted(steam_text_entry: SteamTextEntry, status_label: Label) -> void:
-    var submitted: bool = steam_text_entry.submitted
-    status_label.text = "Submitted: yes" if submitted else "Submitted: no"
-```

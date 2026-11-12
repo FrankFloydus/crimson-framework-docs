@@ -24,16 +24,3 @@ var issued_at_unix: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_issued_at_unix()`](/api/classes/SteamOwnership/methods/get_issued_at_unix) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_issued_at_unix(
-    steam_ownership: SteamOwnership,
-    issued_at_unix_label: Label
-) -> void:
-    var issued_at_unix: int = steam_ownership.issued_at_unix
-    issued_at_unix_label.text = "Issued at unix: %s" % str(issued_at_unix)
-```

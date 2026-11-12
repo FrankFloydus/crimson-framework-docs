@@ -22,23 +22,3 @@ wait() -> Variant
 `Variant`
 
 Await the call to receive [`SteamNotificationSessionsResult`](/api/classes/SteamNotificationSessionsResult).
-
-## Example
-
-```gdscript
-extends Node
-
-func run_wait(
-    steam_notification_sessions_operation: SteamNotificationSessionsOperation,
-    add_wait_entry: Callable
-) -> void:
-    var result: SteamNotificationSessionsResult = await steam_notification_sessions_operation.wait()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: Array[SteamNotificationSession] = result.value
-    for entry: SteamNotificationSession in payload:
-        add_wait_entry.call(entry)
-```

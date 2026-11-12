@@ -24,16 +24,3 @@ var reporter_steam_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_reporter_steam_id()`](/api/classes/SteamCheatEvidence/methods/get_reporter_steam_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_reporter_steam_id(
-    steam_cheat_evidence: SteamCheatEvidence,
-    apply_reporter_steam_id: Callable
-) -> void:
-    var reporter_steam_id: String = steam_cheat_evidence.reporter_steam_id
-    apply_reporter_steam_id.call(reporter_steam_id)
-```

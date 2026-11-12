@@ -20,17 +20,3 @@ get_items() -> SteamItemInstance[]
 ## Return value
 
 `SteamItemInstance[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_items(
-    steam_inventory_snapshot: SteamInventorySnapshot,
-    add_items_entry: Callable
-) -> void:
-    var result: Array[SteamItemInstance] = steam_inventory_snapshot.get_items()
-    for entry: SteamItemInstance in result:
-        add_items_entry.call(entry)
-```

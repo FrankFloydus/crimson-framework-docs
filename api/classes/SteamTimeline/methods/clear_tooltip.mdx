@@ -24,25 +24,3 @@ clear_tooltip(offset_seconds: float = 0.0) -> Error
 ## Return value
 
 `Error`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_clear_tooltip(
-    steam_client: SteamClient,
-    offset_seconds: float,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: Error = steam_timeline.clear_tooltip(offset_seconds)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Clear tooltip accepted."
-```

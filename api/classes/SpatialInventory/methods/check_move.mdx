@@ -31,21 +31,4 @@ check_move(id: StringName, origin: Vector2i, rotated: bool) -> Error
 
 The item's current cells are treated as free.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_check_move(
-    spatial_inventory: SpatialInventory,
-    id: StringName,
-    origin: Vector2i,
-    rotated: bool,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory.check_move(id, origin, rotated)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Check move accepted."
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

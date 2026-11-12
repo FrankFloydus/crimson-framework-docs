@@ -23,14 +23,4 @@ timeline() -> SteamTimeline
 
 Returns null when this generation has ended.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_timeline(steam_scope: SteamScope, apply_timeline: Callable) -> void:
-    var result: SteamTimeline = steam_scope.timeline()
-    if result == null:
-        return
-    apply_timeline.call(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

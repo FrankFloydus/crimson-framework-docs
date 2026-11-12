@@ -26,13 +26,3 @@ var samples: PackedByteArray
 ## Description
 
 The size is an even number of bytes.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_samples(steam_voice_pcm: SteamVoicePcm, byte_count_label: Label) -> void:
-    var samples: PackedByteArray = steam_voice_pcm.samples
-    byte_count_label.text = "%d bytes" % samples.size()
-```

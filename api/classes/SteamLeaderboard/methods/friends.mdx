@@ -28,28 +28,3 @@ friends(limit: int = 100) -> SteamLeaderboardPageOperation
 ## Description
 
 The limit is between 1 and 100. Results use the same page format as `entries()`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_friends(
-    steam_leaderboard: SteamLeaderboard,
-    limit: int,
-    apply_friends: Callable
-) -> void:
-    var result: SteamLeaderboardPageOperation = steam_leaderboard.friends(limit)
-    if result == null:
-        return
-    var result_value: SteamLeaderboardPageResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamLeaderboardPage = result_value.value
-    if payload == null:
-        return
-    apply_friends.call(payload)
-```

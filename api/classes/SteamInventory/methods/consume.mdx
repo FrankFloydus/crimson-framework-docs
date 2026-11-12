@@ -29,34 +29,3 @@ consume(instance_id: String, quantity: int = 1) -> Variant
 ## Description
 
 Use a confirmation step in the game UI before submitting this action. Returns [`SteamInventoryChangeResult`](/api/classes/SteamInventoryChangeResult). Refresh inventory before retrying after a timeout.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_consume(
-    steam_client: SteamClient,
-    consumption_confirmed: bool,
-    instance_id: String,
-    quantity: int,
-    apply_consume: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_inventory: SteamInventory = steam_client.inventory()
-    if steam_inventory == null:
-        return
-    if not consumption_confirmed:
-        return
-    var result: SteamInventoryChangeResult = await steam_inventory.consume(instance_id, quantity)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventoryChange = result.value
-    if payload == null:
-        return
-    apply_consume.call(payload)
-```

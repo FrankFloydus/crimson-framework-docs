@@ -22,24 +22,3 @@ var value: SteamLeaderboardInfo
 | Type | [`SteamLeaderboardInfo`](/api/classes/SteamLeaderboardInfo) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamLeaderboardInfoResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_leaderboard_info_result: SteamLeaderboardInfoResult,
-    name_label: Label
-) -> void:
-    if steam_leaderboard_info_result == null:
-        return
-    if not steam_leaderboard_info_result.ok:
-        push_warning(steam_leaderboard_info_result.message)
-        return
-    var value: SteamLeaderboardInfo = steam_leaderboard_info_result.value
-    if value == null:
-        return
-    var name: String = value.name
-    name_label.text = "Name: %s" % str(name)
-```

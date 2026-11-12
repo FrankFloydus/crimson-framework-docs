@@ -19,14 +19,4 @@ networking() -> SteamNetworking
 
 [`SteamNetworking`](/api/classes/SteamNetworking)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_networking(steam_client: SteamClient, apply_networking: Callable) -> void:
-    var result: SteamNetworking = steam_client.networking()
-    if result == null:
-        return
-    apply_networking.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

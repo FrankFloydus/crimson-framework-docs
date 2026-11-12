@@ -25,16 +25,3 @@ var next_since_unix: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_next_since_unix()`](/api/classes/SteamPurchaseReconciliation/methods/get_next_since_unix) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_next_since_unix(
-    steam_purchase_reconciliation: SteamPurchaseReconciliation,
-    next_since_unix_label: Label
-) -> void:
-    var next_since_unix: int = steam_purchase_reconciliation.next_since_unix
-    next_since_unix_label.text = "Next since unix: %s" % str(next_since_unix)
-```

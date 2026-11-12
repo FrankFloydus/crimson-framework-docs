@@ -33,38 +33,79 @@ Choose a stable project-specific app\_id and a writable path under user://.
 
 ## Example
 
+### Rest at a checkpoint and retry after leaving the safe room
+
+Press **Rest** in the safe room, then **Enter Mines** and **Retry** to return to the saved room. Keep the campaign controller outside both world scenes so it survives the swap.
+
 ```gdscript
 extends Node
 
-const SAVE_APP_ID: String = "harbor.example.campaign"
-const SAVE_DIRECTORY: String = "user://harbor-checkpoints"
-const SAVE_SCHEMA: int = 1
-const PROFILE: String = "local-player"
-const SLOT: String = "campaign"
+const SAFE_ROOM: StringName = &"safe_room"
+const MINES: StringName = &"mines"
+const PROFILE: String = "campaign"
+const SLOT: String = "checkpoint"
+const SAVE_APP: String = "demo.mine_campaign"
 
-# Assign a coordinated campaign definition with a registered starting world.
-@export var campaign: GameDefinition
+@export_file("*.tscn") var safe_room_scene: String
+@export_file("*.tscn") var mines_scene: String
+@export var rest_button: Button
+@export var enter_mines_button: Button
+@export var retry_button: Button
+@export var status: Label
+
 var _game: GameRuntime
+var _checkpoint: SaveSlot
+
 
 func _ready() -> void:
-    if campaign == null:
-        push_error("Assign the campaign definition.")
-        return
-    var definition: GameDefinition = campaign.with_saves(SAVE_APP_ID, SAVE_DIRECTORY, SAVE_SCHEMA)
+    _set_busy(true)
+    var definition: GameDefinition = GameRuntime.configure().with_worlds({
+        SAFE_ROOM: {"scene_id": SAFE_ROOM, "path": safe_room_scene},
+        MINES: {"scene_id": MINES, "path": mines_scene},
+    }).starting_in(SAFE_ROOM).with_saves(SAVE_APP)
     _game = definition.boot(self)
     if _game == null:
+        status.text = "Could not start the campaign."
         return
-    var started: Dictionary = await _game.start_offline().wait()
-    if not started.ok:
-        push_error(started.message)
+    var result: Dictionary = await _game.start_offline().wait()
+    if not result.ok:
+        status.text = result.message
+        return
+    _checkpoint = _game.save_slot(PROFILE, SLOT)
+    rest_button.pressed.connect(_rest)
+    enter_mines_button.pressed.connect(_enter_mines)
+    retry_button.pressed.connect(_retry)
+    _set_busy(false)
+    status.text = "Safe room. Rest before entering the mines."
 
-# Connect a Save button after the game reports that its world is ready.
-func save_checkpoint() -> void:
-    if not is_instance_valid(_game):
-        return
-    var saved: Dictionary = await _game.save(PROFILE, SLOT).wait()
-    if not saved.ok:
-        push_error(saved.message)
-        return
-    print("Saved to the campaign slot.")
+
+func _rest() -> void:
+    _set_busy(true)
+    var request: SaveRequest = _checkpoint.save().named("Mine entrance")
+    request = request.with_context({"region": "Safe room"}).as_autosave()
+    var result: Dictionary = await request.submit().wait()
+    status.text = "Checkpoint saved." if result.ok else result.message
+    _set_busy(false)
+
+
+func _enter_mines() -> void:
+    _set_busy(true)
+    var result: Dictionary = await _game.travel_to(MINES).wait()
+    status.text = "Mines. Retry to return to your last rest." if result.ok else result.message
+    _set_busy(false)
+
+
+func _retry() -> void:
+    _set_busy(true)
+    var result: Dictionary = await _checkpoint.restore_latest().wait()
+    status.text = "Returned to the saved room." if result.ok else result.message
+    _set_busy(false)
+
+
+func _set_busy(busy: bool) -> void:
+    rest_button.disabled = busy
+    enter_mines_button.disabled = busy
+    retry_button.disabled = busy
+    if not busy:
+        rest_button.disabled = _game.get_world_id() != SAFE_ROOM
 ```

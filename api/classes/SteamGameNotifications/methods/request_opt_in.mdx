@@ -31,32 +31,3 @@ request_opt_in(user: SteamIdentity, launch_id: String = "") -> SteamNotification
 ## Description
 
 Reuse `launch_id` across authentication refreshes within a launch and issue a fresh ID on the next game launch. Use 1 to 128 ASCII letters, digits, hyphens, underscores, periods, or colons. A missing ID returns `ERR_INVALID_PARAMETER`. A claimed launch returns `ERR_ALREADY_IN_USE`, including after an ambiguous Steam reply. Implement the launch claim hooks in [`SteamNotificationStore`](/api/classes/SteamNotificationStore). A true receipt means Steam accepted registration. Steam controls the opt-in prompt and decision.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_request_opt_in(
-    steam_publisher: SteamPublisher,
-    user: SteamIdentity,
-    launch_id: String,
-    status_label: Label
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_game_notifications: SteamGameNotifications = steam_publisher.game_notifications()
-    if steam_game_notifications == null:
-        return
-    var result: SteamNotificationBoolOperation = steam_game_notifications.request_opt_in(user, launch_id)
-    if result == null:
-        return
-    var result_value: SteamBoolResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: bool = result_value.value
-    status_label.text = "Request opt in: yes" if payload else "Request opt in: no"
-```

@@ -23,12 +23,4 @@ is_social() -> bool
 
 A thin invite locator may need to join Steam membership before the selected flow can verify its type.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_is_social(steam_listing: SteamListing, status_label: Label) -> void:
-    var result: bool = steam_listing.is_social()
-    status_label.text = "Social: yes" if result else "Social: no"
-```
+[See gameplay examples for `SteamListing`](/api/classes/SteamListing#examples).

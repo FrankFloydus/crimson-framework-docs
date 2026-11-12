@@ -20,16 +20,3 @@ get_size_bytes() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_size_bytes(
-    steam_workshop_install: SteamWorkshopInstall,
-    size_bytes_label: Label
-) -> void:
-    var result: int = steam_workshop_install.get_size_bytes()
-    size_bytes_label.text = "Size bytes: %s" % str(result)
-```

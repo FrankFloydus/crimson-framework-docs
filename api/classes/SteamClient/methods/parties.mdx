@@ -19,14 +19,4 @@ parties() -> SteamParties
 
 [`SteamParties`](/api/classes/SteamParties)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_parties(steam_client: SteamClient, apply_parties: Callable) -> void:
-    var result: SteamParties = steam_client.parties()
-    if result == null:
-        return
-    apply_parties.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

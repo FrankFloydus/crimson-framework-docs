@@ -33,31 +33,3 @@ Await the call to receive [`SteamAppOwnershipResult`](/api/classes/SteamAppOwner
 ## Description
 
 Use `await` to receive [`SteamAppOwnershipResult`](/api/classes/SteamAppOwnershipResult). A negative license is a successful query with `SteamAppOwnership.owns_app` false.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_owns_app(
-    steam_publisher: SteamPublisher,
-    identity: SteamIdentity,
-    app_id: int,
-    apply_owns_app: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_auth: SteamPublisherAuth = steam_publisher.auth()
-    if steam_publisher_auth == null:
-        return
-    var result: SteamAppOwnershipResult = await steam_publisher_auth.owns_app(identity, app_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamAppOwnership = result.value
-    if payload == null:
-        return
-    apply_owns_app.call(payload)
-```

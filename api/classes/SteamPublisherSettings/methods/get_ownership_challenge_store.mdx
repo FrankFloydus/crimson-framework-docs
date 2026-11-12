@@ -22,18 +22,3 @@ get_ownership_challenge_store() -> SteamOwnershipChallengeStore
 ## Return value
 
 [`SteamOwnershipChallengeStore`](/api/classes/SteamOwnershipChallengeStore)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_ownership_challenge_store(
-    steam_publisher_settings: SteamPublisherSettings,
-    apply_ownership_challenge_store: Callable
-) -> void:
-    var result: SteamOwnershipChallengeStore = steam_publisher_settings.get_ownership_challenge_store()
-    if result == null:
-        return
-    apply_ownership_challenge_store.call(result)
-```

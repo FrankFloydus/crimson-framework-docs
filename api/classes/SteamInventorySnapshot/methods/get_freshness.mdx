@@ -20,16 +20,3 @@ get_freshness() -> SteamInventorySnapshot.Freshness
 ## Return value
 
 `SteamInventorySnapshot.Freshness`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_freshness(
-    steam_inventory_snapshot: SteamInventorySnapshot,
-    freshness_label: Label
-) -> void:
-    var result: SteamInventorySnapshot.Freshness = steam_inventory_snapshot.get_freshness()
-    freshness_label.text = "Freshness: %s" % str(result)
-```

@@ -28,23 +28,3 @@ stat_float(name: StringName) -> SteamFloatResult
 ## Description
 
 A missing definition or wrong type returns `ERR_DOES_NOT_EXIST`. An unloaded cache returns `ERR_UNCONFIGURED`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_stat_float(
-    steam_server_player_stats: SteamServerPlayerStats,
-    name: StringName,
-    stat_float_label: Label
-) -> void:
-    var result: SteamFloatResult = steam_server_player_stats.stat_float(name)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: float = result.value
-    stat_float_label.text = "Stat float: %s" % str(payload)
-```

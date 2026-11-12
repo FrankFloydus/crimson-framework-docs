@@ -29,20 +29,4 @@ var worlds: Dictionary = {}
 
 Each stable world ID maps to a scene\_id and a local PackedScene resource path.
 
-## Example
-
-```gdscript
-extends Node
-
-func update_worlds(
-    game_definition: GameDefinition,
-    new_worlds: Dictionary,
-    game: GameRuntime
-) -> void:
-    if game_definition == null:
-        return
-    if game.is_inside_tree():
-        return
-    game_definition.worlds = new_worlds
-    game.definition = game_definition
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

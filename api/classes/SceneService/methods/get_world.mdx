@@ -18,15 +18,3 @@ get_world() -> Node
 ## Return value
 
 `Node`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_world(scene_service: SceneService, world_label: Label) -> void:
-    var result: Node = scene_service.get_world()
-    if result == null:
-        return
-    world_label.text = str(result.name)
-```

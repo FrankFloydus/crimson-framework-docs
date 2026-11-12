@@ -22,13 +22,3 @@ var quantity: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_quantity()`](/api/classes/SteamItemQuantity/methods/get_quantity) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_quantity(steam_item_quantity: SteamItemQuantity, quantity_label: Label) -> void:
-    var quantity: int = steam_item_quantity.quantity
-    quantity_label.text = "Quantity: %s" % str(quantity)
-```

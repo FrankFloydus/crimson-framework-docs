@@ -25,14 +25,4 @@ get_player(peer_id: int) -> Node3D
 
 `Node3D`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_player(world_session: WorldSession, peer_id: int, player_label: Label) -> void:
-    var result: Node3D = world_session.get_player(peer_id)
-    if result == null:
-        return
-    player_label.text = str(result.name)
-```
+[See gameplay examples for `WorldSession`](/api/classes/WorldSession#examples).

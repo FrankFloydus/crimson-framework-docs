@@ -22,13 +22,3 @@ get_player_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_player_id(steam_trade_session: SteamTradeSession, player_id_label: Label) -> void:
-    var result: String = steam_trade_session.get_player_id()
-    player_id_label.text = "Player id: %s" % str(result)
-```

@@ -24,16 +24,3 @@ var session_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_session_id()`](/api/classes/SteamNotificationClaim/methods/get_session_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_session_id(
-    steam_notification_claim: SteamNotificationClaim,
-    apply_session_id: Callable
-) -> void:
-    var session_id: String = steam_notification_claim.session_id
-    apply_session_id.call(session_id)
-```

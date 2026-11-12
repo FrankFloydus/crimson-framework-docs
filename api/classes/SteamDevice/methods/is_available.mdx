@@ -22,18 +22,3 @@ is_available() -> bool
 ## Description
 
 Some individual queries depend on additional SDK exports.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_available(steam_client: SteamClient, action_button: Button) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_device: SteamDevice = steam_client.device()
-    if steam_device == null:
-        return
-    var result: bool = steam_device.is_available()
-    action_button.disabled = not result
-```

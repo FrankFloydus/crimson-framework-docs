@@ -20,16 +20,3 @@ get_description() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_description(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    description_label: Label
-) -> void:
-    var result: String = timeline_marker_presentation.get_description()
-    description_label.text = "Description: %s" % str(result)
-```

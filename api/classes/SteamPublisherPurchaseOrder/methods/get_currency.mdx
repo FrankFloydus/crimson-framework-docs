@@ -22,16 +22,3 @@ get_currency() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_currency(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_currency: Callable
-) -> void:
-    var result: String = steam_publisher_purchase_order.get_currency()
-    apply_currency.call(result)
-```

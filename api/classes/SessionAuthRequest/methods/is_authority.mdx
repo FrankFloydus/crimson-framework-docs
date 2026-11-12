@@ -18,13 +18,3 @@ is_authority() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_authority(session_auth_request: SessionAuthRequest, status_label: Label) -> void:
-    var result: bool = session_auth_request.is_authority()
-    status_label.text = "Authority: yes" if result else "Authority: no"
-```

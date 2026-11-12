@@ -32,30 +32,3 @@ register_participant(actor: int, backpack: SpatialInventory, size: Vector2i, off
 ## Description
 
 Register exactly two actors while idle. The optional offer grid must be empty, and both optional offer and recovery grids must match the requested dimensions. The model creates any omitted grids.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_register_participant(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    backpack: SpatialInventory,
-    size: Vector2i,
-    offer: SpatialInventory,
-    recovery: SpatialInventory,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_trade.register_participant(
-        actor,
-        backpack,
-        size,
-        offer,
-        recovery,
-    )
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Register participant accepted."
-```

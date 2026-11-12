@@ -20,16 +20,3 @@ is_accepted() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_accepted(
-    steam_workshop_legal_agreement_status: SteamWorkshopLegalAgreementStatus,
-    status_label: Label
-) -> void:
-    var result: bool = steam_workshop_legal_agreement_status.is_accepted()
-    status_label.text = "Accepted: yes" if result else "Accepted: no"
-```

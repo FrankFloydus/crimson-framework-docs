@@ -32,30 +32,3 @@ commit_split(plan: Dictionary, destination: SpatialInventory, footprint: Vector2
 ## Description
 
 Pass its unrotated footprint.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_commit_split(
-    spatial_inventory_stack_adapter: SpatialInventoryStackAdapter,
-    plan: Dictionary,
-    destination: SpatialInventory,
-    footprint: Vector2i,
-    origin: Vector2i,
-    rotated: bool,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_stack_adapter.commit_split(
-        plan,
-        destination,
-        footprint,
-        origin,
-        rotated,
-    )
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Commit split accepted."
-```

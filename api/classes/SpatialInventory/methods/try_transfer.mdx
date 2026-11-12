@@ -35,10 +35,40 @@ Commits both grids before either emits `changed`. An unsuccessful transfer prese
 ## Example
 
 ```gdscript
-func transfer_medkit(
-    source: SpatialInventory, destination: SpatialInventory, item_id: StringName, cell: Vector2i
-) -> void:
-    var error: Error = source.try_transfer(item_id, destination, cell, false)
-    if error != OK:
-        push_warning(error_string(error))
+extends Node
+
+const PACK_SIZE: Vector2i = Vector2i(4, 4)
+const CHEST_SIZE: Vector2i = Vector2i(6, 3)
+const MEDKIT_SIZE: Vector2i = Vector2i(2, 1)
+const MEDKIT_ID: StringName = &"field_medkit"
+const SUPPLY_CELL: Vector2i = Vector2i(0, 2)
+
+# Assign the camp screen's Donate Medkit button and medkit location label.
+@export var donate_button: Button
+@export var medkit_location: Label
+
+var _backpack: SpatialInventory = SpatialInventory.new()
+var _party_chest: SpatialInventory = SpatialInventory.new()
+
+func _ready() -> void:
+    if donate_button == null or medkit_location == null:
+        push_error("Assign the Donate Medkit button and its location label.")
+        return
+    if _backpack.configure(PACK_SIZE) != OK or _party_chest.configure(CHEST_SIZE) != OK:
+        push_error("Could not set up camp inventories.")
+        return
+    if _backpack.try_place(MEDKIT_ID, MEDKIT_SIZE, Vector2i.ZERO) != OK:
+        push_error("Could not add the field medkit.")
+        return
+    medkit_location.text = "Field medkit: Backpack"
+    donate_button.pressed.connect(_donate_medkit)
+
+func _donate_medkit() -> void:
+    # Put the medkit on the chest's designated supply shelf.
+    var moved: Error = _backpack.try_transfer(MEDKIT_ID, _party_chest, SUPPLY_CELL, false)
+    if moved != OK:
+        medkit_location.text = "Medkit stayed in the backpack: " + error_string(moved)
+        return
+    medkit_location.text = "Field medkit: Party chest"
+    donate_button.disabled = true
 ```

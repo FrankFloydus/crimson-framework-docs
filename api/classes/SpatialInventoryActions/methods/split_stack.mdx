@@ -34,33 +34,3 @@ split_stack(source: SpatialInventory, id: StringName, amount: int, new_id: Strin
 ## Description
 
 The source record, new record, and destination placement commit through the stack adapter.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_split_stack(
-    spatial_inventory_actions: SpatialInventoryActions,
-    source: SpatialInventory,
-    id: StringName,
-    amount: int,
-    new_id: StringName,
-    destination: SpatialInventory,
-    origin: Vector2i,
-    rotated: bool,
-    apply_split_stack: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_actions.split_stack(
-        source,
-        id,
-        amount,
-        new_id,
-        destination,
-        origin,
-        rotated,
-    )
-    if result.is_empty():
-        return
-    apply_split_stack.call(result)
-```

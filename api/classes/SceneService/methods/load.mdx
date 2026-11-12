@@ -28,19 +28,3 @@ load(world_id: StringName) -> GameOperation
 ## Description
 
 Await the returned GameOperation to observe the outcome, including when the originating game scope has retired.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_load(scene_service: SceneService, world_id: StringName, status_label: Label) -> void:
-    var result: GameOperation = scene_service.load(world_id)
-    if result == null:
-        return
-    var result_value: Dictionary = await result.wait()
-    if not result_value.get("ok", false):
-        status_label.text = str(result_value.get("message", "Operation failed."))
-        return
-    status_label.text = "Load completed."
-```

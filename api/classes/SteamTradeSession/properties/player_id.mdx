@@ -24,13 +24,3 @@ var player_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_player_id()`](/api/classes/SteamTradeSession/methods/get_player_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_player_id(steam_trade_session: SteamTradeSession, player_id_label: Label) -> void:
-    var player_id: String = steam_trade_session.player_id
-    player_id_label.text = "Player id: %s" % str(player_id)
-```

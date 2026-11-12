@@ -20,13 +20,3 @@ get_port() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_port(steam_socket_endpoint: SteamSocketEndpoint, port_label: Label) -> void:
-    var result: int = steam_socket_endpoint.get_port()
-    port_label.text = "Port: %s" % str(result)
-```

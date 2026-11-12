@@ -18,25 +18,3 @@ result() -> SteamSharedCloudFileResult
 ## Return value
 
 [`SteamSharedCloudFileResult`](/api/classes/SteamSharedCloudFileResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(
-    steam_shared_cloud_file_operation: SteamSharedCloudFileOperation,
-    name_label: Label
-) -> void:
-    var result: SteamSharedCloudFileResult = steam_shared_cloud_file_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamSharedCloudFile = result.value
-    if payload == null:
-        return
-    var name: String = payload.name
-    name_label.text = "Name: %s" % str(name)
-```

@@ -29,15 +29,4 @@ static restart_through_steam_if_needed(app_id: int) -> Error
 
 Call before `boot()`, any provider initialization, or the overlay bootstrap. `ERR_SKIP` means Steam requested relaunch and the calling game should quit promptly. `OK` means the current process can continue. The check requires a non-Spacewar AppID, a Steam-enabled build, and the packaged SDK runtime. It is unavailable in headless or editor contexts and reports `ERR_BUSY` after client initialization has been attempted.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_restart_through_steam_if_needed(app_id: int, status_label: Label) -> void:
-    var result: Error = SteamClient.restart_through_steam_if_needed(app_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Restart through steam if needed accepted."
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

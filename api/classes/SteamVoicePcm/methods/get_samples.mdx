@@ -20,13 +20,3 @@ get_samples() -> PackedByteArray
 ## Return value
 
 `PackedByteArray`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_samples(steam_voice_pcm: SteamVoicePcm, byte_count_label: Label) -> void:
-    var result: PackedByteArray = steam_voice_pcm.get_samples()
-    byte_count_label.text = "%d bytes" % result.size()
-```

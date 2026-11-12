@@ -29,19 +29,4 @@ advance_world(world_epoch: int) -> Error
 
 Returns `ERR\_INVALID\_PARAMETER` for an epoch that does not advance.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_advance_world(
-    command_router: CommandRouter,
-    world_epoch: int,
-    status_label: Label
-) -> void:
-    var result: Error = command_router.advance_world(world_epoch)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Advance world accepted."
-```
+[See gameplay examples for `CommandRouter`](/api/classes/CommandRouter#examples).

@@ -21,17 +21,4 @@ get_service_provider() -> GameServiceProvider
 
 [`GameServiceProvider`](/api/classes/GameServiceProvider)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_service_provider(
-    game_definition: GameDefinition,
-    apply_service_provider: Callable
-) -> void:
-    var result: GameServiceProvider = game_definition.get_service_provider()
-    if result == null:
-        return
-    apply_service_provider.call(result)
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

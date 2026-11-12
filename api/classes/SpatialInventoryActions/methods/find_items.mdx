@@ -29,19 +29,3 @@ static find_items(inventory: SpatialInventory, predicate: Callable = Callable())
 ## Description
 
 The predicate receives one placement dictionary and must return true to include its ID. Without a predicate, every placement is included.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_find_items(
-    inventory: SpatialInventory,
-    predicate: Callable,
-    results_list: ItemList
-) -> void:
-    var result: Array[StringName] = SpatialInventoryActions.find_items(inventory, predicate)
-    results_list.clear()
-    for entry: StringName in result:
-        results_list.add_item(str(entry))
-```

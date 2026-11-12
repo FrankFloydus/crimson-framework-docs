@@ -23,15 +23,4 @@ cancel() -> Error
 
 An acquired membership is cleaned up once the pending native Steam call completes. An already settled operation returns `ERR_DOES_NOT_EXIST`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(steam_lobby_operation: SteamLobbyOperation, status_label: Label) -> void:
-    var result: Error = steam_lobby_operation.cancel()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Cancel accepted."
-```
+[See gameplay examples for `SteamLobbyOperation`](/api/classes/SteamLobbyOperation#examples).

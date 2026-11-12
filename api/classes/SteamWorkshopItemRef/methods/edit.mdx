@@ -23,14 +23,4 @@ edit() -> SteamWorkshopPublishRequest
 
 Unset fields keep their current values. Submission verifies that the item belongs to the active app.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_edit(steam_workshop_item_ref: SteamWorkshopItemRef, apply_edit: Callable) -> void:
-    var result: SteamWorkshopPublishRequest = steam_workshop_item_ref.edit()
-    if result == null:
-        return
-    apply_edit.call(result)
-```
+[See gameplay examples for `SteamWorkshopItemRef`](/api/classes/SteamWorkshopItemRef#examples).

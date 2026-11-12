@@ -29,28 +29,4 @@ join(listing: SteamListing) -> SteamLobbyOperation
 
 A known Game listing is rejected locally. A Game scope cannot submit standalone membership.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_join(steam_client: SteamClient, listing: SteamListing, apply_join: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_lobbies: SteamLobbies = steam_client.lobbies()
-    if steam_lobbies == null:
-        return
-    var result: SteamLobbyOperation = steam_lobbies.join(listing)
-    if result == null:
-        return
-    var result_value: SteamLobbyResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamLobby = result_value.value
-    if payload == null:
-        return
-    apply_join.call(payload)
-```
+[See gameplay examples for `SteamLobbies`](/api/classes/SteamLobbies#examples).

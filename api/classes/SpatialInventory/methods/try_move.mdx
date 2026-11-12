@@ -34,8 +34,38 @@ An unsuccessful move preserves the current placement.
 ## Example
 
 ```gdscript
-func move_medkit(inventory: SpatialInventory, item_id: StringName, cell: Vector2i) -> void:
-    var error: Error = inventory.try_move(item_id, cell, false)
-    if error != OK:
-        push_warning(error_string(error))
+extends Node
+
+const PACK_SIZE: Vector2i = Vector2i(4, 4)
+const MEDKIT_SIZE: Vector2i = Vector2i(2, 1)
+const MEDKIT_ID: StringName = &"field_medkit"
+const RESERVED_ROW_CELL: Vector2i = Vector2i(0, 3)
+
+# Assign a Stow Medkit button and the medkit row's location label.
+@export var stow_button: Button
+@export var medkit_location: Label
+
+var _backpack: SpatialInventory = SpatialInventory.new()
+
+func _ready() -> void:
+    if stow_button == null or medkit_location == null:
+        push_error("Assign the Stow Medkit button and its location label.")
+        return
+    if _backpack.configure(PACK_SIZE) != OK:
+        push_error("Could not prepare the backpack.")
+        return
+    if _backpack.try_place(MEDKIT_ID, MEDKIT_SIZE, Vector2i.ZERO) != OK:
+        push_error("Could not add the field medkit.")
+        return
+    medkit_location.text = "Field medkit: top row"
+    stow_button.pressed.connect(_stow_medkit)
+
+func _stow_medkit() -> void:
+    # Clear the top row for loot by reserving the bottom row for supplies.
+    var moved: Error = _backpack.try_move(MEDKIT_ID, RESERVED_ROW_CELL, false)
+    if moved != OK:
+        medkit_location.text = "Medkit stayed in the top row: " + error_string(moved)
+        return
+    medkit_location.text = "Field medkit: bottom row"
+    stow_button.disabled = true
 ```

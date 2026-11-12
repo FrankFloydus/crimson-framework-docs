@@ -20,13 +20,3 @@ get_size_bytes() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_size_bytes(steam_cloud_file: SteamCloudFile, size_bytes_label: Label) -> void:
-    var result: int = steam_cloud_file.get_size_bytes()
-    size_bytes_label.text = "Size bytes: %s" % str(result)
-```

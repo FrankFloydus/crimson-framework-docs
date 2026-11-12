@@ -20,16 +20,3 @@ get_instance_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_instance_id(
-    steam_item_instance: SteamItemInstance,
-    instance_id_label: Label
-) -> void:
-    var result: String = steam_item_instance.get_instance_id()
-    instance_id_label.text = "Instance id: %s" % str(result)
-```

@@ -22,13 +22,3 @@ type() -> SteamController.Type
 ## Description
 
 Returns `TYPE_UNKNOWN` if the view is unavailable or the reported value is unrecognized.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_type(steam_controller: SteamController, type_label: Label) -> void:
-    var result: SteamController.Type = steam_controller.type()
-    type_label.text = "Type: %s" % str(result)
-```

@@ -24,23 +24,3 @@ var value: SteamPurchaseBuyerInfo
 | Type | [`SteamPurchaseBuyerInfo`](/api/classes/SteamPurchaseBuyerInfo) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamPurchaseBuyerInfoResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_purchase_buyer_info_result: SteamPurchaseBuyerInfoResult,
-    apply_value: Callable
-) -> void:
-    if steam_purchase_buyer_info_result == null:
-        return
-    if not steam_purchase_buyer_info_result.ok:
-        push_warning(steam_purchase_buyer_info_result.message)
-        return
-    var value: SteamPurchaseBuyerInfo = steam_purchase_buyer_info_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

@@ -28,29 +28,3 @@ with_timeout(milliseconds: int) -> SteamHttpOptions
 ## Description
 
 The default is 15,000 milliseconds.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_with_timeout(
-    steam_http_options: SteamHttpOptions,
-    milliseconds: int,
-    url: String,
-    apply_response: Callable
-) -> void:
-    var result: SteamHttpOptions = steam_http_options.with_timeout(milliseconds)
-    if result == null:
-        return
-    var response: SteamHttpResponseResult = await result.fetch(url)
-    if response == null:
-        return
-    if not response.ok:
-        push_warning(response.message)
-        return
-    var payload: SteamHttpResponse = response.value
-    if payload == null:
-        return
-    apply_response.call(payload)
-```

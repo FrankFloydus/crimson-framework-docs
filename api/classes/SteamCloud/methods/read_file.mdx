@@ -29,28 +29,4 @@ read_file(name: String) -> SteamBytesOperation
 
 An existing empty file completes successfully with zero bytes. A missing file completes with `ERR_FILE_NOT_FOUND`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_read_file(steam_client: SteamClient, name: String, load_file_bytes: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_cloud: SteamCloud = steam_client.cloud()
-    if steam_cloud == null:
-        return
-    var result: SteamBytesOperation = steam_cloud.read_file(name)
-    if result == null:
-        return
-    var result_value: SteamBytesResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: PackedByteArray = result_value.value
-    if payload.is_empty():
-        return
-    load_file_bytes.call(payload)
-```
+[See gameplay examples for `SteamCloud`](/api/classes/SteamCloud#examples).

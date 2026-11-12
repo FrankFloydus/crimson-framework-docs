@@ -25,16 +25,3 @@ var currency: String = ""
 | Access | Read only |
 | Default | `""` |
 | Getter | [`get_currency()`](/api/classes/SteamPublisherPurchaseOrder/methods/get_currency) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_currency(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_currency: Callable
-) -> void:
-    var currency: String = steam_publisher_purchase_order.currency
-    apply_currency.call(currency)
-```

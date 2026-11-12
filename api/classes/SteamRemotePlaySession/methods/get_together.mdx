@@ -20,16 +20,3 @@ get_together() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_together(
-    steam_remote_play_session: SteamRemotePlaySession,
-    status_label: Label
-) -> void:
-    var result: bool = steam_remote_play_session.get_together()
-    status_label.text = "Together: yes" if result else "Together: no"
-```

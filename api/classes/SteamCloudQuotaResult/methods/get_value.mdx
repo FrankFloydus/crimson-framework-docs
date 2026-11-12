@@ -20,24 +20,3 @@ get_value() -> SteamCloudQuota
 ## Return value
 
 [`SteamCloudQuota`](/api/classes/SteamCloudQuota)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_cloud_quota_result: SteamCloudQuotaResult,
-    total_bytes_label: Label
-) -> void:
-    if steam_cloud_quota_result == null:
-        return
-    if not steam_cloud_quota_result.ok:
-        push_warning(steam_cloud_quota_result.message)
-        return
-    var result: SteamCloudQuota = steam_cloud_quota_result.get_value()
-    if result == null:
-        return
-    var total_bytes: int = result.total_bytes
-    total_bytes_label.text = "Total bytes: %s" % str(total_bytes)
-```

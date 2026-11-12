@@ -18,16 +18,3 @@ is_available() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_available(
-    steam_server_player_stats: SteamServerPlayerStats,
-    action_button: Button
-) -> void:
-    var result: bool = steam_server_player_stats.is_available()
-    action_button.disabled = not result
-```

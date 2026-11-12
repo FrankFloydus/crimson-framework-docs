@@ -23,15 +23,4 @@ get_initialization_error() -> String
 
 Successful attachments return an empty string.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_initialization_error(
-    steam_scope: SteamScope,
-    initialization_error_label: Label
-) -> void:
-    var result: String = steam_scope.get_initialization_error()
-    initialization_error_label.text = "Initialization error: %s" % str(result)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

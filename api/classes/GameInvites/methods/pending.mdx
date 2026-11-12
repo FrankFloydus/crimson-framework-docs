@@ -23,17 +23,4 @@ pending() -> SteamInvite
 
 Crimson ignores malformed or conflicting lobby candidates. The game decides when to join.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_pending(game_runtime: GameRuntime, apply_pending: Callable) -> void:
-    var game_invites: GameInvites = game_runtime.invites()
-    if game_invites == null:
-        return
-    var result: SteamInvite = game_invites.pending()
-    if result == null:
-        return
-    apply_pending.call(result)
-```
+[See gameplay examples for `GameInvites`](/api/classes/GameInvites#examples).

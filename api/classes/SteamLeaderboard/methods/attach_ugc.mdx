@@ -28,25 +28,3 @@ attach_ugc(shared_file_handle: String) -> SteamOperation
 ## Description
 
 Pass the handle as a decimal string. Await the operation to receive a [`SteamResult`](/api/classes/SteamResult). An overlapping score write or attachment returns `@GlobalScope.ERR_BUSY`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_attach_ugc(
-    steam_leaderboard: SteamLeaderboard,
-    shared_file_handle: String,
-    status_label: Label
-) -> void:
-    var result: SteamOperation = steam_leaderboard.attach_ugc(shared_file_handle)
-    if result == null:
-        return
-    var result_value: SteamResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    status_label.text = "Attach ugc succeeded."
-```

@@ -25,18 +25,3 @@ disconnect_after_flush(peer: MultiplayerPeer, peer_id: int) -> void
 ## Description
 
 Does nothing when the peer is not an ENet peer or the guest is absent.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_disconnect_after_flush(
-    e_net_session_transport: ENetSessionTransport,
-    peer: MultiplayerPeer,
-    peer_id: int,
-    after_disconnect_after_flush: Callable
-) -> void:
-    e_net_session_transport.disconnect_after_flush(peer, peer_id)
-    after_disconnect_after_flush.call()
-```

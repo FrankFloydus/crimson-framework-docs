@@ -22,18 +22,3 @@ get_body() -> PackedByteArray
 ## Description
 
 HEAD responses have an empty body.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_body(
-    steam_http_response: SteamHttpResponse,
-    process_private_payload: Callable
-) -> void:
-    var result: PackedByteArray = steam_http_response.get_body()
-    if result.is_empty():
-        return
-    process_private_payload.call(result)
-```

@@ -25,18 +25,3 @@ remove_peer(peer_id: int, binding_generation: int = 0) -> void
 ## Description
 
 Supply the binding generation to guard against a delayed disconnect for an older binding. Zero removes the current stream.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_remove_peer(
-    state_replication: StateReplication,
-    peer_id: int,
-    binding_generation: int,
-    after_remove_peer: Callable
-) -> void:
-    state_replication.remove_peer(peer_id, binding_generation)
-    after_remove_peer.call()
-```

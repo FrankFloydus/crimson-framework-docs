@@ -24,13 +24,3 @@ var match_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_match_id()`](/api/classes/SteamCheatReport/methods/get_match_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_match_id(steam_cheat_report: SteamCheatReport, apply_match_id: Callable) -> void:
-    var match_id: String = steam_cheat_report.match_id
-    apply_match_id.call(match_id)
-```

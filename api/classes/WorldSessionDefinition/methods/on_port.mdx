@@ -29,18 +29,4 @@ on_port(port: int) -> WorldSessionDefinition
 
 The valid range is 1 through 65535.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_on_port(
-    world_session_definition: WorldSessionDefinition,
-    port: int,
-    session: WorldSession
-) -> void:
-    var result: WorldSessionDefinition = world_session_definition.on_port(port)
-    if result == null:
-        return
-    session.definition = result
-```
+[See gameplay examples for `WorldSessionDefinition`](/api/classes/WorldSessionDefinition#examples).

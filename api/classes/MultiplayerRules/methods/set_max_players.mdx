@@ -23,18 +23,4 @@ set_max_players(count: int) -> void
 | --- | --- | --- |
 | `count` | `int` | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_max_players(
-    multiplayer_rules: MultiplayerRules,
-    count: int,
-    definition: GameDefinition
-) -> void:
-    if multiplayer_rules == null:
-        return
-    multiplayer_rules.set_max_players(count)
-    definition.multiplayer_rules = multiplayer_rules
-```
+[See gameplay examples for `MultiplayerRules`](/api/classes/MultiplayerRules#examples).

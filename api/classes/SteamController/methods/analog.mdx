@@ -28,25 +28,3 @@ analog(action: StringName) -> SteamAnalogInputResult
 ## Description
 
 Inactive input returns an inactive zero vector. Unknown actions return `ERR_DOES_NOT_EXIST`. An empty or oversized action name returns `ERR_INVALID_PARAMETER`. A retired view or unavailable Steam interface returns `ERR_UNAVAILABLE`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_analog(
-    steam_controller: SteamController,
-    action: StringName,
-    apply_analog: Callable
-) -> void:
-    var result: SteamAnalogInputResult = steam_controller.analog(action)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamAnalogInput = result.value
-    if payload == null:
-        return
-    apply_analog.call(payload)
-```

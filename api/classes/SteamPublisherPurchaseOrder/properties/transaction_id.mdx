@@ -25,16 +25,3 @@ var transaction_id: String = ""
 | Access | Read only |
 | Default | `""` |
 | Getter | [`get_transaction_id()`](/api/classes/SteamPublisherPurchaseOrder/methods/get_transaction_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_transaction_id(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_transaction_id: Callable
-) -> void:
-    var transaction_id: String = steam_publisher_purchase_order.transaction_id
-    apply_transaction_id.call(transaction_id)
-```

@@ -23,12 +23,4 @@ get_state() -> WorldSession.State
 
 Observe state\_changed to learn when a pending join reaches RUNNING.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_state(world_session: WorldSession, state_label: Label) -> void:
-    var result: WorldSession.State = world_session.get_state()
-    state_label.text = "State: %s" % str(result)
-```
+[See gameplay examples for `WorldSession`](/api/classes/WorldSession#examples).

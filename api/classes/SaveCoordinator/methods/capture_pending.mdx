@@ -28,17 +28,3 @@ capture_pending(revision: String = "") -> bool
 ## Description
 
 The optional `revision` label is limited to 128 UTF-8 bytes. Returns true if the capture succeeds. Call once for each pending save you want to capture.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_capture_pending(
-    save_coordinator: SaveCoordinator,
-    revision: String,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.capture_pending(revision)
-    status_label.text = "Capture pending: yes" if result else "Capture pending: no"
-```

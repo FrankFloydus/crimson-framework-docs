@@ -24,18 +24,3 @@ var describe_stack: Callable = Callable()
 | Default | `Callable()` |
 | Getter | [`get_describe_stack()`](/api/classes/SpatialInventoryTrade/methods/get_describe_stack) |
 | Setter | [`set_describe_stack()`](/api/classes/SpatialInventoryTrade/methods/set_describe_stack) |
-
-## Example
-
-```gdscript
-extends Node
-
-func update_describe_stack(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    new_describe_stack: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_trade.describe_stack = new_describe_stack
-    var active_describe_stack: Callable = spatial_inventory_trade.describe_stack
-    action_button.disabled = not active_describe_stack.is_valid()
-```

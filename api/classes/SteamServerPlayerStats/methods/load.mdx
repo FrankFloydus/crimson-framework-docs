@@ -22,21 +22,3 @@ load() -> SteamServerStatsOperation
 ## Description
 
 An already loaded cache returns success immediately. Steam can refuse the request for an account or app without eligible stats. If another operation on the account is pending, this returns `ERR_BUSY`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_load(steam_server_player_stats: SteamServerPlayerStats, status_label: Label) -> void:
-    var result: SteamServerStatsOperation = steam_server_player_stats.load()
-    if result == null:
-        return
-    var result_value: SteamServerStatsResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    status_label.text = "Load succeeded."
-```

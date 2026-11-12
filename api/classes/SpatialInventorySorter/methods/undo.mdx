@@ -28,20 +28,3 @@ undo(placement_policy: Callable = Callable()) -> Error
 ## Description
 
 A conflict preserves the grid and keeps undo available.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_undo(
-    spatial_inventory_sorter: SpatialInventorySorter,
-    placement_policy: Callable,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_sorter.undo(placement_policy)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Undo accepted."
-```

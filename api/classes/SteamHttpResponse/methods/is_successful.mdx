@@ -18,13 +18,3 @@ is_successful() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_successful(steam_http_response: SteamHttpResponse, status_label: Label) -> void:
-    var result: bool = steam_http_response.is_successful()
-    status_label.text = "Successful: yes" if result else "Successful: no"
-```

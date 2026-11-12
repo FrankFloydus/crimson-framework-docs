@@ -22,13 +22,3 @@ get_world_id() -> StringName
 ## Description
 
 Empty during client authorization.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_world_id(steam_relay_request: SteamRelayRequest, world_id_label: Label) -> void:
-    var result: StringName = steam_relay_request.get_world_id()
-    world_id_label.text = "World id: %s" % str(result)
-```

@@ -29,23 +29,4 @@ stat_int(name: String) -> SteamIntResult
 
 Check `SteamResult.ok` before using its value. The result reports an invalid name, an unavailable interface, or a missing stat of the requested type.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_stat_int(steam_client: SteamClient, name: String, stat_int_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: SteamIntResult = steam_stats.stat_int(name)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: int = result.value
-    stat_int_label.text = "Stat int: %s" % str(payload)
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

@@ -23,14 +23,4 @@ voice() -> GameVoice
 
 Returns null when no Steam client or dedicated Steam service is configured.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_voice(game_runtime: GameRuntime, apply_voice: Callable) -> void:
-    var result: GameVoice = game_runtime.voice()
-    if result == null:
-        return
-    apply_voice.call(result)
-```
+[See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

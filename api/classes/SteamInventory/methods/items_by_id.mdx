@@ -28,30 +28,3 @@ items_by_id(instance_ids: PackedStringArray) -> Variant
 ## Description
 
 Steam may omit instances that are no longer present. Supply one to 256 distinct unsigned decimal IDs.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_items_by_id(
-    steam_client: SteamClient,
-    instance_ids: PackedStringArray,
-    apply_items_by_id: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_inventory: SteamInventory = steam_client.inventory()
-    if steam_inventory == null:
-        return
-    var result: SteamInventorySnapshotResult = await steam_inventory.items_by_id(instance_ids)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventorySnapshot = result.value
-    if payload == null:
-        return
-    apply_items_by_id.call(payload)
-```

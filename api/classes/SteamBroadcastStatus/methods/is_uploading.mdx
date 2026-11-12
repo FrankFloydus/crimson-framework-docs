@@ -20,16 +20,3 @@ is_uploading() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_uploading(
-    steam_broadcast_status: SteamBroadcastStatus,
-    status_label: Label
-) -> void:
-    var result: bool = steam_broadcast_status.is_uploading()
-    status_label.text = "Uploading: yes" if result else "Uploading: no"
-```

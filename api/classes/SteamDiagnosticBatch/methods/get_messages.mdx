@@ -24,17 +24,3 @@ get_messages() -> SteamDiagnosticMessage[]
 ## Description
 
 An empty snapshot returns an empty typed array.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_messages(
-    steam_diagnostic_batch: SteamDiagnosticBatch,
-    add_messages_entry: Callable
-) -> void:
-    var result: Array[SteamDiagnosticMessage] = steam_diagnostic_batch.get_messages()
-    for entry: SteamDiagnosticMessage in result:
-        add_messages_entry.call(entry)
-```

@@ -31,22 +31,3 @@ offer_item(actor: int, id: StringName, origin: Vector2i = Vector2i(-1, -1), rota
 ## Description
 
 `Vector2i(-1, -1)` selects first fit, and a null rotation uses the source orientation. The trade reserves the source and handles escrow when the item is a stack.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_offer_item(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    id: StringName,
-    origin: Vector2i,
-    rotated: Variant,
-    apply_offer_item: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_trade.offer_item(actor, id, origin, rotated)
-    if result.is_empty():
-        return
-    apply_offer_item.call(result)
-```

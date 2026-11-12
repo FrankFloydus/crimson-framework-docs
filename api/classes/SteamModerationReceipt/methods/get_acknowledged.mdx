@@ -22,16 +22,3 @@ get_acknowledged() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_acknowledged(
-    steam_moderation_receipt: SteamModerationReceipt,
-    apply_acknowledged: Callable
-) -> void:
-    var result: bool = steam_moderation_receipt.get_acknowledged()
-    apply_acknowledged.call(result)
-```

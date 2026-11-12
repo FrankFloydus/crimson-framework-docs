@@ -24,25 +24,3 @@ set_game_mode(mode: SteamTimeline.GameMode) -> Error
 ## Return value
 
 `Error`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_game_mode(
-    steam_client: SteamClient,
-    mode: SteamTimeline.GameMode,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_timeline: SteamTimeline = steam_client.timeline()
-    if steam_timeline == null:
-        return
-    var result: Error = steam_timeline.set_game_mode(mode)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set game mode accepted."
-```

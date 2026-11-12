@@ -29,18 +29,3 @@ configure(app_id: String, root: String = "user://godot-save-system") -> bool
 ## Description
 
 Pass a nonempty directory under `user://` as `root`. Returns false for invalid configuration or if the app and storage configuration has already been frozen by an admitted ticket.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_configure(
-    save_coordinator: SaveCoordinator,
-    app_id: String,
-    root: String,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.configure(app_id, root)
-    status_label.text = "Configure: yes" if result else "Configure: no"
-```

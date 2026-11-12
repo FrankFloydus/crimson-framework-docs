@@ -23,16 +23,3 @@ var receiver: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_receiver()`](/api/classes/SpatialInventoryTrade/methods/get_receiver) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_receiver(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    receiver_label: Label
-) -> void:
-    var receiver: int = spatial_inventory_trade.receiver
-    receiver_label.text = "Receiver: %s" % str(receiver)
-```

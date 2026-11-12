@@ -22,16 +22,3 @@ var accepted_at_unix: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_accepted_at_unix()`](/api/classes/SteamWorkshopLegalAgreementStatus/methods/get_accepted_at_unix) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_accepted_at_unix(
-    steam_workshop_legal_agreement_status: SteamWorkshopLegalAgreementStatus,
-    accepted_at_unix_label: Label
-) -> void:
-    var accepted_at_unix: int = steam_workshop_legal_agreement_status.accepted_at_unix
-    accepted_at_unix_label.text = "Accepted at unix: %s" % str(accepted_at_unix)
-```

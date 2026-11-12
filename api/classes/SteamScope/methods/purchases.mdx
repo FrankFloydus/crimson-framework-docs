@@ -23,23 +23,4 @@ purchases() -> SteamPurchases
 
 Bind a backend through `SteamProvider.with_commerce_backend()`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_purchases(steam_scope: SteamScope, apply_purchase_catalog: Callable) -> void:
-    var result: SteamPurchases = steam_scope.purchases()
-    if result == null:
-        return
-    var purchase_catalog: SteamPurchaseCatalogResult = await result.catalog()
-    if purchase_catalog == null:
-        return
-    if not purchase_catalog.ok:
-        push_warning(purchase_catalog.message)
-        return
-    var payload: SteamPurchaseCatalog = purchase_catalog.value
-    if payload == null:
-        return
-    apply_purchase_catalog.call(payload)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

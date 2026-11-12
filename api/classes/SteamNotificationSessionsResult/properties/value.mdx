@@ -28,22 +28,3 @@ var value: SteamNotificationSession[]
 ## Description
 
 An unsuccessful query yields an empty array.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_notification_sessions_result: SteamNotificationSessionsResult,
-    add_value_entry: Callable
-) -> void:
-    if steam_notification_sessions_result == null:
-        return
-    if not steam_notification_sessions_result.ok:
-        push_warning(steam_notification_sessions_result.message)
-        return
-    var value: Array[SteamNotificationSession] = steam_notification_sessions_result.value
-    for entry: SteamNotificationSession in value:
-        add_value_entry.call(entry)
-```

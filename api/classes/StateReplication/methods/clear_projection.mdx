@@ -18,16 +18,3 @@ clear_projection() -> void
 ## Description
 
 Keeps the stream identity so the orchestrator can clear the view after mounting a new world and before receiving its baseline.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_clear_projection(
-    state_replication: StateReplication,
-    projection_rows: ItemList
-) -> void:
-    state_replication.clear_projection()
-    projection_rows.clear()
-```

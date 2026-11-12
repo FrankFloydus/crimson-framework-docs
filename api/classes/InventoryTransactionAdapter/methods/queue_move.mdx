@@ -31,23 +31,3 @@ queue_move(transaction: GameTransaction, item_id: String, origin: Vector2i, rota
 ## Description
 
 Returns a Godot Error. The inventory changes on a successful commit.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_queue_move(
-    inventory_transaction_adapter: InventoryTransactionAdapter,
-    transaction: GameTransaction,
-    item_id: String,
-    origin: Vector2i,
-    rotated: bool,
-    status_label: Label
-) -> void:
-    var result: Error = inventory_transaction_adapter.queue_move(transaction, item_id, origin, rotated)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Queue move accepted."
-```

@@ -20,16 +20,3 @@ get_icon() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_icon(
-    timeline_marker_presentation: TimelineMarkerPresentation,
-    icon_label: Label
-) -> void:
-    var result: String = timeline_marker_presentation.get_icon()
-    icon_label.text = "Icon: %s" % str(result)
-```

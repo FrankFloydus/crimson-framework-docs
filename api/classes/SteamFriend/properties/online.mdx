@@ -26,13 +26,3 @@ var online: bool
 ## Description
 
 Use a new list read to refresh it.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_online(steam_friend: SteamFriend, action_button: Button) -> void:
-    var online: bool = steam_friend.online
-    action_button.disabled = not online
-```

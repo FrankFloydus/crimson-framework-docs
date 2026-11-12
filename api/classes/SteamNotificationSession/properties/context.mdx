@@ -24,16 +24,3 @@ var context: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_context()`](/api/classes/SteamNotificationSession/methods/get_context) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_context(
-    steam_notification_session: SteamNotificationSession,
-    apply_context: Callable
-) -> void:
-    var context: String = steam_notification_session.context
-    apply_context.call(context)
-```

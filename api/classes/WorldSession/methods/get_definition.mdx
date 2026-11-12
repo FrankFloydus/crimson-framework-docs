@@ -21,14 +21,4 @@ get_definition() -> WorldSessionDefinition
 
 [`WorldSessionDefinition`](/api/classes/WorldSessionDefinition)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_definition(world_session: WorldSession, apply_definition: Callable) -> void:
-    var result: WorldSessionDefinition = world_session.get_definition()
-    if result == null:
-        return
-    apply_definition.call(result)
-```
+[See gameplay examples for `WorldSession`](/api/classes/WorldSession#examples).

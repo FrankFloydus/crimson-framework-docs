@@ -29,24 +29,4 @@ clear_achievement(name: String) -> Error
 
 Use on controlled test data or as part of a game reset. Call `store()` to request persistence.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_clear_achievement(
-    steam_client: SteamClient,
-    name: String,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: Error = steam_stats.clear_achievement(name)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Clear achievement accepted."
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

@@ -18,26 +18,3 @@ status() -> SteamMusicStatusResult
 ## Return value
 
 [`SteamMusicStatusResult`](/api/classes/SteamMusicStatusResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_status(steam_client: SteamClient, apply_status: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_music: SteamMusic = steam_client.music()
-    if steam_music == null:
-        return
-    var result: SteamMusicStatusResult = steam_music.status()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamMusicStatus = result.value
-    if payload == null:
-        return
-    apply_status.call(payload)
-```

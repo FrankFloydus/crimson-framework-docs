@@ -29,26 +29,3 @@ show_keyboard_for(field: Control, mode: SteamDevice.FloatingKeyboardMode = 0) ->
 ## Description
 
 The field's bounds are transformed to client pixels. Steam sends OS key events to the focused control. Crimson requests dismissal if the field loses focus, becomes hidden or read-only, or leaves the tree. The field keeps its normal Godot text and submit behavior. Return `ERR_BUSY` while any scope's Steam keyboard is active or closing.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_show_keyboard_for(
-    steam_client: SteamClient,
-    field: Control,
-    mode: SteamDevice.FloatingKeyboardMode,
-    status_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_device: SteamDevice = steam_client.device()
-    if steam_device == null:
-        return
-    var result: Error = steam_device.show_keyboard_for(field, mode)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Show keyboard for accepted."
-```

@@ -24,19 +24,3 @@ accept(actor: int) -> Dictionary
 ## Return value
 
 `Dictionary`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_accept(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    actor: int,
-    apply_accept: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_trade.accept(actor)
-    if result.is_empty():
-        return
-    apply_accept.call(result)
-```

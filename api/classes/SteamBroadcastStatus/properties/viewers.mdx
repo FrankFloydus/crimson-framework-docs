@@ -22,16 +22,3 @@ var viewers: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_viewers()`](/api/classes/SteamBroadcastStatus/methods/get_viewers) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_viewers(
-    steam_broadcast_status: SteamBroadcastStatus,
-    viewers_label: Label
-) -> void:
-    var viewers: int = steam_broadcast_status.viewers
-    viewers_label.text = "Viewers: %s" % str(viewers)
-```

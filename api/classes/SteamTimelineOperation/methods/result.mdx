@@ -18,19 +18,3 @@ result() -> SteamBoolResult
 ## Return value
 
 [`SteamBoolResult`](/api/classes/SteamBoolResult)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_result(steam_timeline_operation: SteamTimelineOperation, status_label: Label) -> void:
-    var result: SteamBoolResult = steam_timeline_operation.result()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: bool = result.value
-    status_label.text = "Result: yes" if payload else "Result: no"
-```

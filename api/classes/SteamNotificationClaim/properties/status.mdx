@@ -24,16 +24,3 @@ var status: SteamNotificationClaim.Status
 | Type | `SteamNotificationClaim.Status` |
 | Access | Read only |
 | Getter | [`get_status()`](/api/classes/SteamNotificationClaim/methods/get_status) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_status(
-    steam_notification_claim: SteamNotificationClaim,
-    apply_status: Callable
-) -> void:
-    var status: SteamNotificationClaim.Status = steam_notification_claim.status
-    apply_status.call(status)
-```

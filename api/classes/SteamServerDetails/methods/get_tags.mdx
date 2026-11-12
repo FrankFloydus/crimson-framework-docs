@@ -21,14 +21,4 @@ get_tags() -> PackedStringArray
 
 `PackedStringArray`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_tags(steam_server_details: SteamServerDetails, results_list: ItemList) -> void:
-    var result: PackedStringArray = steam_server_details.get_tags()
-    results_list.clear()
-    for entry: String in result:
-        results_list.add_item(str(entry))
-```
+[See gameplay examples for `SteamServerDetails`](/api/classes/SteamServerDetails#examples).

@@ -19,26 +19,4 @@ quota() -> SteamCloudQuotaResult
 
 [`SteamCloudQuotaResult`](/api/classes/SteamCloudQuotaResult)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_quota(steam_client: SteamClient, total_bytes_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_cloud: SteamCloud = steam_client.cloud()
-    if steam_cloud == null:
-        return
-    var result: SteamCloudQuotaResult = steam_cloud.quota()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamCloudQuota = result.value
-    if payload == null:
-        return
-    var total_bytes: int = payload.total_bytes
-    total_bytes_label.text = "Total bytes: %s" % str(total_bytes)
-```
+[See gameplay examples for `SteamCloud`](/api/classes/SteamCloud#examples).

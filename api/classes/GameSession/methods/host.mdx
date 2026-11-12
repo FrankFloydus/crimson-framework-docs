@@ -30,22 +30,3 @@ host(port: int, max_clients: int = 32, bind_address: String = "*") -> Error
 ## Description
 
 Provide a port from 1 to 65535, a remote client limit from 1 to 4095, and `\*` or a literal bind IP. Returns OK when the host is installed, ERR\_INVALID\_PARAMETER for invalid settings, or the scope or transport setup error.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_host(
-    game_session: GameSession,
-    port: int,
-    max_clients: int,
-    bind_address: String,
-    status_label: Label
-) -> void:
-    var result: Error = game_session.host(port, max_clients, bind_address)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Host accepted."
-```

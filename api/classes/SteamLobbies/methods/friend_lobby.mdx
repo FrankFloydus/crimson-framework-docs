@@ -29,26 +29,4 @@ friend_lobby(friend_id: String) -> SteamListingResult
 
 The game verifies its live namespace and owner on join.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_friend_lobby(steam_client: SteamClient, friend_id: String, name_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_lobbies: SteamLobbies = steam_client.lobbies()
-    if steam_lobbies == null:
-        return
-    var result: SteamListingResult = steam_lobbies.friend_lobby(friend_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamListing = result.value
-    if payload == null:
-        return
-    var name: String = payload.name
-    name_label.text = "Name: %s" % str(name)
-```
+[See gameplay examples for `SteamLobbies`](/api/classes/SteamLobbies#examples).

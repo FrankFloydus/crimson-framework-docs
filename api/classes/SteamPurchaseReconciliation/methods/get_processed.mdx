@@ -22,16 +22,3 @@ get_processed() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_processed(
-    steam_purchase_reconciliation: SteamPurchaseReconciliation,
-    processed_label: Label
-) -> void:
-    var result: int = steam_purchase_reconciliation.get_processed()
-    processed_label.text = "Processed: %s" % str(result)
-```

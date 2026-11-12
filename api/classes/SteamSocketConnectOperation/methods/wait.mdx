@@ -22,24 +22,3 @@ wait() -> Variant
 ## Description
 
 Returns the existing result immediately or a signal that settles with the typed result.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_wait(
-    steam_socket_connect_operation: SteamSocketConnectOperation,
-    apply_wait: Callable
-) -> void:
-    var result: SteamSocketConnectionResult = await steam_socket_connect_operation.wait()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamSocketConnection = result.value
-    if payload == null:
-        return
-    apply_wait.call(payload)
-```

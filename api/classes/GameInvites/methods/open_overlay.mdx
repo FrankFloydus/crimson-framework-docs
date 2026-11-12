@@ -25,16 +25,34 @@ open_overlay() -> Error
 
 ## Example
 
-```gdscript
-extends Node
+### Invite a friend to the arena from the pause menu
 
-func run_open_overlay(game_runtime: GameRuntime, status_label: Label) -> void:
-    var game_invites: GameInvites = game_runtime.invites()
-    if game_invites == null:
+From the host's pause menu, press Invite friends to open Steam's invitation picker for the [active arena lobby](/steam/listen-servers#invite-and-join).
+
+```gdscript
+extends Control
+
+@export var game: GameRuntime
+@export var invite_button: Button
+@export var status_label: Label
+
+func _ready() -> void:
+    if game == null or invite_button == null or status_label == null:
+        push_error("Assign the game, Invite friends button, and status label.")
         return
-    var result: Error = game_invites.open_overlay()
-    if result != OK:
-        status_label.text = error_string(result)
+    invite_button.pressed.connect(_invite_friends)
+
+func _invite_friends() -> void:
+    var invites: GameInvites = game.invites()
+    if invites == null:
+        status_label.text = "Start a Steam lobby before inviting friends."
         return
-    status_label.text = "Open overlay accepted."
+
+    var status: Error = invites.open_overlay()
+    if status == OK:
+        status_label.text = "Choose a friend in the Steam Overlay."
+    elif status == ERR_BUSY:
+        status_label.text = "The Steam Overlay is still loading. Try again."
+    else:
+        status_label.text = "Could not open invites. %s" % error_string(status)
 ```

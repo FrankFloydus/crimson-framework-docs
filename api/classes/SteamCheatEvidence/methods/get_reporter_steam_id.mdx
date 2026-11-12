@@ -22,16 +22,3 @@ get_reporter_steam_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_reporter_steam_id(
-    steam_cheat_evidence: SteamCheatEvidence,
-    apply_reporter_steam_id: Callable
-) -> void:
-    var result: String = steam_cheat_evidence.get_reporter_steam_id()
-    apply_reporter_steam_id.call(result)
-```

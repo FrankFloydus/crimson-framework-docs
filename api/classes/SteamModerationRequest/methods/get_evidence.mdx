@@ -22,18 +22,3 @@ get_evidence() -> SteamCheatEvidence
 ## Return value
 
 [`SteamCheatEvidence`](/api/classes/SteamCheatEvidence)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_evidence(
-    steam_moderation_request: SteamModerationRequest,
-    apply_evidence: Callable
-) -> void:
-    var result: SteamCheatEvidence = steam_moderation_request.get_evidence()
-    if result == null:
-        return
-    apply_evidence.call(result)
-```

@@ -26,18 +26,3 @@ var value: bool
 ## Description
 
 A successful false is distinct from an error.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(steam_bool_result: SteamBoolResult, status_label: Label) -> void:
-    if steam_bool_result == null:
-        return
-    if not steam_bool_result.ok:
-        push_warning(steam_bool_result.message)
-        return
-    var value: bool = steam_bool_result.value
-    status_label.text = "Value: yes" if value else "Value: no"
-```

@@ -22,15 +22,3 @@ var location: SteamPartyLocation
 | Type | [`SteamPartyLocation`](/api/classes/SteamPartyLocation) |
 | Access | Read only |
 | Getter | [`get_location()`](/api/classes/SteamPartyListing/methods/get_location) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_location(steam_party_listing: SteamPartyListing, apply_location: Callable) -> void:
-    var location: SteamPartyLocation = steam_party_listing.location
-    if location == null:
-        return
-    apply_location.call(location)
-```

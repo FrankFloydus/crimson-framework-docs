@@ -22,16 +22,3 @@ get_login_blob() -> PackedByteArray
 ## Description
 
 Send it only to the authenticated coordinator backend. Empty off the scene thread, during client authorization, or after settlement.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_login_blob(
-    steam_relay_request: SteamRelayRequest,
-    byte_count_label: Label
-) -> void:
-    var result: PackedByteArray = steam_relay_request.get_login_blob()
-    byte_count_label.text = "%d bytes" % result.size()
-```

@@ -21,24 +21,4 @@ get_virtual_port() -> int
 
 `int`
 
-## Example
-
-```gdscript
-extends Node
-
-const STEAM_APP_ID: int = 480
-const LOBBY_NAMESPACE: String = "crimson-harbor"
-const EVENT_VIRTUAL_PORT: int = 17
-
-@export var lobby_details: Label
-
-# Attach to the lobby settings screen and assign its summary label.
-func _ready() -> void:
-    if lobby_details == null:
-        return
-    var provider: SteamProvider = SteamProvider.configure().for_app(STEAM_APP_ID)
-    provider = provider.with_lobby_namespace(LOBBY_NAMESPACE)
-    provider = provider.on_virtual_port(EVENT_VIRTUAL_PORT)
-    var virtual_port: int = provider.get_virtual_port()
-    lobby_details.text = "Use virtual port %d in the joining game." % virtual_port
-```
+[See gameplay examples for `SteamProvider`](/api/classes/SteamProvider#examples).

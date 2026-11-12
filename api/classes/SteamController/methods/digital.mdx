@@ -28,25 +28,3 @@ digital(action: StringName) -> SteamDigitalInputResult
 ## Description
 
 An inactive action reports `active = false`. Unknown actions return `ERR_DOES_NOT_EXIST`. An empty or oversized action name returns `ERR_INVALID_PARAMETER`. A retired view or unavailable Steam interface returns `ERR_UNAVAILABLE`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_digital(
-    steam_controller: SteamController,
-    action: StringName,
-    apply_digital: Callable
-) -> void:
-    var result: SteamDigitalInputResult = steam_controller.digital(action)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamDigitalInput = result.value
-    if payload == null:
-        return
-    apply_digital.call(payload)
-```

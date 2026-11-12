@@ -20,16 +20,3 @@ get_operation_guard() -> Callable
 ## Return value
 
 `Callable`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_operation_guard(
-    spatial_inventory_actions: SpatialInventoryActions,
-    action_button: Button
-) -> void:
-    var result: Callable = spatial_inventory_actions.get_operation_guard()
-    action_button.disabled = not result.is_valid()
-```

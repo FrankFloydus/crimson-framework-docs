@@ -29,16 +29,3 @@ var tax_basis: SteamPublisherPurchaseOrder.TaxBasis = 0
 ## Description
 
 Defaults to `NET`.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_tax_basis(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_tax_basis: Callable
-) -> void:
-    var tax_basis: SteamPublisherPurchaseOrder.TaxBasis = steam_publisher_purchase_order.tax_basis
-    apply_tax_basis.call(tax_basis)
-```

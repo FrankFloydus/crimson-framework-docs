@@ -22,13 +22,3 @@ var size_bytes: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_size_bytes()`](/api/classes/SteamCloudFile/methods/get_size_bytes) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_size_bytes(steam_cloud_file: SteamCloudFile, size_bytes_label: Label) -> void:
-    var size_bytes: int = steam_cloud_file.size_bytes
-    size_bytes_label.text = "Size bytes: %s" % str(size_bytes)
-```

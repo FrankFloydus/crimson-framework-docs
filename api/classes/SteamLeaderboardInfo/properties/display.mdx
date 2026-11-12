@@ -23,16 +23,3 @@ var display: SteamLeaderboards.Display = 1
 | Access | Read only |
 | Default | `1` |
 | Getter | [`get_display()`](/api/classes/SteamLeaderboardInfo/methods/get_display) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_display(
-    steam_leaderboard_info: SteamLeaderboardInfo,
-    display_label: Label
-) -> void:
-    var display: SteamLeaderboards.Display = steam_leaderboard_info.display
-    display_label.text = "Display: %s" % str(display)
-```

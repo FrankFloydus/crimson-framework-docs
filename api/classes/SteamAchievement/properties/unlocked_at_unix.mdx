@@ -26,16 +26,3 @@ var unlocked_at_unix: int
 ## Description
 
 Zero means the achievement is locked or Steam has no timestamp. Use `unlocked` to determine the unlock state.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_unlocked_at_unix(
-    steam_achievement: SteamAchievement,
-    unlocked_at_unix_label: Label
-) -> void:
-    var unlocked_at_unix: int = steam_achievement.unlocked_at_unix
-    unlocked_at_unix_label.text = "Unlocked at unix: %s" % str(unlocked_at_unix)
-```

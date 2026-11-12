@@ -28,18 +28,3 @@ set_environment(environment: SteamPublisherSettings.Environment) -> void
 ## Description
 
 The default is `LIVE`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_environment(
-    steam_publisher_settings: SteamPublisherSettings,
-    environment: SteamPublisherSettings.Environment,
-    apply_environment: Callable
-) -> void:
-    steam_publisher_settings.set_environment(environment)
-    var active_environment: SteamPublisherSettings.Environment = steam_publisher_settings.environment
-    apply_environment.call(active_environment)
-```

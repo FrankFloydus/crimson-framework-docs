@@ -18,16 +18,3 @@ close() -> Error
 ## Return value
 
 `Error`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_close(steam_socket_listener: SteamSocketListener, status_label: Label) -> void:
-    var result: Error = steam_socket_listener.close()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Close accepted."
-```

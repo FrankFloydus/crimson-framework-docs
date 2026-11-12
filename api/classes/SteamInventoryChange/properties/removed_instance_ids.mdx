@@ -22,18 +22,3 @@ var removed_instance_ids: PackedStringArray
 | Type | `PackedStringArray` |
 | Access | Read only |
 | Getter | [`get_removed_instance_ids()`](/api/classes/SteamInventoryChange/methods/get_removed_instance_ids) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_removed_instance_ids(
-    steam_inventory_change: SteamInventoryChange,
-    results_list: ItemList
-) -> void:
-    var removed_instance_ids: PackedStringArray = steam_inventory_change.removed_instance_ids
-    results_list.clear()
-    for entry: String in removed_instance_ids:
-        results_list.add_item(str(entry))
-```

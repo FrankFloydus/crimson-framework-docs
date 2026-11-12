@@ -29,19 +29,4 @@ set_manage_admission(enabled: bool) -> Error
 
 The default is `true`. Set `false` when the orchestrator closes admission before a host transition and holds it through confirmation. Returns `ERR\_BUSY` while a transition is active or this loader holds a gate.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_manage_admission(
-    scene_load_manager: SceneLoadManager,
-    enabled: bool,
-    status_label: Label
-) -> void:
-    var result: Error = scene_load_manager.set_manage_admission(enabled)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set manage admission accepted."
-```
+[See gameplay examples for `SceneLoadManager`](/api/classes/SceneLoadManager#examples).

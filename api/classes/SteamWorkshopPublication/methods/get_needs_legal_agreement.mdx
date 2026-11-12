@@ -20,16 +20,3 @@ get_needs_legal_agreement() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_needs_legal_agreement(
-    steam_workshop_publication: SteamWorkshopPublication,
-    status_label: Label
-) -> void:
-    var result: bool = steam_workshop_publication.get_needs_legal_agreement()
-    status_label.text = "Needs legal agreement: yes" if result else "Needs legal agreement: no"
-```

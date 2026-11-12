@@ -14,16 +14,3 @@ description: "Discard the pending preview without changing the inventory."
 ```text
 cancel_preview() -> void
 ```
-
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel_preview(
-    spatial_inventory_sorter: SpatialInventorySorter,
-    preview_panel: Control
-) -> void:
-    spatial_inventory_sorter.cancel_preview()
-    preview_panel.hide()
-```

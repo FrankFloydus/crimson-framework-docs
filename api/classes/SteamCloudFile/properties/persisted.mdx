@@ -26,13 +26,3 @@ var persisted: bool
 ## Description
 
 Cross-device delivery follows Steam's sync lifecycle.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_persisted(steam_cloud_file: SteamCloudFile, status_label: Label) -> void:
-    var persisted: bool = steam_cloud_file.persisted
-    status_label.text = "Persisted: yes" if persisted else "Persisted: no"
-```

@@ -24,23 +24,3 @@ get_value() -> SteamCloudFile[]
 ## Description
 
 Returns an empty array on failure.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_cloud_files_result: SteamCloudFilesResult,
-    results_list: ItemList
-) -> void:
-    if steam_cloud_files_result == null:
-        return
-    if not steam_cloud_files_result.ok:
-        push_warning(steam_cloud_files_result.message)
-        return
-    var result: Array[SteamCloudFile] = steam_cloud_files_result.get_value()
-    results_list.clear()
-    for entry: SteamCloudFile in result:
-        results_list.add_item(str(entry.name))
-```

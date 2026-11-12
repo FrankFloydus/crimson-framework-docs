@@ -20,21 +20,3 @@ get_value() -> SteamCloudFile
 ## Return value
 
 [`SteamCloudFile`](/api/classes/SteamCloudFile)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(steam_cloud_file_result: SteamCloudFileResult, name_label: Label) -> void:
-    if steam_cloud_file_result == null:
-        return
-    if not steam_cloud_file_result.ok:
-        push_warning(steam_cloud_file_result.message)
-        return
-    var result: SteamCloudFile = steam_cloud_file_result.get_value()
-    if result == null:
-        return
-    var name: String = result.name
-    name_label.text = "Name: %s" % str(name)
-```

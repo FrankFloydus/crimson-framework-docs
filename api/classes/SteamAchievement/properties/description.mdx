@@ -26,13 +26,3 @@ var description: String
 ## Description
 
 An empty string means Steam supplied no description. For a hidden locked entry, keep the description out of the player-facing achievement list.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_description(steam_achievement: SteamAchievement, description_label: Label) -> void:
-    var description: String = steam_achievement.description
-    description_label.text = "Description: %s" % str(description)
-```

@@ -24,13 +24,3 @@ var token: StringName
 | Type | `StringName` |
 | Access | Read only |
 | Getter | [`get_token()`](/api/classes/SteamLocalizedText/methods/get_token) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_token(steam_localized_text: SteamLocalizedText, apply_token: Callable) -> void:
-    var token: StringName = steam_localized_text.token
-    apply_token.call(token)
-```

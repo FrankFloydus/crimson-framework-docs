@@ -20,22 +20,3 @@ get_value() -> SteamPartyListing[]
 ## Return value
 
 `SteamPartyListing[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_party_listings_result: SteamPartyListingsResult,
-    add_value_entry: Callable
-) -> void:
-    if steam_party_listings_result == null:
-        return
-    if not steam_party_listings_result.ok:
-        push_warning(steam_party_listings_result.message)
-        return
-    var result: Array[SteamPartyListing] = steam_party_listings_result.get_value()
-    for entry: SteamPartyListing in result:
-        add_value_entry.call(entry)
-```

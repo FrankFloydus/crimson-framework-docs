@@ -29,15 +29,4 @@ invite(steam_id: String) -> Error
 
 A malformed ID or the local account returns `ERR_INVALID_PARAMETER`. `OK` acknowledges submission.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_invite(steam_lobby: SteamLobby, steam_id: String, status_label: Label) -> void:
-    var result: Error = steam_lobby.invite(steam_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Invite accepted."
-```
+[See gameplay examples for `SteamLobby`](/api/classes/SteamLobby#examples).

@@ -22,13 +22,3 @@ get_local_peer_id() -> int
 ## Description
 
 Offline and host sessions use ID 1. Returns 0 while idle or waiting for admission.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_local_peer_id(game_session: GameSession, local_peer_id_label: Label) -> void:
-    var result: int = game_session.get_local_peer_id()
-    local_peer_id_label.text = "Local peer id: %s" % str(result)
-```

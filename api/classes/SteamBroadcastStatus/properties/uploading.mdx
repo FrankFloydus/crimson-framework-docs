@@ -22,16 +22,3 @@ var uploading: bool
 | Type | `bool` |
 | Access | Read only |
 | Getter | [`is_uploading()`](/api/classes/SteamBroadcastStatus/methods/is_uploading) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_uploading(
-    steam_broadcast_status: SteamBroadcastStatus,
-    status_label: Label
-) -> void:
-    var uploading: bool = steam_broadcast_status.uploading
-    status_label.text = "Uploading: yes" if uploading else "Uploading: no"
-```

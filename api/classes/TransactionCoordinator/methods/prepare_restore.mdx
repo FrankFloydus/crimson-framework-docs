@@ -30,22 +30,4 @@ prepare_restore(snapshot: Dictionary, context: Dictionary = {}) -> Dictionary
 
 On success, the result's `candidate` field contains a single-use `GameTransaction` for `publish\_restore()`. Live stores stay readable at their current committed revision during preparation.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_prepare_restore(
-    game_runtime: GameRuntime,
-    snapshot: Dictionary,
-    context: Dictionary,
-    apply_prepare_restore: Callable
-) -> void:
-    var transaction_coordinator: TransactionCoordinator = game_runtime.get_transactions()
-    if transaction_coordinator == null:
-        return
-    var result: Dictionary = transaction_coordinator.prepare_restore(snapshot, context)
-    if result.is_empty():
-        return
-    apply_prepare_restore.call(result)
-```
+[See gameplay examples for `TransactionCoordinator`](/api/classes/TransactionCoordinator#examples).

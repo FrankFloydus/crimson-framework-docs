@@ -22,19 +22,3 @@ apply_preview() -> Error
 ## Description
 
 A successful sort with placement changes records the prior placements for undo. A rejected plan preserves the grid.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_apply_preview(
-    spatial_inventory_sorter: SpatialInventorySorter,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_sorter.apply_preview()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Apply preview accepted."
-```

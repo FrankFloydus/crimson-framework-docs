@@ -22,24 +22,3 @@ var value: SteamWorkshopPublication
 | Type | [`SteamWorkshopPublication`](/api/classes/SteamWorkshopPublication) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamWorkshopPublicationResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_workshop_publication_result: SteamWorkshopPublicationResult,
-    published_id_label: Label
-) -> void:
-    if steam_workshop_publication_result == null:
-        return
-    if not steam_workshop_publication_result.ok:
-        push_warning(steam_workshop_publication_result.message)
-        return
-    var value: SteamWorkshopPublication = steam_workshop_publication_result.value
-    if value == null:
-        return
-    var published_id: String = value.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```

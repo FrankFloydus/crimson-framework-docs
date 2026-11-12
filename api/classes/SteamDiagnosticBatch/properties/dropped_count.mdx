@@ -22,16 +22,3 @@ var dropped_count: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_dropped_count()`](/api/classes/SteamDiagnosticBatch/methods/get_dropped_count) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_dropped_count(
-    steam_diagnostic_batch: SteamDiagnosticBatch,
-    dropped_count_label: Label
-) -> void:
-    var dropped_count: int = steam_diagnostic_batch.dropped_count
-    dropped_count_label.text = "Dropped count: %s" % str(dropped_count)
-```

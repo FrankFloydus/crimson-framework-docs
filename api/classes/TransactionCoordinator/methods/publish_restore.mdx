@@ -30,22 +30,4 @@ publish_restore(candidate: GameTransaction, defer_notification: bool = false) ->
 
 Changes to the registry or revision since preparation make a candidate stale. Set `defer\_notification` to hold the `committed` signal and mutation gate until `notify\_restore\_published()`. Returns `ok`, `code`, `message`, and `revision`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_publish_restore(
-    game_runtime: GameRuntime,
-    candidate: GameTransaction,
-    defer_notification: bool,
-    apply_publish_restore: Callable
-) -> void:
-    var transaction_coordinator: TransactionCoordinator = game_runtime.get_transactions()
-    if transaction_coordinator == null:
-        return
-    var result: Dictionary = transaction_coordinator.publish_restore(candidate, defer_notification)
-    if result.is_empty():
-        return
-    apply_publish_restore.call(result)
-```
+[See gameplay examples for `TransactionCoordinator`](/api/classes/TransactionCoordinator#examples).

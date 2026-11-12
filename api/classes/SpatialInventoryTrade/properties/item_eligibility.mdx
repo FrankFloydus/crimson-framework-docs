@@ -28,18 +28,3 @@ var item_eligibility: Callable = Callable()
 ## Description
 
 Return an empty string to allow the offer or exchange.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_item_eligibility(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    new_item_eligibility: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_trade.item_eligibility = new_item_eligibility
-    var active_item_eligibility: Callable = spatial_inventory_trade.item_eligibility
-    action_button.disabled = not active_item_eligibility.is_valid()
-```

@@ -27,15 +27,4 @@ var error: Error
 
 Zero indicates success.
 
-## Example
-
-```gdscript
-extends Node
-
-func refresh_error(steam_result: SteamResult, status_label: Label) -> void:
-    var error: Error = steam_result.error
-    if error != OK:
-        status_label.text = error_string(error)
-        return
-    status_label.text = "Error accepted."
-```
+[See gameplay examples for `SteamResult`](/api/classes/SteamResult#examples).

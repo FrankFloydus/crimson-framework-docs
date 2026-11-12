@@ -19,22 +19,4 @@ current() -> SteamLobby
 
 [`SteamLobby`](/api/classes/SteamLobby)
 
-## Example
-
-```gdscript
-extends Node
-
-func run_current(steam_client: SteamClient, results_list: ItemList) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_lobbies: SteamLobbies = steam_client.lobbies()
-    if steam_lobbies == null:
-        return
-    var result: SteamLobby = steam_lobbies.current()
-    if result == null:
-        return
-    var members: Array[SteamLobbyMember] = result.members()
-    results_list.clear()
-    for entry: SteamLobbyMember in members:
-        results_list.add_item(str(entry.display_name))
-```
+[See gameplay examples for `SteamLobbies`](/api/classes/SteamLobbies#examples).

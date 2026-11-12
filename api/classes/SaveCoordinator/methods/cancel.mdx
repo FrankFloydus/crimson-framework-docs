@@ -28,13 +28,3 @@ cancel(ticket: int) -> String
 ## Description
 
 Returns `Cancelled` if cancellation won, `TooLate` after the commit gate, or `UnknownTicket` for an untracked ticket. Wait for the terminal signal before treating admitted work as finished.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_cancel(save_coordinator: SaveCoordinator, ticket: int, cancel_label: Label) -> void:
-    var result: String = save_coordinator.cancel(ticket)
-    cancel_label.text = "Cancel: %s" % str(result)
-```

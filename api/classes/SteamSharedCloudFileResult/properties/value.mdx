@@ -22,24 +22,3 @@ var value: SteamSharedCloudFile
 | Type | [`SteamSharedCloudFile`](/api/classes/SteamSharedCloudFile) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamSharedCloudFileResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_shared_cloud_file_result: SteamSharedCloudFileResult,
-    name_label: Label
-) -> void:
-    if steam_shared_cloud_file_result == null:
-        return
-    if not steam_shared_cloud_file_result.ok:
-        push_warning(steam_shared_cloud_file_result.message)
-        return
-    var value: SteamSharedCloudFile = steam_shared_cloud_file_result.value
-    if value == null:
-        return
-    var name: String = value.name
-    name_label.text = "Name: %s" % str(name)
-```

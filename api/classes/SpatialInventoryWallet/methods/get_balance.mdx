@@ -25,18 +25,3 @@ get_balance(actor: int, currency: StringName) -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_balance(
-    spatial_inventory_wallet: SpatialInventoryWallet,
-    actor: int,
-    currency: StringName,
-    balance_label: Label
-) -> void:
-    var result: int = spatial_inventory_wallet.get_balance(actor, currency)
-    balance_label.text = "Balance: %s" % str(result)
-```

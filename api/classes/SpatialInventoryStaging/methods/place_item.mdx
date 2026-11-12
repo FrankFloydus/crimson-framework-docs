@@ -31,23 +31,3 @@ place_item(id: StringName, destination: SpatialInventory, origin: Vector2i, rota
 ## Description
 
 On success the item leaves the tray and its original placement record is cleared.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_place_item(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    id: StringName,
-    destination: SpatialInventory,
-    origin: Vector2i,
-    rotated: bool,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_staging.place_item(id, destination, origin, rotated)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Place item accepted."
-```

@@ -20,13 +20,3 @@ get_playback() -> SteamMusicStatus.Playback
 ## Return value
 
 `SteamMusicStatus.Playback`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_playback(steam_music_status: SteamMusicStatus, playback_label: Label) -> void:
-    var result: SteamMusicStatus.Playback = steam_music_status.get_playback()
-    playback_label.text = "Playback: %s" % str(result)
-```

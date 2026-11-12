@@ -20,18 +20,3 @@ get_event() -> InputEvent
 ## Return value
 
 `InputEvent`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_event(
-    steam_remote_play_input_event: SteamRemotePlayInputEvent,
-    apply_event: Callable
-) -> void:
-    var result: InputEvent = steam_remote_play_input_event.get_event()
-    if result == null:
-        return
-    apply_event.call(result)
-```

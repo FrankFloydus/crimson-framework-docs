@@ -18,21 +18,3 @@ previous() -> Error
 ## Return value
 
 `Error`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_previous(steam_client: SteamClient, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_music: SteamMusic = steam_client.music()
-    if steam_music == null:
-        return
-    var result: Error = steam_music.previous()
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Previous accepted."
-```

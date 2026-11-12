@@ -28,20 +28,3 @@ unregister_inventory(inventory: SpatialInventory) -> Error
 ## Description
 
 Returns `ERR_DOES_NOT_EXIST` if it was not registered.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_unregister_inventory(
-    spatial_inventory_containers: SpatialInventoryContainers,
-    inventory: SpatialInventory,
-    status_label: Label
-) -> void:
-    var result: Error = spatial_inventory_containers.unregister_inventory(inventory)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Unregister inventory accepted."
-```

@@ -26,13 +26,3 @@ var sku: StringName
 ## Description
 
 The backend resolves its price.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_sku(steam_purchase_line: SteamPurchaseLine, sku_label: Label) -> void:
-    var sku: StringName = steam_purchase_line.sku
-    sku_label.text = "Sku: %s" % str(sku)
-```

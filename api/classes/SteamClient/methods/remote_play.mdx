@@ -23,14 +23,4 @@ remote_play() -> SteamRemotePlay
 
 Returns null while the scope is inactive.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_remote_play(steam_client: SteamClient, apply_remote_play: Callable) -> void:
-    var result: SteamRemotePlay = steam_client.remote_play()
-    if result == null:
-        return
-    apply_remote_play.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

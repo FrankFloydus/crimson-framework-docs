@@ -23,16 +23,4 @@ set_app_id(app_id: String) -> void
 | --- | --- | --- |
 | `app_id` | `String` | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_app_id(game_definition: GameDefinition, app_id: String, game: GameRuntime) -> void:
-    if game_definition == null:
-        return
-    if game.is_inside_tree():
-        return
-    game_definition.set_app_id(app_id)
-    game.definition = game_definition
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

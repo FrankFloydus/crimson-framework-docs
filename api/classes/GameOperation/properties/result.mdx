@@ -30,10 +30,43 @@ It is empty until the operation has settled.
 ## Example
 
 ```gdscript
-func update_operation_status(operation: GameOperation) -> void:
-    if not operation.is_finished():
-        print("Waiting for the game.")
+extends Node
+
+# Attach to the title menu. Assign a GameDefinition with a starting world,
+# a player scene, and a world spawn point, plus the menu controls.
+@export var game_definition: GameDefinition
+@export var play_button: Button
+@export var startup_status: Label
+@export var title_menu: Control
+
+var _game: GameRuntime
+var _startup: GameOperation
+
+func _ready() -> void:
+    if game_definition == null or play_button == null or startup_status == null or title_menu == null:
+        push_error("Assign the game definition and title-menu controls.")
         return
-    var result: Dictionary = operation.result
-    print("Complete." if result.ok else result.message)
+    play_button.disabled = true
+    _game = game_definition.boot(self)
+    if _game == null:
+        startup_status.text = "Could not prepare the campaign."
+        return
+    play_button.pressed.connect(_start_campaign)
+    play_button.disabled = false
+
+func _start_campaign() -> void:
+    play_button.disabled = true
+    startup_status.text = "Loading the harbor…"
+    _startup = _game.play_solo()
+
+func _process(_delta: float) -> void:
+    if _startup == null or not _startup.is_finished():
+        return
+    var started: Dictionary = _startup.result
+    _startup = null
+    if started.ok:
+        title_menu.hide()
+    else:
+        startup_status.text = started.message
+        play_button.disabled = false
 ```

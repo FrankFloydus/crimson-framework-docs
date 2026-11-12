@@ -22,18 +22,3 @@ build_id() -> int
 ## Description
 
 Returns `0` when Steam has no build ID for this process, including launches outside a Steam download or an inactive client scope.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_build_id(steam_client: SteamClient, build_id_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_apps: SteamApps = steam_client.apps()
-    if steam_apps == null:
-        return
-    var result: int = steam_apps.build_id()
-    build_id_label.text = "Build id: %s" % str(result)
-```

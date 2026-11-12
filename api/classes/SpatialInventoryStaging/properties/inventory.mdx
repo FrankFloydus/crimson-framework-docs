@@ -26,18 +26,3 @@ var inventory: SpatialInventory
 ## Description
 
 Use the tray methods to keep placements and tracked origins in sync.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_inventory(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    apply_inventory: Callable
-) -> void:
-    var inventory: SpatialInventory = spatial_inventory_staging.inventory
-    if inventory == null:
-        return
-    apply_inventory.call(inventory)
-```

@@ -28,32 +28,3 @@ with_preview(image_file: String) -> SteamWorkshopPublishRequest
 ## Description
 
 The file must contain at least 16 bytes and be smaller than 1 MiB. Steam uses the active app's Cloud settings to store the preview.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_with_preview(
-    steam_workshop_publish_request: SteamWorkshopPublishRequest,
-    image_file: String,
-    confirmed: bool,
-    published_id_label: Label
-) -> void:
-    var result: SteamWorkshopPublishRequest = steam_workshop_publish_request.with_preview(image_file)
-    if result == null:
-        return
-    if not confirmed:
-        return
-    var completion: SteamWorkshopPublicationResult = await result.submit()
-    if completion == null:
-        return
-    if not completion.ok:
-        push_warning(completion.message)
-        return
-    var payload: SteamWorkshopPublication = completion.value
-    if payload == null:
-        return
-    var published_id: String = payload.published_id
-    published_id_label.text = "Published id: %s" % str(published_id)
-```

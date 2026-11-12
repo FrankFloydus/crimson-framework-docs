@@ -23,20 +23,4 @@ set_multiplayer_rules(rules: MultiplayerRules) -> void
 | --- | --- | --- |
 | `rules` | [`MultiplayerRules`](/api/classes/MultiplayerRules) | — |
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_multiplayer_rules(
-    game_definition: GameDefinition,
-    rules: MultiplayerRules,
-    game: GameRuntime
-) -> void:
-    if game_definition == null:
-        return
-    if game.is_inside_tree():
-        return
-    game_definition.set_multiplayer_rules(rules)
-    game.definition = game_definition
-```
+[See gameplay examples for `GameDefinition`](/api/classes/GameDefinition#examples).

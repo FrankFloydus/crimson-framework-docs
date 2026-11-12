@@ -24,15 +24,3 @@ moderation() -> SteamPublisherModeration
 ## Description
 
 Actions require an injected `SteamPublisherSettings.moderation_policy`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_moderation(steam_publisher: SteamPublisher, apply_moderation: Callable) -> void:
-    var result: SteamPublisherModeration = steam_publisher.moderation()
-    if result == null:
-        return
-    apply_moderation.call(result)
-```

@@ -23,20 +23,3 @@ var wallet: SpatialInventoryWallet
 | Access | Read and write |
 | Getter | [`get_wallet()`](/api/classes/SpatialInventoryTrade/methods/get_wallet) |
 | Setter | [`set_wallet()`](/api/classes/SpatialInventoryTrade/methods/set_wallet) |
-
-## Example
-
-```gdscript
-extends Node
-
-func update_wallet(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    new_wallet: SpatialInventoryWallet,
-    apply_wallet: Callable
-) -> void:
-    spatial_inventory_trade.wallet = new_wallet
-    var active_wallet: SpatialInventoryWallet = spatial_inventory_trade.wallet
-    if active_wallet == null:
-        return
-    apply_wallet.call(active_wallet)
-```

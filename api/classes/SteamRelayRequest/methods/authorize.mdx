@@ -28,20 +28,3 @@ authorize(ticket: PackedByteArray) -> Error
 ## Description
 
 Crimson verifies the SDK-parsed fields and cache selection before opening any peer.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_authorize(
-    steam_relay_request: SteamRelayRequest,
-    ticket: PackedByteArray,
-    status_label: Label
-) -> void:
-    var result: Error = steam_relay_request.authorize(ticket)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Authorize accepted."
-```

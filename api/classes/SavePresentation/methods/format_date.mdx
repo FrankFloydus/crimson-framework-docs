@@ -30,18 +30,3 @@ static format_date(unix_seconds: int, pattern: String, utc_offset_minutes: int =
 ## Description
 
 Supported tokens include `%Y`, `%m`, `%d`, `%H`, `%M`, `%S`, `%z`, and `%%`. An out-of-range date or offset returns an empty string.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_format_date(
-    unix_seconds: int,
-    pattern: String,
-    utc_offset_minutes: int,
-    format_date_label: Label
-) -> void:
-    var result: String = SavePresentation.format_date(unix_seconds, pattern, utc_offset_minutes)
-    format_date_label.text = "Format date: %s" % str(result)
-```

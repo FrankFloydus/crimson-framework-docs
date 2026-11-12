@@ -24,19 +24,3 @@ get_upload() -> SteamScoreUpload
 ## Description
 
 A publisher submission can acknowledge the score without a native rank or change receipt, in which case this returns `null`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_upload(
-    steam_leaderboard_submission: SteamLeaderboardSubmission,
-    score_label: Label
-) -> void:
-    var result: SteamScoreUpload = steam_leaderboard_submission.get_upload()
-    if result == null:
-        return
-    var score: int = result.score
-    score_label.text = "Score: %s" % str(score)
-```

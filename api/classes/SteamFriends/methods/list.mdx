@@ -22,26 +22,3 @@ list() -> SteamFriendsResult
 ## Description
 
 A successful result can contain an empty array. An inactive or unavailable Steam client returns `@GlobalScope.ERR_UNAVAILABLE`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_list(steam_client: SteamClient, results_list: ItemList) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_friends: SteamFriends = steam_client.friends()
-    if steam_friends == null:
-        return
-    var result: SteamFriendsResult = steam_friends.list()
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: Array[SteamFriend] = result.value
-    results_list.clear()
-    for entry: SteamFriend in payload:
-        results_list.add_item(str(entry.display_name))
-```

@@ -23,16 +23,3 @@ var revision: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_revision()`](/api/classes/SpatialInventoryTrade/methods/get_revision) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_revision(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    revision_label: Label
-) -> void:
-    var revision: int = spatial_inventory_trade.revision
-    revision_label.text = "Revision: %s" % str(revision)
-```

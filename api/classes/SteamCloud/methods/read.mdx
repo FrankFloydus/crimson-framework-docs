@@ -33,39 +33,78 @@ Inspect `SteamResult.ok` before reading `SteamBytesResult.value`. Use `read_file
 
 ## Example
 
-```gdscript
-extends Node
+### Resume a campaign at the last saved Steam Cloud checkpoint
 
-const PROFILE_FILE: String = "profile.json"
-const DISPLAY_NAME_FIELD: String = "display_name"
-const MAX_DISPLAY_NAME_LENGTH: int = 32
+Reaching a campaign checkpoint saves its ID to [Steam Cloud](/steam/client-services#save-a-profile-to-cloud). Press Continue to resume from the last saved checkpoint.
+
+```gdscript
+extends Control
+
+signal continue_requested(checkpoint_id: StringName)
+
+const CHECKPOINT_FILE: String = "campaign_checkpoint.json"
+const CHECKPOINT_KEY: String = "checkpoint_id"
 
 @export var steam_client: SteamClient
-@export var profile_name: Label
+@export var continue_button: Button
+@export var cloud_status: Label
 
-# Connect this method to the Profile screen's Refresh button.
-func refresh_profile_name() -> void:
-    if steam_client == null or profile_name == null:
+var _cloud_busy: bool = false
+
+
+func _ready() -> void:
+    continue_button.pressed.connect(_continue_from_cloud)
+
+
+func save_checkpoint(checkpoint_id: StringName) -> void:
+    if not is_instance_valid(steam_client) or not steam_client.is_online():
+        cloud_status.text = "Steam Cloud is unavailable."
         return
+    if _cloud_busy:
+        cloud_status.text = "Steam Cloud is busy. Try saving again."
+        return
+
+    _set_cloud_busy(true)
     var cloud: SteamCloud = steam_client.cloud()
-    if cloud == null:
-        profile_name.text = "Steam Cloud unavailable"
-        return
-    var result: SteamBytesResult = await cloud.read(PROFILE_FILE)
-    if not result.ok:
-        profile_name.text = "Profile unavailable"
+    var payload: Dictionary = {CHECKPOINT_KEY: String(checkpoint_id)}
+    var bytes: PackedByteArray = JSON.stringify(payload).to_utf8_buffer()
+    var result: SteamResult = await cloud.write(CHECKPOINT_FILE, bytes)
+    _set_cloud_busy(false)
+
+    if result.ok:
+        cloud_status.text = "Checkpoint saved to Steam Cloud."
+    else:
+        cloud_status.text = "Could not save checkpoint: %s" % result.message
+
+
+func _continue_from_cloud() -> void:
+    if not is_instance_valid(steam_client) or not steam_client.is_online():
+        cloud_status.text = "Steam Cloud is unavailable."
         return
 
-    var parser: JSON = JSON.new()
-    var parsed: Error = parser.parse(result.value.get_string_from_utf8())
-    if parsed != OK or not parser.data is Dictionary:
-        profile_name.text = "Invalid profile"
+    _set_cloud_busy(true)
+    var cloud: SteamCloud = steam_client.cloud()
+    var result: SteamBytesResult = await cloud.read(CHECKPOINT_FILE)
+    _set_cloud_busy(false)
+    if not result.ok:
+        cloud_status.text = "Could not load checkpoint: %s" % result.message
         return
-    var profile: Dictionary = parser.data
-    var display_name: Variant = profile.get(DISPLAY_NAME_FIELD)
-    if not display_name is String:
-        profile_name.text = "Player"
+
+    var decoded: Variant = JSON.parse_string(result.value.get_string_from_utf8())
+    if not decoded is Dictionary:
+        cloud_status.text = "The cloud checkpoint is invalid."
         return
-    var cleaned_name: String = display_name.strip_edges().left(MAX_DISPLAY_NAME_LENGTH)
-    profile_name.text = cleaned_name if not cleaned_name.is_empty() else "Player"
+    var payload: Dictionary = decoded
+    var checkpoint_id: Variant = payload.get(CHECKPOINT_KEY)
+    if not checkpoint_id is String or checkpoint_id.is_empty():
+        cloud_status.text = "The cloud checkpoint has no checkpoint ID."
+        return
+
+    cloud_status.text = "Resuming from checkpoint %s." % checkpoint_id
+    continue_requested.emit(StringName(checkpoint_id))
+
+
+func _set_cloud_busy(is_busy: bool) -> void:
+    _cloud_busy = is_busy
+    continue_button.disabled = is_busy
 ```

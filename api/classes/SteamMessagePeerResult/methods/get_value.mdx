@@ -20,23 +20,3 @@ get_value() -> SteamMessagePeer
 ## Return value
 
 [`SteamMessagePeer`](/api/classes/SteamMessagePeer)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_message_peer_result: SteamMessagePeerResult,
-    apply_value: Callable
-) -> void:
-    if steam_message_peer_result == null:
-        return
-    if not steam_message_peer_result.ok:
-        push_warning(steam_message_peer_result.message)
-        return
-    var result: SteamMessagePeer = steam_message_peer_result.get_value()
-    if result == null:
-        return
-    apply_value.call(result)
-```

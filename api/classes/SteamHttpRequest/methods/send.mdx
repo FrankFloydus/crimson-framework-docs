@@ -22,24 +22,3 @@ send() -> SteamHttpResponseOperation
 ## Description
 
 Invalid drafts and stopped scopes return already-settled failures.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_send(steam_http_request: SteamHttpRequest, apply_send: Callable) -> void:
-    var result: SteamHttpResponseOperation = steam_http_request.send()
-    if result == null:
-        return
-    var result_value: SteamHttpResponseResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamHttpResponse = result_value.value
-    if payload == null:
-        return
-    apply_send.call(payload)
-```

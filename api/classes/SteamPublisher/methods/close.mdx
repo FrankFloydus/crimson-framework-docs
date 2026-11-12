@@ -20,13 +20,3 @@ close() -> void
 ## Description
 
 Pending local observations settle on the next host tick.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_close(steam_publisher: SteamPublisher, after_close: Callable) -> void:
-    steam_publisher.close()
-    after_close.call()
-```

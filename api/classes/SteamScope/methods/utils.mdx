@@ -23,15 +23,4 @@ utils() -> SteamUtils
 
 Returns null when this generation has ended.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_utils(steam_scope: SteamScope, language_label: Label) -> void:
-    var result: SteamUtils = steam_scope.utils()
-    if result == null:
-        return
-    var language: String = result.ui_language()
-    language_label.text = "Language: %s" % str(language)
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

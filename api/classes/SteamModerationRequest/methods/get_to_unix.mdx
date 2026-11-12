@@ -22,16 +22,3 @@ get_to_unix() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_to_unix(
-    steam_moderation_request: SteamModerationRequest,
-    apply_to_unix: Callable
-) -> void:
-    var result: int = steam_moderation_request.get_to_unix()
-    apply_to_unix.call(result)
-```

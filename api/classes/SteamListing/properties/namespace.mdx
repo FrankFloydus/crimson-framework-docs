@@ -24,12 +24,4 @@ var namespace: StringName = &""
 | Default | `&""` |
 | Getter | [`get_namespace()`](/api/classes/SteamListing/methods/get_namespace) |
 
-## Example
-
-```gdscript
-extends Node
-
-func refresh_namespace(steam_listing: SteamListing, namespace_label: Label) -> void:
-    var namespace_value: StringName = steam_listing.namespace
-    namespace_label.text = "Namespace: %s" % str(namespace_value)
-```
+[See gameplay examples for `SteamListing`](/api/classes/SteamListing#examples).

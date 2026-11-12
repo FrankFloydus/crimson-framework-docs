@@ -22,13 +22,3 @@ var playback: SteamMusicStatus.Playback
 | Type | `SteamMusicStatus.Playback` |
 | Access | Read only |
 | Getter | [`get_playback()`](/api/classes/SteamMusicStatus/methods/get_playback) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_playback(steam_music_status: SteamMusicStatus, playback_label: Label) -> void:
-    var playback: SteamMusicStatus.Playback = steam_music_status.playback
-    playback_label.text = "Playback: %s" % str(playback)
-```

@@ -24,16 +24,3 @@ var reported_at_unix: int
 | Type | `int` |
 | Access | Read only |
 | Getter | [`get_reported_at_unix()`](/api/classes/SteamCheatReport/methods/get_reported_at_unix) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_reported_at_unix(
-    steam_cheat_report: SteamCheatReport,
-    apply_reported_at_unix: Callable
-) -> void:
-    var reported_at_unix: int = steam_cheat_report.reported_at_unix
-    apply_reported_at_unix.call(reported_at_unix)
-```

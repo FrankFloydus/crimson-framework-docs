@@ -31,31 +31,3 @@ ban(report_id: String, reason: String) -> Variant
 ## Description
 
 Supply the reviewed `reason`. Returns [`SteamModerationReceiptResult`](/api/classes/SteamModerationReceiptResult). The exact game policy must authorize the request and reserve the audit record before Steam receives it. An expired or closed observation can leave the remote outcome unresolved.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_ban(
-    steam_publisher: SteamPublisher,
-    report_id: String,
-    reason: String,
-    apply_ban: Callable
-) -> void:
-    if not steam_publisher.is_ready():
-        return
-    var steam_publisher_moderation: SteamPublisherModeration = steam_publisher.moderation()
-    if steam_publisher_moderation == null:
-        return
-    var result: SteamModerationReceiptResult = await steam_publisher_moderation.ban(report_id, reason)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamModerationReceipt = result.value
-    if payload == null:
-        return
-    apply_ban.call(payload)
-```

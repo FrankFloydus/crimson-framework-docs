@@ -28,18 +28,3 @@ var operation_guard: Callable = Callable()
 ## Description
 
 Return true while both grids are available to this action.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_operation_guard(
-    spatial_inventory_actions: SpatialInventoryActions,
-    new_operation_guard: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_actions.operation_guard = new_operation_guard
-    var active_operation_guard: Callable = spatial_inventory_actions.operation_guard
-    action_button.disabled = not active_operation_guard.is_valid()
-```

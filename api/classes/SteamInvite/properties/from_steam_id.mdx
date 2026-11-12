@@ -26,13 +26,3 @@ var from_steam_id: String
 ## Description
 
 A launch invite can omit this field.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_from_steam_id(steam_invite: SteamInvite, apply_from_steam_id: Callable) -> void:
-    var from_steam_id: String = steam_invite.from_steam_id
-    apply_from_steam_id.call(from_steam_id)
-```

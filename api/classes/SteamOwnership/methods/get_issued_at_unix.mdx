@@ -22,16 +22,3 @@ get_issued_at_unix() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_issued_at_unix(
-    steam_ownership: SteamOwnership,
-    issued_at_unix_label: Label
-) -> void:
-    var result: int = steam_ownership.get_issued_at_unix()
-    issued_at_unix_label.text = "Issued at unix: %s" % str(result)
-```

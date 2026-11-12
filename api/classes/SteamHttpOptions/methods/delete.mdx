@@ -30,25 +30,3 @@ Await the call to receive [`SteamHttpResponseResult`](/api/classes/SteamHttpResp
 ## Description
 
 Returns a [`SteamHttpResponseResult`](/api/classes/SteamHttpResponseResult) after `await`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_delete(
-    steam_http_options: SteamHttpOptions,
-    url: String,
-    apply_delete: Callable
-) -> void:
-    var result: SteamHttpResponseResult = await steam_http_options.delete(url)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamHttpResponse = result.value
-    if payload == null:
-        return
-    apply_delete.call(payload)
-```

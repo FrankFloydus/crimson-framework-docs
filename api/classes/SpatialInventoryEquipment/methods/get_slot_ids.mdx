@@ -18,18 +18,3 @@ get_slot_ids() -> StringName[]
 ## Return value
 
 `StringName[]`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_slot_ids(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    results_list: ItemList
-) -> void:
-    var result: Array[StringName] = spatial_inventory_equipment.get_slot_ids()
-    results_list.clear()
-    for entry: StringName in result:
-        results_list.add_item(str(entry))
-```

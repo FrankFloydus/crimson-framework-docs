@@ -28,18 +28,3 @@ owns_dlc(dlc_app_id: int) -> bool
 ## Description
 
 Use it as an ownership hint in the UI. Use `is_dlc_installed()` to check whether the local content is installed.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_owns_dlc(steam_client: SteamClient, dlc_app_id: int, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_apps: SteamApps = steam_client.apps()
-    if steam_apps == null:
-        return
-    var result: bool = steam_apps.owns_dlc(dlc_app_id)
-    status_label.text = "Owns dlc: yes" if result else "Owns dlc: no"
-```

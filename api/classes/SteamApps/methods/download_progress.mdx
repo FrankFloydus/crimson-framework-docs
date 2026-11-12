@@ -28,31 +28,3 @@ download_progress(dlc_app_id: int) -> SteamDlcProgressResult
 ## Description
 
 When Steam reports no active download, the query succeeds with an inactive [`SteamDlcProgress`](/api/classes/SteamDlcProgress). Returns an error for an invalid AppID, unavailable interface, or byte counts beyond the signed integer range.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_download_progress(
-    steam_client: SteamClient,
-    dlc_app_id: int,
-    total_bytes_label: Label
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_apps: SteamApps = steam_client.apps()
-    if steam_apps == null:
-        return
-    var result: SteamDlcProgressResult = steam_apps.download_progress(dlc_app_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamDlcProgress = result.value
-    if payload == null:
-        return
-    var total_bytes: int = payload.total_bytes
-    total_bytes_label.text = "Total bytes: %s" % str(total_bytes)
-```

@@ -31,28 +31,4 @@ register_validator(validator_id: String, watched_stores: PackedStringArray, vali
 
 The `validator(prepared, context)` callback receives detached candidates for changed stores. Read unchanged stores through the coordinator. Return a dictionary with boolean `ok` and an optional `message`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_register_validator(
-    game_runtime: GameRuntime,
-    validator_id: String,
-    watched_stores: PackedStringArray,
-    validator: Callable,
-    status_label: Label
-) -> void:
-    var transaction_coordinator: TransactionCoordinator = game_runtime.get_transactions()
-    if transaction_coordinator == null:
-        return
-    var result: Error = transaction_coordinator.register_validator(
-        validator_id,
-        watched_stores,
-        validator,
-    )
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Register validator accepted."
-```
+[See gameplay examples for `TransactionCoordinator`](/api/classes/TransactionCoordinator#examples).

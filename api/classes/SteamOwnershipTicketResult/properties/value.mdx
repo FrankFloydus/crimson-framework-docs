@@ -26,23 +26,3 @@ var value: SteamOwnershipTicket
 ## Description
 
 The backend verifies and consumes the associated challenge.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_ownership_ticket_result: SteamOwnershipTicketResult,
-    apply_value: Callable
-) -> void:
-    if steam_ownership_ticket_result == null:
-        return
-    if not steam_ownership_ticket_result.ok:
-        push_warning(steam_ownership_ticket_result.message)
-        return
-    var value: SteamOwnershipTicket = steam_ownership_ticket_result.value
-    if value == null:
-        return
-    apply_value.call(value)
-```

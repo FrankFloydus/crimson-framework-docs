@@ -22,16 +22,3 @@ get_currency() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_currency(
-    steam_purchase_buyer_info: SteamPurchaseBuyerInfo,
-    currency_label: Label
-) -> void:
-    var result: String = steam_purchase_buyer_info.get_currency()
-    currency_label.text = "Currency: %s" % str(result)
-```

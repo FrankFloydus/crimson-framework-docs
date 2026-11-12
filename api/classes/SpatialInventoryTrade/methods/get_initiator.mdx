@@ -20,16 +20,3 @@ get_initiator() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_initiator(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    initiator_label: Label
-) -> void:
-    var result: int = spatial_inventory_trade.get_initiator()
-    initiator_label.text = "Initiator: %s" % str(result)
-```

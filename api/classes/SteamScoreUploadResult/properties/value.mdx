@@ -22,24 +22,3 @@ var value: SteamScoreUpload
 | Type | [`SteamScoreUpload`](/api/classes/SteamScoreUpload) |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamScoreUploadResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_score_upload_result: SteamScoreUploadResult,
-    score_label: Label
-) -> void:
-    if steam_score_upload_result == null:
-        return
-    if not steam_score_upload_result.ok:
-        push_warning(steam_score_upload_result.message)
-        return
-    var value: SteamScoreUpload = steam_score_upload_result.value
-    if value == null:
-        return
-    var score: int = value.score
-    score_label.text = "Score: %s" % str(score)
-```

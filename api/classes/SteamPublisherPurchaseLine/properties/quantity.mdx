@@ -25,16 +25,3 @@ var quantity: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_quantity()`](/api/classes/SteamPublisherPurchaseLine/methods/get_quantity) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_quantity(
-    steam_publisher_purchase_line: SteamPublisherPurchaseLine,
-    apply_quantity: Callable
-) -> void:
-    var quantity: int = steam_publisher_purchase_line.quantity
-    apply_quantity.call(quantity)
-```

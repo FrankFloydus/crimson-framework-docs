@@ -23,12 +23,4 @@ get_port() -> int
 
 While idle, return the definition's port or 7000 if no definition is assigned.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_port(world_session: WorldSession, port_label: Label) -> void:
-    var result: int = world_session.get_port()
-    port_label.text = "Port: %s" % str(result)
-```
+[See gameplay examples for `WorldSession`](/api/classes/WorldSession#examples).

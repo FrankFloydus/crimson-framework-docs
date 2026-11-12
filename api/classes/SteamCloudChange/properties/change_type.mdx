@@ -22,16 +22,3 @@ var change_type: SteamCloudChange.ChangeType
 | Type | `SteamCloudChange.ChangeType` |
 | Access | Read only |
 | Getter | [`get_change_type()`](/api/classes/SteamCloudChange/methods/get_change_type) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_change_type(
-    steam_cloud_change: SteamCloudChange,
-    change_type_label: Label
-) -> void:
-    var change_type: SteamCloudChange.ChangeType = steam_cloud_change.change_type
-    change_type_label.text = "Change type: %s" % str(change_type)
-```

@@ -32,20 +32,3 @@ static player(match_id: String, reason_code: int, reporter: SteamIdentity) -> St
 ## Description
 
 Report submission checks that the identity belongs to this publisher.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_player(
-    match_id: String,
-    reason_code: int,
-    reporter: SteamIdentity,
-    apply_player: Callable
-) -> void:
-    var result: SteamCheatEvidence = SteamCheatEvidence.player(match_id, reason_code, reporter)
-    if result == null:
-        return
-    apply_player.call(result)
-```

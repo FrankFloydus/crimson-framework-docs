@@ -28,17 +28,3 @@ header(name: String) -> String
 ## Description
 
 An absent, empty, or unselected field returns an empty string.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_header(
-    steam_http_response: SteamHttpResponse,
-    name: String,
-    apply_header: Callable
-) -> void:
-    var result: String = steam_http_response.header(name)
-    apply_header.call(result)
-```

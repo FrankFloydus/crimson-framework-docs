@@ -22,18 +22,3 @@ get_message() -> SteamLocalizedText
 ## Return value
 
 [`SteamLocalizedText`](/api/classes/SteamLocalizedText)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_message(
-    steam_notification_user_state: SteamNotificationUserState,
-    apply_message: Callable
-) -> void:
-    var result: SteamLocalizedText = steam_notification_user_state.get_message()
-    if result == null:
-        return
-    apply_message.call(result)
-```

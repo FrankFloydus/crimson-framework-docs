@@ -26,23 +26,3 @@ get_value() -> SteamNotificationSession
 ## Description
 
 If Steam accepted a write and the durable store could not commit it, the known receipt can still be available for trusted reconciliation.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_value(
-    steam_notification_session_result: SteamNotificationSessionResult,
-    apply_value: Callable
-) -> void:
-    if steam_notification_session_result == null:
-        return
-    if not steam_notification_session_result.ok:
-        push_warning(steam_notification_session_result.message)
-        return
-    var result: SteamNotificationSession = steam_notification_session_result.get_value()
-    if result == null:
-        return
-    apply_value.call(result)
-```

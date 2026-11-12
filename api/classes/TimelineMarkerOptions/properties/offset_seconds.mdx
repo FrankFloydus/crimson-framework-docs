@@ -28,18 +28,3 @@ var offset_seconds: float = 0.0
 ## Description
 
 Negative values place the marker in the past. Supply a finite value.
-
-## Example
-
-```gdscript
-extends Node
-
-func update_offset_seconds(
-    timeline_marker_options: TimelineMarkerOptions,
-    new_offset_seconds: float,
-    offset_seconds_label: Label
-) -> void:
-    timeline_marker_options.offset_seconds = new_offset_seconds
-    var active_offset_seconds: float = timeline_marker_options.offset_seconds
-    offset_seconds_label.text = "Offset seconds: %s" % str(active_offset_seconds)
-```

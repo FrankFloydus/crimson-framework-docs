@@ -26,18 +26,3 @@ set_move_policy(value: Callable) -> void
 ## Description
 
 Return an empty string to allow the move or a reason to deny it.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_move_policy(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    value: Callable,
-    action_button: Button
-) -> void:
-    spatial_inventory_equipment.set_move_policy(value)
-    var active_move_policy: Callable = spatial_inventory_equipment.move_policy
-    action_button.disabled = not active_move_policy.is_valid()
-```

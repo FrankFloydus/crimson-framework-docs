@@ -14,6 +14,15 @@ description: "Owns a standalone Steam client scope."
 
 Attach the client to a persistent node and start it on the main thread. Active scopes share the local account and the process AppID. Cached Steam services can remain available without a live connection to Valve. The client pumps Steam callbacks while active. Stopping the client, leaving the scene tree, or losing the native callback pipe invalidates its services and ends observation of outstanding operations.
 
+## Examples
+
+- [Enable the online menu when Steam connects](/api/classes/SteamClient/methods/boot#example)
+- [Resume a campaign at the last saved Steam Cloud checkpoint](/api/classes/SteamClient/methods/cloud#example)
+- [Open a Steam practice room and show who joins](/api/classes/SteamClient/methods/lobbies#example)
+- [Open the player's achievements from the pause menu](/api/classes/SteamClient/methods/overlay#example)
+- [Update Steam progression after a match victory](/api/classes/SteamClient/methods/stats#example)
+- [Show subscribed Workshop maps in the custom map browser](/api/classes/SteamClient/methods/workshop#example)
+
 ## Methods
 
 ### Static methods

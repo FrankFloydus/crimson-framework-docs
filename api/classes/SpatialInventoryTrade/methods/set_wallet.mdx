@@ -26,20 +26,3 @@ set_wallet(value: SpatialInventoryWallet) -> void
 ## Description
 
 Replace or clear it while no currency offers or commits are pending.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_wallet(
-    spatial_inventory_trade: SpatialInventoryTrade,
-    value: SpatialInventoryWallet,
-    apply_wallet: Callable
-) -> void:
-    spatial_inventory_trade.set_wallet(value)
-    var active_wallet: SpatialInventoryWallet = spatial_inventory_trade.wallet
-    if active_wallet == null:
-        return
-    apply_wallet.call(active_wallet)
-```

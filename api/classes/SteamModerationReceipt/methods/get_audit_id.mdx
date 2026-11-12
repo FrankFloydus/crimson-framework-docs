@@ -22,16 +22,3 @@ get_audit_id() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_audit_id(
-    steam_moderation_receipt: SteamModerationReceipt,
-    apply_audit_id: Callable
-) -> void:
-    var result: String = steam_moderation_receipt.get_audit_id()
-    apply_audit_id.call(result)
-```

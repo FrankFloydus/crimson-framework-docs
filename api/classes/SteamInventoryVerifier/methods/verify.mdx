@@ -29,26 +29,3 @@ verify(proof: PackedByteArray, expected_steam_id: String) -> Variant
 ## Description
 
 A successful snapshot contains up to 256 selected items at the signed timestamp and uses `SteamInventorySnapshot.FRESHNESS_VERIFIED_PROOF`. Invalid arguments return `ERR_INVALID_PARAMETER`. An unavailable game server returns `ERR_UNAVAILABLE`. A rejected signature or malformed result returns `ERR_INVALID_DATA`. An expired proof or verification deadline returns `ERR_TIMEOUT`. An owner or admission mismatch returns `ERR_UNAUTHORIZED`. A retired observation returns `ERR_SKIP`.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_verify(
-    steam_inventory_verifier: SteamInventoryVerifier,
-    proof: PackedByteArray,
-    expected_steam_id: String,
-    apply_verify: Callable
-) -> void:
-    var result: SteamInventorySnapshotResult = await steam_inventory_verifier.verify(proof, expected_steam_id)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamInventorySnapshot = result.value
-    if payload == null:
-        return
-    apply_verify.call(payload)
-```

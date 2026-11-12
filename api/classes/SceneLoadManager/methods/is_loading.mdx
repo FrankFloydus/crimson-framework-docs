@@ -21,10 +21,61 @@ is_loading() -> bool
 
 ## Example
 
-```gdscript
-extends Node
+### Load the caves when the player crosses the village gate
 
-func run_is_loading(scene_load_manager: SceneLoadManager, status_label: Label) -> void:
-    var result: bool = scene_load_manager.is_loading()
-    status_label.text = "Loading: yes" if result else "Loading: no"
+When a body in the `player` group crosses the village gate, the loader swaps the village for the caves. Keep the player, camera, and gate outside the world container.
+
+```gdscript
+extends Node3D
+
+const VILLAGE: StringName = &"village"
+const CAVES: StringName = &"caves"
+const PLAYER_GROUP: StringName = &"player"
+
+@export var world_container: Node3D
+@export_file("*.tscn") var village_scene: String
+@export_file("*.tscn") var caves_scene: String
+@export var village_gate: Area3D
+@export var zone_label: Label
+
+var _loader: SceneLoadManager
+
+
+func _ready() -> void:
+    _loader = SceneLoadManager.new()
+    add_child(_loader)
+
+    var error: Error = _loader.set_world_container(world_container)
+    if error == OK:
+        error = _loader.register_scene(VILLAGE, village_scene)
+    if error == OK:
+        error = _loader.register_scene(CAVES, caves_scene)
+    if error != OK:
+        zone_label.text = error_string(error)
+        return
+
+    _loader.load_completed.connect(_on_load_completed)
+    _loader.load_failed.connect(_on_load_failed)
+    village_gate.body_entered.connect(_on_gate_entered)
+    _load(VILLAGE)
+
+
+func _on_gate_entered(body: Node3D) -> void:
+    if not body.is_in_group(PLAYER_GROUP) or _loader.is_loading():
+        return
+    if _loader.get_current_scene_id() == VILLAGE:
+        _load(CAVES)
+
+
+func _load(scene_id: StringName) -> void:
+    var error: Error = _loader.request_load(scene_id)
+    zone_label.text = "Loading…" if error == OK else error_string(error)
+
+
+func _on_load_completed(scene_id: StringName) -> void:
+    zone_label.text = "Caves" if scene_id == CAVES else "Village"
+
+
+func _on_load_failed(_scene_id: StringName, _error: int, message: String) -> void:
+    zone_label.text = message
 ```

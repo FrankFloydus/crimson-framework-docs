@@ -29,15 +29,4 @@ set_joinable(open: bool) -> Error
 
 The current Steam owner can call this. Game-owned lobbies and guests return `ERR_UNAUTHORIZED`.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_set_joinable(steam_lobby: SteamLobby, open: bool, status_label: Label) -> void:
-    var result: Error = steam_lobby.set_joinable(open)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set joinable accepted."
-```
+[See gameplay examples for `SteamLobby`](/api/classes/SteamLobby#examples).

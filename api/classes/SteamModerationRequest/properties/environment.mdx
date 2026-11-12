@@ -25,16 +25,3 @@ var environment: SteamPublisherSettings.Environment = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_environment()`](/api/classes/SteamModerationRequest/methods/get_environment) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_environment(
-    steam_moderation_request: SteamModerationRequest,
-    apply_environment: Callable
-) -> void:
-    var environment: SteamPublisherSettings.Environment = steam_moderation_request.environment
-    apply_environment.call(environment)
-```

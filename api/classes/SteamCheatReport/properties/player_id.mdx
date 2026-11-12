@@ -24,13 +24,3 @@ var player_id: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_player_id()`](/api/classes/SteamCheatReport/methods/get_player_id) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_player_id(steam_cheat_report: SteamCheatReport, apply_player_id: Callable) -> void:
-    var player_id: String = steam_cheat_report.player_id
-    apply_player_id.call(player_id)
-```

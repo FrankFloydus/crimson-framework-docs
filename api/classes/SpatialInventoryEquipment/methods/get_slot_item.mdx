@@ -24,17 +24,3 @@ get_slot_item(slot: StringName) -> StringName
 ## Return value
 
 `StringName`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_slot_item(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    slot: StringName,
-    slot_item_label: Label
-) -> void:
-    var result: StringName = spatial_inventory_equipment.get_slot_item(slot)
-    slot_item_label.text = "Slot item: %s" % str(result)
-```

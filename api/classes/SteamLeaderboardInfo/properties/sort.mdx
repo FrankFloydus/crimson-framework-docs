@@ -23,13 +23,3 @@ var sort: SteamLeaderboards.Sort = 2
 | Access | Read only |
 | Default | `2` |
 | Getter | [`get_sort()`](/api/classes/SteamLeaderboardInfo/methods/get_sort) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_sort(steam_leaderboard_info: SteamLeaderboardInfo, sort_label: Label) -> void:
-    var sort: SteamLeaderboards.Sort = steam_leaderboard_info.sort
-    sort_label.text = "Sort: %s" % str(sort)
-```

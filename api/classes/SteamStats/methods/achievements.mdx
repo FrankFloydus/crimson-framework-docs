@@ -23,19 +23,4 @@ achievements() -> SteamAchievement[]
 
 Returns an empty array if the Steam stats cache is unavailable or there are no entries.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_achievements(steam_client: SteamClient, results_list: ItemList) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_stats: SteamStats = steam_client.stats()
-    if steam_stats == null:
-        return
-    var result: Array[SteamAchievement] = steam_stats.achievements()
-    results_list.clear()
-    for entry: SteamAchievement in result:
-        results_list.add_item(str(entry.display_name))
-```
+[See gameplay examples for `SteamStats`](/api/classes/SteamStats#examples).

@@ -30,35 +30,3 @@ find_or_create(name: String, sort: SteamLeaderboards.Sort = 2, display: SteamLea
 ## Description
 
 An existing board keeps its configured settings. On success, the typed result contains the board.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_find_or_create(
-    steam_client: SteamClient,
-    name: String,
-    sort: SteamLeaderboards.Sort,
-    display: SteamLeaderboards.Display,
-    apply_find_or_create: Callable
-) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_leaderboards: SteamLeaderboards = steam_client.leaderboards()
-    if steam_leaderboards == null:
-        return
-    var result: SteamLeaderboardOperation = steam_leaderboards.find_or_create(name, sort, display)
-    if result == null:
-        return
-    var result_value: SteamLeaderboardResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamLeaderboard = result_value.value
-    if payload == null:
-        return
-    apply_find_or_create.call(payload)
-```

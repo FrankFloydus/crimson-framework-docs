@@ -20,16 +20,3 @@ get_last_reason() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_last_reason(
-    spatial_inventory_staging: SpatialInventoryStaging,
-    last_reason_label: Label
-) -> void:
-    var result: String = spatial_inventory_staging.get_last_reason()
-    last_reason_label.text = "Last reason: %s" % str(result)
-```

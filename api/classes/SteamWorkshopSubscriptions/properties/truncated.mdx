@@ -23,15 +23,4 @@ var truncated: bool
 | Access | Read only |
 | Getter | [`is_truncated()`](/api/classes/SteamWorkshopSubscriptions/methods/is_truncated) |
 
-## Example
-
-```gdscript
-extends Node
-
-func refresh_truncated(
-    steam_workshop_subscriptions: SteamWorkshopSubscriptions,
-    status_label: Label
-) -> void:
-    var truncated: bool = steam_workshop_subscriptions.truncated
-    status_label.text = "Truncated: yes" if truncated else "Truncated: no"
-```
+[See gameplay examples for `SteamWorkshopSubscriptions`](/api/classes/SteamWorkshopSubscriptions#examples).

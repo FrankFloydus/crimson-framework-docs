@@ -22,18 +22,3 @@ get_user() -> SteamIdentity
 ## Return value
 
 [`SteamIdentity`](/api/classes/SteamIdentity)
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_user(
-    steam_notification_user_state: SteamNotificationUserState,
-    apply_user: Callable
-) -> void:
-    var result: SteamIdentity = steam_notification_user_state.get_user()
-    if result == null:
-        return
-    apply_user.call(result)
-```

@@ -29,19 +29,4 @@ reset_player_sequence(player_id: String) -> Error
 
 Call after trusted ingress revokes the old binding, before accepting commands on a replacement stream.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_reset_player_sequence(
-    command_router: CommandRouter,
-    player_id: String,
-    status_label: Label
-) -> void:
-    var result: Error = command_router.reset_player_sequence(player_id)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Reset player sequence accepted."
-```
+[See gameplay examples for `CommandRouter`](/api/classes/CommandRouter#examples).

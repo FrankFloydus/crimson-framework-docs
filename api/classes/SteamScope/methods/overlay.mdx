@@ -23,15 +23,4 @@ overlay() -> SteamOverlay
 
 Returns null when this generation has ended.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_overlay(steam_scope: SteamScope, status_label: Label) -> void:
-    var result: SteamOverlay = steam_scope.overlay()
-    if result == null:
-        return
-    var overlay_ready: bool = result.is_ready()
-    status_label.text = "Overlay ready: yes" if overlay_ready else "Overlay ready: no"
-```
+[See gameplay examples for `SteamScope`](/api/classes/SteamScope#examples).

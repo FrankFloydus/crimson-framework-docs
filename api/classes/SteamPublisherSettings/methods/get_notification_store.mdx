@@ -26,18 +26,3 @@ get_notification_store() -> SteamNotificationStore
 ## Description
 
 The default null leaves notification mutations unavailable.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_notification_store(
-    steam_publisher_settings: SteamPublisherSettings,
-    apply_notification_store: Callable
-) -> void:
-    var result: SteamNotificationStore = steam_publisher_settings.get_notification_store()
-    if result == null:
-        return
-    apply_notification_store.call(result)
-```

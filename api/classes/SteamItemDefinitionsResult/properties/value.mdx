@@ -22,23 +22,3 @@ var value: SteamItemDefinition[]
 | Type | `SteamItemDefinition[]` |
 | Access | Read only |
 | Getter | [`get_value()`](/api/classes/SteamItemDefinitionsResult/methods/get_value) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_value(
-    steam_item_definitions_result: SteamItemDefinitionsResult,
-    results_list: ItemList
-) -> void:
-    if steam_item_definitions_result == null:
-        return
-    if not steam_item_definitions_result.ok:
-        push_warning(steam_item_definitions_result.message)
-        return
-    var value: Array[SteamItemDefinition] = steam_item_definitions_result.value
-    results_list.clear()
-    for entry: SteamItemDefinition in value:
-        results_list.add_item(str(entry.display_name))
-```

@@ -24,17 +24,3 @@ var users: SteamNotificationParticipant[]
 | Type | `SteamNotificationParticipant[]` |
 | Access | Read only |
 | Getter | [`get_users()`](/api/classes/SteamNotificationSession/methods/get_users) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_users(
-    steam_notification_session: SteamNotificationSession,
-    add_users_entry: Callable
-) -> void:
-    var users: Array[SteamNotificationParticipant] = steam_notification_session.users
-    for entry: SteamNotificationParticipant in users:
-        add_users_entry.call(entry)
-```

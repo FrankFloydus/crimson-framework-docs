@@ -28,19 +28,4 @@ var definition: WorldSessionDefinition
 
 For game definitions with explicit multiplayer rules and spawn components, use [`GameRuntime`](/api/classes/GameRuntime).
 
-## Example
-
-```gdscript
-extends Node
-
-func update_definition(
-    world_session: WorldSession,
-    new_definition: WorldSessionDefinition,
-    apply_definition: Callable
-) -> void:
-    world_session.definition = new_definition
-    var active_definition: WorldSessionDefinition = world_session.definition
-    if active_definition == null:
-        return
-    apply_definition.call(active_definition)
-```
+[See gameplay examples for `WorldSession`](/api/classes/WorldSession#examples).

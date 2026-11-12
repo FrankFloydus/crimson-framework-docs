@@ -22,21 +22,3 @@ store() -> SteamServerStatsOperation
 ## Description
 
 Use this after a partially applied batch or a drained failed store if the game intends to persist those accepted changes. An unloaded cache returns `ERR_UNCONFIGURED`. An undrained call returns `ERR_BUSY`. A loaded cache without pending changes returns success without issuing a Steam call.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_store(steam_server_player_stats: SteamServerPlayerStats, status_label: Label) -> void:
-    var result: SteamServerStatsOperation = steam_server_player_stats.store()
-    if result == null:
-        return
-    var result_value: SteamServerStatsResult = await result.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    status_label.text = "Store succeeded."
-```

@@ -26,16 +26,3 @@ var severity: int
 ## Description
 
 Use it to select how a developer console presents the message.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_severity(
-    steam_diagnostic_message: SteamDiagnosticMessage,
-    apply_severity: Callable
-) -> void:
-    var severity: int = steam_diagnostic_message.severity
-    apply_severity.call(severity)
-```

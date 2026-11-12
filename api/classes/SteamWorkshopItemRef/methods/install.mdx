@@ -31,25 +31,4 @@ Await the call to receive [`SteamWorkshopInstallResult`](/api/classes/SteamWorks
 
 A same-app item with a current local directory resolves immediately after identity verification. Otherwise this waits for Steam's matching download. `high_priority` tells Steam to prioritize the transfer ahead of other downloads. An unsubscribed item may be cached temporarily. Inspect and validate the installed content before using it.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_install(
-    steam_workshop_item_ref: SteamWorkshopItemRef,
-    high_priority: bool,
-    size_bytes_label: Label
-) -> void:
-    var result: SteamWorkshopInstallResult = await steam_workshop_item_ref.install(high_priority)
-    if result == null:
-        return
-    if not result.ok:
-        push_warning(result.message)
-        return
-    var payload: SteamWorkshopInstall = result.value
-    if payload == null:
-        return
-    var size_bytes: int = payload.size_bytes
-    size_bytes_label.text = "Size bytes: %s" % str(size_bytes)
-```
+[See gameplay examples for `SteamWorkshopItemRef`](/api/classes/SteamWorkshopItemRef#examples).

@@ -28,23 +28,3 @@ open_client(endpoint: SessionEndpoint) -> SessionTransportResult
 ## Description
 
 An absent, opaque, or invalid endpoint produces ERR\_INVALID\_PARAMETER. A successful open starts the attempt, while GameSession confirms admission later.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_open_client(
-    e_net_session_transport: ENetSessionTransport,
-    endpoint: SessionEndpoint,
-    install_peer: Callable
-) -> void:
-    var result: SessionTransportResult = e_net_session_transport.open_client(endpoint)
-    if result == null:
-        return
-    if result.get_error() != OK:
-        push_warning(error_string(result.get_error()))
-        return
-    var peer: MultiplayerPeer = result.get_peer()
-    install_peer.call(peer)
-```

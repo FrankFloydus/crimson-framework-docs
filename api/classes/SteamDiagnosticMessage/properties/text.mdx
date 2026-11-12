@@ -22,16 +22,3 @@ var text: String
 | Type | `String` |
 | Access | Read only |
 | Getter | [`get_text()`](/api/classes/SteamDiagnosticMessage/methods/get_text) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_text(
-    steam_diagnostic_message: SteamDiagnosticMessage,
-    apply_text: Callable
-) -> void:
-    var text: String = steam_diagnostic_message.text
-    apply_text.call(text)
-```

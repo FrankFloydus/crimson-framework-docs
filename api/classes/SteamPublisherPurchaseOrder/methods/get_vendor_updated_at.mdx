@@ -22,16 +22,3 @@ get_vendor_updated_at() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_vendor_updated_at(
-    steam_publisher_purchase_order: SteamPublisherPurchaseOrder,
-    apply_vendor_updated_at: Callable
-) -> void:
-    var result: int = steam_publisher_purchase_order.get_vendor_updated_at()
-    apply_vendor_updated_at.call(result)
-```

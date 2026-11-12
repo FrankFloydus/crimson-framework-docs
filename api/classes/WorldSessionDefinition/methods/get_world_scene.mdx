@@ -21,17 +21,4 @@ get_world_scene() -> PackedScene
 
 `PackedScene`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_world_scene(
-    world_session_definition: WorldSessionDefinition,
-    apply_world_scene: Callable
-) -> void:
-    var result: PackedScene = world_session_definition.get_world_scene()
-    if result == null:
-        return
-    apply_world_scene.call(result)
-```
+[See gameplay examples for `WorldSessionDefinition`](/api/classes/WorldSessionDefinition#examples).

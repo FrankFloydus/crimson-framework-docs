@@ -26,13 +26,3 @@ var changed: bool
 ## Description
 
 Keep-best can accept the submission while retaining the old score.
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_changed(steam_score_upload: SteamScoreUpload, status_label: Label) -> void:
-    var changed: bool = steam_score_upload.changed
-    status_label.text = "Changed: yes" if changed else "Changed: no"
-```

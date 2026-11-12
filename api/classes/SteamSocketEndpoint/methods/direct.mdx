@@ -29,15 +29,3 @@ static direct(address: String, port: int) -> SteamSocketEndpoint
 ## Description
 
 Returns `null` for invalid input. Wildcard addresses are for listeners.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_direct(address: String, port: int, apply_direct: Callable) -> void:
-    var result: SteamSocketEndpoint = SteamSocketEndpoint.direct(address, port)
-    if result == null:
-        return
-    apply_direct.call(result)
-```

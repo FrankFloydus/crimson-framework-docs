@@ -22,16 +22,3 @@ get_local_steam_id() -> String
 ## Description
 
 The coordinator independently authenticates the caller before using this value. Empty during registration.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_local_steam_id(
-    steam_relay_request: SteamRelayRequest,
-    apply_local_steam_id: Callable
-) -> void:
-    var result: String = steam_relay_request.get_local_steam_id()
-    apply_local_steam_id.call(result)
-```

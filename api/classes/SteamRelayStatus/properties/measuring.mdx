@@ -23,13 +23,3 @@ var measuring: bool = false
 | Access | Read only |
 | Default | `false` |
 | Getter | [`is_measuring()`](/api/classes/SteamRelayStatus/methods/is_measuring) |
-
-## Example
-
-```gdscript
-extends Node
-
-func refresh_measuring(steam_relay_status: SteamRelayStatus, status_label: Label) -> void:
-    var measuring: bool = steam_relay_status.measuring
-    status_label.text = "Measuring: yes" if measuring else "Measuring: no"
-```

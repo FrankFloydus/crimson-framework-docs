@@ -29,32 +29,3 @@ with_header(name: String, value: String) -> SteamHttpRequest
 ## Description
 
 Header names are case-insensitive, and a new value replaces the same header on that branch. Steam manages framing and connection headers.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_with_header(
-    steam_http_request: SteamHttpRequest,
-    name: String,
-    value: String,
-    apply_send: Callable
-) -> void:
-    var result: SteamHttpRequest = steam_http_request.with_header(name, value)
-    if result == null:
-        return
-    var completion: SteamHttpResponseOperation = result.send()
-    if completion == null:
-        return
-    var result_value: SteamHttpResponseResult = await completion.wait()
-    if result_value == null:
-        return
-    if not result_value.ok:
-        push_warning(result_value.message)
-        return
-    var payload: SteamHttpResponse = result_value.value
-    if payload == null:
-        return
-    apply_send.call(payload)
-```

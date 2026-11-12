@@ -18,16 +18,3 @@ is_finished() -> bool
 ## Return value
 
 `bool`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_is_finished(
-    steam_shared_cloud_file_operation: SteamSharedCloudFileOperation,
-    action_button: Button
-) -> void:
-    var result: bool = steam_shared_cloud_file_operation.is_finished()
-    action_button.disabled = not result
-```

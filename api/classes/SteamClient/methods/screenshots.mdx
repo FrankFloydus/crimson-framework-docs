@@ -23,14 +23,4 @@ screenshots() -> SteamScreenshots
 
 Returns null while the scope is inactive.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_screenshots(steam_client: SteamClient, apply_screenshots: Callable) -> void:
-    var result: SteamScreenshots = steam_client.screenshots()
-    if result == null:
-        return
-    apply_screenshots.call(result)
-```
+[See gameplay examples for `SteamClient`](/api/classes/SteamClient#examples).

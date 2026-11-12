@@ -20,13 +20,3 @@ get_name() -> String
 ## Return value
 
 `String`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_name(steam_leaderboard_info: SteamLeaderboardInfo, name_label: Label) -> void:
-    var result: String = steam_leaderboard_info.get_name()
-    name_label.text = "Name: %s" % str(result)
-```

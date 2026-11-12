@@ -24,19 +24,3 @@ get_equipped(id: StringName) -> Dictionary
 ## Return value
 
 `Dictionary`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_equipped(
-    spatial_inventory_equipment: SpatialInventoryEquipment,
-    id: StringName,
-    apply_equipped: Callable
-) -> void:
-    var result: Dictionary = spatial_inventory_equipment.get_equipped(id)
-    if result.is_empty():
-        return
-    apply_equipped.call(result)
-```

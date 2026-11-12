@@ -31,20 +31,3 @@ register_participant(id: String, version: int, adapter: Object, required: bool =
 ## Description
 
 Returns true if registration succeeds. Declare schemas before the first admitted save or load.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_register_participant(
-    save_coordinator: SaveCoordinator,
-    id: String,
-    version: int,
-    adapter: Object,
-    required: bool,
-    status_label: Label
-) -> void:
-    var result: bool = save_coordinator.register_participant(id, version, adapter, required)
-    status_label.text = "Register participant: yes" if result else "Register participant: no"
-```

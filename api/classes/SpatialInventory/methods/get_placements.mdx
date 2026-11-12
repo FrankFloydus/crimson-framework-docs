@@ -19,16 +19,4 @@ get_placements() -> Array
 
 `Array`
 
-## Example
-
-```gdscript
-extends Node
-
-func run_get_placements(
-    spatial_inventory: SpatialInventory,
-    add_placements_entry: Callable
-) -> void:
-    var result: Array = spatial_inventory.get_placements()
-    for entry: Variant in result:
-        add_placements_entry.call(entry)
-```
+[See gameplay examples for `SpatialInventory`](/api/classes/SpatialInventory#examples).

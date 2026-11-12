@@ -23,17 +23,4 @@ is_enabled_for_app() -> bool
 
 Returns `false` when the query is unavailable.
 
-## Example
-
-```gdscript
-extends Node
-
-func run_is_enabled_for_app(steam_client: SteamClient, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_cloud: SteamCloud = steam_client.cloud()
-    if steam_cloud == null:
-        return
-    var result: bool = steam_cloud.is_enabled_for_app()
-    status_label.text = "Enabled for app: yes" if result else "Enabled for app: no"
-```
+[See gameplay examples for `SteamCloud`](/api/classes/SteamCloud#examples).

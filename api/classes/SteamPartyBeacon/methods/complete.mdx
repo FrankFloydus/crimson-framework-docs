@@ -28,20 +28,3 @@ complete(reservation: SteamPartyReservation) -> Error
 ## Description
 
 The Game also performs this acknowledgment automatically.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_complete(
-    steam_party_beacon: SteamPartyBeacon,
-    reservation: SteamPartyReservation,
-    status_label: Label
-) -> void:
-    var result: Error = steam_party_beacon.complete(reservation)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Complete accepted."
-```

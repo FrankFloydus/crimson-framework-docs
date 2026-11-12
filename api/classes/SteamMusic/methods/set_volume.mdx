@@ -24,21 +24,3 @@ set_volume(level: float) -> Error
 ## Return value
 
 `Error`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_set_volume(steam_client: SteamClient, level: float, status_label: Label) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_music: SteamMusic = steam_client.music()
-    if steam_music == null:
-        return
-    var result: Error = steam_music.set_volume(level)
-    if result != OK:
-        status_label.text = error_string(result)
-        return
-    status_label.text = "Set volume accepted."
-```

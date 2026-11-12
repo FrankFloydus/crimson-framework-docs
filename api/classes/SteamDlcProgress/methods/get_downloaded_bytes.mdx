@@ -20,16 +20,3 @@ get_downloaded_bytes() -> int
 ## Return value
 
 `int`
-
-## Example
-
-```gdscript
-extends Node
-
-func run_get_downloaded_bytes(
-    steam_dlc_progress: SteamDlcProgress,
-    downloaded_bytes_label: Label
-) -> void:
-    var result: int = steam_dlc_progress.get_downloaded_bytes()
-    downloaded_bytes_label.text = "Downloaded bytes: %s" % str(result)
-```

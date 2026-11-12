@@ -22,19 +22,3 @@ sessions() -> SteamRemotePlaySession[]
 ## Description
 
 An empty list is valid when nobody is connected. Use `is_available()` to distinguish unavailable observation.
-
-## Example
-
-```gdscript
-extends Node
-
-func run_sessions(steam_client: SteamClient, add_sessions_entry: Callable) -> void:
-    if not steam_client.is_ready():
-        return
-    var steam_remote_play: SteamRemotePlay = steam_client.remote_play()
-    if steam_remote_play == null:
-        return
-    var result: Array[SteamRemotePlaySession] = steam_remote_play.sessions()
-    for entry: SteamRemotePlaySession in result:
-        add_sessions_entry.call(entry)
-```
