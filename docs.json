@@ -7,6 +7,24 @@
     "light": "#FB7185",
     "dark": "#A7193D"
   },
+  "redirects": [
+    {
+      "source": "/api/classes/DedicatedServerBoot",
+      "destination": "/dedicated-lan"
+    },
+    {
+      "source": "/api/classes/DedicatedServerBoot/methods/get_game",
+      "destination": "/api/classes/GameConfig/methods/boot_server"
+    },
+    {
+      "source": "/api/classes/DedicatedServerBoot/methods/set_game",
+      "destination": "/api/classes/GameConfig/methods/boot_server"
+    },
+    {
+      "source": "/api/classes/DedicatedServerBoot/properties/game",
+      "destination": "/api/classes/GameConfig/methods/boot_server"
+    }
+  ],
   "navigation": {
     "tabs": [
       {
@@ -19,6 +37,16 @@
               "installation",
               "quickstart",
               "multiplayer-quickstart"
+            ]
+          },
+          {
+            "group": "Game development",
+            "pages": [
+              "game-services",
+              "coordinated-lan",
+              "dedicated-lan",
+              "inventory",
+              "migration"
             ]
           },
           {
@@ -54,326 +82,507 @@
                 "expanded": false,
                 "pages": [
                   {
-                    "group": "DedicatedServerBoot",
-                    "icon": "cube",
-                    "root": "api/classes/DedicatedServerBoot",
+                    "group": "Code-first game",
+                    "icon": "folder",
+                    "root": "api/modules/game-runtime/code-first-game",
                     "expanded": false,
                     "pages": [
                       {
-                        "group": "Properties",
-                        "icon": "sliders",
+                        "group": "Game",
+                        "icon": "cube",
+                        "root": "api/classes/Game",
                         "expanded": false,
                         "pages": [
-                          "api/classes/DedicatedServerBoot/properties/game"
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/Game/methods/accept_invite",
+                              "api/classes/Game/methods/bind_player",
+                              "api/classes/Game/methods/boot_result",
+                              "api/classes/Game/methods/campaign",
+                              "api/classes/Game/methods/configure",
+                              "api/classes/Game/methods/current",
+                              "api/classes/Game/methods/dismiss_invite",
+                              "api/classes/Game/methods/find_and_join",
+                              "api/classes/Game/methods/for_node",
+                              "api/classes/Game/methods/get_local_player",
+                              "api/classes/Game/methods/get_phase",
+                              "api/classes/Game/methods/get_player",
+                              "api/classes/Game/methods/get_port",
+                              "api/classes/Game/methods/get_world",
+                              "api/classes/Game/methods/host",
+                              "api/classes/Game/methods/inventory",
+                              "api/classes/Game/methods/invite_friends",
+                              "api/classes/Game/methods/join",
+                              "api/classes/Game/methods/join_listing",
+                              "api/classes/Game/methods/join_lobby",
+                              "api/classes/Game/methods/leave",
+                              "api/classes/Game/methods/open_lobby",
+                              "api/classes/Game/methods/pending_invite",
+                              "api/classes/Game/methods/perform",
+                              "api/classes/Game/methods/play",
+                              "api/classes/Game/methods/register_command",
+                              "api/classes/Game/methods/save_slot",
+                              "api/classes/Game/methods/scenes",
+                              "api/classes/Game/methods/serve",
+                              "api/classes/Game/methods/set_default",
+                              "api/classes/Game/methods/start_match",
+                              "api/classes/Game/methods/steam",
+                              "api/classes/Game/methods/transactions"
+                            ]
+                          }
                         ]
                       },
                       {
-                        "group": "Methods",
-                        "icon": "code",
+                        "group": "GameBindings",
+                        "icon": "cube",
+                        "root": "api/classes/GameBindings",
                         "expanded": false,
                         "pages": [
-                          "api/classes/DedicatedServerBoot/methods/get_game",
-                          "api/classes/DedicatedServerBoot/methods/set_game"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "GameDefinition",
-                    "icon": "cube",
-                    "root": "api/classes/GameDefinition",
-                    "expanded": false,
-                    "pages": [
-                      {
-                        "group": "Properties",
-                        "icon": "sliders",
-                        "expanded": false,
-                        "pages": [
-                          "api/classes/GameDefinition/properties/app_id",
-                          "api/classes/GameDefinition/properties/multiplayer_rules",
-                          "api/classes/GameDefinition/properties/player_scene",
-                          "api/classes/GameDefinition/properties/save_root",
-                          "api/classes/GameDefinition/properties/schema_version",
-                          "api/classes/GameDefinition/properties/service_provider",
-                          "api/classes/GameDefinition/properties/starting_world",
-                          "api/classes/GameDefinition/properties/starting_world_scene",
-                          "api/classes/GameDefinition/properties/worlds"
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameBindings/methods/session_transport"
+                            ]
+                          }
                         ]
                       },
                       {
-                        "group": "Methods",
-                        "icon": "code",
+                        "group": "GameConfig",
+                        "icon": "cube",
+                        "root": "api/classes/GameConfig",
                         "expanded": false,
                         "pages": [
-                          "api/classes/GameDefinition/methods/boot",
-                          "api/classes/GameDefinition/methods/configure",
-                          "api/classes/GameDefinition/methods/create",
-                          "api/classes/GameDefinition/methods/get_app_id",
-                          "api/classes/GameDefinition/methods/get_multiplayer_rules",
-                          "api/classes/GameDefinition/methods/get_player_scene",
-                          "api/classes/GameDefinition/methods/get_save_root",
-                          "api/classes/GameDefinition/methods/get_schema_version",
-                          "api/classes/GameDefinition/methods/get_service_provider",
-                          "api/classes/GameDefinition/methods/get_starting_world",
-                          "api/classes/GameDefinition/methods/get_starting_world_scene",
-                          "api/classes/GameDefinition/methods/get_worlds",
-                          "api/classes/GameDefinition/methods/set_app_id",
-                          "api/classes/GameDefinition/methods/set_multiplayer_rules",
-                          "api/classes/GameDefinition/methods/set_player_scene",
-                          "api/classes/GameDefinition/methods/set_save_root",
-                          "api/classes/GameDefinition/methods/set_schema_version",
-                          "api/classes/GameDefinition/methods/set_service_provider",
-                          "api/classes/GameDefinition/methods/set_starting_world",
-                          "api/classes/GameDefinition/methods/set_starting_world_scene",
-                          "api/classes/GameDefinition/methods/set_worlds",
-                          "api/classes/GameDefinition/methods/starting_in",
-                          "api/classes/GameDefinition/methods/with_multiplayer",
-                          "api/classes/GameDefinition/methods/with_player",
-                          "api/classes/GameDefinition/methods/with_provider",
-                          "api/classes/GameDefinition/methods/with_saves",
-                          "api/classes/GameDefinition/methods/with_starting_world",
-                          "api/classes/GameDefinition/methods/with_worlds"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "GameOperation",
-                    "icon": "cube",
-                    "root": "api/classes/GameOperation",
-                    "expanded": false,
-                    "pages": [
-                      {
-                        "group": "Properties",
-                        "icon": "sliders",
-                        "expanded": false,
-                        "pages": [
-                          "api/classes/GameOperation/properties/result"
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameConfig/methods/boot",
+                              "api/classes/GameConfig/methods/boot_server",
+                              "api/classes/GameConfig/methods/from_definition",
+                              "api/classes/GameConfig/methods/inventory",
+                              "api/classes/GameConfig/methods/lan",
+                              "api/classes/GameConfig/methods/on_port",
+                              "api/classes/GameConfig/methods/provider",
+                              "api/classes/GameConfig/methods/steam",
+                              "api/classes/GameConfig/methods/steam_server",
+                              "api/classes/GameConfig/methods/with_world",
+                              "api/classes/GameConfig/methods/world_id"
+                            ]
+                          }
                         ]
                       },
                       {
-                        "group": "Methods",
-                        "icon": "code",
+                        "group": "GameProvider",
+                        "icon": "cube",
+                        "root": "api/classes/GameProvider",
                         "expanded": false,
                         "pages": [
-                          "api/classes/GameOperation/methods/get_result",
-                          "api/classes/GameOperation/methods/is_finished",
-                          "api/classes/GameOperation/methods/wait"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "GameRuntime",
-                    "icon": "cube",
-                    "root": "api/classes/GameRuntime",
-                    "expanded": false,
-                    "pages": [
-                      {
-                        "group": "Properties",
-                        "icon": "sliders",
-                        "expanded": false,
-                        "pages": [
-                          "api/classes/GameRuntime/properties/definition",
-                          "api/classes/GameRuntime/properties/possession",
-                          "api/classes/GameRuntime/properties/transactions"
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameProvider/methods/_register"
+                            ]
+                          }
                         ]
                       },
                       {
-                        "group": "Methods",
-                        "icon": "code",
+                        "group": "GameResult",
+                        "icon": "cube",
+                        "root": "api/classes/GameResult",
                         "expanded": false,
                         "pages": [
-                          "api/classes/GameRuntime/methods/bind_player",
-                          "api/classes/GameRuntime/methods/configure",
-                          "api/classes/GameRuntime/methods/declare_command",
-                          "api/classes/GameRuntime/methods/get_definition",
-                          "api/classes/GameRuntime/methods/get_local_character_id",
-                          "api/classes/GameRuntime/methods/get_local_player",
-                          "api/classes/GameRuntime/methods/get_local_player_id",
-                          "api/classes/GameRuntime/methods/get_online_listing",
-                          "api/classes/GameRuntime/methods/get_phase",
-                          "api/classes/GameRuntime/methods/get_player",
-                          "api/classes/GameRuntime/methods/get_possession",
-                          "api/classes/GameRuntime/methods/get_projection",
-                          "api/classes/GameRuntime/methods/get_transactions",
-                          "api/classes/GameRuntime/methods/get_world",
-                          "api/classes/GameRuntime/methods/get_world_epoch",
-                          "api/classes/GameRuntime/methods/get_world_id",
-                          "api/classes/GameRuntime/methods/host",
-                          "api/classes/GameRuntime/methods/host_game",
-                          "api/classes/GameRuntime/methods/host_online",
-                          "api/classes/GameRuntime/methods/invites",
-                          "api/classes/GameRuntime/methods/is_authority",
-                          "api/classes/GameRuntime/methods/join",
-                          "api/classes/GameRuntime/methods/join_game",
-                          "api/classes/GameRuntime/methods/join_listing",
-                          "api/classes/GameRuntime/methods/join_online",
-                          "api/classes/GameRuntime/methods/leave",
-                          "api/classes/GameRuntime/methods/open_offline",
-                          "api/classes/GameRuntime/methods/play_solo",
-                          "api/classes/GameRuntime/methods/register_command",
-                          "api/classes/GameRuntime/methods/restore",
-                          "api/classes/GameRuntime/methods/save",
-                          "api/classes/GameRuntime/methods/save_history",
-                          "api/classes/GameRuntime/methods/save_slot",
-                          "api/classes/GameRuntime/methods/set_definition",
-                          "api/classes/GameRuntime/methods/set_projector",
-                          "api/classes/GameRuntime/methods/set_shared_stores",
-                          "api/classes/GameRuntime/methods/start_dedicated",
-                          "api/classes/GameRuntime/methods/start_dedicated_online",
-                          "api/classes/GameRuntime/methods/start_match",
-                          "api/classes/GameRuntime/methods/start_offline",
-                          "api/classes/GameRuntime/methods/submit",
-                          "api/classes/GameRuntime/methods/travel_to",
-                          "api/classes/GameRuntime/methods/voice"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "GameServiceProvider",
-                    "icon": "cube",
-                    "root": "api/classes/GameServiceProvider",
-                    "expanded": false,
-                    "pages": [
-                      {
-                        "group": "Methods",
-                        "icon": "code",
-                        "expanded": false,
-                        "pages": [
-                          "api/classes/GameServiceProvider/methods/_create_online_directory",
-                          "api/classes/GameServiceProvider/methods/_create_scene_loader",
-                          "api/classes/GameServiceProvider/methods/_create_session"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "GameServices",
-                    "icon": "cube",
-                    "root": "api/classes/GameServices",
-                    "expanded": false,
-                    "pages": [
-                      {
-                        "group": "Methods",
-                        "icon": "code",
-                        "expanded": false,
-                        "pages": [
-                          "api/classes/GameServices/methods/for_node",
-                          "api/classes/GameServices/methods/game",
-                          "api/classes/GameServices/methods/scenes",
-                          "api/classes/GameServices/methods/set_default_game"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "GameVoice",
-                    "icon": "cube",
-                    "root": "api/classes/GameVoice",
-                    "expanded": false,
-                    "pages": [
-                      {
-                        "group": "Methods",
-                        "icon": "code",
-                        "expanded": false,
-                        "pages": [
-                          "api/classes/GameVoice/methods/set_channel",
-                          "api/classes/GameVoice/methods/set_muted",
-                          "api/classes/GameVoice/methods/set_recipient_policy",
-                          "api/classes/GameVoice/methods/start_talking",
-                          "api/classes/GameVoice/methods/stop_talking"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "MultiplayerRules",
-                    "icon": "cube",
-                    "root": "api/classes/MultiplayerRules",
-                    "expanded": false,
-                    "pages": [
-                      {
-                        "group": "Properties",
-                        "icon": "sliders",
-                        "expanded": false,
-                        "pages": [
-                          "api/classes/MultiplayerRules/properties/join_in_progress",
-                          "api/classes/MultiplayerRules/properties/max_players",
-                          "api/classes/MultiplayerRules/properties/port"
+                          {
+                            "group": "Properties",
+                            "icon": "sliders",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameResult/properties/code",
+                              "api/classes/GameResult/properties/listing_id",
+                              "api/classes/GameResult/properties/message",
+                              "api/classes/GameResult/properties/ok",
+                              "api/classes/GameResult/properties/reason",
+                              "api/classes/GameResult/properties/world_epoch",
+                              "api/classes/GameResult/properties/world_id"
+                            ]
+                          },
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameResult/methods/get_code",
+                              "api/classes/GameResult/methods/get_listing_id",
+                              "api/classes/GameResult/methods/get_message",
+                              "api/classes/GameResult/methods/get_reason",
+                              "api/classes/GameResult/methods/get_world_epoch",
+                              "api/classes/GameResult/methods/get_world_id",
+                              "api/classes/GameResult/methods/is_ok"
+                            ]
+                          }
                         ]
                       },
                       {
-                        "group": "Methods",
-                        "icon": "code",
+                        "group": "GameScenes",
+                        "icon": "cube",
+                        "root": "api/classes/GameScenes",
                         "expanded": false,
                         "pages": [
-                          "api/classes/MultiplayerRules/methods/allow_join_in_progress",
-                          "api/classes/MultiplayerRules/methods/get_join_in_progress",
-                          "api/classes/MultiplayerRules/methods/get_max_players",
-                          "api/classes/MultiplayerRules/methods/get_port",
-                          "api/classes/MultiplayerRules/methods/listen_coop",
-                          "api/classes/MultiplayerRules/methods/on_port",
-                          "api/classes/MultiplayerRules/methods/set_join_in_progress",
-                          "api/classes/MultiplayerRules/methods/set_max_players",
-                          "api/classes/MultiplayerRules/methods/set_port",
-                          "api/classes/MultiplayerRules/methods/with_max_players"
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameScenes/methods/get_world",
+                              "api/classes/GameScenes/methods/load"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "WorldDefinition",
+                        "icon": "cube",
+                        "root": "api/classes/WorldDefinition",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Properties",
+                            "icon": "sliders",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/WorldDefinition/properties/id",
+                              "api/classes/WorldDefinition/properties/path"
+                            ]
+                          },
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/WorldDefinition/methods/at",
+                              "api/classes/WorldDefinition/methods/get_id",
+                              "api/classes/WorldDefinition/methods/get_path",
+                              "api/classes/WorldDefinition/methods/set_id",
+                              "api/classes/WorldDefinition/methods/set_path"
+                            ]
+                          }
                         ]
                       }
                     ]
                   },
                   {
-                    "group": "OnlineDirectory",
-                    "icon": "cube",
-                    "root": "api/classes/OnlineDirectory",
+                    "group": "Lower-level runtime",
+                    "icon": "folder",
+                    "root": "api/modules/game-runtime/lower-level-runtime",
                     "expanded": false,
                     "pages": [
                       {
-                        "group": "Methods",
-                        "icon": "code",
+                        "group": "GameDefinition",
+                        "icon": "cube",
+                        "root": "api/classes/GameDefinition",
                         "expanded": false,
                         "pages": [
-                          "api/classes/OnlineDirectory/methods/_leave",
-                          "api/classes/OnlineDirectory/methods/_publish",
-                          "api/classes/OnlineDirectory/methods/_resolve",
-                          "api/classes/OnlineDirectory/methods/_unpublish"
+                          {
+                            "group": "Properties",
+                            "icon": "sliders",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameDefinition/properties/app_id",
+                              "api/classes/GameDefinition/properties/multiplayer_rules",
+                              "api/classes/GameDefinition/properties/player_scene",
+                              "api/classes/GameDefinition/properties/save_root",
+                              "api/classes/GameDefinition/properties/schema_version",
+                              "api/classes/GameDefinition/properties/service_provider",
+                              "api/classes/GameDefinition/properties/starting_world",
+                              "api/classes/GameDefinition/properties/starting_world_scene",
+                              "api/classes/GameDefinition/properties/worlds"
+                            ]
+                          },
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameDefinition/methods/boot",
+                              "api/classes/GameDefinition/methods/configure",
+                              "api/classes/GameDefinition/methods/create",
+                              "api/classes/GameDefinition/methods/get_app_id",
+                              "api/classes/GameDefinition/methods/get_multiplayer_rules",
+                              "api/classes/GameDefinition/methods/get_player_scene",
+                              "api/classes/GameDefinition/methods/get_save_root",
+                              "api/classes/GameDefinition/methods/get_schema_version",
+                              "api/classes/GameDefinition/methods/get_service_provider",
+                              "api/classes/GameDefinition/methods/get_starting_world",
+                              "api/classes/GameDefinition/methods/get_starting_world_scene",
+                              "api/classes/GameDefinition/methods/get_worlds",
+                              "api/classes/GameDefinition/methods/set_app_id",
+                              "api/classes/GameDefinition/methods/set_multiplayer_rules",
+                              "api/classes/GameDefinition/methods/set_player_scene",
+                              "api/classes/GameDefinition/methods/set_save_root",
+                              "api/classes/GameDefinition/methods/set_schema_version",
+                              "api/classes/GameDefinition/methods/set_service_provider",
+                              "api/classes/GameDefinition/methods/set_starting_world",
+                              "api/classes/GameDefinition/methods/set_starting_world_scene",
+                              "api/classes/GameDefinition/methods/set_worlds",
+                              "api/classes/GameDefinition/methods/starting_in",
+                              "api/classes/GameDefinition/methods/with_multiplayer",
+                              "api/classes/GameDefinition/methods/with_player",
+                              "api/classes/GameDefinition/methods/with_provider",
+                              "api/classes/GameDefinition/methods/with_saves",
+                              "api/classes/GameDefinition/methods/with_starting_world",
+                              "api/classes/GameDefinition/methods/with_worlds"
+                            ]
+                          }
                         ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "OnlineDirectoryRequest",
-                    "icon": "cube",
-                    "root": "api/classes/OnlineDirectoryRequest",
-                    "expanded": false,
-                    "pages": [
+                      },
                       {
-                        "group": "Methods",
-                        "icon": "code",
+                        "group": "GameOperation",
+                        "icon": "cube",
+                        "root": "api/classes/GameOperation",
                         "expanded": false,
                         "pages": [
-                          "api/classes/OnlineDirectoryRequest/methods/fail",
-                          "api/classes/OnlineDirectoryRequest/methods/is_cancelled",
-                          "api/classes/OnlineDirectoryRequest/methods/publish",
-                          "api/classes/OnlineDirectoryRequest/methods/resolve"
+                          {
+                            "group": "Properties",
+                            "icon": "sliders",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameOperation/properties/result"
+                            ]
+                          },
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameOperation/methods/get_result",
+                              "api/classes/GameOperation/methods/get_typed_result",
+                              "api/classes/GameOperation/methods/is_finished",
+                              "api/classes/GameOperation/methods/wait",
+                              "api/classes/GameOperation/methods/wait_result"
+                            ]
+                          }
                         ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "SceneService",
-                    "icon": "cube",
-                    "root": "api/classes/SceneService",
-                    "expanded": false,
-                    "pages": [
+                      },
                       {
-                        "group": "Methods",
-                        "icon": "code",
+                        "group": "GameRuntime",
+                        "icon": "cube",
+                        "root": "api/classes/GameRuntime",
                         "expanded": false,
                         "pages": [
-                          "api/classes/SceneService/methods/get_world",
-                          "api/classes/SceneService/methods/load"
+                          {
+                            "group": "Properties",
+                            "icon": "sliders",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameRuntime/properties/definition",
+                              "api/classes/GameRuntime/properties/possession",
+                              "api/classes/GameRuntime/properties/transactions"
+                            ]
+                          },
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameRuntime/methods/bind_player",
+                              "api/classes/GameRuntime/methods/configure",
+                              "api/classes/GameRuntime/methods/declare_command",
+                              "api/classes/GameRuntime/methods/get_definition",
+                              "api/classes/GameRuntime/methods/get_local_character_id",
+                              "api/classes/GameRuntime/methods/get_local_player",
+                              "api/classes/GameRuntime/methods/get_local_player_id",
+                              "api/classes/GameRuntime/methods/get_online_listing",
+                              "api/classes/GameRuntime/methods/get_phase",
+                              "api/classes/GameRuntime/methods/get_player",
+                              "api/classes/GameRuntime/methods/get_possession",
+                              "api/classes/GameRuntime/methods/get_projection",
+                              "api/classes/GameRuntime/methods/get_transactions",
+                              "api/classes/GameRuntime/methods/get_world",
+                              "api/classes/GameRuntime/methods/get_world_epoch",
+                              "api/classes/GameRuntime/methods/get_world_id",
+                              "api/classes/GameRuntime/methods/host",
+                              "api/classes/GameRuntime/methods/host_game",
+                              "api/classes/GameRuntime/methods/host_online",
+                              "api/classes/GameRuntime/methods/invites",
+                              "api/classes/GameRuntime/methods/is_authority",
+                              "api/classes/GameRuntime/methods/join",
+                              "api/classes/GameRuntime/methods/join_game",
+                              "api/classes/GameRuntime/methods/join_listing",
+                              "api/classes/GameRuntime/methods/join_online",
+                              "api/classes/GameRuntime/methods/leave",
+                              "api/classes/GameRuntime/methods/open_offline",
+                              "api/classes/GameRuntime/methods/play_solo",
+                              "api/classes/GameRuntime/methods/register_command",
+                              "api/classes/GameRuntime/methods/restore",
+                              "api/classes/GameRuntime/methods/save",
+                              "api/classes/GameRuntime/methods/save_history",
+                              "api/classes/GameRuntime/methods/save_slot",
+                              "api/classes/GameRuntime/methods/set_definition",
+                              "api/classes/GameRuntime/methods/set_projector",
+                              "api/classes/GameRuntime/methods/set_shared_stores",
+                              "api/classes/GameRuntime/methods/start_dedicated",
+                              "api/classes/GameRuntime/methods/start_dedicated_online",
+                              "api/classes/GameRuntime/methods/start_match",
+                              "api/classes/GameRuntime/methods/start_offline",
+                              "api/classes/GameRuntime/methods/submit",
+                              "api/classes/GameRuntime/methods/travel_to",
+                              "api/classes/GameRuntime/methods/voice"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "GameServiceProvider",
+                        "icon": "cube",
+                        "root": "api/classes/GameServiceProvider",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameServiceProvider/methods/_create_online_directory",
+                              "api/classes/GameServiceProvider/methods/_create_scene_loader",
+                              "api/classes/GameServiceProvider/methods/_create_session"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "GameServices",
+                        "icon": "cube",
+                        "root": "api/classes/GameServices",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameServices/methods/for_node",
+                              "api/classes/GameServices/methods/game",
+                              "api/classes/GameServices/methods/scenes",
+                              "api/classes/GameServices/methods/set_default_game"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "GameVoice",
+                        "icon": "cube",
+                        "root": "api/classes/GameVoice",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameVoice/methods/set_channel",
+                              "api/classes/GameVoice/methods/set_muted",
+                              "api/classes/GameVoice/methods/set_recipient_policy",
+                              "api/classes/GameVoice/methods/start_talking",
+                              "api/classes/GameVoice/methods/stop_talking"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "MultiplayerRules",
+                        "icon": "cube",
+                        "root": "api/classes/MultiplayerRules",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Properties",
+                            "icon": "sliders",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/MultiplayerRules/properties/join_in_progress",
+                              "api/classes/MultiplayerRules/properties/max_players",
+                              "api/classes/MultiplayerRules/properties/port"
+                            ]
+                          },
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/MultiplayerRules/methods/allow_join_in_progress",
+                              "api/classes/MultiplayerRules/methods/get_join_in_progress",
+                              "api/classes/MultiplayerRules/methods/get_max_players",
+                              "api/classes/MultiplayerRules/methods/get_port",
+                              "api/classes/MultiplayerRules/methods/listen_coop",
+                              "api/classes/MultiplayerRules/methods/on_port",
+                              "api/classes/MultiplayerRules/methods/set_join_in_progress",
+                              "api/classes/MultiplayerRules/methods/set_max_players",
+                              "api/classes/MultiplayerRules/methods/set_port",
+                              "api/classes/MultiplayerRules/methods/with_max_players"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "OnlineDirectory",
+                        "icon": "cube",
+                        "root": "api/classes/OnlineDirectory",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/OnlineDirectory/methods/_leave",
+                              "api/classes/OnlineDirectory/methods/_publish",
+                              "api/classes/OnlineDirectory/methods/_resolve",
+                              "api/classes/OnlineDirectory/methods/_unpublish"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "OnlineDirectoryRequest",
+                        "icon": "cube",
+                        "root": "api/classes/OnlineDirectoryRequest",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/OnlineDirectoryRequest/methods/fail",
+                              "api/classes/OnlineDirectoryRequest/methods/is_cancelled",
+                              "api/classes/OnlineDirectoryRequest/methods/publish",
+                              "api/classes/OnlineDirectoryRequest/methods/resolve"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "SceneService",
+                        "icon": "cube",
+                        "root": "api/classes/SceneService",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/SceneService/methods/get_world",
+                              "api/classes/SceneService/methods/load"
+                            ]
+                          }
                         ]
                       }
                     ]
@@ -816,6 +1025,152 @@
                 "expanded": false,
                 "pages": [
                   {
+                    "group": "GameInventory",
+                    "icon": "cube",
+                    "root": "api/classes/GameInventory",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/GameInventory/methods/backpack"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Inventory",
+                    "icon": "cube",
+                    "root": "api/classes/Inventory",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/Inventory/methods/grid"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "InventoryConfig",
+                    "icon": "cube",
+                    "root": "api/classes/InventoryConfig",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/InventoryConfig/methods/backpack",
+                          "api/classes/InventoryConfig/methods/pickups"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "InventoryItemView",
+                    "icon": "cube",
+                    "root": "api/classes/InventoryItemView",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Properties",
+                        "icon": "sliders",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/InventoryItemView/properties/footprint",
+                          "api/classes/InventoryItemView/properties/id",
+                          "api/classes/InventoryItemView/properties/origin",
+                          "api/classes/InventoryItemView/properties/rotated"
+                        ]
+                      },
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/InventoryItemView/methods/get_footprint",
+                          "api/classes/InventoryItemView/methods/get_id",
+                          "api/classes/InventoryItemView/methods/get_origin",
+                          "api/classes/InventoryItemView/methods/is_rotated"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "InventoryPickup",
+                    "icon": "cube",
+                    "root": "api/classes/InventoryPickup",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/InventoryPickup/methods/take"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "InventoryPickupSource",
+                    "icon": "cube",
+                    "root": "api/classes/InventoryPickupSource",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/InventoryPickupSource/methods/_register_stores",
+                          "api/classes/InventoryPickupSource/methods/_resolve_pickup"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "InventoryResult",
+                    "icon": "cube",
+                    "root": "api/classes/InventoryResult",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Properties",
+                        "icon": "sliders",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/InventoryResult/properties/code",
+                          "api/classes/InventoryResult/properties/item_id",
+                          "api/classes/InventoryResult/properties/message",
+                          "api/classes/InventoryResult/properties/ok",
+                          "api/classes/InventoryResult/properties/origin",
+                          "api/classes/InventoryResult/properties/revision"
+                        ]
+                      },
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/InventoryResult/methods/get_code",
+                          "api/classes/InventoryResult/methods/get_item_id",
+                          "api/classes/InventoryResult/methods/get_message",
+                          "api/classes/InventoryResult/methods/get_origin",
+                          "api/classes/InventoryResult/methods/get_revision",
+                          "api/classes/InventoryResult/methods/is_ok"
+                        ]
+                      }
+                    ]
+                  },
+                  {
                     "group": "InventoryTransactionAdapter",
                     "icon": "cube",
                     "root": "api/classes/InventoryTransactionAdapter",
@@ -836,6 +1191,22 @@
                     ]
                   },
                   {
+                    "group": "MatchInventory",
+                    "icon": "cube",
+                    "root": "api/classes/MatchInventory",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/MatchInventory/methods/pick_up"
+                        ]
+                      }
+                    ]
+                  },
+                  {
                     "group": "SpatialInventory",
                     "icon": "cube",
                     "root": "api/classes/SpatialInventory",
@@ -846,6 +1217,7 @@
                         "icon": "code",
                         "expanded": false,
                         "pages": [
+                          "api/classes/SpatialInventory/methods/add",
                           "api/classes/SpatialInventory/methods/apply_placement_changes",
                           "api/classes/SpatialInventory/methods/check_move",
                           "api/classes/SpatialInventory/methods/check_placement",
@@ -861,6 +1233,8 @@
                           "api/classes/SpatialInventory/methods/get_swap_target",
                           "api/classes/SpatialInventory/methods/import_snapshot",
                           "api/classes/SpatialInventory/methods/is_placement_deltas_enabled",
+                          "api/classes/SpatialInventory/methods/item_at",
+                          "api/classes/SpatialInventory/methods/items",
                           "api/classes/SpatialInventory/methods/remove",
                           "api/classes/SpatialInventory/methods/set_placement_deltas_enabled",
                           "api/classes/SpatialInventory/methods/try_move",
@@ -1311,14 +1685,6 @@
                     "expanded": false,
                     "pages": [
                       {
-                        "group": "Properties",
-                        "icon": "sliders",
-                        "expanded": false,
-                        "pages": [
-                          "api/classes/StateReplication/properties/process_mode"
-                        ]
-                      },
-                      {
                         "group": "Methods",
                         "icon": "code",
                         "expanded": false,
@@ -1367,6 +1733,7 @@
                           "api/classes/SaveCoordinator/methods/configure_scope",
                           "api/classes/SaveCoordinator/methods/declare_participant",
                           "api/classes/SaveCoordinator/methods/get_last_admission_error",
+                          "api/classes/SaveCoordinator/methods/get_last_admission_message",
                           "api/classes/SaveCoordinator/methods/get_prepared_candidate",
                           "api/classes/SaveCoordinator/methods/invalidate_world",
                           "api/classes/SaveCoordinator/methods/is_idle",
@@ -1458,14 +1825,6 @@
                     "expanded": false,
                     "pages": [
                       {
-                        "group": "Properties",
-                        "icon": "sliders",
-                        "expanded": false,
-                        "pages": [
-                          "api/classes/SceneLoadManager/properties/process_mode"
-                        ]
-                      },
-                      {
                         "group": "Methods",
                         "icon": "code",
                         "expanded": false,
@@ -1520,14 +1879,6 @@
                     "root": "api/classes/GameSession",
                     "expanded": false,
                     "pages": [
-                      {
-                        "group": "Properties",
-                        "icon": "sliders",
-                        "expanded": false,
-                        "pages": [
-                          "api/classes/GameSession/properties/process_mode"
-                        ]
-                      },
                       {
                         "group": "Methods",
                         "icon": "code",
@@ -1855,6 +2206,40 @@
                         ]
                       },
                       {
+                        "group": "SteamConfig",
+                        "icon": "cube",
+                        "root": "api/classes/SteamConfig",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Properties",
+                            "icon": "sliders",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/SteamConfig/properties/app_id",
+                              "api/classes/SteamConfig/properties/discoverable",
+                              "api/classes/SteamConfig/properties/test_group"
+                            ]
+                          },
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/SteamConfig/methods/get_app_id",
+                              "api/classes/SteamConfig/methods/get_test_group",
+                              "api/classes/SteamConfig/methods/is_public",
+                              "api/classes/SteamConfig/methods/is_valid",
+                              "api/classes/SteamConfig/methods/public_games",
+                              "api/classes/SteamConfig/methods/set_app_id",
+                              "api/classes/SteamConfig/methods/set_public",
+                              "api/classes/SteamConfig/methods/set_test_group",
+                              "api/classes/SteamConfig/methods/spacewar"
+                            ]
+                          }
+                        ]
+                      },
+                      {
                         "group": "SteamDlcInfo",
                         "icon": "cube",
                         "root": "api/classes/SteamDlcInfo",
@@ -2119,6 +2504,59 @@
                               "api/classes/SteamUtils/methods/is_running_in_vr",
                               "api/classes/SteamUtils/methods/is_running_under_proton",
                               "api/classes/SteamUtils/methods/ui_language"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Steamworks",
+                        "icon": "cube",
+                        "root": "api/classes/Steamworks",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/Steamworks/methods/achievements",
+                              "api/classes/Steamworks/methods/apps",
+                              "api/classes/Steamworks/methods/auth",
+                              "api/classes/Steamworks/methods/boot",
+                              "api/classes/Steamworks/methods/boot_result",
+                              "api/classes/Steamworks/methods/browser",
+                              "api/classes/Steamworks/methods/cloud",
+                              "api/classes/Steamworks/methods/device",
+                              "api/classes/Steamworks/methods/diagnostics",
+                              "api/classes/Steamworks/methods/friends",
+                              "api/classes/Steamworks/methods/get_app_id",
+                              "api/classes/Steamworks/methods/get_local_steam_id",
+                              "api/classes/Steamworks/methods/http",
+                              "api/classes/Steamworks/methods/input",
+                              "api/classes/Steamworks/methods/inventory",
+                              "api/classes/Steamworks/methods/is_online",
+                              "api/classes/Steamworks/methods/is_ready",
+                              "api/classes/Steamworks/methods/leaderboards",
+                              "api/classes/Steamworks/methods/lobbies",
+                              "api/classes/Steamworks/methods/messages",
+                              "api/classes/Steamworks/methods/music",
+                              "api/classes/Steamworks/methods/networking",
+                              "api/classes/Steamworks/methods/open_achievements",
+                              "api/classes/Steamworks/methods/overlay",
+                              "api/classes/Steamworks/methods/parties",
+                              "api/classes/Steamworks/methods/presence",
+                              "api/classes/Steamworks/methods/purchases",
+                              "api/classes/Steamworks/methods/remote_play",
+                              "api/classes/Steamworks/methods/restart_through_steam_if_needed",
+                              "api/classes/Steamworks/methods/screenshots",
+                              "api/classes/Steamworks/methods/server_browser",
+                              "api/classes/Steamworks/methods/sockets",
+                              "api/classes/Steamworks/methods/stats",
+                              "api/classes/Steamworks/methods/timeline",
+                              "api/classes/Steamworks/methods/utils",
+                              "api/classes/Steamworks/methods/video",
+                              "api/classes/Steamworks/methods/voice",
+                              "api/classes/Steamworks/methods/workshop"
                             ]
                           }
                         ]
@@ -3367,6 +3805,22 @@
                               "api/classes/SteamAchievement/methods/get_unlocked_at_unix",
                               "api/classes/SteamAchievement/methods/is_hidden",
                               "api/classes/SteamAchievement/methods/is_unlocked"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "SteamAchievements",
+                        "icon": "cube",
+                        "root": "api/classes/SteamAchievements",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/SteamAchievements/methods/unlock"
                             ]
                           }
                         ]

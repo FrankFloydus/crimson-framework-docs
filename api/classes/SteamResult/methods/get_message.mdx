@@ -1,7 +1,7 @@
 ---
 title: "get_message()"
 sidebarTitle: "get_message"
-description: "Returns the diagnostic for this result, or an empty string if the action supplied none."
+description: "Returns the action's diagnostic."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -20,5 +20,9 @@ get_message() -> String
 ## Return value
 
 `String`
+
+## Description
+
+A failed action that supplies no specific detail returns the Godot error description. A successful action can leave this empty.
 
 [See gameplay examples for `SteamResult`](/api/classes/SteamResult#examples).

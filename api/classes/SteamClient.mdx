@@ -1,6 +1,6 @@
 ---
 title: "SteamClient"
-description: "Owns a standalone Steam client scope."
+description: "Owns the native callback lifetime for a Steam client scope."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -12,7 +12,7 @@ description: "Owns a standalone Steam client scope."
 
 ## Description
 
-Attach the client to a persistent node and start it on the main thread. Active scopes share the local account and the process AppID. Cached Steam services can remain available without a live connection to Valve. The client pumps Steam callbacks while active. Stopping the client, leaving the scene tree, or losing the native callback pipe invalidates its services and ends observation of outstanding operations.
+Use `Steamworks.boot()` to attach Steam features to an existing owner. This callback node supports existing scenes and scripts. Active scopes share the local account and the process AppID. Cached Steam services can remain available without a live connection to Valve. The client pumps Steam callbacks while active. Stopping the client, leaving the scene tree, or losing the native callback pipe invalidates its services and ends observation of outstanding operations.
 
 ## Examples
 
@@ -71,7 +71,7 @@ Returns the active Steam AppID, or `0` when the client scope is inactive.
 
 #### [`get_initialization_error`](/api/classes/SteamClient/methods/get_initialization_error)
 
-Returns the stored startup diagnostic.
+Returns the stored startup diagnostic, including the Steam SDK's reason when available.
 
 #### [`get_local_steam_id`](/api/classes/SteamClient/methods/get_local_steam_id)
 

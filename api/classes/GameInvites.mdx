@@ -36,6 +36,12 @@ Submit one invite to the selected decimal SteamID64 from the current owned lobby
 
 ## Signals
 
+### `changed`
+
+`changed(invite: SteamInvite)`
+
+Emitted when the exact pending offer changes. A null offer clears the current prompt after acceptance, dismissal, or attachment retirement.
+
 ### `received`
 
 `received(invite: SteamInvite)`

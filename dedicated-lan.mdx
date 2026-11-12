@@ -1,0 +1,39 @@
+---
+title: "Run a dedicated LAN server"
+description: "Start a playerless world from a Godot scene and wait for Crimson's native readiness marker."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+A dedicated server loads the world without spawning a local player. Every seat is available to remote players. Use the same world, player, capacity, and runtime node path on the server and its clients. This example uses the scenes from the [multiplayer quickstart](/multiplayer-quickstart).
+
+## Create the server scene
+
+Create a scene with an ordinary `Node` root named `Main`, the same root name as the client scene. Save it as `res://server.tscn`. Attach `res://server.gd` to the root.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://world.tscn")
+const PLAYER: PackedScene = preload("res://player.tscn")
+
+
+func _ready() -> void:
+    Game.configure(LEVEL, PLAYER).lan().boot_server(self)
+```
+
+[`boot_server()`](/api/classes/GameConfig/methods/boot_server) attaches the game and enables native startup when the process receives the server role. The native launcher mounts the world, opens admission, and reports readiness. The same call without the server role only boots the configuration. This launcher takes a fixed-world LAN configuration.
+
+## Launch and connect
+
+From the directory containing `project.godot`, pass the scene path and put Crimson's arguments after Godot's `--` separator. Replace the executable path with the path to your Godot console build.
+
+```powershell
+& 'C:\path\to\Godot_v4.7-stable_win64_console.exe' --headless --path . res://server.tscn -- --crimson-role=server
+```
+
+Wait for `[Crimson] READY server 7000`, then launch the normal client and press **J** to join `127.0.0.1`. If the launch fails, Crimson prints `[Crimson] ERROR server` with the reason and exits with status `1`.
+
+The launcher binds to `127.0.0.1` by default. For other machines on your LAN, use `--crimson-bind=<server-lan-address>` and tell clients to join that address. You can override the UDP port with `--crimson-port=<port>`. Set the same port on the client using [`on_port()`](/api/classes/GameConfig/methods/on_port).
+
+For a custom launch flow, call [`await game.serve()`](/api/classes/Game/methods/serve) on a booted server profile and handle its [`GameResult`](/api/classes/GameResult). For a Steam server, see [Steam dedicated servers](/steam/dedicated-servers).

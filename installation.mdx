@@ -7,7 +7,7 @@ description: "Add the purchased Crimson Framework package to a Godot project on 
 
 ## Before you start
 
-- The Crimson Framework v0.0.3 addon ZIP from your purchase. It includes the Windows DLLs for the editor and for debug and release exports.
+- The current Crimson Framework addon ZIP from your purchase. It includes the Windows DLLs for the editor and for debug and release exports.
 - Godot 4.7 stable for Windows x86-64 with standard single precision. [Godot 4.7 downloads](https://godotengine.org/download/archive/4.7-stable/)
 - A new or existing Godot project.
 
@@ -38,9 +38,9 @@ If your project already uses Crimson, follow the [update steps](#update-an-exist
 
 ## Verify the installation
 
-In any scene, open **Add Child Node** and search for [`GameRuntime`](/api/classes/GameRuntime). If it appears in the results, Crimson is ready to use. [Start a solo game](/quickstart)
+In Godot, open the **Script** workspace and click **Search Help**. Search for [`Game`](/api/classes/Game) and open the Crimson class that lists `configure()` and `play()`. Those bindings are available when the addon has loaded. [Start a solo game](/quickstart)
 
-If `GameRuntime` is missing, check **Output** for a loading error. Verify your Godot version and check the folder layout above. If Godot reports a duplicate class, look for an older Crimson install or a standalone inventory or save addon that registers the same class name.
+If the Crimson class is missing, check **Output** for a loading error. Verify your Godot version and check the folder layout above. If Godot reports a duplicate class, look for an older Crimson install or a standalone inventory or save addon that registers the same class name.
 
 ## Update an existing project
 

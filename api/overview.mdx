@@ -5,21 +5,21 @@ description: "Look up the Godot classes, methods, properties, signals, and const
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-This reference covers the Godot scripting API in Crimson Framework v0.0.3. Open a module to see what it does, which classes it exposes, and which enums those classes define. Each class page describes its purpose, shows its inheritance, and lists the members it defines.
+Start with [`Game`](/api/classes/Game) for game actions, [`Inventory`](/api/classes/Inventory) for standalone grids, or [`Steamworks`](/api/classes/Steamworks) for Steam app features. Each class page describes its purpose, shows its inheritance, and lists the members it defines.
 
-For a step-by-step example, start with [your first solo game](/quickstart), [host and join on one computer](/multiplayer-quickstart), or the [Steamworks guides](/steam/overview).
+For a step-by-step example, start with [your first solo game](/quickstart), [host and join on one computer](/multiplayer-quickstart), or the [Steamworks guides](/steam/overview). The [migration guide](/migration) maps existing setup types and operation calls to the code-first API.
 
 ## Modules
 
 | Module | Use it to |
 | --- | --- |
-| [Game runtime](/api/modules/game-runtime) | Configure, start, and run a game with world transitions and checkpoints. |
+| [Game runtime](/api/modules/game-runtime) | Boot a game scope, configure services, and start or retire game sessions. |
 | [World sessions](/api/modules/world-sessions) | Mount one shared world and manage player spawning and local views. |
 | [Sessions and transport](/api/modules/sessions-and-transport) | Host and join sessions, admit peers, and choose a transport. |
 | [Scene loading](/api/modules/scene-loading) | Prepare scenes and coordinate when they become active. |
 | [Match runtime](/api/modules/match-runtime) | Bind players to characters and apply authoritative gameplay changes. |
 | [Replication](/api/modules/replication) | Distribute committed state to the players who can see it. |
-| [Inventory](/api/modules/inventory) | Manage grid items, containers, equipment, and trades. |
+| [Inventory](/api/modules/inventory) | Place items in a grid, pick up items during coordinated play, and manage equipment and trades. |
 | [Save and restore](/api/modules/save-and-restore) | Store, inspect, and restore checkpoint generations. |
 | [Steamworks](/api/modules/steamworks) | Use player services such as achievements, Cloud, Input, and Workshop. |
 | [Steam multiplayer](/api/modules/steam-multiplayer) | Connect a Crimson game to Steam lobbies, invites, and dedicated servers. |
@@ -27,11 +27,11 @@ For a step-by-step example, start with [your first solo game](/quickstart), [hos
 
 ## Read a class page
 
-Expand a module in the sidebar, open a class, then expand **Properties** or **Methods**. For example, open [Game runtime](/api/modules/game-runtime), choose [`GameRuntime`](/api/classes/GameRuntime), and follow [`play_solo()`](/api/classes/GameRuntime/methods/play_solo). Follow **Inherits** on a class page to find members of its base class when that class is also part of Crimson.
+Expand a module in the sidebar, open a class, then expand **Properties** or **Methods**. For example, open [Game runtime](/api/modules/game-runtime), choose [`Game`](/api/classes/Game), and follow [`play()`](/api/classes/Game/methods/play). Follow **Inherits** on a class page to find members of its base class when that class is also part of Crimson.
 
 Each property page shows its type, access, and any documented default. Each method page shows its signature, parameters, and return value where applicable. Signals, enums, and constants are listed on their declaring class. Examples show when to use a member and what happens in the game.
 
-The return value section explains how to receive an asynchronous result. Some methods return an operation and ask you to await its [`wait()`](/api/classes/GameOperation/methods/wait) method. Others, such as [`web_ticket()`](/api/classes/SteamAuth/methods/web_ticket), can be awaited directly.
+Await actions such as [`game.play()`](/api/classes/Game/methods/play) directly and assign the outcome to a [`GameResult`](/api/classes/GameResult). The return value section describes each method's completion contract. Lower-level methods that return a [`GameOperation`](/api/classes/GameOperation) use its [`wait()`](/api/classes/GameOperation/methods/wait) method.
 
 ## Steam availability
 

@@ -1,5 +1,39 @@
 [
   {
+    "title": "Pack a starting kit",
+    "setup": "Press **Pack supplies** to load a medkit and radio into a bag. The output shows the first available placement for each item. [Set up the supply button](/inventory#pack-a-starting-kit)",
+    "members": [
+      "Inventory.methods.grid",
+      "SpatialInventory.methods.add",
+      "SpatialInventory.methods.items",
+      "SpatialInventory.methods.item_at",
+      "InventoryItemView.properties.id",
+      "InventoryItemView.properties.origin",
+      "InventoryItemView.properties.footprint"
+    ],
+    "code": "extends Button\n\nconst BAG_SIZE: Vector2i = Vector2i(4, 3)\nconst MEDKIT_ID: StringName = &\"medkit_17\"\nconst MEDKIT_SIZE: Vector2i = Vector2i(2, 1)\nconst RADIO_ID: StringName = &\"radio_02\"\nconst RADIO_SIZE: Vector2i = Vector2i(1, 2)\nconst RADIO_CELL: Vector2i = Vector2i(2, 1)\n\nvar _bag: SpatialInventory\n\n\nfunc _ready() -> void:\n    pressed.connect(_pack_supplies)\n\n\nfunc _pack_supplies() -> void:\n    var bag: SpatialInventory = Inventory.grid(BAG_SIZE)\n    if bag == null:\n        push_error(\"Invalid supply bag dimensions.\")\n        return\n    var error: Error = bag.add(MEDKIT_ID, MEDKIT_SIZE)\n    if error == OK:\n        error = bag.add(RADIO_ID, RADIO_SIZE)\n    if error != OK:\n        push_error(\"Could not pack the supplies: %s\" % error_string(error))\n        return\n\n    _bag = bag\n    var placements: Array[InventoryItemView] = _bag.items()\n    for item: InventoryItemView in placements:\n        print(\"%s at %s, footprint %s\" % [item.id, item.origin, item.footprint])\n\n    var inspected: InventoryItemView = _bag.item_at(RADIO_CELL)\n    if inspected != null:\n        print(\"Cell %s contains %s.\" % [RADIO_CELL, inspected.id])\n    text = \"Supplies packed\"\n    disabled = true\n"
+  },
+  {
+    "title": "Take a medkit from the aid station",
+    "setup": "Take the medkit to fill the one-cell backpack. The authority keeps the flare available when the next pickup cannot fit. [Set up the aid station](/inventory#pick-up-an-item-in-a-coordinated-game)",
+    "members": [
+      "GameConfig.methods.inventory",
+      "Game.methods.inventory",
+      "GameInventory.methods.backpack",
+      "InventoryConfig.methods.backpack",
+      "InventoryConfig.methods.pickups",
+      "InventoryPickup.methods.take",
+      "InventoryPickupSource.methods._register_stores",
+      "InventoryPickupSource.methods._resolve_pickup",
+      "MatchInventory.methods.pick_up",
+      "InventoryResult.properties.ok",
+      "InventoryResult.properties.message",
+      "InventoryResult.properties.item_id",
+      "InventoryResult.properties.origin"
+    ],
+    "code": "extends Node\n\nconst WORLD_ID: StringName = &\"aid_station\"\nconst WORLD_PATH: String = \"res://levels/aid_station.tscn\"\nconst BAG_SIZE: Vector2i = Vector2i.ONE\n\n@export var medkit_button: Button\n@export var flare_button: Button\n@export var status: Label\n\nvar _game: Game\nvar _pickup_pending: bool = false\n\n\nclass AidStationPickups extends InventoryPickupSource:\n    const STORE: String = \"aid_station_supplies\"\n    const SOLO_PLAYER_ID: String = \"local\"\n    const MEDKIT_ID: StringName = &\"medkit_17\"\n    const FLARE_ID: StringName = &\"flare_08\"\n    const ITEM_SIZE: Vector2i = Vector2i.ONE\n\n    func _register_stores(stores: TransactionCoordinator) -> Error:\n        var available: Dictionary = {String(MEDKIT_ID): true, String(FLARE_ID): true}\n        return stores.register_store(STORE, available, _prepare_consumption)\n\n    func _resolve_pickup(\n        player_id: String, pickup_id: StringName, stores: TransactionCoordinator\n    ) -> InventoryPickup:\n        var id: String = String(pickup_id)\n        var available: Dictionary = stores.read_store(STORE)\n        if player_id != SOLO_PLAYER_ID or available.get(id, false) != true:\n            return null\n        return InventoryPickup.take(pickup_id, ITEM_SIZE, STORE, {\"id\": id})\n\n    func _prepare_consumption(\n        available: Dictionary, edits: Array, _context: Dictionary\n    ) -> Dictionary:\n        for edit: Dictionary in edits:\n            var id: String = edit.id\n            if available.get(id, false) != true:\n                return {\"ok\": false, \"message\": \"That supply has already been taken.\"}\n            available[id] = false\n        return {\"ok\": true, \"state\": available}\n\n\nfunc _ready() -> void:\n    medkit_button.disabled = true\n    flare_button.disabled = true\n\n    var station: WorldDefinition = WorldDefinition.at(WORLD_ID, WORLD_PATH)\n    var config: InventoryConfig = InventoryConfig.backpack(BAG_SIZE)\n    _game = Game.campaign(station).inventory(config.pickups(AidStationPickups.new())).boot(self)\n    var started: GameResult = await _game.play()\n    if not started.ok:\n        status.text = started.message\n        return\n\n    medkit_button.pressed.connect(_take.bind(AidStationPickups.MEDKIT_ID, medkit_button))\n    flare_button.pressed.connect(_take.bind(AidStationPickups.FLARE_ID, flare_button))\n    medkit_button.disabled = false\n    flare_button.disabled = false\n    status.text = \"The aid station has a medkit and a flare.\"\n\n\nfunc _take(pickup_id: StringName, pickup_button: Button) -> void:\n    if _pickup_pending:\n        return\n    var inventory: GameInventory = _game.inventory()\n    var bag: MatchInventory = inventory.backpack() if inventory != null else null\n    if bag == null:\n        status.text = \"The backpack is unavailable.\"\n        return\n\n    _pickup_pending = true\n    var result: InventoryResult = await bag.pick_up(pickup_id)\n    _pickup_pending = false\n    if not result.ok:\n        status.text = result.message\n        return\n\n    pickup_button.hide()\n    status.text = \"Packed %s at %s.\" % [result.item_id, result.origin]\n"
+  },
+  {
     "title": "Pick up a keycard and open the airlock",
     "setup": "Walking over the keycard with a body in the `player` group puts it in the first position with enough space. Press **Open Airlock** to consume the card and clear the exit.",
     "code": "extends Node3D\n\nconst GRID_SIZE: Vector2i = Vector2i(4, 3)\nconst KEYCARD_SIZE: Vector2i = Vector2i(2, 1)\nconst NO_FIT: Vector2i = Vector2i(-1, -1)\nconst KEYCARD: StringName = &\"cargo_airlock_keycard\"\nconst PLAYER_GROUP: StringName = &\"player\"\n\n@export var keycard_pickup: Node3D\n@export var pickup_area: Area3D\n@export var airlock: Node3D\n@export var open_airlock_button: Button\n@export var inventory_status: Label\n\nvar _inventory: SpatialInventory = SpatialInventory.new()\n\n\nfunc _ready() -> void:\n    open_airlock_button.disabled = true\n    var error: Error = _inventory.configure(GRID_SIZE)\n    if error != OK:\n        inventory_status.text = error_string(error)\n        return\n    pickup_area.body_entered.connect(_on_pickup_entered)\n    open_airlock_button.pressed.connect(_open_airlock)\n    inventory_status.text = \"Find the cargo keycard.\"\n\n\nfunc _on_pickup_entered(body: Node3D) -> void:\n    if not body.is_in_group(PLAYER_GROUP):\n        return\n    var cell: Vector2i = _inventory.find_first_fit(KEYCARD_SIZE)\n    if cell == NO_FIT:\n        inventory_status.text = \"Free two adjacent cells to pick up the card.\"\n        return\n    var error: Error = _inventory.try_place(KEYCARD, KEYCARD_SIZE, cell)\n    if error != OK:\n        return\n    keycard_pickup.queue_free()\n    open_airlock_button.disabled = false\n    inventory_status.text = \"Keycard stored. The cargo airlock can now open.\"\n\n\nfunc _open_airlock() -> void:\n    if _inventory.remove(KEYCARD) != OK:\n        return\n    open_airlock_button.disabled = true\n    airlock.queue_free()\n    inventory_status.text = \"Keycard used. The cargo route is open.\"\n",

@@ -1,6 +1,6 @@
 # Copyright Francesco Di Blasi 2026 - All Rights Reserved
 
-"""Generate the Mintlify reference from a tagged Crimson release and Godot's bindings."""
+"""Generate the Mintlify reference from Crimson class XML and Godot's bindings."""
 
 from __future__ import annotations
 
@@ -25,6 +25,7 @@ CLASS_ROUTE = "api/classes"
 PROSE_DIR = DOCS_ROOT / "scripts" / "api-prose"
 ADDON_PATH = "addons/crimson-framework/crimson-framework.gdextension"
 DEBUG_DLL = "crimson_framework.windows.template_debug.x86_64.dll"
+TRUSTED_PUBLISHER = "Steam publisher"
 NOTICE = "Copyright Francesco Di Blasi 2026 - All Rights Reserved"
 
 MEMBER_PATHS = {
@@ -38,13 +39,14 @@ SOURCE_GROUPS = {
     "integration/online/steam": "Steam multiplayer",
     "integration/world_session": "World sessions",
     "modules/inventory": "Inventory",
+    "integration/adapters": "Inventory",
     "modules/match_runtime": "Match runtime",
     "modules/replication": "Replication",
     "modules/save": "Save and restore",
     "modules/scene_load": "Scene loading",
     "modules/session": "Sessions and transport",
     "modules/steam": "Steamworks",
-    "modules/steam/publisher": "Steam publisher",
+    "modules/steam/publisher": TRUSTED_PUBLISHER,
 }
 REFLECTED_GROUPS = {
     "Game runtime": "GameOperation GameServices OnlineDirectory OnlineDirectoryRequest SceneService",
@@ -60,8 +62,8 @@ REFLECTED_GROUPS = {
 }
 STEAM_GROUPS = {
     "Client and results": (
-        "SteamApps SteamBoolResult SteamBytes SteamClient SteamDlc SteamFloatResult SteamIntResult "
-        "SteamJsonResult SteamOperation SteamResult SteamStringResult SteamUtils"
+        "SteamApps SteamBoolResult SteamBytes SteamClient SteamConfig SteamDlc SteamFloatResult SteamIntResult "
+        "SteamJsonResult SteamOperation SteamResult SteamStringResult SteamUtils Steamworks"
     ),
     "Lobbies and social": (
         "SteamFriend SteamListing SteamLobb SteamOverlay SteamParties SteamParty SteamPresence"
@@ -82,6 +84,13 @@ STEAM_GROUPS = {
         "SteamAuth SteamBrowser SteamDiagnostic SteamHttp SteamOwnershipTicket SteamWebTicket"
     ),
 }
+GAME_GROUPS = {
+    "Code-first game": "Game GameBindings GameConfig GameProvider GameResult GameScenes WorldDefinition",
+    "Lower-level runtime": (
+        "GameDefinition GameOperation GameRuntime GameServiceProvider GameServices GameVoice MultiplayerRules "
+        "OnlineDirectory SceneService"
+    ),
+}
 PUBLISHER_GROUPS = {
     "Host and authorization": (
         "SteamPublisherHost SteamPublisherSettings SteamPublisherAuth SteamPublisherCompletion "
@@ -97,6 +106,14 @@ INTERNAL_CLASSES = {
     "SteamPublisherCompletion",
     "SteamTimelinePhaseOperation",
     "SteamVideoOperation",
+}
+PUBLISHER_FIXTURE_METHODS = {"_fixture_transport_enabled", "_test_decrypted_ownership_ticket", "_test_response"}
+AWAITED_RESULTS = {
+    "Game": {name: "GameResult" for name in (
+        "play", "host", "join", "serve", "find_and_join", "join_listing", "start_match", "accept_invite", "leave", "perform"
+    )},
+    "GameOperation": {"wait": "Dictionary", "wait_result": "GameResult"},
+    "GameScenes": {"load": "GameResult"},
 }
 BBCODE = re.compile(r"\[code\](.*?)\[/code\]|\[([A-Za-z_][\w.]*)(?: ([^\]\n]+))?\]", re.DOTALL)
 
@@ -145,16 +162,31 @@ def read_release(framework: Path, ref: str) -> tuple[dict[str, ClassDoc], bytes]
         for path in contents.namelist():
             if "/doc_classes/" not in path or not path.endswith(".xml"):
                 continue
-            area = path.removeprefix("framework/src/").split("/doc_classes/")[0]
-            root = ET.fromstring(contents.read(path))
-            name = root.attrib["name"]
-            if name in classes:
-                raise ValueError(f"Duplicate authored XML for {name}.")
-            classes[name] = ClassDoc(name, SOURCE_GROUPS[area], root, None)
+            add_authored_class(classes, path.removeprefix("framework/src/"), ET.fromstring(contents.read(path)))
         if not classes:
             raise ValueError(f"No authored class XML at {ref}.")
         addon = contents.read(f"framework/releases/crimson-framework-{ref.removeprefix('v')}.zip")
     return classes, addon
+
+
+def add_authored_class(classes: dict[str, ClassDoc], source_path: str, root: ET.Element) -> None:
+    """Assign one authored declaration to the module that owns its source."""
+    area = source_path.split("/doc_classes/")[0]
+    name = root.attrib["name"]
+    if name in classes:
+        raise ValueError(f"Duplicate authored XML for {name}.")
+    classes[name] = ClassDoc(name, SOURCE_GROUPS[area], root, None)
+
+
+def read_working_tree(framework: Path) -> dict[str, ClassDoc]:
+    """Read current authored XML, including files awaiting their first commit."""
+    source = framework / "framework" / "src"
+    classes = {}
+    for path in sorted(source.glob("**/doc_classes/*.xml")):
+        add_authored_class(classes, path.relative_to(source).as_posix(), ET.parse(path).getroot())
+    if not classes:
+        raise ValueError(f"No authored class XML in {source}.")
+    return classes
 
 
 def read_bindings(directory: Path) -> dict[str, ET.Element]:
@@ -171,8 +203,8 @@ def read_bindings(directory: Path) -> dict[str, ET.Element]:
     return classes
 
 
-def reflect(godot: Path, addon: bytes, publisher_dll: Path | None = None) -> dict[str, ET.Element]:
-    """Run Godot's GDExtension doctool against the release in an isolated project."""
+def reflect(godot: Path, addon: bytes | Path, publisher_dll: Path | None = None) -> dict[str, ET.Element]:
+    """Run Godot's GDExtension doctool against the addon in an isolated project."""
     with tempfile.TemporaryDirectory(prefix="crimson-api-") as workspace:
         root = Path(workspace)
         project = root / "project"
@@ -181,11 +213,14 @@ def reflect(godot: Path, addon: bytes, publisher_dll: Path | None = None) -> dic
         output.mkdir()
         (project / "project.godot").write_text("config_version=5\n", encoding="utf-8")
         (project / ".godot" / "extension_list.cfg").write_text(f"res://{ADDON_PATH}\n", encoding="utf-8")
-        with ZipFile(io.BytesIO(addon)) as package:
-            package.extractall(project)
         descriptor = project / ADDON_PATH
+        if isinstance(addon, Path):
+            shutil.copytree(addon, descriptor.parent)
+        else:
+            with ZipFile(io.BytesIO(addon)) as package:
+                package.extractall(project)
         if not descriptor.is_file():
-            raise ValueError(f"The release archive is missing {ADDON_PATH}.")
+            raise ValueError(f"The addon is missing {ADDON_PATH}.")
         if publisher_dll is not None:
             dll_directory = descriptor.parent / "bin"
             shutil.copyfile(publisher_dll, dll_directory / DEBUG_DLL)
@@ -215,20 +250,20 @@ def add_bindings(classes: dict[str, ClassDoc], runtime: dict[str, ET.Element], p
     if publisher:
         shared = {name for name, doc in classes.items() if doc.reflected is not None}
         if shared - runtime.keys():
-            raise ValueError("The trusted DLL is missing standard bindings. Build it from the same release tag.")
+            raise ValueError("The trusted binding export is missing standard classes. Use a matching addon build.")
     for name, reflected in runtime.items():
         if name in classes:
             doc = classes[name]
-            if publisher == (doc.group == "Steam publisher"):
+            if publisher == (doc.group == TRUSTED_PUBLISHER):
                 doc.reflected = reflected
         elif publisher:
-            classes[name] = ClassDoc(name, "Steam publisher", None, reflected)
+            classes[name] = ClassDoc(name, TRUSTED_PUBLISHER, None, reflected)
         else:
             group = "Inventory" if name.startswith("SpatialInventory") else by_class.get(name)
             if group is None:
                 raise ValueError(f"Assign newly reflected class {name} to its API group.")
             classes[name] = ClassDoc(name, group, None, reflected)
-    expected = {name for name, doc in classes.items() if publisher == (doc.group == "Steam publisher")}
+    expected = {name for name, doc in classes.items() if publisher == (doc.group == TRUSTED_PUBLISHER)}
     missing = expected - runtime.keys() - INTERNAL_CLASSES
     if missing:
         raise ValueError(f"Binding XML is missing expected public classes: {', '.join(sorted(missing))}.")
@@ -245,6 +280,8 @@ def collect_members(doc: ClassDoc) -> dict[str, dict[str, MemberDoc]]:
         authored = {item.attrib["name"]: item for item in doc.authored.findall(path)} if doc.authored is not None else {}
         reflected = {item.attrib["name"]: item for item in doc.reflected.findall(path)} if doc.reflected is not None else {}
         names = authored.keys() if doc.reflected is None else reflected.keys()
+        if doc.reflected is None and doc.name == "SteamPublisherHost" and category == "methods":
+            names = names - PUBLISHER_FIXTURE_METHODS
         if doc.reflected is not None and category == "methods":
             names = names | (authored.keys() & accessors)
         members = {}
@@ -530,7 +567,7 @@ def render_class(
     base = root.get("inherits")
     if base:
         lines.extend([f"**Inherits** {class_link(base, known_classes)}", ""])
-    if doc.group == "Steam publisher":
+    if doc.group == TRUSTED_PUBLISHER:
         lines.extend(["**Availability** [Trusted Steam publisher addon](/steam/publisher).", ""])
     if doc.name in INTERNAL_CLASSES:
         lines.extend(["Crimson creates this class internally. You can use the instances exposed by the framework.", ""])
@@ -561,12 +598,13 @@ def module_route(group: str, section: str | None = None) -> str:
 
 
 def service_sections(group: str) -> dict[str, str]:
-    """Return the service areas defined for a module."""
-    return {"Steamworks": STEAM_GROUPS, "Steam publisher": PUBLISHER_GROUPS}.get(group, {})
+    """Return the service or usage areas defined for a module."""
+    return {"Game runtime": GAME_GROUPS, "Steamworks": STEAM_GROUPS,
+            TRUSTED_PUBLISHER: PUBLISHER_GROUPS}.get(group, {})
 
 
 def class_section(doc: ClassDoc) -> str | None:
-    """Assign a Steam class to the service area with the most specific name prefix."""
+    """Assign a class to the area with the most specific name prefix."""
     sections = service_sections(doc.group)
     if not sections:
         return None
@@ -574,7 +612,7 @@ def class_section(doc: ClassDoc) -> str | None:
                for prefix in patterns.split() if doc.name.startswith(prefix))
     _, section = max(matches, key=lambda match: match[0], default=(0, None))
     if section is None:
-        raise ValueError(f"Assign {doc.name} to a Steam API section.")
+        raise ValueError(f"Assign {doc.name} to an API section in {doc.group}.")
     return section
 
 
@@ -617,13 +655,13 @@ def render_catalog_listing(docs: list[ClassDoc], members: dict, descriptions: di
     return lines
 
 
-def catalog_heading(title: str, entry: dict) -> list[str]:
+def catalog_heading(title: str, entry: dict, known_classes: set[str]) -> list[str]:
     """Start a generated catalog page with its authored module purpose."""
     return ["---", f"title: {json.dumps(title)}",
             f"description: {json.dumps(entry['summary'], ensure_ascii=False)}", "---", "",
             "{/* " + NOTICE + " */}",
             "{/* Generated by scripts/generate_api.py. Update scripts/api-module-prose.json for module prose. */}",
-            "", plain(entry["description"]), ""]
+            "", prose(entry["description"], known_classes), ""]
 
 
 def catalog_text(lines: list[str], entry: dict) -> str:
@@ -643,16 +681,17 @@ def render_module_pages(classes: dict[str, ClassDoc], members: dict,
     for group, sections in module_catalog(classes).items():
         entry = content[group]
         route = module_route(group)
-        lines = catalog_heading(group, entry)
+        lines = catalog_heading(group, entry, known_classes)
         if None in sections:
             lines.extend(render_catalog_listing(sections[None], members, descriptions, known_classes))
         else:
-            lines.extend(["## Service areas", "", "| Service area | Purpose |", "| --- | --- |"])
+            area_label = "API areas" if group == "Game runtime" else "Service areas"
+            lines.extend([f"## {area_label}", "", "| Area | Purpose |", "| --- | --- |"])
             for section, docs in sections.items():
                 area = entry["sections"][section]
                 section_route = module_route(group, section)
                 lines.append(f"| [{plain(section)}](/{section_route}) | {table_cell(plain(area['summary']))} |")
-                area_lines = catalog_heading(section, area)
+                area_lines = catalog_heading(section, area, known_classes)
                 area_lines.extend([f"**Module** [{plain(group)}](/{route})", ""])
                 area_lines.extend(render_catalog_listing(docs, members, descriptions, known_classes))
                 pages[section_route] = catalog_text(area_lines, area)
@@ -788,14 +827,20 @@ def render_member_parameters(element: ET.Element, known_classes: set[str]) -> li
     return lines + [""]
 
 
-def render_member_return(element: ET.Element, description: str, known_classes: set[str]) -> list[str]:
+def render_member_return(owner: str, element: ET.Element, description: str, known_classes: set[str]) -> list[str]:
     """Show the declared type and any explicitly documented awaited result."""
     returns = element.find("return")
     if returns is None or returns.get("type") == "void":
         return []
     declared = type_label(returns)
     lines = ["## Return value", "", class_link(declared, known_classes), ""]
-    if declared != "Variant" or not re.search(r"\bawait(?:ing)?\b|\bcompletion signal\b", description, re.I):
+    if declared != "Variant":
+        return lines
+    typed_result = AWAITED_RESULTS.get(owner, {}).get(element.get("name"))
+    if typed_result:
+        lines.extend([f"Await the call to receive {class_link(typed_result, known_classes)}.", ""])
+        return lines
+    if not re.search(r"\bawait(?:ing)?\b|\bcompletion signal\b", description, re.I):
         return lines
 
     types = set(re.findall(r"\[(\w+Result)\]", description)) & known_classes
@@ -865,7 +910,7 @@ def render_member_page(doc: ClassDoc, category: str, name: str, member: MemberDo
         api_breadcrumb(doc, category),
         "",
     ]
-    if doc.group == "Steam publisher":
+    if doc.group == TRUSTED_PUBLISHER:
         lines.extend(["**Availability** [Trusted Steam publisher addon](/steam/publisher).", ""])
     status = annotations(element)
     if status:
@@ -885,7 +930,7 @@ def render_member_page(doc: ClassDoc, category: str, name: str, member: MemberDo
     lines.extend(["## Signature", "", "```text", signature, "```", ""])
     if is_method:
         lines.extend(render_member_parameters(element, known_classes))
-        lines.extend(render_member_return(element, member.description, known_classes))
+        lines.extend(render_member_return(doc.name, element, member.description, known_classes))
     else:
         lines.extend(render_member_property(doc.name, element, class_members["methods"], known_classes))
     if len(summary_parts) > 1:
@@ -930,11 +975,14 @@ def main() -> None:
     """Generate pages, check reproducibility, or print navigation and prose gaps."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--framework", type=Path, default=DOCS_ROOT.parent, help="Path to the Crimson Framework Git checkout")
-    parser.add_argument("--ref", required=True, help="Crimson Framework release tag, for example v0.0.3")
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--ref", help="Crimson Framework release tag, for example v0.0.3")
+    source.add_argument("--working-tree", action="store_true", help="Use current source XML and the staged project addon")
     parser.add_argument("--godot", type=Path, help="Path to the matching Windows Godot console executable")
     parser.add_argument("--binding-docs", type=Path, help="Previously extracted standard Godot class XML directory")
-    parser.add_argument("--publisher-dll", type=Path, help="Trusted debug DLL built from the same release tag")
-    parser.add_argument("--publisher-binding-docs", type=Path, help="Previously extracted trusted Godot class XML directory")
+    publisher = parser.add_mutually_exclusive_group()
+    publisher.add_argument("--publisher-dll", type=Path, help="Matching trusted debug DLL")
+    publisher.add_argument("--publisher-binding-docs", type=Path, help="Previously extracted trusted Godot class XML directory")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--nav", action="store_true", help="Print Mintlify groups JSON")
     mode.add_argument("--gaps", action="store_true", help="Print undocumented declarations in overlay JSON format")
@@ -944,10 +992,15 @@ def main() -> None:
         parser.error("Supply --godot or --binding-docs for the standard release.")
     if args.publisher_dll and args.godot is None:
         parser.error("--publisher-dll requires --godot.")
-    if args.publisher_dll is None and args.publisher_binding_docs is None:
+    if args.ref and args.publisher_dll is None and args.publisher_binding_docs is None:
         parser.error("Supply --publisher-dll or --publisher-binding-docs for the trusted build.")
     try:
-        classes, addon = read_release(args.framework.resolve(), args.ref)
+        framework = args.framework.resolve()
+        if args.working_tree:
+            classes = read_working_tree(framework)
+            addon = framework / "framework" / "project" / Path(ADDON_PATH).parent
+        else:
+            classes, addon = read_release(framework, args.ref)
         runtime = read_bindings(args.binding_docs) if args.binding_docs else reflect(args.godot, addon)
         add_bindings(classes, runtime)
         if args.publisher_binding_docs:
@@ -992,9 +1045,12 @@ def main() -> None:
         sync_pages(CLASS_ROUTE, class_pages | member_pages, args.check)
         sync_pages("api/modules", module_pages, args.check)
         sync_navigation(classes, members, args.check)
+        source_label = args.ref or "the current working tree"
         print(f"{'Verified' if args.check else 'Generated'} {len(class_pages)} class pages, {len(member_pages)} member pages, and "
-              f"{len(module_pages)} module and service area pages for {args.ref}.")
+              f"{len(module_pages)} module and service area pages for {source_label}.")
         print(f"{len(examples)} member pages have authored examples.")
+        if not (args.publisher_binding_docs or args.publisher_dll):
+            print("Trusted publisher pages use authored class XML.")
     except (OSError, ValueError, KeyError, ET.ParseError, subprocess.SubprocessError) as error:
         parser.exit(1, f"{error}\n")
 

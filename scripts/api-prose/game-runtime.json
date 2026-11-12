@@ -25,18 +25,11 @@
       "open_offline": "Open a local authority lobby. Use it before restore to continue from a menu without loading the default world first. Returns a Godot Error.",
       "play_solo": "Mount the configured starting scene and spawn the local player in an offline game. Await the operation before accessing the mounted world or player.",
       "register_command": "Register an authority-side handler for a command name. The handler receives the trusted player ID and the intent dictionary. Set requires_primary to require a current primary character assignment. Returns a Godot Error.",
-      "restore": "Read a checkpoint for profile and slot and activate its saved world and stores through the authority transition pipeline. Leave sequence and generation_id empty to restore the latest generation, or supply both for an exact restore.",
-      "save": "Capture the running authority's committed state and publish a checkpoint generation. Pass display metadata as a dictionary and set autosave to use autosave admission. A successful operation returns the generation sequence and ID in value.",
       "save_history": "Read up to limit generations from a known profile and slot, newest first. Supply both before_sequence and before_id to continue from an exclusive cursor. A successful result includes rows in value, the slot status, a truncated flag, and a next cursor when more rows exist.",
-      "save_slot": "Create a handle for save, history, and restore actions on the specified profile and slot of this game.",
-      "set_projector": "Set the authority's visibility callback. It receives peer ID, player ID, world epoch, and committed revision, and returns a dictionary with ok and view. Its per-recipient view takes precedence over the shared-store list. Returns a Godot Error.",
       "set_shared_stores": "Set the store IDs whose complete records can be published to every bound guest. The default view exposes no shared stores. A custom projector takes precedence. Returns a Godot Error.",
       "start_dedicated": "Mount the starting world as a dedicated direct-address authority. All configured player seats are available to guests. Await the operation for world and admission readiness.",
       "start_dedicated_online": "Mount a playerless authority world and publish it through the configured online provider. Supply the advertised address, or an empty string for a provider-managed route. Await the operation for listing and world readiness.",
-      "start_match": "Start a registered world from the coordinated authority lobby. An empty world uses the definition's starting world. Bind all admitted peers before calling it and await world readiness.",
-      "start_offline": "Open a coordinated offline session, bind the local player, and start the configured world. Await the operation for world readiness.",
-      "submit": "Submit a declared gameplay command and a plain dictionary payload from a ready participant. The returned operation reports the authority's command result. Observe projection_updated separately for visible state changes.",
-      "travel_to": "Activate a registered destination on the coordinated authority while preserving committed match stores. Await the operation before using the replacement world. A preparation failure leaves the prior world available."
+      "submit": "Submit a declared gameplay command and a plain dictionary payload from a ready participant. The returned operation reports the authority's command result. Observe projection_updated separately for visible state changes."
     },
     "signals": {
       "peer_joined": "Emitted when a peer joins the coordinated session roster. The authority can then bind the admitted connection to a verified player ID.",

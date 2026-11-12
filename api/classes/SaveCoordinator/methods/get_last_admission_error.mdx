@@ -1,7 +1,7 @@
 ---
 title: "get_last_admission_error()"
 sidebarTitle: "get_last_admission_error"
-description: "Read the error code from the most recent rejected request."
+description: "Returns the stable code for the most recent admission or setup rejection, or an empty string when the coordinator has no recorded rejection."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -21,4 +21,4 @@ get_last_admission_error() -> String
 
 ## Description
 
-Call immediately after a request returns 0. A rejected request produces no ticket events.
+A later rejection replaces the code and a successful admission clears it. A call from outside the main thread returns `WrongThread`.

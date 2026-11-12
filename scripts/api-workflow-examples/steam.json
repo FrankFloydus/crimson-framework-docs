@@ -1,7 +1,48 @@
 [
   {
+    "title": "Enable online play after Steam connects",
+    "setup": "The title screen enables Online Play when Steam connects and leaves Solo Play available during an outage. Launch the game through Steam.",
+    "code": "extends Control\n\nconst STEAM_CHECK_SECONDS: float = 1.0\n\n@export var online_play: Button\n@export var status: Label\n\nvar _steam: Steamworks\n\nfunc _ready() -> void:\n    online_play.disabled = true\n    _steam = Steamworks.boot(self)\n    var booted: SteamResult = _steam.boot_result()\n    if not booted.ok:\n        status.text = \"Steam unavailable. You can still play solo.\"\n        push_warning(booted.message)\n        return\n\n    var refresh: Timer = Timer.new()\n    refresh.wait_time = STEAM_CHECK_SECONDS\n    refresh.timeout.connect(_refresh_online_status)\n    add_child(refresh)\n    refresh.start()\n    _refresh_online_status()\n\nfunc _refresh_online_status() -> void:\n    var online: bool = _steam.is_ready() and _steam.is_online()\n    online_play.disabled = not online\n    status.text = \"Online play available.\" if online else \"Steam offline. Solo play available.\"\n",
+    "members": [
+      "Steamworks.methods.boot",
+      "Steamworks.methods.boot_result",
+      "Steamworks.methods.is_ready",
+      "Steamworks.methods.is_online"
+    ]
+  },
+  {
+    "title": "Host an invite-only Steam arena",
+    "setup": "Press Host to open a two-player arena, then Invite to choose a Steam friend. Launch the game through Steam.",
+    "code": "extends Node\n\nconst TOTAL_SEATS: int = 2\n\n@export var arena: PackedScene\n@export var player: PackedScene\n@export var host_button: Button\n@export var invite_button: Button\n@export var status: Label\n\nvar _game: Game\n\nfunc _ready() -> void:\n    host_button.disabled = true\n    invite_button.disabled = true\n    var setup: GameConfig = Game.configure(arena, player).steam(null, TOTAL_SEATS)\n    _game = setup.boot(self)\n    var booted: GameResult = _game.boot_result()\n    if not booted.ok:\n        status.text = booted.message\n        return\n    var steam: Steamworks = _game.steam()\n    if not steam.is_ready():\n        status.text = steam.boot_result().message\n        return\n    host_button.pressed.connect(_host)\n    invite_button.pressed.connect(_invite)\n    host_button.disabled = false\n\nfunc _host() -> void:\n    host_button.disabled = true\n    var hosted: GameResult = await _game.host()\n    if not hosted.ok:\n        status.text = hosted.message\n        host_button.disabled = false\n        return\n    status.text = \"Arena open. Lobby %s.\" % hosted.listing_id\n    invite_button.disabled = false\n\nfunc _invite() -> void:\n    var requested: GameResult = _game.invite_friends()\n    status.text = \"Choose a friend in Steam.\" if requested.ok else requested.message\n",
+    "members": [
+      "GameConfig.methods.steam",
+      "Game.methods.steam",
+      "Game.methods.invite_friends",
+      "GameResult.properties.listing_id"
+    ]
+  },
+  {
+    "title": "Find an open Spacewar arena",
+    "setup": "Press Find Game to join an open test arena. Launch both copies in Spacewar with the same test group and have one copy host first.",
+    "code": "extends Node\n\nconst TEST_GROUP: String = \"crimson-arena-test\"\nconst ARENA_ID: StringName = &\"arena\"\n\n@export var arena: PackedScene\n@export var player: PackedScene\n@export var find_game: Button\n@export var status: Label\n\nvar _game: Game\n\nfunc _ready() -> void:\n    find_game.disabled = true\n    var settings: SteamConfig = SteamConfig.spacewar(TEST_GROUP).public_games()\n    var setup: GameConfig = Game.configure(arena, player).world_id(ARENA_ID).steam(settings)\n    _game = setup.boot(self)\n    var booted: GameResult = _game.boot_result()\n    if not booted.ok:\n        status.text = booted.message\n        return\n    find_game.pressed.connect(_find_open_arena)\n    find_game.disabled = false\n\nfunc _find_open_arena() -> void:\n    find_game.disabled = true\n    status.text = \"Finding an open arena…\"\n    var joined: GameResult = await _game.find_and_join()\n    status.text = \"You joined the arena.\" if joined.ok else joined.message\n    find_game.disabled = joined.ok\n",
+    "members": [
+      "SteamConfig.methods.spacewar",
+      "SteamConfig.methods.public_games",
+      "Game.methods.find_and_join"
+    ]
+  },
+  {
+    "title": "Open achievements from the pause menu",
+    "setup": "Press Achievements to request the Steam overlay. This menu shares the Steam attachment of its owning game.",
+    "code": "extends Control\n\n@export var achievements_button: Button\n@export var status: Label\n\nvar _steam: Steamworks\n\nfunc _ready() -> void:\n    var game: Game = Game.for_node(self)\n    achievements_button.disabled = game == null\n    if game == null:\n        status.text = \"No game is attached.\"\n        return\n    _steam = game.steam()\n    achievements_button.pressed.connect(_open_achievements)\n\nfunc _open_achievements() -> void:\n    var requested: SteamResult = _steam.open_achievements()\n    status.text = \"\" if requested.ok else requested.message\n",
+    "members": [
+      "Game.methods.for_node",
+      "Steamworks.methods.open_achievements"
+    ]
+  },
+  {
     "title": "Enable the online menu when Steam connects",
-    "setup": "The main menu enables Online Play when Steam connects and keeps Local Play available when it disconnects. Set `STEAM_APP_ID` to the ID used to [launch your game](/steam/setup#launch-with-an-appid).",
+    "setup": "A standalone Steam client enables Online Play when it connects. A runtime loss disables the button.",
     "code": "extends Control\n\nconst STEAM_APP_ID: int = 480\nconst ONLINE_CHECK_SECONDS: float = 1.0\n\n@export var online_button: Button\n@export var status_label: Label\n\nvar _steam: SteamClient\nvar _online_timer: Timer\n\n\nfunc _ready() -> void:\n    online_button.disabled = true\n    _steam = SteamClient.boot(self, STEAM_APP_ID)\n    if _steam == null:\n        status_label.text = \"Online play unavailable.\"\n        return\n    if not _steam.is_ready():\n        status_label.text = \"Steam startup failed. Local play is available.\"\n        push_warning(_steam.get_initialization_error())\n        return\n\n    _online_timer = Timer.new()\n    _online_timer.wait_time = ONLINE_CHECK_SECONDS\n    _online_timer.timeout.connect(_update_online_menu)\n    add_child(_online_timer)\n    _steam.runtime_lost.connect(_disable_online_menu)\n    _online_timer.start()\n    _update_online_menu()\n\n\nfunc _update_online_menu() -> void:\n    var online: bool = _steam.is_online()\n    online_button.disabled = not online\n    status_label.text = \"Online play ready.\" if online else \"Steam offline. Local play is available.\"\n\n\nfunc _disable_online_menu() -> void:\n    _online_timer.stop()\n    online_button.disabled = true\n    status_label.text = \"Steam closed. Local play is available.\"",
     "members": [
       "SteamClient.methods.boot",
@@ -12,7 +53,7 @@
   },
   {
     "title": "Host a two-player game for Steam friends",
-    "setup": "Press Host to open a two-player arena with one seat available to Steam friends and invitees. The [Steam hosting guide](/steam/listen-servers) shows how to configure the host.",
+    "setup": "A serialized game definition opens a friends-only lobby for a two-player arena.",
     "code": "extends Node\n\nconst STEAM_APP_ID: int = 480\nconst LOBBY_NAMESPACE: String = \"crimson-arena\"\nconst ARENA_ID: StringName = &\"arena\"\nconst TOTAL_SEATS: int = 2\n\n@export var host_button: Button\n@export var status_label: Label\n@export var arena_scene: PackedScene\n@export var player_scene: PackedScene\n\nvar game: GameRuntime\n\nfunc _ready() -> void:\n    if host_button == null or status_label == null:\n        push_error(\"Assign the Host button and status label.\")\n        return\n    host_button.pressed.connect(_host_for_friends)\n\nfunc _host_for_friends() -> void:\n    if arena_scene == null or player_scene == null:\n        status_label.text = \"Assign the arena and player scenes.\"\n        return\n\n    host_button.disabled = true\n    var provider: SteamProvider = (\n        SteamProvider.configure()\n        .for_app(STEAM_APP_ID)\n        .with_lobby_namespace(LOBBY_NAMESPACE)\n        .friends_only()\n    )\n    var rules: MultiplayerRules = MultiplayerRules.listen_coop().with_max_players(TOTAL_SEATS)\n    var definition: GameDefinition = (\n        GameRuntime.configure()\n        .with_starting_world(ARENA_ID, arena_scene)\n        .with_player(player_scene)\n        .with_multiplayer(rules)\n        .with_provider(provider)\n    )\n    game = definition.boot(self)\n    if game == null:\n        status_label.text = \"Could not create the game.\"\n        host_button.disabled = false\n        return\n\n    status_label.text = \"Opening the arena…\"\n    var result: Dictionary = await game.host_online().wait()\n    if not result.ok:\n        status_label.text = result.message\n        game.queue_free()\n        game = null\n        host_button.disabled = false\n        return\n\n    status_label.text = \"Arena open to friends. Lobby %s\" % game.get_online_listing()",
     "members": [
       "SteamProvider.methods.configure",

@@ -1,5 +1,4 @@
 {
-  "DedicatedServerBoot.set_game": "game",
   "GameDefinition.set_app_id": "app_id",
   "GameDefinition.set_multiplayer_rules": "rules",
   "GameDefinition.set_player_scene": "scene",

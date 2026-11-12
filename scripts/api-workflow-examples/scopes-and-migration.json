@@ -1,0 +1,19 @@
+[
+  {
+    "title": "Start a world from an existing game definition",
+    "setup": "Boot from your existing definition and start its saved world offline. [Move an existing project to code-first actions](/migration#keep-a-saved-game-definition)",
+    "code": "extends Node\n\n@export var previous_definition: GameDefinition\n\n\nfunc _ready() -> void:\n    if previous_definition == null:\n        push_error(\"Assign the existing game definition before starting.\")\n        return\n\n    var game: Game = GameConfig.from_definition(previous_definition).boot(self)\n    var started: GameResult = await game.play()\n    if not started.ok:\n        push_error(started.message)\n        return\n\n    print(\"The saved starting world is ready.\")\n",
+    "members": [
+      "GameConfig.methods.from_definition"
+    ]
+  },
+  {
+    "title": "Choose the match for an external debug panel",
+    "setup": "Select the live match when both a preview and a match own game scopes. Clear the selection to return to automatic lookup. [Set up the debug panel](/game-services#select-a-game-from-a-debug-panel)",
+    "code": "extends CheckButton\n\n@export var match_owner: Node\n\n\nfunc _ready() -> void:\n    toggled.connect(_select_default)\n\n\nfunc _select_default(use_match: bool) -> void:\n    var selected: Game\n    if use_match:\n        selected = Game.for_node(match_owner)\n        if selected == null:\n            set_pressed_no_signal(false)\n            push_warning(\"Start the match before selecting it.\")\n            return\n\n    var status: int = Game.set_default(selected)\n    if status != OK:\n        set_pressed_no_signal(not use_match)\n        push_error(\"Could not update the default game.\")\n        return\n\n    var current: Game = Game.current()\n    if current == null:\n        print(\"No default game selected.\")\n    else:\n        print(\"Debug game phase: %d\" % current.get_phase())\n",
+    "members": [
+      "Game.methods.current",
+      "Game.methods.set_default"
+    ]
+  }
+]

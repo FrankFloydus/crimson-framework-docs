@@ -1,0 +1,123 @@
+---
+title: "Game scopes and service overrides"
+description: "Pass a game into your scene, resolve the nearest scope, and provide a transport when you need to."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Boot once from a persistent node such as `Main`. [`Game.configure(LEVEL, PLAYER).boot(self)`](/api/classes/Game/methods/configure) gives you a [`Game`](/api/classes/Game) handle for that scene branch. Pass it directly to menus and other consumers you wire up in the boot script.
+
+## Find the game from a pause menu
+
+A reusable menu can call [`Game.for_node(self)`](/api/classes/Game/methods/for_node) after its owner has booted. It gets the game for the nearest owning branch. Attach this script to a **Return to title** button inside the pause menu. Assign both menus in the Inspector. When the player clicks the button, the script waits for the active session to end before switching menus.
+
+```gdscript
+extends Button
+
+@export var pause_menu: Control
+@export var title_menu: Control
+
+
+func _ready() -> void:
+    pressed.connect(_return_to_title)
+
+
+func _return_to_title() -> void:
+    var game: Game = Game.for_node(self)
+    if game == null:
+        push_error("No game owns this pause menu.")
+        return
+
+    disabled = true
+    var result: GameResult = await game.leave()
+    disabled = false
+
+    if not result.ok:
+        push_error(result.message)
+        return
+
+    pause_menu.hide()
+    title_menu.show()
+```
+
+## Select a game from a debug panel
+
+[`Game.current()`](/api/classes/Game/methods/current) returns the selected game or the only live game. When several games are live and none is selected, it returns `null`. If your project has a preview and a match running together, attach this script to a **Use match as default** check button outside both branches. Assign the match's boot owner to **Match Owner**. Turning the button on selects that game with [`Game.set_default()`](/api/classes/Game/methods/set_default) so debug tools can look it up. Turning it off clears the selection.
+
+```gdscript
+extends CheckButton
+
+@export var match_owner: Node
+
+
+func _ready() -> void:
+    toggled.connect(_select_default)
+
+
+func _select_default(use_match: bool) -> void:
+    var selected: Game
+    if use_match:
+        selected = Game.for_node(match_owner)
+        if selected == null:
+            set_pressed_no_signal(false)
+            push_warning("Start the match before selecting it.")
+            return
+
+    var status: int = Game.set_default(selected)
+    if status != OK:
+        set_pressed_no_signal(not use_match)
+        push_error("Could not update the default game.")
+        return
+
+    var current: Game = Game.current()
+    if current == null:
+        print("No default game selected.")
+    else:
+        print("Debug game phase: %d" % current.get_phase())
+```
+
+## Know when a handle expires
+
+[`game.leave()`](/api/classes/Game/methods/leave) ends the session or cancels a pending start. The owner remains attached, so the same game can start another session. When the owner exits the scene tree, Crimson retires its attachment. A retained game handle and its scoped services cannot act on a replacement game. Boot again after the new owner enters the tree and give consumers the new handle.
+
+## Override the LAN transport
+
+LAN uses ENet by default. To exercise your project's provider path during a local smoke test, register a factory that logs when the transport is created and returns a fresh ENet adapter. Later you can have the factory supply a different [`SessionTransport`](/api/classes/SessionTransport) without changing the menu’s game actions.
+
+Make a second copy of the [LAN project](/multiplayer-quickstart) in another folder. In that copy, replace `main.gd` with this script to start the host automatically. It prints `Created the test transport.` when boot resolves the provider. Run the original project and press **J** to join.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://world.tscn")
+const PLAYER: PackedScene = preload("res://player.tscn")
+const LOOPBACK_ADDRESS: String = "127.0.0.1"
+
+var game: Game
+
+
+class TestTransportProvider extends GameProvider:
+    func _register(bindings: GameBindings) -> void:
+        var status: int = bindings.session_transport(_make_transport)
+        if status != OK:
+            push_error("Could not register the test transport.")
+
+
+    func _make_transport() -> SessionTransport:
+        print("Created the test transport.")
+        return ENetSessionTransport.new()
+
+
+func _ready() -> void:
+    var provider: GameProvider = TestTransportProvider.new()
+    game = Game.configure(LEVEL, PLAYER).lan().provider(provider).boot(self)
+
+    var result: GameResult = await game.host(LOOPBACK_ADDRESS)
+    if not result.ok:
+        push_error(result.message)
+        return
+
+    print("Test host ready.")
+```
+
+[`GameConfig.provider()`](/api/classes/GameConfig/methods/provider) calls the [`GameProvider`](/api/classes/GameProvider) hook during boot. Register the factory with [`GameBindings.session_transport()`](/api/classes/GameBindings/methods/session_transport). Crimson seals the bindings and resolves the factory on the scene thread before attaching the game. Each boot needs its own adapter. Use the transport override with direct LAN play. A configured Steam or other online provider owns its connection. [Migrate an existing project](/migration)

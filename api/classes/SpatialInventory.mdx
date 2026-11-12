@@ -12,10 +12,11 @@ description: "A native grid inventory keyed by game-supplied item instance IDs."
 
 ## Description
 
-Stores rectangular footprints, their zero-based top-left cells, and rotation. The game owns the item records and provides a stable, nonempty `StringName` instance ID for each placement. A rotated footprint swaps width and height. Call `configure()` or `import_snapshot()` before placing items. Use the grid from the main thread.
+Stores rectangular footprints, their zero-based top-left cells, and rotation. The game owns the item records and provides a stable, nonempty `StringName` instance ID for each placement. A rotated footprint swaps width and height. Use `Inventory.grid()` to create a configured grid, or call `configure()` or `import_snapshot()` on a detached grid. Use the grid from the main thread.
 
 ## Examples
 
+- [Pack a starting kit](/api/classes/SpatialInventory/methods/add#example)
 - [Pick up a keycard and open the airlock](/api/classes/SpatialInventory/methods/configure#example)
 
 ## Methods
@@ -27,6 +28,10 @@ Stores rectangular footprints, their zero-based top-left cells, and rotation. Th
 Compares current placements with expected values and atomically applies the changes across grids.
 
 ### Instance methods
+
+#### [`add`](/api/classes/SpatialInventory/methods/add)
+
+Place an unused instance ID in the first legal position in row-major order.
 
 #### [`check_move`](/api/classes/SpatialInventory/methods/check_move)
 
@@ -83,6 +88,14 @@ Validates a snapshot from `export_snapshot()` and replaces the current grid on s
 #### [`is_placement_deltas_enabled`](/api/classes/SpatialInventory/methods/is_placement_deltas_enabled)
 
 Returns whether this grid emits `placements_changed`.
+
+#### [`item_at`](/api/classes/SpatialInventory/methods/item_at)
+
+Return a detached typed placement snapshot of the item occupying the zero-based `cell`, or `null` if it is empty or outside the grid.
+
+#### [`items`](/api/classes/SpatialInventory/methods/items)
+
+Return a detached array of typed placement snapshots.
 
 #### [`remove`](/api/classes/SpatialInventory/methods/remove)
 

@@ -17,9 +17,6 @@
       "set_manage_admission": "Selects who manages the host admission gate. The default is `true`. Set `false` when the orchestrator closes admission before a host transition and holds it through confirmation. Returns `ERR_BUSY` while a transition is active or this loader holds a gate.",
       "set_world_container": "Assigns a live container in the manager's scene tree. Reserve the child name `World` for the loader. Keep the current container while a managed world is mounted."
     },
-    "properties": {
-      "process_mode": "Defaults to `Node.PROCESS_MODE_ALWAYS` so scene preparation and transition deadlines continue while the scene tree is paused."
-    },
     "signals": {
       "load_completed": "Emits after the offline scene mounts or the multiplayer host confirms activation by all participants. An orchestrator can wait for a separate gameplay baseline before opening input.",
       "load_failed": "Emits for cancellation or failure before commit, including a rejected publisher or peer membership changes. The existing world stays mounted.",
@@ -43,9 +40,6 @@
       "reset": "Drops active streams, the current epoch, and the revision. Keeps the configured projector.",
       "send_baseline": "Sends a fresh snapshot from the authority to the registered peer after it has mounted the matching scene. Returns immediate errors. Wait for `peer_ready` before admitting that peer's commands.",
       "set_projector": "Sets a synchronous callback receiving `(peer_id, player_id, world_epoch, committed_revision)`. Return a dictionary with `ok` set to `true` and `view` set to a bounded dictionary of records visible to that player. Configure before registering peers and keep the callback free of side effects."
-    },
-    "properties": {
-      "process_mode": "Defaults to `Node.PROCESS_MODE_ALWAYS` so replication transport and timeout checks continue while the scene tree is paused."
     },
     "signals": {
       "peer_ready": "Emits on the authority after the matching baseline acknowledgment and successful catch-up for the given world epoch and binding generation.",

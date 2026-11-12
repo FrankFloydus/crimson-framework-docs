@@ -52,19 +52,6 @@
       "with_max_players": "Return a copy with the total seat count. Listen hosting supports 2 through 64 players, including the host. Dedicated hosting supports 1 through 64 guests."
     }
   },
-  "GameOperation": {
-    "description": "A handle for one GameRuntime action. Observe its completion and read the result dictionary, which includes ok, code, and message along with any action-specific fields.",
-    "methods": {
-      "is_finished": "Return true after the operation has settled, whether it succeeded or failed.",
-      "wait": "Use await in GDScript to receive the result dictionary. While pending, this method returns the completion signal. Once settled, it returns a copy of the result immediately."
-    },
-    "properties": {
-      "result": "A read-only copy of the operation's result. It is empty until the operation has settled."
-    },
-    "signals": {
-      "completed": "Emitted once when the operation settles, with a copy of its result dictionary."
-    }
-  },
   "SaveSlot": {
     "description": "A handle for one checkpoint slot in a named profile. Obtain it from GameRuntime.save_slot. The originating GameRuntime must remain in the scene tree for storage operations.",
     "methods": {

@@ -1,53 +1,51 @@
 ---
 title: Steamworks
-description: "Choose how your Godot game uses Steam through Crimson Framework."
+description: "Connect your Godot project to Steam and choose the features your game needs."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Add Steam to the parts of your game that need it. A solo game can award achievements, sync a player profile to Steam Cloud, or use Steam Input. A multiplayer game can let friends invite each other into a session or give players a dedicated server to join.
+Use Steam for app services such as achievements and Cloud, or add it as the connection for a multiplayer game. Both use the Steam client and the AppID supplied at launch.
 
 ## Connect your game to Steam
 
-Add Valve's runtime to your Crimson installation and sign in to Steam. For a development launch, configure the same AppID in the launch environment and in this script. The default is Valve's Spacewar test app. [Steamworks setup](/steam/setup#launch-with-an-appid)
-
-Attach this script to a `Node` in a scene that stays loaded, such as your main menu. Run the scene and check **Output**. A successful connection prints the AppID Steam reports.
+Attach this script to a persistent `Node` in your main scene. Launch with the Steam client running and signed in. For a direct Spacewar test, follow the setup guide to launch under AppID `480`. The script reports which app connected and whether Steam is online. [Launch with an AppID](/steam/setup#launch-with-an-appid)
 
 ```gdscript
 extends Node
 
-const SPACEWAR_APP_ID: int = 480
+const TEST_GROUP: String = "my-studio-training"
 
-@export var steam_app_id: int = SPACEWAR_APP_ID
+@export var use_spacewar: bool = false
 
-var _steam: SteamClient
+var _steam: Steamworks
 
 
 func _ready() -> void:
-    _steam = SteamClient.boot(self, steam_app_id)
-    if _steam == null:
-        push_error("Could not attach the Steam client.")
-        return
-    if not _steam.is_ready():
-        push_error(_steam.get_initialization_error())
+    var settings: SteamConfig
+    if use_spacewar:
+        settings = SteamConfig.spacewar(TEST_GROUP)
+
+    _steam = Steamworks.boot(self, settings)
+    var result: SteamResult = _steam.boot_result()
+    if not result.ok:
+        push_error(result.message)
         return
 
-    if not _steam.is_online():
-        push_warning("Steam initialized locally. Steam is currently offline.")
-        return
-
-    print("Connected to Steamworks for AppID %d." % _steam.get_app_id())
+    print("Steam AppID %d ready. Online: %s" % [_steam.get_app_id(), _steam.is_online()])
 ```
 
-[`SteamClient.boot()`](/api/classes/SteamClient/methods/boot) attaches and initializes the client. [`is_ready()`](/api/classes/SteamClient/methods/is_ready) checks local initialization. [`is_online()`](/api/classes/SteamClient/methods/is_online) checks the connection to Steam. If initialization fails, use the diagnostic in **Output** to check your runtime and launch setup. [Test and troubleshoot](/steam/testing#diagnose-common-failures)
+Enable **Use Spacewar** when running this script under AppID `480`. For your own app, leave it off to use the AppID Steam supplies. [SteamConfig](/api/classes/SteamConfig) · [Steamworks.boot()](/api/classes/Steamworks/methods/boot)
+
+A multiplayer game that boots with [`Game.configure(LEVEL, PLAYER).steam().boot(self)`](/api/classes/GameConfig/methods/steam) already has Steam services. Read them through [`game.steam()`](/api/classes/Game/methods/steam). [Host and join a Steam game](/steam/listen-servers)
 
 ## Choose a guide
 
-| What you want to build | Start here |
-| --- | --- |
-| Add achievements, Cloud saves, or Steam Input | [Use Steam client services](/steam/client-services) |
-| Let players host and invite friends | [Set up lobbies and listen servers](/steam/listen-servers) |
-| Run a server that players can join without a player hosting it | [Set up a dedicated server](/steam/dedicated-servers) |
-| Verify player ownership or process Steam Wallet purchases | [Set up a trusted publisher backend](/steam/publisher) |
-
-Verify the features you use in a Windows export. [Test and troubleshoot](/steam/testing)
+<CardGroup cols={2}>
+  <Card title="Setup and Windows exports" href="/steam/setup">Stage the Steam runtime and launch with the right AppID.</Card>
+  <Card title="Steam app services" href="/steam/client-services">Open achievements, record progression, and save files to Cloud.</Card>
+  <Card title="Lobbies and listen servers" href="/steam/listen-servers">Host, invite a friend, or find a public game.</Card>
+  <Card title="Dedicated servers" href="/steam/dedicated-servers">Run a playerless authority and connect a Steam guest.</Card>
+  <Card title="Trusted publisher services" href="/steam/publisher">Verify tickets and run publisher operations on your backend.</Card>
+  <Card title="Testing and troubleshooting" href="/steam/testing">Check startup, multiplayer, and the features your app ships.</Card>
+</CardGroup>

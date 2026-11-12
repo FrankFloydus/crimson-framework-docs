@@ -31,23 +31,23 @@ An empty successful result means no matching listings.
 
 ### Let the player pick a nearby arena server
 
-In the arena menu, refresh to find nearby servers with an open seat, then select an arena and join it. Use the AppID, namespace, and game definition of your [advertised server](/steam/dedicated-servers#list-the-server-in-steam).
+Refresh to find open arenas below the ping limit, then select one and press Join. Launch the client with the same Steam app and game build as the servers.
 
 ```gdscript
 extends Control
 
-const APP_ID: int = 480
-const SESSION_NAMESPACE: String = "my-studio-arena"
+const ARENA_ID: StringName = &"arena"
 const MAX_PING_MS: int = 120
 const MIN_FREE_SEATS: int = 1
 
-@export var game_definition: GameDefinition
+@export var arena: PackedScene
+@export var player: PackedScene
 @export var refresh_button: Button
 @export var join_button: Button
 @export var server_rows: ItemList
 @export var status_label: Label
 
-var _game: GameRuntime
+var _game: Game
 var _browser: SteamServerBrowser
 var _listings: Array[SteamListing] = []
 
@@ -55,16 +55,15 @@ var _listings: Array[SteamListing] = []
 func _ready() -> void:
     refresh_button.disabled = true
     join_button.disabled = true
-    var provider: SteamProvider = SteamProvider.configure().for_app(APP_ID)
-    provider = provider.with_lobby_namespace(SESSION_NAMESPACE)
-    _game = game_definition.with_provider(provider).boot(self)
-    if _game == null:
-        status_label.text = "Could not prepare the arena session."
+    var setup: GameConfig = Game.configure(arena, player).world_id(ARENA_ID).steam()
+    _game = setup.boot(self)
+    var booted: GameResult = _game.boot_result()
+    if not booted.ok:
+        status_label.text = booted.message
         return
-
-    var steam: SteamScope = SteamServices.for_game(_game)
-    if steam == null or not steam.is_ready():
-        status_label.text = "Start Steam and launch the game again."
+    var steam: Steamworks = _game.steam()
+    if not steam.is_ready():
+        status_label.text = steam.boot_result().message
         return
     _browser = steam.server_browser()
     if _browser == null or not _browser.is_available():
@@ -86,7 +85,7 @@ func _refresh() -> void:
     status_label.text = "Finding nearby arenas…"
 
     var query: SteamServerQuery = _browser.query()
-    query = query.on_map(game_definition.starting_world)
+    query = query.on_map(ARENA_ID)
     query = query.with_room_for(MIN_FREE_SEATS).under_latency(MAX_PING_MS)
     var found: SteamListingsResult = await query.fetch()
     refresh_button.disabled = false
@@ -126,7 +125,7 @@ func _join_selected() -> void:
     status_label.text = "Joining %s (%d ms)…" % [
         checked.value.listing.name, checked.value.ping_ms
     ]
-    var joined: Dictionary = await _game.join_listing(checked.value.listing).wait()
+    var joined: GameResult = await _game.join_listing(checked.value.listing)
     if not joined.ok:
         status_label.text = joined.message
         refresh_button.disabled = false

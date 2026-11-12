@@ -1,108 +1,83 @@
 ---
-title: Steam client services
-description: "Connect your game to Steam and use achievements, Cloud saves, the Overlay, and other player features."
+title: Steam app services
+description: "Use achievements, stats, Cloud, and other Steam services with or without multiplayer."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Use the Steam client services when you want player features in your game. You can start with one feature, such as saving a profile to Steam Cloud, and add others as you need them.
+Start Steamworks from a persistent scene node for app services alone. If your game already uses a Steam connection, get the services from the same game. Make the calls on Godot's main thread.
 
 ## Start a client
 
-Choose the path that owns your Steam connection. A game can start a standalone client for player features, or reuse the Steam scope already attached by its multiplayer provider. [Steamworks setup](/steam/setup)
-
 ### Start a standalone client
 
-Attach this script to a node that stays in the scene tree when your game changes levels. [`SteamClient.boot()`](/api/classes/SteamClient/methods/boot) attaches a client and starts its Steam scope. `STEAM_APP_ID` uses Valve's Spacewar AppID. Set it to your game's AppID and match it to the [launch setup](/steam/setup#launch-with-an-appid). Run the scene and check **Output** for `Steam online` and the game's language.
+Use [`Steamworks.boot(self)`](/api/classes/Steamworks/methods/boot) when your project only needs Steam app services. The [connection script](/steam/overview#connect-your-game-to-steam) prints the confirmed AppID and connection state. It selects [`SteamConfig.spacewar()`](/api/classes/SteamConfig/methods/spacewar) for a development launch or accepts your app's normal Steam launch context. [Launch with an AppID](/steam/setup#launch-with-an-appid)
+
+[`boot_result()`](/api/classes/Steamworks/methods/boot_result) reports how the attachment attempt ended. [`is_ready()`](/api/classes/Steamworks/methods/is_ready) checks whether the original client is still usable. [`is_online()`](/api/classes/Steamworks/methods/is_online) checks the live connection to Steam. Steam Offline Mode can still provide some cached features.
+
+### Reuse a Steam game's attachment
+
+On a Steam multiplayer project, get the service through [`game.steam()`](/api/classes/Game/methods/steam). This startup script reads the configured Steam language from the same scope that will host or join. It uses the scene paths from Getting Started and your normal Steam launch AppID. Use `.steam(SteamConfig.spacewar(TEST_GROUP))` with your own test group for a Spacewar launch as shown in the listen server guide. [Host and join a Steam game](/steam/listen-servers)
 
 ```gdscript
 extends Node
 
-const STEAM_APP_ID: int = 480
+const LEVEL: PackedScene = preload("res://world.tscn")
+const PLAYER: PackedScene = preload("res://player.tscn")
+
+var game: Game
+var steam: Steamworks
+
 
 func _ready() -> void:
-    var steam: SteamClient = SteamClient.boot(self, STEAM_APP_ID)
-    if steam == null:
-        push_error("Could not attach the Steam client.")
-        return
-    if not steam.is_ready():
-        push_error(steam.get_initialization_error())
+    game = Game.configure(LEVEL, PLAYER).steam().boot(self)
+    steam = game.steam()
+    var startup: SteamResult = steam.boot_result()
+    if not startup.ok:
+        push_warning(startup.message)
         return
 
-    var apps: SteamApps = steam.apps()
-    if apps != null:
-        print("Steam game language: ", apps.current_language())
-    print("Steam online: ", steam.is_online())
+    print("Steam game language: %s" % steam.apps().current_language())
 ```
 
-[`is_ready()`](/api/classes/SteamClient/methods/is_ready) tells you whether the local Steam client initialized. [`is_online()`](/api/classes/SteamClient/methods/is_online) checks whether it is connected. In Steam Offline Mode, some cached features may still be available. Call Steam services from Godot's main thread.
-
-### Reuse a game's Steam provider
-
-Attach this script to a node in your game scene. Call `print_game_steam_language(game)` after your [`GameRuntime`](/api/classes/GameRuntime) is attached with a Steam provider. [`SteamServices.for_game(game)`](/api/classes/SteamServices/methods/for_game) returns its [`SteamScope`](/api/classes/SteamScope). The script handles both a missing scope and an initialization failure. [Set up a Steam game](/steam/listen-servers)
-
-```gdscript
-extends Node
-
-func print_game_steam_language(game: GameRuntime) -> void:
-    var scope: SteamScope = SteamServices.for_game(game)
-    if scope == null:
-        push_warning("This game has no Steam scope.")
-        return
-    if not scope.is_ready():
-        var reason: String = scope.get_initialization_error()
-        push_warning(reason if not reason.is_empty() else "The Steam scope is unavailable.")
-        return
-
-    var apps: SteamApps = scope.apps()
-    if apps != null:
-        print("Steam game language: ", apps.current_language())
-```
-
-Use the scope's [`is_ready()`](/api/classes/SteamScope/methods/is_ready) and [`get_initialization_error()`](/api/classes/SteamScope/methods/get_initialization_error) to check that attachment. Get the scope and service handles again when you replace the game. This function resolves both handles each time it runs.
+The game facade and standalone Steamworks each belong to one attachment. Removing their owning node from the tree retires its services. A second consumer in the process can continue to use its own Steam scope.
 
 ### Recover a standalone client
 
-If your game loses its local connection to the Steam client process, a standalone [`SteamClient`](/api/classes/SteamClient) emits [`runtime_lost`](/api/classes/SteamClient#runtime_lost). Attach this script to a persistent node to start a client and try one restart each time it loses the runtime. Set `STEAM_APP_ID` for your project.
+If Steam loses its local client connection, the standalone facade emits [`runtime_lost`](/api/classes/Steamworks#runtime_lost). This script defers a fresh boot until the callback returns. Run it on a persistent node with your app's launch AppID. It prints the app language again when the fresh attachment is ready.
 
 ```gdscript
 extends Node
 
-const STEAM_APP_ID: int = 480
+var _steam: Steamworks
 
-var _client: SteamClient
 
 func _ready() -> void:
-    _client = SteamClient.boot(self, STEAM_APP_ID)
-    if _client == null:
-        push_error("Could not attach the Steam client.")
-        return
-    if not _client.is_ready():
-        push_error(_client.get_initialization_error())
+    _attach_steam()
+
+
+func _attach_steam() -> void:
+    _steam = Steamworks.boot(self)
+    var startup: SteamResult = _steam.boot_result()
+    if not startup.ok:
+        push_warning(startup.message)
         return
 
-    _client.runtime_lost.connect(_restart_steam_client, CONNECT_DEFERRED)
+    _steam.runtime_lost.connect(_on_runtime_lost, CONNECT_ONE_SHOT)
+    print("Steam game language: %s" % _steam.apps().current_language())
 
-func _restart_steam_client() -> void:
-    if not is_instance_valid(_client) or not _client.is_inside_tree():
-        return
-    var restart_error: Error = _client.start(STEAM_APP_ID)
-    if restart_error != OK:
-        push_warning(_client.get_initialization_error())
-        return
 
-    var apps: SteamApps = _client.apps()
-    if apps != null:
-        print("Steam game language after restart: ", apps.current_language())
+func _on_runtime_lost() -> void:
+    _attach_steam.call_deferred()
 ```
 
-The deferred connection calls [`start()`](/api/classes/SteamClient/methods/start) after the failure callback returns. After a successful restart, ask the client for fresh handles, as shown by the call to [`apps()`](/api/classes/SteamClient/methods/apps). A temporary loss of connectivity to Valve keeps the local scope active.
+Resolve new service handles after reattaching. A temporary loss of connectivity to Valve keeps the local scope active. Existing integrations can continue to use [`SteamClient`](/api/classes/SteamClient) and [`SteamServices.for_game(game_runtime)`](/api/classes/SteamServices/methods/for_game).
 
 ## Choose a service
 
 | Use case | Service |
 | --- | --- |
-| App language, installed DLC, branch, and notification launch IDs | [SteamApps](/api/classes/SteamApps) through [`apps()`](/api/classes/SteamClient/methods/apps) |
+| App language, installed DLC, branch, and notification launch IDs | [SteamApps](/api/classes/SteamApps) through [`apps()`](/api/classes/Steamworks/methods/apps) |
 | Friends, localized display status, and Steam panes | [SteamFriends](/api/classes/SteamFriends), [SteamPresence](/api/classes/SteamPresence), and [SteamOverlay](/api/classes/SteamOverlay) |
 | Stats, achievements, and ranked results | [SteamStats](/api/classes/SteamStats) and [SteamLeaderboards](/api/classes/SteamLeaderboards) |
 | Files, quota, shared files, and write batch hints | [SteamCloud](/api/classes/SteamCloud) |
@@ -112,9 +87,77 @@ The deferred connection calls [`start()`](/api/classes/SteamClient/methods/start
 | Steam HTTP requests and redacted SDK warnings | [SteamHttp](/api/classes/SteamHttp) and [SteamDiagnostics](/api/classes/SteamDiagnostics) |
 | Web tickets and checkout | [SteamAuth](/api/classes/SteamAuth) and [SteamPurchases](/api/classes/SteamPurchases), with a [publisher backend](/steam/publisher) |
 
+## Open the Steam Overlay
+
+Attach this script to a persistent node and assign an **Achievements** button. Press it to request the achievements panel through [`Steamworks.open_achievements()`](/api/classes/Steamworks/methods/open_achievements). The example uses your app's launch AppID. On a Steam multiplayer project, use the Steamworks attachment supplied by `game.steam()`.
+
+```gdscript
+extends Node
+
+@export var achievements_button: Button
+
+var _steam: Steamworks
+
+
+func _ready() -> void:
+    _steam = Steamworks.boot(self)
+    achievements_button.pressed.connect(_open_achievements)
+
+
+func _open_achievements() -> void:
+    var request: SteamResult = _steam.open_achievements()
+    if not request.ok:
+        push_warning(request.message)
+```
+
+A successful result means Steam received the request. Verify that the panel appears in a rendered window. Enable the Overlay in Steam and use the early Overlay argument for direct development launches. Use [`activation_changed(active)`](/api/classes/SteamOverlay#activation_changed) to suspend local gameplay input and restore focus when the Overlay closes. Keep the multiplayer simulation running. [Graphical launch setup](/steam/setup#launch-with-an-appid) · [Overlay test](/steam/testing#check-the-overlay-and-achievements)
+
+## Unlock an achievement
+
+Publish an achievement for your AppID that the client can update. Replace the sample API name and call `record_training_completed()` when your training objective succeeds. Attach this script to a persistent node to keep receiving callbacks when the player changes levels.
+
+```gdscript
+extends Node
+
+const TRAINING_COMPLETE: String = "TRAINING_COMPLETE"
+const STEAM_RESULT_OK: int = 1
+
+var _steam: Steamworks
+
+
+func _ready() -> void:
+    _steam = Steamworks.boot(self)
+    var startup: SteamResult = _steam.boot_result()
+    if not startup.ok:
+        push_warning(startup.message)
+        return
+
+    var stats: SteamStats = _steam.stats()
+    stats.stats_stored.connect(_on_stats_stored)
+    stats.achievement_stored.connect(_on_achievement_stored)
+
+
+func record_training_completed() -> void:
+    var submission: SteamStatsSubmissionResult = _steam.achievements().unlock(TRAINING_COMPLETE)
+    if not submission.ok:
+        push_warning(submission.message)
+
+
+func _on_stats_stored(steam_result: int) -> void:
+    if steam_result != STEAM_RESULT_OK:
+        push_warning("Steam could not store stats: %d" % steam_result)
+
+
+func _on_achievement_stored(name: String, current: int, maximum: int) -> void:
+    if name == TRAINING_COMPLETE and current == 0 and maximum == 0:
+        print("Steam reported a full training achievement unlock.")
+```
+
+[`unlock()`](/api/classes/SteamAchievements/methods/unlock) applies the achievement edit and asks Steam to store it. A successful submission confirms that request. [`stats_stored`](/api/classes/SteamStats#stats_stored) reports the app-wide store callback. [`achievement_stored`](/api/classes/SteamStats#achievement_stored) reports the named achievement, with zero progress and maximum for a full unlock. Confirm persistence by reading the achievement after a fresh launch, and observe a new unlock notification separately in a rendered test. [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
+
 ## Record progression
 
-Use your own AppID. In Steamworks, publish an integer stat and an achievement that the client can update. Set the script constants to their exact API names. When one game event changes several values, collect them with [`edit()`](/api/classes/SteamStats/methods/edit) and apply them together with [`submit()`](/api/classes/SteamStatsEdit/methods/submit). Attach this script to a node and call `record_win()` after a victory. Pass the [`SteamStats`](/api/classes/SteamStats) service from your [client](/api/classes/SteamClient/methods/stats) or [game scope](/api/classes/SteamScope/methods/stats) and the player's total number of wins. [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
+Use your own AppID. In Steamworks, publish an integer stat and an achievement that the client can update. Set the script constants to their exact API names. When one game event changes several values, collect them with [`edit()`](/api/classes/SteamStats/methods/edit) and apply them together with [`submit()`](/api/classes/SteamStatsEdit/methods/submit). Attach this script to a node and call `record_win()` after a victory. Pass the [`SteamStats`](/api/classes/SteamStats) service from [`steam.stats()`](/api/classes/Steamworks/methods/stats) on your standalone or game-owned Steamworks attachment and the player's total number of wins. [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
 
 ```gdscript
 extends Node
@@ -141,7 +184,7 @@ The result describes the submission. [`value.applied`](/api/classes/SteamStatsSu
 
 ## Save a profile to Cloud
 
-Enable Cloud and allocate quota for your own AppID in Steamworks. Use a test account with access to that app when testing writes. Get a [`SteamCloud`](/api/classes/SteamCloud) service from a ready [`SteamClient`](/api/classes/SteamClient/methods/cloud) or [`SteamScope`](/api/classes/SteamScope/methods/cloud). Choose one of the scripts below and attach it to a node. Call its save function with that service and your serialized bytes. Use a dedicated file key for the game's profile.
+Enable Cloud and allocate quota for your own AppID in Steamworks. Use a test account with access to that app when testing writes. Get a [`SteamCloud`](/api/classes/SteamCloud) service from [`steam.cloud()`](/api/classes/Steamworks/methods/cloud) on your standalone or game-owned Steamworks attachment. Choose one of the scripts below and attach it to a node. Call its save function with that service and your serialized bytes. Use a dedicated file key for the game's profile.
 
 ### Await the result directly
 
@@ -252,45 +295,6 @@ func write_profile_batch(
 ```
 
 [`SteamCloudWriteBatch.close()`](/api/classes/SteamCloudWriteBatch/methods/close) ends the hint. Check actual sync on a second device using the same test account. [Verify Steam Cloud sync](/steam/testing#verify-steam-cloud-sync)
-
-## Open the Steam Overlay
-
-Attach this script to a node. In the Inspector, assign the achievements button and either a standalone Steam client or a game configured with a Steam provider. Each press gets the current service through [`SteamClient.overlay()`](/api/classes/SteamClient/methods/overlay) or [`SteamScope.overlay()`](/api/classes/SteamScope/methods/overlay). The script checks [`is_ready()`](/api/classes/SteamOverlay/methods/is_ready) before calling [`open_achievements()`](/api/classes/SteamOverlay/methods/open_achievements).
-
-```gdscript
-extends Node
-
-@export var achievements_button: BaseButton
-@export var steam_client: SteamClient
-@export var game: GameRuntime
-
-func _ready() -> void:
-    if achievements_button == null:
-        push_warning("Assign the achievements button in the Inspector.")
-        return
-    achievements_button.pressed.connect(_open_steam_achievements)
-
-func _open_steam_achievements() -> void:
-    var overlay: SteamOverlay = _get_overlay()
-    if overlay == null or not overlay.is_ready():
-        return
-    var requested: Error = overlay.open_achievements()
-    if requested != OK:
-        push_warning(error_string(requested))
-
-func _get_overlay() -> SteamOverlay:
-    if is_instance_valid(steam_client) and steam_client.is_ready():
-        return steam_client.overlay()
-    if is_instance_valid(game):
-        var scope: SteamScope = SteamServices.for_game(game)
-        if scope != null and scope.is_ready():
-            return scope.overlay()
-    return null
-```
-
-`OK` confirms that Crimson submitted the request. Confirm the rendered pane during testing. Use [`activation_changed(active)`](/api/classes/SteamOverlay#activation_changed) to suspend local gameplay input and restore the relevant focus when the Overlay closes. Keep the multiplayer simulation running.
-
-For a direct, windowed development launch, pass `--crimson-steam-overlay=480` as a user argument after Godot's `--` separator, using the launch AppID. Crimson initializes Steam before Godot creates the display. Enable the Overlay in Steam and run the [rendered test](/steam/testing#check-the-overlay-and-achievements). [Valve's Overlay requirements](https://partner.steamgames.com/doc/features/overlay#requirements)
 
 ## Consume Steam results
 

@@ -14,7 +14,7 @@ description: "Resolves secrets and owns the trusted publisher transport."
 
 ## Description
 
-Attach a subclass on the trusted backend and override `_resolve_secret()`. Production requests use verified HTTPS to the fixed Steam partner origin. Test builds replace the transport with a local override and open no sockets.
+Attach a scripted subclass from the trusted backend's code and override `_resolve_secret()`. Production requests use verified HTTPS to the fixed Steam partner origin. Test builds replace the transport with a local override and open no sockets.
 
 ## Methods
 

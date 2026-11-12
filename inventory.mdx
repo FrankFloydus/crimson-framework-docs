@@ -1,0 +1,163 @@
+---
+title: "Grid inventory and pickups"
+description: "Pack items into a grid and commit world pickups to a coordinated backpack."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Use a standalone grid for a local bag or a supply chest. Use a coordinated backpack when a pickup must update the world and a player's inventory together.
+
+## Pack a starting kit
+
+Attach this script to a **Pack supplies** button. Pressing it packs a medkit and a radio into the player's supply bag, then prints the occupied placements to **Output**.
+
+```gdscript
+extends Button
+
+const BAG_SIZE: Vector2i = Vector2i(4, 3)
+const MEDKIT_ID: StringName = &"medkit_17"
+const MEDKIT_SIZE: Vector2i = Vector2i(2, 1)
+const RADIO_ID: StringName = &"radio_02"
+const RADIO_SIZE: Vector2i = Vector2i(1, 2)
+const RADIO_CELL: Vector2i = Vector2i(2, 1)
+
+var _bag: SpatialInventory
+
+
+func _ready() -> void:
+    pressed.connect(_pack_supplies)
+
+
+func _pack_supplies() -> void:
+    var bag: SpatialInventory = Inventory.grid(BAG_SIZE)
+    if bag == null:
+        push_error("Invalid supply bag dimensions.")
+        return
+    var error: Error = bag.add(MEDKIT_ID, MEDKIT_SIZE)
+    if error == OK:
+        error = bag.add(RADIO_ID, RADIO_SIZE)
+    if error != OK:
+        push_error("Could not pack the supplies: %s" % error_string(error))
+        return
+
+    _bag = bag
+    var placements: Array[InventoryItemView] = _bag.items()
+    for item: InventoryItemView in placements:
+        print("%s at %s, footprint %s" % [item.id, item.origin, item.footprint])
+
+    var inspected: InventoryItemView = _bag.item_at(RADIO_CELL)
+    if inspected != null:
+        print("Cell %s contains %s." % [RADIO_CELL, inspected.id])
+    text = "Supplies packed"
+    disabled = true
+```
+
+[`Inventory.grid()`](/api/classes/Inventory/methods/grid) takes width and height in cells and returns `null` for invalid dimensions. [`add()`](/api/classes/SpatialInventory/methods/add) searches left to right across each row, starting at the top, with the footprint unrotated. Here the medkit starts at `(0, 0)`, and the radio starts at `(2, 0)`. A grid with no legal fit returns `ERR_CANT_CREATE`. A repeated instance ID returns `ERR_ALREADY_EXISTS`.
+
+[`items()`](/api/classes/SpatialInventory/methods/items) returns typed [`InventoryItemView`](/api/classes/InventoryItemView) entries. Read `id`, `origin`, `footprint`, and `rotated` to draw each item. [`item_at()`](/api/classes/SpatialInventory/methods/item_at) resolves any occupied cell in the placement, including the lower cell of the radio. An empty cell returns `null`. The views are read-only snapshots. Read them again after a move to update your UI. Keep names, icons, and other item data in your own records keyed by the instance ID.
+
+## Pick up an item in a coordinated game
+
+This example represents two items in an aid station. The backpack holds one item, so taking the medkit consumes it and leaves the flare available. The authority decides whether the player can take each item and commits both changes together.
+
+Save a separate world scene as `res://levels/aid_station.tscn` with an ordinary `Node` root. Attach the script to a persistent main scene outside that world. Assign two buttons labeled **Take medkit** and **Take flare**, and a status label, to its exports. The buttons stand in for interactions with the two world items.
+
+```gdscript
+extends Node
+
+const WORLD_ID: StringName = &"aid_station"
+const WORLD_PATH: String = "res://levels/aid_station.tscn"
+const BAG_SIZE: Vector2i = Vector2i.ONE
+
+@export var medkit_button: Button
+@export var flare_button: Button
+@export var status: Label
+
+var _game: Game
+var _pickup_pending: bool = false
+
+
+class AidStationPickups extends InventoryPickupSource:
+    const STORE: String = "aid_station_supplies"
+    const SOLO_PLAYER_ID: String = "local"
+    const MEDKIT_ID: StringName = &"medkit_17"
+    const FLARE_ID: StringName = &"flare_08"
+    const ITEM_SIZE: Vector2i = Vector2i.ONE
+
+    func _register_stores(stores: TransactionCoordinator) -> Error:
+        var available: Dictionary = {String(MEDKIT_ID): true, String(FLARE_ID): true}
+        return stores.register_store(STORE, available, _prepare_consumption)
+
+    func _resolve_pickup(
+        player_id: String, pickup_id: StringName, stores: TransactionCoordinator
+    ) -> InventoryPickup:
+        var id: String = String(pickup_id)
+        var available: Dictionary = stores.read_store(STORE)
+        if player_id != SOLO_PLAYER_ID or available.get(id, false) != true:
+            return null
+        return InventoryPickup.take(pickup_id, ITEM_SIZE, STORE, {"id": id})
+
+    func _prepare_consumption(
+        available: Dictionary, edits: Array, _context: Dictionary
+    ) -> Dictionary:
+        for edit: Dictionary in edits:
+            var id: String = edit.id
+            if available.get(id, false) != true:
+                return {"ok": false, "message": "That supply has already been taken."}
+            available[id] = false
+        return {"ok": true, "state": available}
+
+
+func _ready() -> void:
+    medkit_button.disabled = true
+    flare_button.disabled = true
+
+    var station: WorldDefinition = WorldDefinition.at(WORLD_ID, WORLD_PATH)
+    var config: InventoryConfig = InventoryConfig.backpack(BAG_SIZE)
+    _game = Game.campaign(station).inventory(config.pickups(AidStationPickups.new())).boot(self)
+    var started: GameResult = await _game.play()
+    if not started.ok:
+        status.text = started.message
+        return
+
+    medkit_button.pressed.connect(_take.bind(AidStationPickups.MEDKIT_ID, medkit_button))
+    flare_button.pressed.connect(_take.bind(AidStationPickups.FLARE_ID, flare_button))
+    medkit_button.disabled = false
+    flare_button.disabled = false
+    status.text = "The aid station has a medkit and a flare."
+
+
+func _take(pickup_id: StringName, pickup_button: Button) -> void:
+    if _pickup_pending:
+        return
+    var inventory: GameInventory = _game.inventory()
+    var bag: MatchInventory = inventory.backpack() if inventory != null else null
+    if bag == null:
+        status.text = "The backpack is unavailable."
+        return
+
+    _pickup_pending = true
+    var result: InventoryResult = await bag.pick_up(pickup_id)
+    _pickup_pending = false
+    if not result.ok:
+        status.text = result.message
+        return
+
+    pickup_button.hide()
+    status.text = "Packed %s at %s." % [result.item_id, result.origin]
+```
+
+Press **Take medkit**. The button disappears and the label reports the placement at `(0, 0)`. Press **Take flare**. The label reports that the backpack has no room and the flare button stays visible.
+
+### Authority and commit
+
+1. Configure [`InventoryConfig.backpack()`](/api/classes/InventoryConfig/methods/backpack) and [`pickups()`](/api/classes/InventoryConfig/methods/pickups) before booting a coordinated [`Game.campaign()`](/api/classes/Game/methods/campaign). The authority calls [`_register_stores()`](/api/classes/InventoryPickupSource/methods/_register_stores) once for each fresh authority match. It registers the game-owned source records and their prepare callback.
+2. After the world is ready, resolve [`game.inventory()`](/api/classes/Game/methods/inventory) and its local [`backpack()`](/api/classes/GameInventory/methods/backpack). Call [`pick_up()`](/api/classes/MatchInventory/methods/pick_up) with the stable pickup ID and await an [`InventoryResult`](/api/classes/InventoryResult). The authority resolves the player from the admitted command scope.
+3. Implement [`_resolve_pickup()`](/api/classes/InventoryPickupSource/methods/_resolve_pickup) to check eligibility against committed authority state. The solo example accepts the local player. In a networked game, check the admitted player's access to the item using your authority's rules and state. Return `null` to deny the request or [`InventoryPickup.take()`](/api/classes/InventoryPickup/methods/take) with the footprint and the source edit.
+4. Keep the source's prepare callback synchronous. It rechecks availability and stages removal in detached data. If validation and placement succeed, the coordinator publishes both changes at the same revision. A denial, a rejected source edit, or `InventoryFull` leaves the source and backpack unchanged.
+
+Run world and UI effects after the commit. The caller can use `result.item_id`, `result.origin`, and `result.revision` from a successful result. In a networked game, project the committed world pickup state to the peers that should see it. The backpack store stays private to the authority, and your game chooses which inventory details to show to each player.
+
+Resolve a fresh backpack when a new match becomes ready. A retained handle expires when its match retires. A headless server with no local player has no local backpack handle.
+
+For explicit grid placement, stack and equipment policies, containers, and trade, see the [Inventory API module](/api/modules/inventory).

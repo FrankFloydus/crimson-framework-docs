@@ -1,7 +1,7 @@
 ---
 title: "get_initialization_error()"
 sidebarTitle: "get_initialization_error"
-description: "Returns the stored startup diagnostic."
+description: "Returns the stored startup diagnostic, including the Steam SDK's reason when available."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,7 +27,7 @@ A successful start clears the diagnostic.
 
 ### Enable the online menu when Steam connects
 
-The main menu enables Online Play when Steam connects and keeps Local Play available when it disconnects. Set `STEAM_APP_ID` to the ID used to [launch your game](/steam/setup#launch-with-an-appid).
+A standalone Steam client enables Online Play when it connects. A runtime loss disables the button.
 
 ```gdscript
 extends Control

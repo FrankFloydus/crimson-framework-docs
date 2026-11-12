@@ -9,7 +9,7 @@ Install Crimson in your Godot project before adding Steam. The setup is the same
 
 ## Add the Steam runtime
 
-1. Obtain Valve's Steamworks SDK. Crimson v0.0.3 was verified with SDK 1.65. [Steamworks SDK](https://partner.steamgames.com/doc/sdk)
+1. Obtain Valve's Steamworks SDK. Use the SDK version specified for your Crimson addon. [Steamworks SDK](https://partner.steamgames.com/doc/sdk)
 2. Copy `redistributable_bin/win64/steam_api64.dll` from the SDK into `addons/crimson-framework/bin/` in your Godot project. Put it beside the Crimson DLLs.
 3. For client testing, start Steam and sign in. Run Steam and Godot under the same Windows account and at the same elevation.
 
@@ -19,7 +19,20 @@ Steam supplies your AppID when you launch an installed game from the Steam Libra
 
 You can use Valve's Spacewar AppID `480` for a first connection check. Use your own AppID and a Steam test account with a license for your app to verify your achievements, Cloud settings, ownership, or purchases. [Valve's Spacewar example](https://partner.steamgames.com/doc/sdk/api/example)
 
-Run the standalone client example with the same AppID. It prints the game's Steam language and whether the client is online. [Start a standalone client](/steam/client-services#start-a-standalone-client)
+For a direct Spacewar test, stage the matching Godot 4.7 executable and console executable in the same test directory. Create `steam_appid.txt` there with `480`, sign in to Steam, and use that test directory as the working directory. This keeps the development AppID out of your regular editor and shipping builds.
+
+```powershell
+$crimsonSteamTestEngine = 'C:\SteamTest\Godot'
+$crimsonSteamTestProject = 'C:\Games\TrainingRoom'
+Push-Location $crimsonSteamTestEngine
+try {
+    & .\Godot_v4.7-stable_win64_console.exe --path $crimsonSteamTestProject -- --crimson-steam-overlay=480
+} finally {
+    Pop-Location
+}
+```
+
+The argument after Godot's `--` separator lets Crimson initialize the matching Steam client before the window opens. Enable the Steam Overlay in Steam for a graphical overlay test. For a connection-only test you can omit the overlay argument. Run the connection script with **Use Spacewar** enabled and look for `Steam AppID 480 ready` in Output. [Connect your game to Steam](/steam/overview#connect-your-game-to-steam) · [Valve Overlay requirements](https://partner.steamgames.com/doc/features/overlay#requirements)
 
 ## Export and verify on Windows
 
@@ -29,7 +42,7 @@ Test your Debug export and your Release export. For the distribution check, put 
 
 ### Relaunch an unwrapped export through Steam
 
-Use this option for an unwrapped, rendered Windows export with an authorized shipping AppID. Attach the script to your startup node, assign **Shipping App ID**, and run it before any Steam client or game provider initializes. For this launch, leave the early `--crimson-steam-overlay` bootstrap disabled. [`SteamClient.restart_through_steam_if_needed()`](/api/classes/SteamClient/methods/restart_through_steam_if_needed) requests a Steam relaunch on `ERR_SKIP` and allows normal startup on `OK`. Use an installed copy of your game and leave the development `steam_appid.txt` out of the export when testing the relaunch. [Valve's relaunch check](https://partner.steamgames.com/doc/sdk/api#SteamAPI_RestartAppIfNecessary)
+Use this option for an unwrapped, rendered Windows export with an authorized shipping AppID. Attach the script to your startup node, assign **Shipping App ID**, and run it before any Steam client or game provider initializes. For this launch, leave the early `--crimson-steam-overlay` bootstrap disabled. [`Steamworks.restart_through_steam_if_needed()`](/api/classes/Steamworks/methods/restart_through_steam_if_needed) requests a Steam relaunch on `ERR_SKIP` and allows normal startup on `OK`. Use an installed copy of your game and leave the development `steam_appid.txt` out of the export when testing the relaunch. [Valve's relaunch check](https://partner.steamgames.com/doc/sdk/api#SteamAPI_RestartAppIfNecessary)
 
 ```gdscript
 extends Node
@@ -41,7 +54,7 @@ func _ready() -> void:
         push_error("Assign your shipping AppID in the Inspector.")
         return
 
-    var launch_status: Error = SteamClient.restart_through_steam_if_needed(shipping_app_id)
+    var launch_status: Error = Steamworks.restart_through_steam_if_needed(shipping_app_id)
     if launch_status == ERR_SKIP:
         get_tree().quit()
         return
@@ -49,12 +62,12 @@ func _ready() -> void:
         push_error("Steam launch check failed: %s" % error_string(launch_status))
         return
 
-    var steam: SteamClient = SteamClient.boot(self, shipping_app_id)
-    if steam == null:
-        push_error("Could not attach a Steam client.")
-        return
-    if not steam.is_ready():
-        push_error(steam.get_initialization_error())
+    var settings: SteamConfig = SteamConfig.new()
+    settings.app_id = shipping_app_id
+    var steam: Steamworks = Steamworks.boot(self, settings)
+    var startup: SteamResult = steam.boot_result()
+    if not startup.ok:
+        push_error(startup.message)
         return
     print("Steam client ready.")
 ```

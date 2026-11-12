@@ -1,0 +1,62 @@
+---
+title: "Migrate an existing game"
+description: "Move from a serialized GameRuntime or operation-based setup to code-first game actions."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Start by moving the game boot into the script on your persistent scene root. A fixed-world project can configure its level and player directly. A project with existing world definitions, rules, or checkpoint configuration can adopt the new `Game` actions first and keep its definition. [Solo quickstart](/quickstart) · [Coordinated LAN](/coordinated-lan)
+
+## Keep a saved game definition
+
+Save the old runtime's **Definition** as a `.tres` resource and assign it to `previous_definition` on the root script below. Remove the serialized `GameRuntime` child from that scene so the script owns the one game attachment. [`from_definition()`](/api/classes/GameConfig/methods/from_definition) takes a snapshot of the resource when it builds the configuration.
+
+```gdscript
+extends Node
+
+@export var previous_definition: GameDefinition
+
+
+func _ready() -> void:
+    if previous_definition == null:
+        push_error("Assign the existing game definition before starting.")
+        return
+
+    var game: Game = GameConfig.from_definition(previous_definition).boot(self)
+    var started: GameResult = await game.play()
+    if not started.ok:
+        push_error(started.message)
+        return
+
+    print("The saved starting world is ready.")
+```
+
+The example starts the saved world offline. For a fixed-world multiplayer project, retain the network configuration in the definition and use the matching Host or Join action. Update and test every peer with the same addon and scene layout. [Multiplayer quickstart](/multiplayer-quickstart)
+
+## Update the action callers
+
+Await a code-first action directly and read `ok`, `code`, and `message` from its [`GameResult`](/api/classes/GameResult). Lower-level operation methods retain their documented contracts, including `wait()` when they return a [`GameOperation`](/api/classes/GameOperation).
+
+| Existing call or entry point | Code-first equivalent |
+| --- | --- |
+| `GameDefinition.boot(owner)` | `Game.configure(LEVEL, PLAYER).boot(owner)` for a new fixed world, or `GameConfig.from_definition(definition).boot(owner)` for an existing definition. |
+| `await runtime.play_solo().wait()` | `await game.play()` |
+| `await runtime.host_game().wait()` or `await runtime.host_online().wait()` | Configure `.lan()` or `.steam()` at boot, then `await game.host()`. |
+| `await runtime.join_game(address).wait()` | `await game.join(address)` |
+| `await runtime.join_listing(listing).wait()` | `await game.join_listing(listing)` for a browser selection. Use `await game.accept_invite(offer)` for the exact offer the player confirmed. |
+| `runtime.leave()` | `await game.leave()` waits for the session or pending start to retire. |
+| `GameServices.for_node(node)` or `GameServices.game()` | `Game.for_node(node)` resolves the nearest game. `Game.current()` resolves a selected or sole live game. |
+| `SteamClient.boot(owner)` or `SteamServices.for_game(runtime)` | `Steamworks.boot(owner)` for app features alone, or `game.steam()` for a game-owned attachment. |
+| Serialized `DedicatedServerBoot` child | Put a script on an ordinary server scene root and call `GameConfig.boot_server(self)` on the configured fixed-world LAN profile. |
+
+For game and service lifetimes, see [Game services](/game-services). For startup and hosting, see [Steamworks](/steam/overview), [Dedicated LAN](/dedicated-lan), and [Steam dedicated servers](/steam/dedicated-servers).
+
+## Update scene conventions when you are ready
+
+For a new fixed-world scene, put ordinary `Marker3D` children under `SpawnPoints` and one `Camera3D` in the player scene. Add the `crimson_local_hidden` group to a direct player child you want hidden from its local camera. The retained `PlayerSpawnPoint` and `LocalPlayerView` bindings support existing scenes. Legacy setup nodes such as `GameRuntime`, `PlayerSpawnPoint`, and `LocalPlayerView` are hidden from **Add Node**. [Build a new world](/quickstart)
+
+If your project still uses older `Crimson`-prefixed names, update typed GDScript references and serialized `.tscn` and `.tres` node and resource types before opening it with the current addon. For example, `CrimsonGame` became `GameRuntime`, `CrimsonGameDefinition` became `GameDefinition`, and `CrimsonSpawnPoint` became `PlayerSpawnPoint`. Preserve scene and resource UIDs and multiplayer node paths. Convert binary scenes and resources to text in a project copy using the addon that can still read them, then update their types.
+
+## Keep a lower-level integration
+
+Projects that explicitly manage operation handles, scene mounting, or admission can continue to use the compatible [`GameRuntime`](/api/classes/GameRuntime), [`GameDefinition`](/api/classes/GameDefinition), [`WorldSession`](/api/classes/WorldSession), and [session and transport classes](/api/modules/sessions-and-transport). To customize a code-first game, use [`GameProvider`](/api/classes/GameProvider) and [`GameBindings`](/api/classes/GameBindings) for the supported boot-time overrides. [Replace a game service](/game-services)

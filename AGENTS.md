@@ -3,8 +3,8 @@
 # Crimson Framework documentation
 
 - Edit this checkout as a standalone Git repository. Run Mintlify commands from the directory containing `docs.json`. Use `npx mint@latest instructions` and the relevant topic for current CLI guidance.
-- Use Crimson Framework and Godot terms from the supported framework release. Put script identifiers and file paths in code spans, and bold editor UI labels. Use active voice and sentence case headings.
-- Use the framework release and fixtures to check example behavior. Write customer guides for the purchased addon and keep framework source, build, and repository download links out of public pages. Keep guides and reference aligned with the version in `README.md`.
+- Use Crimson Framework and Godot terms from the addon build documented in `README.md`. Put script identifiers and file paths in code spans, and bold editor UI labels. Use active voice and sentence case headings.
+- Use the matching addon and fixtures to check example behavior. Lead new-project guides with the code-first API and cover compatible setup types in migration or lower-level reference. Write customer guides for the purchased addon and keep framework source, build, and repository download links out of public pages.
 - Keep **Docs** and **API Reference** as the two top-level tabs. Put articles and examples in **Docs** and the Godot class catalog in **API Reference**.
 - Link named Crimson APIs in guide prose to their owning class or member in **API Reference**. Keep code examples copyable. Show a GDScript example for each distinct way of completing a workflow described in a guide.
 - Write guide examples as complete scripts with their own dependencies and stated scene setup. Use explicit GDScript types, named constants for meaningful literal values, and top-level typed constants for preloaded scenes and assets.

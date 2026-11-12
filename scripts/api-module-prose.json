@@ -1,14 +1,34 @@
 {
   "Game runtime": {
     "summary": "Start a game, coordinate its session, and move between worlds.",
-    "description": "Use GameRuntime as the persistent entry point for a solo, hosted, or dedicated game. Define the worlds and player setup in GameDefinition. The runtime exposes operations for joining, changing worlds, routing game commands, and accessing checkpoint slots.",
+    "description": "Use [Game] to configure a solo, LAN, or Steam game from an existing scene owner. Use [GameConfig] to attach a dedicated server with [code]boot_server(owner)[/code]. For a coordinated game, register [WorldDefinition] destinations and use [GameScenes] for travel.",
     "guides": {
-      "Start a solo game": "/quickstart"
+      "Start a solo game": "/quickstart",
+      "Host and join over LAN": "/multiplayer-quickstart",
+      "Set up a coordinated LAN game": "/coordinated-lan",
+      "Migrate an existing project": "/migration"
+    },
+    "sections": {
+      "Code-first game": {
+        "summary": "Configure, attach, and run a game from GDScript.",
+        "description": "Call [code]Game.configure(level, player).boot(self)[/code] from a live scene owner. Await the direct game actions for a typed [GameResult]. Use [GameProvider] and [GameBindings] to supply a custom session transport at boot.",
+        "guides": {
+          "Start a solo game": "/quickstart",
+          "Provide and resolve scoped services": "/game-services"
+        }
+      },
+      "Lower-level runtime": {
+        "summary": "Work with existing game definitions, operation handles, and provider services.",
+        "description": "Use [GameRuntime] and [GameDefinition] for existing scenes and lower-level integrations. These classes expose retained operations, admission rules, and provider interfaces. [GameConfig] can adapt a legacy definition before you move callers to [Game].",
+        "guides": {
+          "Migrate an existing project": "/migration"
+        }
+      }
     }
   },
   "Steam multiplayer": {
     "summary": "Connect a Crimson game session to Steam for hosting, discovery, and joining.",
-    "description": "Attach SteamProvider to your game definition to use Steam transport and verify peer identities. Use SteamServices to access the game's Steam scope or its dedicated server state. GameInvites exposes invitations for the active game.",
+    "description": "Choose [code]Game.configure(level, player).steam().boot(self)[/code] to use Steam hosting and discovery. Use the [Game] actions for quick join and exact invite acceptance, and [code]game.steam()[/code] for client services. [SteamProvider], [GameInvites], and [SteamServices] expose the lower-level attachment and dedicated status interfaces.",
     "guides": {
       "Lobbies and listen servers": "/steam/listen-servers",
       "Dedicated servers": "/steam/dedicated-servers"
@@ -16,14 +36,18 @@
   },
   "World sessions": {
     "summary": "Run a standalone session in one configured world.",
-    "description": "WorldSession starts a fixed world offline or over a direct network connection. Use it with WorldSessionDefinition for integrations that already use the standalone API. PlayerSpawnPoint and LocalPlayerView also support authored spawn placements and local camera selection.",
+    "description": "[WorldSession] and [WorldSessionDefinition] support existing standalone fixed-world integrations. Use [Game] for a new project, with ordinary [Marker3D] children under [code]SpawnPoints[/code] and one [Camera3D] in the player scene. Existing [PlayerSpawnPoint] and [LocalPlayerView] placements remain supported.",
     "guides": {
-      "Set up player spawn points and cameras": "/quickstart"
+      "Set up player spawn points and cameras": "/quickstart",
+      "Migrate an existing project": "/migration"
     }
   },
   "Inventory": {
     "summary": "Place, move, and exchange game items across inventory grids.",
-    "description": "Use SpatialInventory for grid placement and add the models your game needs for stacks, equipment, containers, sorting, or trade. Your game owns item identities and rules. InventoryTransactionAdapter lets grid changes join other authoritative changes in one match transaction."
+    "description": "Start a standalone grid with [code]Inventory.grid(size)[/code] and add items by ID and footprint. Read their placements as [InventoryItemView] values. In coordinated games, use [InventoryConfig] to enable backpacks and provide pickup rules. A [MatchInventory] backpack places an authorized pickup and consumes it in one commit. [SpatialInventory] and the lower-level adapters provide explicit placement, equipment, container, sorting, and trade tools.",
+    "guides": {
+      "Use an inventory grid and a match backpack": "/inventory"
+    }
   },
   "Match runtime": {
     "summary": "Coordinate authoritative game state and route player commands.",
@@ -35,19 +59,19 @@
   },
   "Save and restore": {
     "summary": "Capture checkpoints, inspect saved generations, and restore game state.",
-    "description": "Use SaveSlot and SaveRequest for checkpoints managed by GameRuntime. Use SaveCoordinator when you need to configure the save lifecycle directly, including participant capture, migrations, and staged restores. SavePresentation provides metadata helpers for checkpoint menus."
+    "description": "Select a coordinated game's checkpoint slot through [code]game.save_slot(profile, slot)[/code]. [SaveSlot] and [SaveRequest] expose the slot's operations. Use [SaveCoordinator] to configure participant capture, migrations, and staged restores directly. [SavePresentation] provides metadata helpers for checkpoint menus."
   },
   "Scene loading": {
     "summary": "Load a registered world offline or coordinate its replacement across peers.",
-    "description": "Use SceneLoadManager when you need explicit control over world replacement. Register scene IDs, choose a world container, and request a local or coordinated load. The manager prepares the scene asynchronously and reports completion or failure."
+    "description": "Use [GameScenes] to travel to registered worlds in a coordinated game. [SceneLoadManager] provides lower-level control over world replacement. Register scene IDs, choose a world container, and request a local or coordinated load. The manager prepares the scene asynchronously and reports completion or failure."
   },
   "Sessions and transport": {
     "summary": "Open offline and network sessions with configurable transport and admission.",
-    "description": "Use GameSession to start an offline session, host, or connect over Godot multiplayer. ENet is the default direct transport. Implement a transport adapter to supply different multiplayer peers, or a session authenticator to verify connection proofs and resolve player identities."
+    "description": "Use [Game] with [code].lan()[/code] for direct hosting and joining. The lower-level [GameSession] API opens offline and network sessions over Godot multiplayer. ENet is the default direct transport. Supply a custom [SessionTransport] through [GameBindings], or use [SessionAuthenticator] when a lower-level integration verifies connection proofs and resolves identities."
   },
   "Steamworks": {
     "summary": "Use Steam client and game server capabilities from Godot.",
-    "description": "Start a standalone SteamClient for Steam features in your Godot project, or use the Steam scope already attached to a Crimson multiplayer game. Pick a service below for the capabilities your game needs. Game server discovery and progression are grouped with networking.",
+    "description": "Attach app features to an existing owner with [code]Steamworks.boot(self)[/code], or get the exact Steam game attachment from [code]game.steam()[/code]. [SteamConfig] sets the expected AppID and discovery options. Pick a service below for the capabilities your game needs.",
     "guides": {
       "Steamworks setup": "/steam/setup",
       "Steam client services": "/steam/client-services"
@@ -55,9 +79,9 @@
     "sections": {
       "Client and results": {
         "summary": "Start a Steam client and inspect the results of Steam operations.",
-        "description": "Use SteamClient to initialize a standalone client scope and access its services. This area also contains app and DLC metadata, platform status utilities, and the shared result and operation types returned by Steam actions.",
+        "description": "Use [Steamworks] to start a standalone attachment or access the client services attached to a game. [SteamClient] is the lower-level callback node for existing integrations. This area also contains app and DLC metadata, platform utilities, and the result and operation types returned by Steam actions.",
         "guides": {
-          "Start a Steam client": "/steam/client-services#start-a-client"
+          "Use Steam client services": "/steam/client-services"
         }
       },
       "Lobbies and social": {
@@ -76,7 +100,7 @@
       },
       "Stats and leaderboards": {
         "summary": "Read or update player progression and work with Steam leaderboards.",
-        "description": "Use the signed-in client's stats service to read published stats, update values, and unlock achievements. The leaderboard classes look up boards, fetch score pages, and submit scores. Use the trusted publisher service if the backend owns score submission."
+        "description": "Use [Steamworks] to request the achievement panel and [SteamAchievements] to submit an unlock. Steam separately handles display and persistence. The stats and leaderboard services read or update progression, fetch score pages, and submit scores. Use the trusted publisher service if the backend owns score submission."
       },
       "Inventory and purchases": {
         "summary": "Read the player's Steam inventory and start purchases through your backend.",
