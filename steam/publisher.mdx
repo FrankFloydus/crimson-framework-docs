@@ -13,59 +13,129 @@ If you have the separate trusted publisher addon, install it in a dedicated Godo
 
 ## Resolve the publisher key on the backend
 
-Attach a [`SteamPublisherHost`](/api/classes/SteamPublisherHost) to your persistent backend scene root. Implement [`_resolve_secret()`](/api/classes/SteamPublisherHost#_resolve_secret) against your backend's secret store. This example uses an environment variable supplied only to the backend process.
+Set [`publisher_key_ref`](/api/classes/SteamPublisherSettings/properties/publisher_key_ref) to the name your backend uses to identify its Steamworks key. Implement [`_resolve_secret()`](/api/classes/SteamPublisherHost/methods/_resolve_secret) to load that key from your backend's secret storage. The example below reads the process environment. Crimson resolves the secret per request and sends it to Valve in `X-WebAPI-Key` over verified TLS. Use a key with the Steamworks permissions required by your AppID and operations. Keep keys, encrypted ticket material, and ticket bytes out of client builds, logs, saves, and replays. [Valve publisher keys](https://partner.steamgames.com/doc/webapi_overview/auth)
+
+## Verify a player and their license
+
+### Set up the backend
+
+Add a [`SteamPublisherHost`](/api/classes/SteamPublisherHost) to your persistent backend scene and attach this script. Set **Steam App ID** in the Inspector and supply `MY_GAME_STEAM_PUBLISHER_KEY` in the backend process environment. The script calls [`SteamPublisher.boot(settings)`](/api/classes/SteamPublisher/methods/boot) after the host enters the tree.
 
 ```gdscript
 extends SteamPublisherHost
 
+const PUBLISHER_KEY_REFERENCE: StringName = &"MY_GAME_STEAM_PUBLISHER_KEY"
+const TICKET_AUDIENCE: String = "game-profile"
+
+@export var steam_app_id: int
+
+var _publisher: SteamPublisher
+
+
+func _ready() -> void:
+    if steam_app_id <= 0:
+        push_error("Assign your Steam AppID in the Inspector.")
+        return
+
+    var settings: SteamPublisherSettings = SteamPublisherSettings.new()
+    settings.app_id = steam_app_id
+    settings.host = self
+    settings.publisher_key_ref = PUBLISHER_KEY_REFERENCE
+
+    var started: SteamPublisherResult = SteamPublisher.boot(settings)
+    if not started.ok:
+        push_error("Steam publisher startup failed: %s" % started.message)
+        return
+
+    _publisher = started.value
+
+
 func _resolve_secret(reference: StringName) -> String:
-    if reference == &"MY_GAME_STEAM_PUBLISHER_KEY":
-        return OS.get_environment(String(reference))
-    return ""
+    if reference != PUBLISHER_KEY_REFERENCE:
+        return ""
+    return OS.get_environment(String(reference))
+
+
+func verify_player(ticket_bytes: PackedByteArray) -> SteamIdentity:
+    if _publisher == null or ticket_bytes.is_empty():
+        return null
+
+    var auth: SteamPublisherAuth = _publisher.auth()
+    if auth == null:
+        return null
+
+    var verified: SteamIdentityResult = await auth.verify(ticket_bytes, TICKET_AUDIENCE)
+    if not verified.ok:
+        return null
+
+    var identity: SteamIdentity = verified.value
+    var license: SteamAppOwnershipResult = await auth.owns_app(identity, steam_app_id)
+    if not license.ok or license.value == null or not license.value.owns_app:
+        return null
+
+    return identity
 ```
 
-Pass a reference to the key through [`SteamPublisherSettings`](/api/classes/SteamPublisherSettings#properties). With the resolver script attached to a child named `PublisherHost`, call [`SteamPublisher.boot(settings)`](/api/classes/SteamPublisher#boot) from its scene parent after both nodes enter the tree.
+When your backend receives a ticket, pass its bytes to `await verify_player(ticket_bytes)`. The function calls [`verify()`](/api/classes/SteamPublisherAuth/methods/verify) with the expected audience and checks the current license with [`owns_app()`](/api/classes/SteamPublisherAuth/methods/owns_app). Attach a returned `SteamIdentity` to that player's backend session and return `true` to the client. If verification returns `null`, reject the request and return `false`.
+
+### Request a ticket on the client
+
+On the game client, attach this script to a persistent `Node` and set **Steam App ID** to the same AppID as the backend. After the node is ready, call `await verify_with_backend(send_ticket)` from your sign-in flow. Pass a `Callable` that accepts one `PackedByteArray`, sends it over your authenticated connection, and returns `true` only if the backend accepts the player. The callable can wait for the server response before returning a `bool`.
+
+The script requests a [Web API ticket](/api/classes/SteamAuth/methods/web_ticket) for `game-profile`, checks [`ok`](/api/classes/SteamResult/properties/ok), sends the [ticket bytes](/api/classes/SteamWebTicket/methods/bytes), and [closes the ticket](/api/classes/SteamWebTicket/methods/close) when the exchange finishes.
 
 ```gdscript
-var settings := SteamPublisherSettings.new()
-settings.app_id = configured_app_id
-settings.host = $PublisherHost
-settings.publisher_key_ref = &"MY_GAME_STEAM_PUBLISHER_KEY"
-var started := SteamPublisher.boot(settings)
-if started.ok:
-    publisher = started.value
-```
+extends Node
 
-Crimson resolves the secret per request and sends it to Valve in `X-WebAPI-Key` over verified TLS. Use a key with the Steamworks permissions required by your AppID and operations. Keep keys, encrypted ticket material, and ticket bytes out of client builds, logs, saves, and replays. [Valve publisher keys](https://partner.steamgames.com/doc/webapi_overview/auth)
+const TICKET_AUDIENCE: String = "game-profile"
 
-## Verify a player and their license
+@export var steam_app_id: int
 
-On the game client, request a Web API ticket with [`await steam.auth().web_ticket("game-profile")`](/api/classes/SteamAuth#web_ticket). After checking [`ok`](/api/classes/SteamResult#properties), send the [ticket bytes](/api/classes/SteamWebTicket#bytes) to your backend over its authenticated connection. [Close the ticket](/api/classes/SteamWebTicket#close) after the backend completes the exchange.
+var _steam: SteamClient
 
-On the backend, call [`verify()`](/api/classes/SteamPublisherAuth#verify) with the same AppID and audience and use the verified identity with [`owns_app()`](/api/classes/SteamPublisherAuth#owns_app). Attach the identity to the backend session that owns this player.
 
-```gdscript
-var verified: SteamIdentityResult = await publisher.auth().verify(ticket_bytes, "game-profile")
-if verified.ok:
-    var license: SteamAppOwnershipResult = await publisher.auth().owns_app(
-        verified.value, configured_app_id
-    )
-    if license.ok and license.value.owns_app:
-        profile_sessions.attach_authenticated_player(verified.value)
+func _ready() -> void:
+    if steam_app_id <= 0:
+        push_error("Assign your Steam AppID in the Inspector.")
+        return
+
+    _steam = SteamClient.boot(self, steam_app_id)
+    if _steam == null:
+        push_error("The Steam client could not attach to this node.")
+    elif not _steam.is_ready():
+        push_error(_steam.get_initialization_error())
+
+
+func verify_with_backend(send_ticket: Callable) -> bool:
+    if _steam == null or not _steam.is_ready() or not send_ticket.is_valid():
+        return false
+
+    var auth: SteamAuth = _steam.auth()
+    if auth == null:
+        return false
+
+    var issued: SteamWebTicketResult = await auth.web_ticket(TICKET_AUDIENCE)
+    if not issued.ok or issued.value == null:
+        return false
+
+    var ticket: SteamWebTicket = issued.value
+    var accepted: bool = await send_ticket.call(ticket.bytes())
+    ticket.close()
+    return accepted
 ```
 
 Your game still decides which actions that player may take. Use the backend session identity when submitting a score from a verified ranked run. For encrypted AppTicket verification, use [SteamOwnership](/api/classes/SteamOwnership) with the app's restricted SDK Auth key and a durable one-use challenge store. [SteamPublisherAuth](/api/classes/SteamPublisherAuth) · [Valve ownership verification](https://partner.steamgames.com/doc/features/auth)
 
 ## Process Steam Wallet orders
 
-Enable microtransactions for your authorized AppID and provide a trusted [SteamPurchaseStore](/api/classes/SteamPurchaseStore) before you boot. Bind your game's authenticated commerce adapter to its Steam provider. The backend authenticates the buyer, validates the cart, and owns pricing and fulfillment.
+Enable microtransactions for your authorized AppID. Before booting the publisher, assign your trusted [SteamPurchaseStore](/api/classes/SteamPurchaseStore) to [`purchase_store`](/api/classes/SteamPublisherSettings/properties/purchase_store). Bind your game's authenticated commerce adapter to its Steam provider. The backend authenticates the buyer, validates the cart, and owns pricing and fulfillment.
 
-1. Read buyer context with [`await publisher.purchases().buyer_info(player)`](/api/classes/SteamPublisherPurchases#buyer_info) before pricing a new checkout.
-2. Use [`begin(player, cart, checkout_id)`](/api/classes/SteamPublisherPurchases#begin) to reserve the quote. Persist it in the store. Reuse the same checkout ID and cart when retrying an ambiguous response.
-3. Treat client authorization as a prompt to check Steam. Use [`finalize(order_id)`](/api/classes/SteamPublisherPurchases#finalize) from the backend. The store atomically persists the new order revision and applies the entitlement difference or records it in a durable outbox.
-4. Run [`reconcile()`](/api/classes/SteamPublisherPurchases#reconcile) with a persisted cursor to recover pending orders and process reversals. Reconciliation can repeat rows. Commit entitlements idempotently by order and item. A partial reversal removes the affected items.
+1. Get the [`purchases()`](/api/classes/SteamPublisher/methods/purchases) service and call [`buyer_info(player)`](/api/classes/SteamPublisherPurchases/methods/buyer_info) before pricing a new checkout.
+2. Use [`begin(player, cart, checkout_id)`](/api/classes/SteamPublisherPurchases/methods/begin) to price and reserve the cart through the store. Reuse the same checkout ID and cart when retrying an ambiguous response.
+3. Treat client authorization as a prompt to check Steam. Use [`finalize(order_id)`](/api/classes/SteamPublisherPurchases/methods/finalize) from the backend. The store atomically persists the new order revision and applies the entitlement difference or records it in a durable outbox.
+4. Run [`reconcile(since_unix)`](/api/classes/SteamPublisherPurchases/methods/reconcile) with a persisted Unix UTC cursor to recover pending orders and process reversals. Reconciliation can repeat rows. Commit entitlements idempotently by order and item. A partial reversal removes the affected items.
 
-Use [`SteamPublisherSettings.SANDBOX`](/api/classes/SteamPublisherSettings#environment) to exercise the Wallet flow with Valve's sandbox for your AppID. Check the API contracts for the store, charge confirmation, and refund authorization before granting real items. [SteamPublisherPurchases](/api/classes/SteamPublisherPurchases) · [Valve microtransactions](https://partner.steamgames.com/doc/features/microtransactions/implementation)
+Set [`environment`](/api/classes/SteamPublisherSettings/properties/environment) to [`SteamPublisherSettings.SANDBOX`](/api/classes/SteamPublisherSettings#environment) before boot to exercise the Wallet flow with Valve's sandbox for your AppID. Check the API contracts for the store, charge confirmation, and refund authorization before granting real items. [SteamPublisherPurchases](/api/classes/SteamPublisherPurchases) · [Valve microtransactions](https://partner.steamgames.com/doc/features/microtransactions/implementation)
 
 ## Use other publisher services
 

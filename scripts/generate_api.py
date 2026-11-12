@@ -409,60 +409,52 @@ def table_cell(value: str) -> str:
     return re.sub(r"(?<!\\)\|", r"\\|", value).replace("\n", " ")
 
 
-def render_properties(properties: dict[str, MemberDoc], known_classes: set[str]) -> list[str]:
-    """Render properties with their accessor bindings and initial values."""
-    if not properties:
-        return []
-    lines = ["## Properties", "", "| Property | Type | Default | Accessors | Description |", "| --- | --- | --- | --- | --- |"]
-    for name, member in properties.items():
-        element = member.element
-        accessors = []
-        if element.get("getter"):
-            accessors.append(code(f"{element.attrib['getter']}()"))
-        if element.get("setter"):
-            accessors.append(code(f"{element.attrib['setter']}(value)"))
-        default = code(element.attrib["default"]) if "default" in element.attrib else "—"
-        description = prose(member.description, known_classes)
-        status = annotations(element)
-        if status:
-            description = f"{plain(status)} {description}".strip()
-        row = (code(name), class_link(type_label(element), known_classes), default, ", ".join(accessors) or "—", description)
-        lines.append("| " + " | ".join(map(table_cell, row)) + " |")
-    return lines + [""]
+def render_member_index(class_name: str, members: dict[str, dict[str, MemberDoc]], known_classes: set[str]) -> list[str]:
+    """Give linked identifiers a full-width line, preserving their class-page anchors."""
+    def entries(category: str, rows: list[tuple[str, MemberDoc]], level: str) -> list[str]:
+        lines = []
+        for name, member in rows:
+            summary = re.split(r"(?<=[.!?])\s+(?=[A-Z])|\n\n", member.description, maxsplit=1)[0]
+            route = member_route(class_name, category, name)
+            link = f"[{code(name)}](/{route})"
+            title = f"{level} {link}" if level else f"**{link}**"
+            lines.extend([title, "", prose(summary, known_classes), ""])
+        return lines
 
+    properties = members["properties"]
+    methods = members["methods"]
+    lines = []
+    if properties:
+        lines.extend(["## Properties", "", *entries("properties", sorted(properties.items()), "")])
+    if not methods:
+        return lines
 
-def render_method_index(entries: dict[str, MemberDoc], known_classes: set[str]) -> list[str]:
-    """Summarize longer method lists and link each row to its full signature."""
-    groups = {"Static methods": [], "Instance methods": [], "Virtual methods": []}
-    for name, member in sorted(entries.items()):
+    accessors = {member.element.get(accessor) for member in properties.values() for accessor in ("getter", "setter")}
+    groups = {"Static methods": [], "Instance methods": [], "Virtual methods": [], "Property accessors": []}
+    for name, member in sorted(methods.items()):
         qualifiers = member.element.get("qualifiers", "").split()
         category = "Instance methods"
-        if "static" in qualifiers:
+        if name in accessors:
+            category = "Property accessors"
+        elif "static" in qualifiers:
             category = "Static methods"
         elif "virtual" in qualifiers:
             category = "Virtual methods"
-        summary = re.split(r"(?<=[.!?])\s+(?=[A-Z])|\n\n", member.description, maxsplit=1)[0]
-        method = f"[{code(name + '()')}](#{name.lower()})"
-        groups[category].append(f"| {method} | {table_cell(prose(summary, known_classes))} |")
-    lines = []
+        groups[category].append((name, member))
+    lines.extend(["## Methods", ""])
     for category, rows in groups.items():
         if rows:
-            lines.extend([f"### {category}", "", "| Method | Purpose |", "| --- | --- |", *rows, ""])
+            lines.extend([f"### {category}", "", *entries("methods", rows, "####")])
     return lines
 
 
-def render_callables(entries: dict[str, MemberDoc], method: bool, known_classes: set[str]) -> list[str]:
-    """Render each signal or method so readers can jump directly to its declaration."""
+def render_signals(entries: dict[str, MemberDoc], known_classes: set[str]) -> list[str]:
+    """Keep signal signatures and their stable anchors on the class page."""
     if not entries:
         return []
-    lines = ["## Methods" if method else "## Signals", ""]
-    heading = "###"
-    if method and len(entries) >= 4:
-        lines.extend(render_method_index(entries, known_classes))
-        lines.extend(["### Method details", ""])
-        heading = "####"
+    lines = ["## Signals", ""]
     for name, member in sorted(entries.items()):
-        lines.extend([f"{heading} {code(name)}", "", code(call_signature(member.element, method)), ""])
+        lines.extend([f"### {code(name)}", "", code(call_signature(member.element, False)), ""])
         status = annotations(member.element)
         if status:
             lines.extend([f"**{plain(status)}**", ""])
@@ -494,6 +486,18 @@ def render_constants(constants: dict[str, MemberDoc], known_classes: set[str]) -
     return lines
 
 
+def api_breadcrumb(doc: ClassDoc, category: str | None = None) -> str:
+    """Link the API index, module, optional service area, and owning class section."""
+    links = ["[API Reference](/api/overview)", f"[{plain(doc.group)}](/{module_route(doc.group)})"]
+    section = class_section(doc)
+    if section:
+        links.append(f"[{plain(section)}](/{module_route(doc.group, section)})")
+    if category:
+        route = f"/{CLASS_ROUTE}/{doc.name}"
+        links.extend([f"[{code(doc.name)}]({route})", f"[{category.title()}]({route}#{category})"])
+    return " › ".join(links)
+
+
 def render_class(
     doc: ClassDoc,
     members: dict[str, dict[str, MemberDoc]],
@@ -510,17 +514,18 @@ def render_class(
         "---",
         f"title: {json.dumps(doc.name)}",
         f"description: {json.dumps(summary, ensure_ascii=False)}",
+    ]
+    if not (members["properties"] or members["methods"]):
+        lines.append('icon: "cube"')
+    lines.extend([
         "---",
         "",
         "{/* " + NOTICE + " */}",
         "{/* Generated by scripts/generate_api.py. Update the class XML or prose overlay instead. */}",
         "",
-    ]
-    module = f"[{plain(doc.group)}](/{module_route(doc.group)})"
-    section = class_section(doc)
-    if section:
-        module += f" / [{plain(section)}](/{module_route(doc.group, section)})"
-    lines.extend([f"**Module** {module}", ""])
+        api_breadcrumb(doc),
+        "",
+    ])
     base = root.get("inherits")
     if base:
         lines.extend([f"**Inherits** {class_link(base, known_classes)}", ""])
@@ -530,9 +535,8 @@ def render_class(
         lines.extend(["Crimson creates this class internally. You can use the instances exposed by the framework.", ""])
     if description and description != brief:
         lines.extend(["## Description", "", prose(description, known_classes), ""])
-    lines.extend(render_properties(members["properties"], known_classes))
-    lines.extend(render_callables(members["methods"], True, known_classes))
-    lines.extend(render_callables(members["signals"], False, known_classes))
+    lines.extend(render_member_index(doc.name, members, known_classes))
+    lines.extend(render_signals(members["signals"], known_classes))
     lines.extend(render_constants(members["constants"], known_classes))
     links = []
     if doc.authored is not None:
@@ -653,23 +657,37 @@ def render_module_pages(classes: dict[str, ClassDoc], members: dict,
     return pages
 
 
-def navigation(classes: dict[str, ClassDoc]) -> list[dict]:
-    """Give each collapsible module and service area a clickable root page."""
+def class_navigation(name: str, members: dict[str, dict[str, MemberDoc]]) -> str | dict:
+    """Expose member pages in collapsible groups beneath their owning class."""
+    class_route = f"{CLASS_ROUTE}/{name}"
+    groups = [
+        {"group": category.title(), "icon": icon, "expanded": False,
+         "pages": [member_route(name, category, member) for member in sorted(members[category])]}
+        for category, icon in (("properties", "sliders"), ("methods", "code")) if members[category]
+    ]
+    if not groups:
+        return class_route
+    return {"group": name, "icon": "cube", "root": class_route, "expanded": False, "pages": groups}
+
+
+def navigation(classes: dict[str, ClassDoc], members: dict) -> list[dict]:
+    """Give modules, classes, and their members a predictable sidebar path."""
     modules = []
     for group, sections in module_catalog(classes).items():
         pages = []
         for section, docs in sections.items():
-            class_pages = [f"{CLASS_ROUTE}/{doc.name}" for doc in docs]
+            class_pages = [class_navigation(doc.name, members[doc.name]) for doc in docs]
             if section is None:
                 pages.extend(class_pages)
             else:
-                pages.append({"group": section, "root": module_route(group, section),
+                pages.append({"group": section, "icon": "folder", "root": module_route(group, section),
                               "expanded": False, "pages": class_pages})
-        modules.append({"group": group, "root": module_route(group), "expanded": False, "pages": pages})
+        modules.append({"group": group, "icon": "layer-group", "root": module_route(group),
+                        "expanded": False, "pages": pages})
     return [{"group": "Modules", "pages": modules}]
 
 
-def sync_navigation(classes: dict[str, ClassDoc], check: bool) -> None:
+def sync_navigation(classes: dict[str, ClassDoc], members: dict, check: bool) -> None:
     """Update generated groups beneath the authored API overview."""
     path = DOCS_ROOT / "docs.json"
     config = json.loads(path.read_text(encoding="utf-8"))
@@ -677,7 +695,7 @@ def sync_navigation(classes: dict[str, ClassDoc], check: bool) -> None:
     groups = api["groups"]
     if not groups or "api/overview" not in groups[0]["pages"]:
         raise ValueError("The API reference tab must start with the authored overview group.")
-    expected = [groups[0], *navigation(classes)]
+    expected = [groups[0], *navigation(classes, members)]
     if groups == expected:
         return
     if check:
@@ -719,6 +737,185 @@ def sync_pages(output_route: str, pages: dict[str, str], check: bool) -> None:
         raise ValueError(f"Update or remove these generated API pages: {', '.join(stale)}")
 
 
+def member_route(class_name: str, category: str, name: str) -> str:
+    """Return the detail page for a method or property of a Crimson class."""
+    return f"{CLASS_ROUTE}/{class_name}/{category}/{name}"
+
+
+def add_property_accessors(members: dict) -> None:
+    """Add reflected accessors Godot groups with properties instead of methods."""
+    path = DOCS_ROOT / "scripts" / "api-accessor-parameters.json"
+    parameter_names = json.loads(path.read_text(encoding="utf-8"))
+    for class_name, categories in members.items():
+        methods = categories["methods"]
+        properties = categories["properties"]
+        for property_name, prop in properties.items():
+            if prop.element.get("overrides"):
+                continue
+            for attribute, action in (("getter", "Returns the value of"), ("setter", "Sets the value of")):
+                name = prop.element.get(attribute)
+                if not name or name in methods:
+                    continue
+                method = accessor_member(name, properties)
+                if method is None:
+                    raise ValueError(f"Could not resolve accessor {name} for {property_name}.")
+                method.description = f"{action} the [member {property_name}] property."
+                if attribute == "setter":
+                    parameter = method.element.find("param")
+                    parameter.set("name", parameter_names.pop(f"{class_name}.{name}", "value"))
+                methods[name] = method
+    if parameter_names:
+        raise ValueError(f"Unused accessor parameters in {path.name}: {', '.join(sorted(parameter_names))}.")
+
+
+def render_member_parameters(element: ET.Element, known_classes: set[str]) -> list[str]:
+    """List parameters and defaults from the binding's callable declaration."""
+    params = sorted(element.findall("param"), key=lambda param: int(param.attrib["index"]))
+    varargs = "vararg" in element.get("qualifiers", "").split()
+    if not params and not varargs:
+        return []
+    lines = ["## Parameters", "", "| Parameter | Type | Default |", "| --- | --- | --- |"]
+    for param in params:
+        default = code(param.attrib["default"]) if "default" in param.attrib else "—"
+        row = (code(param.attrib["name"]), class_link(type_label(param), known_classes), default)
+        lines.append("| " + " | ".join(map(table_cell, row)) + " |")
+    if varargs:
+        lines.append("| `...` | `Variant` | — |")
+    return lines + [""]
+
+
+def render_member_return(element: ET.Element, description: str, known_classes: set[str]) -> list[str]:
+    """Show the declared type and any explicitly documented awaited result."""
+    returns = element.find("return")
+    if returns is None or returns.get("type") == "void":
+        return []
+    declared = type_label(returns)
+    lines = ["## Return value", "", class_link(declared, known_classes), ""]
+    if declared != "Variant" or not re.search(r"\bawait(?:ing)?\b|\bcompletion signal\b", description, re.I):
+        return lines
+
+    types = set(re.findall(r"\[(\w+Result)\]", description)) & known_classes
+    if len(types) == 1:
+        awaited = class_link(next(iter(types)), known_classes)
+    elif re.search(r"\bresult dictionary\b", description, re.I):
+        awaited = code("Dictionary")
+    else:
+        return lines
+    lines.extend([f"Await the call to receive {awaited}.", ""])
+    return lines
+
+
+def render_member_property(class_name: str, element: ET.Element, methods: dict[str, MemberDoc],
+                           known_classes: set[str]) -> list[str]:
+    """Show a property's reflected type, access, and accessor declarations."""
+    getter = element.get("getter")
+    setter = element.get("setter")
+    access = "Read and write" if getter and setter else "Read only" if getter else "Write only"
+    rows = [
+        ("Type", class_link(type_label(element), known_classes)),
+        ("Access", access),
+    ]
+    if "default" in element.attrib:
+        rows.append(("Default", code(element.attrib["default"])))
+    if element.get("overrides"):
+        rows.append(("Inherited from", class_link(element.attrib["overrides"], known_classes)))
+    for label, name in (("Getter", getter), ("Setter", setter)):
+        if name:
+            accessor = code(f"{name}()")
+            if name in methods:
+                accessor = f"[{accessor}](/{member_route(class_name, 'methods', name)})"
+            rows.append((label, accessor))
+    return ["## Property details", "", "| Detail | Value |", "| --- | --- |",
+            *["| " + " | ".join(map(table_cell, row)) + " |" for row in rows], ""]
+
+
+def render_member_page(doc: ClassDoc, category: str, name: str, member: MemberDoc,
+                       class_members: dict[str, dict[str, MemberDoc]], known_classes: set[str],
+                       example: str) -> str:
+    """Render one documented binding as its own Mintlify page."""
+    is_method = category == "methods"
+    element = member.element
+    summary_parts = re.split(r"(?<=[.!?])\s+(?=[A-Z\[])|\n\n", member.description, maxsplit=1)
+    summary = BBCODE.sub(lambda match: match.group(1) or match.group(3) or match.group(2), summary_parts[0])
+    summary = " ".join(summary.split())
+    title = f"{name}()" if is_method else name
+    lines = [
+        "---",
+        f"title: {json.dumps(title)}",
+        f"sidebarTitle: {json.dumps(name)}",
+        f"description: {json.dumps(summary, ensure_ascii=False)}",
+        "---",
+        "",
+        "{/* " + NOTICE + " */}",
+        "{/* Generated by scripts/generate_api.py. Update the binding documentation or example inputs instead. */}",
+        "",
+        api_breadcrumb(doc, category),
+        "",
+    ]
+    if doc.group == "Steam publisher":
+        lines.extend(["**Availability** [Trusted Steam publisher addon](/steam/publisher).", ""])
+    status = annotations(element)
+    if status:
+        lines.extend([f"**{plain(status)}**", ""])
+    if is_method:
+        for property_name, prop in class_members["properties"].items():
+            if name in (prop.element.get("getter"), prop.element.get("setter")):
+                lines.extend([
+                    f"**Property** [{code(property_name)}](/{member_route(doc.name, 'properties', property_name)})",
+                    "",
+                ])
+        signature = call_signature(element, True)
+    else:
+        signature = f"var {name}: {type_label(element)}"
+        if "default" in element.attrib:
+            signature += f" = {element.attrib['default']}"
+    lines.extend(["## Signature", "", "```text", signature, "```", ""])
+    if is_method:
+        lines.extend(render_member_parameters(element, known_classes))
+        lines.extend(render_member_return(element, member.description, known_classes))
+    else:
+        lines.extend(render_member_property(doc.name, element, class_members["methods"], known_classes))
+    if len(summary_parts) > 1:
+        lines.extend(["## Description", "", prose(summary_parts[1], known_classes), ""])
+    lines.extend(["## Example", "", "```gdscript", example.rstrip(), "```", ""])
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def example_factories(members: dict[str, dict[str, dict[str, MemberDoc]]]) -> dict[str, tuple[str, str]]:
+    """Find safe service accessors and builders that can supply an example receiver."""
+    sources = {
+        "SteamScope": {"messages", "networking", "purchases"},
+        "SteamClient": set("""
+            apps auth browser cloud device diagnostics friends http input inventory leaderboards lobbies
+            music overlay parties presence remote_play screenshots server_browser sockets stats timeline
+            utils video voice workshop
+        """.split()),
+        "SteamPublisher": {"auth", "game_notifications", "inventory", "leaderboards", "moderation", "purchases"},
+        "GameRuntime": {"get_possession", "get_transactions", "invites", "voice"},
+        "SteamDedicatedServer": {"status"},
+        "SteamLobbies": {"query"},
+        "SteamServerBrowser": {"query"},
+        "SteamLobby": {"edit"},
+        "SteamStats": {"edit"},
+        "SteamServerPlayerStats": {"edit"},
+    }
+    factories = {}
+    for owner, names in sources.items():
+        for name, member in sorted(members.get(owner, {}).get("methods", {}).items()):
+            if name not in names:
+                continue
+            element = member.element
+            qualifiers = element.get("qualifiers", "").split()
+            if "static" in qualifiers or "virtual" in qualifiers:
+                continue
+            if any("default" not in param.attrib for param in element.findall("param")):
+                continue
+            result = element.find("return")
+            if result is not None and result.get("type") in members and result.get("type") != owner:
+                factories.setdefault(result.attrib["type"], (owner, name))
+    return factories
+
+
 def main() -> None:
     """Generate pages, check reproducibility, or print navigation and prose gaps."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -749,8 +946,9 @@ def main() -> None:
             add_bindings(classes, reflect(args.godot, addon, args.publisher_dll), publisher=True)
         members = {name: collect_members(doc) for name, doc in classes.items()}
         descriptions = load_overlays(classes, members)
+        add_property_accessors(members)
         if args.nav:
-            print(json.dumps(navigation(classes), indent=2))
+            print(json.dumps(navigation(classes, members), indent=2))
             return
         missing = describe_gaps(classes, members, descriptions)
         if args.gaps:
@@ -762,11 +960,31 @@ def main() -> None:
             f"{CLASS_ROUTE}/{name}": render_class(doc, members[name], descriptions.get(name, ""), classes.keys())
             for name, doc in sorted(classes.items())
         }
+        from api_examples import render_example
+
+        examples_path = DOCS_ROOT / "scripts" / "api-member-examples.json"
+        overrides = json.loads(examples_path.read_text(encoding="utf-8-sig")) if examples_path.is_file() else {}
+        factories = example_factories(members)
+        parents = {name: (doc.reflected if doc.reflected is not None else doc.authored).get("inherits", "")
+                   for name, doc in classes.items()}
+        example_keys = set()
+        member_pages = {}
+        for name, doc in sorted(classes.items()):
+            for category in ("methods", "properties"):
+                for member_name, member in sorted(members[name][category].items()):
+                    example_keys.add(f"{name}.{category}.{member_name}")
+                    example = render_example(name, category, member.element, member.description, overrides,
+                                             catalog=members, factories=factories, parents=parents)
+                    member_pages[member_route(name, category, member_name)] = render_member_page(
+                        doc, category, member_name, member, members[name], classes.keys(), example,
+                    )
+        if obsolete_examples := overrides.keys() - example_keys:
+            raise ValueError(f"Unknown member example overrides: {', '.join(sorted(obsolete_examples))}.")
         module_pages = render_module_pages(classes, members, descriptions)
-        sync_pages(CLASS_ROUTE, class_pages, args.check)
+        sync_pages(CLASS_ROUTE, class_pages | member_pages, args.check)
         sync_pages("api/modules", module_pages, args.check)
-        sync_navigation(classes, args.check)
-        print(f"{'Verified' if args.check else 'Generated'} {len(class_pages)} class pages and "
+        sync_navigation(classes, members, args.check)
+        print(f"{'Verified' if args.check else 'Generated'} {len(class_pages)} class pages, {len(member_pages)} member pages, and "
               f"{len(module_pages)} module and service area pages for {args.ref}.")
     except (OSError, ValueError, KeyError, ET.ParseError, subprocess.SubprocessError) as error:
         parser.exit(1, f"{error}\n")

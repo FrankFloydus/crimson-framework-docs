@@ -11,15 +11,15 @@ Install Crimson in your Godot project before adding Steam. The setup is the same
 
 1. Obtain Valve's Steamworks SDK. Crimson v0.0.3 was verified with SDK 1.65. [Steamworks SDK](https://partner.steamgames.com/doc/sdk)
 2. Copy `redistributable_bin/win64/steam_api64.dll` from the SDK into `addons/crimson-framework/bin/` in your Godot project. Put it beside the Crimson DLLs.
-3. Start Steam and sign in. Launch Steam and Godot under the same Windows account and with the same administrator privileges.
+3. For client testing, start Steam and sign in. Run Steam and Godot under the same Windows account and at the same elevation.
 
 ## Launch with an AppID
 
-Steam supplies your AppID when you launch an installed game from the Steam Library. For a development launch, use a separate copy of Godot or a test export. Put a plain text file named `steam_appid.txt` beside the executable. Write only the AppID into the file and launch with that directory as the working directory. [Valve's initialization guide](https://partner.steamgames.com/doc/sdk/api#SteamAPI_Init)
+Steam supplies your AppID when you launch an installed game from the Steam Library. For a development launch, use a separate copy of Godot or a test export. Put a plain text file named `steam_appid.txt` beside the executable. Write only the AppID into the file and launch with that directory as the working directory. Use the same AppID in the script's configuration. The configured value checks the launch AppID and does not replace it. [Valve's initialization guide](https://partner.steamgames.com/doc/sdk/api#SteamAPI_Init)
 
 You can use Valve's Spacewar AppID `480` for a first connection check. Use your own AppID and a Steam test account with a license for your app to verify your achievements, Cloud settings, ownership, or purchases. [Valve's Spacewar example](https://partner.steamgames.com/doc/sdk/api/example)
 
-Run the first client example with the same AppID. It prints the game's Steam language and whether the client is online. [Start a Steam client](/steam/client-services#start-a-client)
+Run the standalone client example with the same AppID. It prints the game's Steam language and whether the client is online. [Start a standalone client](/steam/client-services#start-a-standalone-client)
 
 ## Export and verify on Windows
 
@@ -29,7 +29,37 @@ Test your Debug export and your Release export. For the distribution check, put 
 
 ### Relaunch an unwrapped export through Steam
 
-If your unwrapped game should launch through Steam even when opened from its executable, call [`SteamClient.restart_through_steam_if_needed(app_id)`](/api/classes/SteamClient#restart_through_steam_if_needed) at your common startup entry point, before initializing any Steam service. Quit the current process on `ERR_SKIP` so Steam can launch the installed copy. Proceed with Steam startup on `OK` and surface any other error. Use your authorized shipping AppID. [Valve's relaunch check](https://partner.steamgames.com/doc/sdk/api#SteamAPI_RestartAppIfNecessary)
+Use this option for an unwrapped, rendered Windows export with an authorized shipping AppID. Attach the script to your startup node, assign **Shipping App ID**, and run it before any Steam client or game provider initializes. For this launch, leave the early `--crimson-steam-overlay` bootstrap disabled. [`SteamClient.restart_through_steam_if_needed()`](/api/classes/SteamClient/methods/restart_through_steam_if_needed) requests a Steam relaunch on `ERR_SKIP` and allows normal startup on `OK`. Use an installed copy of your game and leave the development `steam_appid.txt` out of the export when testing the relaunch. [Valve's relaunch check](https://partner.steamgames.com/doc/sdk/api#SteamAPI_RestartAppIfNecessary)
+
+```gdscript
+extends Node
+
+@export var shipping_app_id: int
+
+func _ready() -> void:
+    if shipping_app_id <= 0:
+        push_error("Assign your shipping AppID in the Inspector.")
+        return
+
+    var launch_status: Error = SteamClient.restart_through_steam_if_needed(shipping_app_id)
+    if launch_status == ERR_SKIP:
+        get_tree().quit()
+        return
+    if launch_status != OK:
+        push_error("Steam launch check failed: %s" % error_string(launch_status))
+        return
+
+    var steam: SteamClient = SteamClient.boot(self, shipping_app_id)
+    if steam == null:
+        push_error("Could not attach a Steam client.")
+        return
+    if not steam.is_ready():
+        push_error(steam.get_initialization_error())
+        return
+    print("Steam client ready.")
+```
+
+This example starts a standalone client. To use a game-owned Steam provider, keep the launch check and boot your game in the success branch. [Set up a Steam game](/steam/listen-servers)
 
 ### Wrap an export for Steam DRM
 

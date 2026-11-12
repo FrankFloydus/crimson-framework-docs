@@ -13,13 +13,15 @@ Choose the path that owns your Steam connection. A game can start a standalone c
 
 ### Start a standalone client
 
-Attach this script to a node that stays in the scene tree when your game changes levels. [`SteamClient.boot()`](/api/classes/SteamClient#boot) connects when the node is ready. The example uses Valve's Spacewar AppID. Replace `480` with your game's AppID.
+Attach this script to a node that stays in the scene tree when your game changes levels. [`SteamClient.boot()`](/api/classes/SteamClient/methods/boot) attaches a client and starts its Steam scope. `STEAM_APP_ID` uses Valve's Spacewar AppID. Set it to your game's AppID and match it to the [launch setup](/steam/setup#launch-with-an-appid). Run the scene and check **Output** for `Steam online` and the game's language.
 
 ```gdscript
 extends Node
 
+const STEAM_APP_ID: int = 480
+
 func _ready() -> void:
-    var steam := SteamClient.boot(self, 480)
+    var steam: SteamClient = SteamClient.boot(self, STEAM_APP_ID)
     if steam == null:
         push_error("Could not attach the Steam client.")
         return
@@ -33,20 +35,22 @@ func _ready() -> void:
     print("Steam online: ", steam.is_online())
 ```
 
-[`is_ready()`](/api/classes/SteamClient#is_ready) tells you whether the local Steam client initialized. [`is_online()`](/api/classes/SteamClient#is_online) checks whether it is connected. In Steam Offline Mode, some cached features may still be available. Call Steam services from Godot's main thread.
+[`is_ready()`](/api/classes/SteamClient/methods/is_ready) tells you whether the local Steam client initialized. [`is_online()`](/api/classes/SteamClient/methods/is_online) checks whether it is connected. In Steam Offline Mode, some cached features may still be available. Call Steam services from Godot's main thread.
 
 ### Reuse a game's Steam provider
 
-Once your [`GameRuntime`](/api/classes/GameRuntime) has been attached with a Steam provider, call the function below with that game. [`SteamServices.for_game(game)`](/api/classes/SteamServices#for_game) returns its [`SteamScope`](/api/classes/SteamScope). A missing scope and a scope that failed to initialize are separate cases. [Set up a Steam game](/steam/listen-servers)
+Attach this script to a node in your game scene. Call `print_game_steam_language(game)` after your [`GameRuntime`](/api/classes/GameRuntime) is attached with a Steam provider. [`SteamServices.for_game(game)`](/api/classes/SteamServices/methods/for_game) returns its [`SteamScope`](/api/classes/SteamScope). The script handles both a missing scope and an initialization failure. [Set up a Steam game](/steam/listen-servers)
 
 ```gdscript
+extends Node
+
 func print_game_steam_language(game: GameRuntime) -> void:
     var scope: SteamScope = SteamServices.for_game(game)
     if scope == null:
         push_warning("This game has no Steam scope.")
         return
     if not scope.is_ready():
-        var reason := scope.get_initialization_error()
+        var reason: String = scope.get_initialization_error()
         push_warning(reason if not reason.is_empty() else "The Steam scope is unavailable.")
         return
 
@@ -55,35 +59,50 @@ func print_game_steam_language(game: GameRuntime) -> void:
         print("Steam game language: ", apps.current_language())
 ```
 
-Use the scope's [`is_ready()`](/api/classes/SteamScope#is_ready) and [`get_initialization_error()`](/api/classes/SteamScope#get_initialization_error) to check that attachment. Get the scope and service handles again when you replace the game. This function resolves both handles each time it runs.
+Use the scope's [`is_ready()`](/api/classes/SteamScope/methods/is_ready) and [`get_initialization_error()`](/api/classes/SteamScope/methods/get_initialization_error) to check that attachment. Get the scope and service handles again when you replace the game. This function resolves both handles each time it runs.
 
 ### Recover a standalone client
 
-If your game loses its local connection to the Steam client process, a standalone [`SteamClient`](/api/classes/SteamClient) emits [`runtime_lost`](/api/classes/SteamClient#runtime_lost). To try once per failure, add these functions to your startup script and call `watch_steam_client(steam, 480)` after the client starts. Use the same AppID as your startup code.
+If your game loses its local connection to the Steam client process, a standalone [`SteamClient`](/api/classes/SteamClient) emits [`runtime_lost`](/api/classes/SteamClient#runtime_lost). Attach this script to a persistent node to start a client and try one restart each time it loses the runtime. Set `STEAM_APP_ID` for your project.
 
 ```gdscript
-func watch_steam_client(client: SteamClient, app_id: int) -> void:
-    client.runtime_lost.connect(_restart_steam_client.bind(client, app_id), CONNECT_DEFERRED)
+extends Node
 
-func _restart_steam_client(client: SteamClient, app_id: int) -> void:
-    if not is_instance_valid(client) or not client.is_inside_tree():
+const STEAM_APP_ID: int = 480
+
+var _client: SteamClient
+
+func _ready() -> void:
+    _client = SteamClient.boot(self, STEAM_APP_ID)
+    if _client == null:
+        push_error("Could not attach the Steam client.")
         return
-    if client.start(app_id) != OK:
-        push_warning(client.get_initialization_error())
+    if not _client.is_ready():
+        push_error(_client.get_initialization_error())
         return
 
-    var apps: SteamApps = client.apps()
+    _client.runtime_lost.connect(_restart_steam_client, CONNECT_DEFERRED)
+
+func _restart_steam_client() -> void:
+    if not is_instance_valid(_client) or not _client.is_inside_tree():
+        return
+    var restart_error: Error = _client.start(STEAM_APP_ID)
+    if restart_error != OK:
+        push_warning(_client.get_initialization_error())
+        return
+
+    var apps: SteamApps = _client.apps()
     if apps != null:
         print("Steam game language after restart: ", apps.current_language())
 ```
 
-The deferred connection calls [`start()`](/api/classes/SteamClient#start) after the failure callback returns. After a successful restart, ask the client for fresh handles, as shown by the call to [`apps()`](/api/classes/SteamClient#apps). A temporary loss of connectivity to Valve keeps the local scope active.
+The deferred connection calls [`start()`](/api/classes/SteamClient/methods/start) after the failure callback returns. After a successful restart, ask the client for fresh handles, as shown by the call to [`apps()`](/api/classes/SteamClient/methods/apps). A temporary loss of connectivity to Valve keeps the local scope active.
 
 ## Choose a service
 
 | Use case | Service |
 | --- | --- |
-| App language, installed DLC, branch, and notification launch IDs | [SteamApps](/api/classes/SteamApps) through [`apps()`](/api/classes/SteamClient#apps) |
+| App language, installed DLC, branch, and notification launch IDs | [SteamApps](/api/classes/SteamApps) through [`apps()`](/api/classes/SteamClient/methods/apps) |
 | Friends, localized display status, and Steam panes | [SteamFriends](/api/classes/SteamFriends), [SteamPresence](/api/classes/SteamPresence), and [SteamOverlay](/api/classes/SteamOverlay) |
 | Stats, achievements, and ranked results | [SteamStats](/api/classes/SteamStats) and [SteamLeaderboards](/api/classes/SteamLeaderboards) |
 | Files, quota, shared files, and write batch hints | [SteamCloud](/api/classes/SteamCloud) |
@@ -95,36 +114,55 @@ The deferred connection calls [`start()`](/api/classes/SteamClient#start) after 
 
 ## Record progression
 
-Publish the stat and achievement definitions for your AppID in Steamworks. Use their exact API names. When one game event changes several values, collect them with [`edit()`](/api/classes/SteamStats#edit) and apply them together with [`submit()`](/api/classes/SteamStatsEdit#submit). Pass the [`SteamStats`](/api/classes/SteamStats) service from your client or game scope and the player's total number of wins.
+Use your own AppID. In Steamworks, publish an integer stat and an achievement that the client can update. Set the script constants to their exact API names. When one game event changes several values, collect them with [`edit()`](/api/classes/SteamStats/methods/edit) and apply them together with [`submit()`](/api/classes/SteamStatsEdit/methods/submit). Attach this script to a node and call `record_win()` after a victory. Pass the [`SteamStats`](/api/classes/SteamStats) service from your [client](/api/classes/SteamClient/methods/stats) or [game scope](/api/classes/SteamScope/methods/stats) and the player's total number of wins. [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
 
 ```gdscript
+extends Node
+
+const WIN_STAT: String = "wins"
+const FIRST_WIN_ACHIEVEMENT: String = "first_win"
+
 func record_win(stats: SteamStats, total_wins: int) -> void:
-    var result := stats.edit() \
-        .set_int("wins", total_wins) \
-        .unlock("first_win") \
+    if stats == null:
+        push_warning("Steam stats are unavailable.")
+        return
+
+    var result: SteamStatsSubmissionResult = stats.edit() \
+        .set_int(WIN_STAT, total_wins) \
+        .unlock(FIRST_WIN_ACHIEVEMENT) \
         .submit()
     if not result.ok:
         push_warning(result.message)
+        return
+    print("Steam accepted the progression update for storage.")
 ```
 
-The result describes the submission. [`value.applied`](/api/classes/SteamStatsSubmission#properties) counts edits accepted into Steam's cache, and [`value.failed_at`](/api/classes/SteamStatsSubmission#properties) identifies the first rejected edit when there is one. Accepted edits can remain in the cache after a later error. Observe [`stats_stored`](/api/classes/SteamStats#stats_stored) for Steam's app-wide persistence result. For scores governed by a dedicated authority or trusted backend, use the [dedicated progression](/steam/dedicated-servers#record-server-owned-progression) or [publisher workflow](/steam/publisher) for that authority.
+The result describes the submission. [`value.applied`](/api/classes/SteamStatsSubmission/properties/applied) counts edits accepted into Steam's cache, and [`value.failed_at`](/api/classes/SteamStatsSubmission/properties/failed_at) identifies the first rejected edit when there is one. Accepted edits can remain in the cache after a later error. Observe [`stats_stored`](/api/classes/SteamStats#stats_stored) for Steam's app-wide persistence result. For scores governed by a dedicated authority or trusted backend, use the [dedicated progression](/steam/dedicated-servers#record-server-owned-progression) or [publisher workflow](/steam/publisher) for that authority.
 
 ## Save a profile to Cloud
 
-Enable Cloud and allocate quota for your AppID in Steamworks. Get a [`SteamCloud`](/api/classes/SteamCloud) service from a ready [`SteamClient`](/api/classes/SteamClient#cloud) or [`SteamScope`](/api/classes/SteamScope#cloud). Pass a non-null service and your serialized profile bytes to the examples below. Use a dedicated file key for the game's profile.
+Enable Cloud and allocate quota for your own AppID in Steamworks. Use a test account with access to that app when testing writes. Get a [`SteamCloud`](/api/classes/SteamCloud) service from a ready [`SteamClient`](/api/classes/SteamClient/methods/cloud) or [`SteamScope`](/api/classes/SteamScope/methods/cloud). Choose one of the scripts below and attach it to a node. Call its save function with that service and your serialized bytes. Use a dedicated file key for the game's profile.
 
 ### Await the result directly
 
-Use [`write()`](/api/classes/SteamCloud#write) and [`read()`](/api/classes/SteamCloud#read) when your code only needs the completed results.
+Call `save_and_read_profile(cloud, profile_bytes)` when your code only needs the completed results from [`write()`](/api/classes/SteamCloud/methods/write) and [`read()`](/api/classes/SteamCloud/methods/read).
 
 ```gdscript
+extends Node
+
+const PROFILE_FILE: String = "player-profile.json"
+
 func save_and_read_profile(cloud: SteamCloud, profile_bytes: PackedByteArray) -> void:
-    var written: SteamResult = await cloud.write("player-profile.json", profile_bytes)
+    if cloud == null:
+        push_warning("Steam Cloud is unavailable.")
+        return
+
+    var written: SteamResult = await cloud.write(PROFILE_FILE, profile_bytes)
     if not written.ok:
         push_warning(written.message)
         return
 
-    var loaded: SteamBytesResult = await cloud.read("player-profile.json")
+    var loaded: SteamBytesResult = await cloud.read(PROFILE_FILE)
     if loaded.ok:
         print("Read %d bytes from Steam Cloud." % loaded.value.size())
     else:
@@ -133,65 +171,121 @@ func save_and_read_profile(cloud: SteamCloud, profile_bytes: PackedByteArray) ->
 
 ### Keep the operation handle
 
-Use [`write_file()`](/api/classes/SteamCloud#write_file) and [`read_file()`](/api/classes/SteamCloud#read_file) when you want a handle that your code can keep and check while the request is pending. Here the function waits on each handle before using its result.
+Call `save_and_read_with_handles(cloud, profile_bytes)` to retain the operations from [`write_file()`](/api/classes/SteamCloud/methods/write_file) and [`read_file()`](/api/classes/SteamCloud/methods/read_file). The script keeps each pending handle so a screen can call `cancel_pending_requests()` when it closes.
 
 ```gdscript
+extends Node
+
+const PROFILE_FILE: String = "player-profile.json"
+
+var _write_operation: SteamOperation
+var _read_operation: SteamBytesOperation
+
 func save_and_read_with_handles(cloud: SteamCloud, profile_bytes: PackedByteArray) -> void:
-    var write_op: SteamOperation = cloud.write_file("player-profile.json", profile_bytes)
-    var written: SteamResult = await write_op.wait()
+    if cloud == null:
+        push_warning("Steam Cloud is unavailable.")
+        return
+    if _write_operation != null or _read_operation != null:
+        push_warning("A Steam Cloud request is already pending.")
+        return
+
+    _write_operation = cloud.write_file(PROFILE_FILE, profile_bytes)
+    var written: SteamResult = await _write_operation.wait()
+    _write_operation = null
     if not written.ok:
         push_warning(written.message)
         return
 
-    var read_op: SteamBytesOperation = cloud.read_file("player-profile.json")
-    var loaded: SteamBytesResult = await read_op.wait()
+    _read_operation = cloud.read_file(PROFILE_FILE)
+    var loaded: SteamBytesResult = await _read_operation.wait()
+    _read_operation = null
     if loaded.ok:
         print("Read %d bytes from Steam Cloud." % loaded.value.size())
     else:
         push_warning(loaded.message)
+
+func cancel_pending_requests() -> void:
+    if _write_operation != null:
+        _write_operation.cancel()
+    if _read_operation != null:
+        _read_operation.cancel()
 ```
 
-If a screen keeps the write handle, it can call [`cancel()`](/api/classes/SteamOperation#cancel) when it closes. That stops waiting locally. Steam can still complete a submitted write.
+Calling [`cancel()`](/api/classes/SteamOperation/methods/cancel) stops waiting locally. Steam can still complete a submitted write.
 
 ### Group related writes
 
-Use [`begin_write_batch()`](/api/classes/SteamCloud#begin_write_batch) to tell Steam that a group of writes belongs together. Close the batch after the last result, even if a write fails. Each write still has its own result. [Steam Cloud write batches](https://partner.steamgames.com/doc/api/ISteamRemoteStorage#BeginFileWriteBatch)
+Call `write_profile_batch(cloud, profile_bytes, settings_bytes)` to group both writes with [`begin_write_batch()`](/api/classes/SteamCloud/methods/begin_write_batch). The script closes the batch after the last result, even if a write fails. Each write still has its own result. [Steam Cloud write batches](https://partner.steamgames.com/doc/api/ISteamRemoteStorage#BeginFileWriteBatch)
 
 ```gdscript
+extends Node
+
+const PROFILE_FILE: String = "player-profile.json"
+const SETTINGS_FILE: String = "settings.json"
+
 func write_profile_batch(
     cloud: SteamCloud, profile_bytes: PackedByteArray, settings_bytes: PackedByteArray
 ) -> void:
+    if cloud == null:
+        push_warning("Steam Cloud is unavailable.")
+        return
+
     var opened: SteamCloudWriteBatchResult = cloud.begin_write_batch()
     if not opened.ok:
         push_warning(opened.message)
         return
 
     var batch: SteamCloudWriteBatch = opened.value
-    var files := {"player-profile.json": profile_bytes, "settings.json": settings_bytes}
+    var files: Dictionary[String, PackedByteArray] = {
+        PROFILE_FILE: profile_bytes,
+        SETTINGS_FILE: settings_bytes,
+    }
     for file_name: String in files:
         var written: SteamResult = await cloud.write(file_name, files[file_name])
         if not written.ok:
             push_warning(written.message)
             break
 
-    var close_error := batch.close()
+    var close_error: Error = batch.close()
     if close_error != OK:
         push_warning(error_string(close_error))
 ```
 
-[`SteamCloudWriteBatch.close()`](/api/classes/SteamCloudWriteBatch#close) ends the hint. Check actual sync on a second device using the same test account. [Verify Steam Cloud sync](/steam/testing#verify-steam-cloud-sync)
+[`SteamCloudWriteBatch.close()`](/api/classes/SteamCloudWriteBatch/methods/close) ends the hint. Check actual sync on a second device using the same test account. [Verify Steam Cloud sync](/steam/testing#verify-steam-cloud-sync)
 
 ## Open the Steam Overlay
 
-From your achievements button's pressed handler, pass a fresh Overlay service from [`SteamClient.overlay()`](/api/classes/SteamClient#overlay) or [`SteamScope.overlay()`](/api/classes/SteamScope#overlay) to this function. It checks [`is_ready()`](/api/classes/SteamOverlay#is_ready) before calling [`open_achievements()`](/api/classes/SteamOverlay#open_achievements).
+Attach this script to a node. In the Inspector, assign the achievements button and either a standalone Steam client or a game configured with a Steam provider. Each press gets the current service through [`SteamClient.overlay()`](/api/classes/SteamClient/methods/overlay) or [`SteamScope.overlay()`](/api/classes/SteamScope/methods/overlay). The script checks [`is_ready()`](/api/classes/SteamOverlay/methods/is_ready) before calling [`open_achievements()`](/api/classes/SteamOverlay/methods/open_achievements).
 
 ```gdscript
-func open_steam_achievements(overlay: SteamOverlay) -> void:
+extends Node
+
+@export var achievements_button: BaseButton
+@export var steam_client: SteamClient
+@export var game: GameRuntime
+
+func _ready() -> void:
+    if achievements_button == null:
+        push_warning("Assign the achievements button in the Inspector.")
+        return
+    achievements_button.pressed.connect(_open_steam_achievements)
+
+func _open_steam_achievements() -> void:
+    var overlay: SteamOverlay = _get_overlay()
     if overlay == null or not overlay.is_ready():
         return
-    var requested := overlay.open_achievements()
+    var requested: Error = overlay.open_achievements()
     if requested != OK:
         push_warning(error_string(requested))
+
+func _get_overlay() -> SteamOverlay:
+    if is_instance_valid(steam_client) and steam_client.is_ready():
+        return steam_client.overlay()
+    if is_instance_valid(game):
+        var scope: SteamScope = SteamServices.for_game(game)
+        if scope != null and scope.is_ready():
+            return scope.overlay()
+    return null
 ```
 
 `OK` confirms that Crimson submitted the request. Confirm the rendered pane during testing. Use [`activation_changed(active)`](/api/classes/SteamOverlay#activation_changed) to suspend local gameplay input and restore the relevant focus when the Overlay closes. Keep the multiplayer simulation running.
@@ -200,4 +294,4 @@ For a direct, windowed development launch, pass `--crimson-steam-overlay=480` as
 
 ## Consume Steam results
 
-Read [`ok`](/api/classes/SteamResult#properties) before using a result's `value`. Some operations expose [`wait()`](/api/classes/SteamOperation#wait) on an operation handle, while convenience methods can be awaited directly. Check the signature in the [API reference](/api/overview). For Steam HTTP, a completed response can still have a 4xx or 5xx status. Check [`response.value.is_successful()`](/api/classes/SteamHttpResponse#is_successful) when you need a 2xx response. For Steam IDs documented as decimal strings, keep them as strings to preserve their full range.
+Read [`ok`](/api/classes/SteamResult/properties/ok) before using a result's `value`. Some operations expose [`wait()`](/api/classes/SteamOperation/methods/wait) on an operation handle, while convenience methods can be awaited directly. Check the signature in the [API reference](/api/overview). For Steam HTTP, a completed response can still have a 4xx or 5xx status. Check [`response.value.is_successful()`](/api/classes/SteamHttpResponse/methods/is_successful) when you need a 2xx response. For Steam IDs documented as decimal strings, keep them as strings to preserve their full range.

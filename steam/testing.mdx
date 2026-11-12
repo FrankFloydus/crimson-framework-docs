@@ -9,7 +9,7 @@ Test in your Godot project first, then repeat the checks that matter to your gam
 
 ## Verify Steam startup
 
-1. Launch your project using the development AppID setup. Run the example that prints the Steam language and online state. Check that [`is_ready()`](/api/classes/SteamClient#is_ready) is true and that [`is_online()`](/api/classes/SteamClient#is_online) is true when you expect a connection. [Start a Steam client](/steam/client-services#start-a-client)
+1. Launch your project using the development AppID setup. Run the standalone client example and look for `Steam game language` and `Steam online: true` in **Output**. The example checks [`is_ready()`](/api/classes/SteamClient/methods/is_ready) before printing the result of [`is_online()`](/api/classes/SteamClient/methods/is_online). [Start a standalone client](/steam/client-services#start-a-standalone-client)
 2. Run your Windows debug and release exports. Confirm `steam_api64.dll` is beside each executable. [Export and verify on Windows](/steam/setup#export-and-verify-on-windows)
 3. Install the release from your private Steam branch. Launch it from the Steam Library. Steam supplies the AppID for this test, so leave `steam_appid.txt` out of the depot. Confirm the Steam features you use still initialize.
 
@@ -22,13 +22,13 @@ If your game supports offline play, repeat startup with Steam in Offline Mode. M
 
 ## Verify Steam Cloud sync
 
-Save a test profile from your game. Close the game and allow Steam to finish syncing. Launch on a second machine with the same test account and check that the profile loads. [Save a profile to Cloud](/steam/client-services#save-a-profile-to-cloud)
+Use your own Cloud-enabled AppID and a test account with access to the app. Write a test profile and confirm that the write succeeds. Close the game and allow Steam to finish syncing. Launch on a second machine with the same test account, read the same file key, and check that the profile bytes match. [Save a profile to Cloud](/steam/client-services#save-a-profile-to-cloud)
 
 ## Verify multiplayer
 
-Use two machines signed in to different test accounts. Run matching game versions with the same AppID and lobby namespace.
+Use two machines and sign each player client into a different test account. Run compatible builds with the same AppID, provider namespace, and game configuration. The anonymous dedicated server runs in its own process and does not need an interactive Steam account.
 
-- **Listen server.** Host a private lobby and send the guest an invite. Accept it through Steam and verify the guest reaches the same world. Leave on both sides and confirm that you can host and join again. If your game has public or friends-only discovery, test those paths with the intended lobby visibility. [Lobbies and listen servers](/steam/listen-servers)
+- **Listen server.** Set **Lobby Visibility** to **Private**, host, and wait for `Steam lobby ready`. Send an invite, accept it through Steam on the guest, then confirm the join in your game. Verify the guest reaches the same world. Leave on both sides and confirm you can host and join again. For lobby search, repeat the test with **Public** visibility. [Lobbies and listen servers](/steam/listen-servers)
 - **Dedicated server.** Run the headless server and wait for it to report readiness. Join from the guest using the server locator. Confirm the server's admitted player count updates on join and leave. If you advertise the server, find it from the guest's server browser and join that listing too. [Dedicated servers](/steam/dedicated-servers)
 
 ## Verify publisher operations
@@ -42,9 +42,9 @@ If you use Steam Wallet, use Valve's sandbox to run a checkout from your game th
 | Symptom | What to check |
 | --- | --- |
 | Crimson classes are missing in Godot | Check the Godot version, platform, precision, and addon folder. [Installation](/installation) |
-| The Steam client cannot initialize | Read [`get_initialization_error()`](/api/classes/SteamClient#get_initialization_error). Check `steam_api64.dll`, the running Steam account, and whether the launch AppID matches the one your code expects. [Steamworks setup](/steam/setup) |
-| The Steam client starts, but online features fail | Check [`is_online()`](/api/classes/SteamClient#is_online). Steam Offline Mode can still provide cached data for some features. |
-| The Overlay reports `ERR_BUSY` | Make sure the Overlay is enabled, your game is rendering, and [`steam.overlay().is_ready()`](/api/classes/SteamOverlay#is_ready) is true. For direct development launches, check the Overlay launch argument. [Open the Steam Overlay](/steam/client-services#open-the-steam-overlay) |
+| The Steam client cannot initialize | Read [`get_initialization_error()`](/api/classes/SteamClient/methods/get_initialization_error). Check `steam_api64.dll`, the running Steam account, and whether the launch AppID matches the one your code expects. [Steamworks setup](/steam/setup) |
+| The Steam client starts, but online features fail | Check [`is_online()`](/api/classes/SteamClient/methods/is_online). Steam Offline Mode can still provide cached data for some features. |
+| The Overlay reports `ERR_BUSY` | Make sure the Overlay is enabled, your game is rendering, and [`steam.overlay().is_ready()`](/api/classes/SteamOverlay/methods/is_ready) is true. For direct development launches, check the Overlay launch argument. [Open the Steam Overlay](/steam/client-services#open-the-steam-overlay) |
 | A lobby is missing or the guest cannot join | Check visibility, membership, open seats, and whether both builds use the same AppID, namespace, and virtual port. For a private lobby, have the guest accept the invitation through Steam. |
 | The server is ready but absent from the browser | Check that the server requested Internet advertisement, uses your app's product metadata, and has a reachable query port. Verify the listing from a separate Steam client. [Dedicated server discovery](/steam/dedicated-servers#list-the-server-in-steam) |
 | A service handle stops working after a restart or session change | Get a fresh handle from the current Steam client or game. |

@@ -7,6 +7,42 @@ description: "Choose how your Godot game uses Steam through Crimson Framework."
 
 Add Steam to the parts of your game that need it. A solo game can award achievements, sync a player profile to Steam Cloud, or use Steam Input. A multiplayer game can let friends invite each other into a session or give players a dedicated server to join.
 
+## Connect your game to Steam
+
+Add Valve's runtime to your Crimson installation and sign in to Steam. For a development launch, configure the same AppID in the launch environment and in this script. The default is Valve's Spacewar test app. [Steamworks setup](/steam/setup#launch-with-an-appid)
+
+Attach this script to a `Node` in a scene that stays loaded, such as your main menu. Run the scene and check **Output**. A successful connection prints the AppID Steam reports.
+
+```gdscript
+extends Node
+
+const SPACEWAR_APP_ID: int = 480
+
+@export var steam_app_id: int = SPACEWAR_APP_ID
+
+var _steam: SteamClient
+
+
+func _ready() -> void:
+    _steam = SteamClient.boot(self, steam_app_id)
+    if _steam == null:
+        push_error("Could not attach the Steam client.")
+        return
+    if not _steam.is_ready():
+        push_error(_steam.get_initialization_error())
+        return
+
+    if not _steam.is_online():
+        push_warning("Steam initialized locally. Steam is currently offline.")
+        return
+
+    print("Connected to Steamworks for AppID %d." % _steam.get_app_id())
+```
+
+[`SteamClient.boot()`](/api/classes/SteamClient/methods/boot) attaches and initializes the client. [`is_ready()`](/api/classes/SteamClient/methods/is_ready) checks local initialization. [`is_online()`](/api/classes/SteamClient/methods/is_online) checks the connection to Steam. If initialization fails, use the diagnostic in **Output** to check your runtime and launch setup. [Test and troubleshoot](/steam/testing#diagnose-common-failures)
+
+## Choose a guide
+
 | What you want to build | Start here |
 | --- | --- |
 | Add achievements, Cloud saves, or Steam Input | [Use Steam client services](/steam/client-services) |
@@ -14,4 +50,4 @@ Add Steam to the parts of your game that need it. A solo game can award achievem
 | Run a server that players can join without a player hosting it | [Set up a dedicated server](/steam/dedicated-servers) |
 | Verify player ownership or process Steam Wallet purchases | [Set up a trusted publisher backend](/steam/publisher) |
 
-Start by adding Valve's Steam runtime to your installed Crimson addon. Then follow the guide for the features you want and verify them in a Windows export. [Steamworks setup](/steam/setup) · [Test and troubleshoot](/steam/testing)
+Verify the features you use in a Windows export. [Test and troubleshoot](/steam/testing)

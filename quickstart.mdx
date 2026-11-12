@@ -5,7 +5,7 @@ description: "Mount a 3D world and spawn a local player with GameRuntime."
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-In this quickstart, you create a world scene, a player scene, and a main scene. Crimson loads the world, places the player at a spawn point, and activates the player's camera. Install Crimson before creating the scenes. [Installation](/installation)
+Start an offline session and see the world through the spawned player's camera. Install Crimson before creating the scenes. [Installation](/installation)
 
 ## Create the world and player scenes
 
@@ -14,18 +14,22 @@ In this quickstart, you create a world scene, a player scene, and a main scene. 
 
 ## Start the session
 
-Create a scene with a plain `Node` root named `Main` and save it as `res://main.tscn`. Attach a GDScript to `Main` and use this script to boot the game and start a solo session.
+Create a scene with a plain `Node` root named `Main` and save it as `res://main.tscn`. Attach this script to `Main` to configure the game in code. You can also configure the same scenes in the [Inspector](#configure-the-same-game-in-the-inspector).
 
 ```gdscript
 extends Node
+
+const WORLD_ID: StringName = &"training_room"
+const WORLD_SCENE: PackedScene = preload("res://world.tscn")
+const PLAYER_SCENE: PackedScene = preload("res://player.tscn")
 
 var game: GameRuntime
 
 func _ready() -> void:
     game = (
         GameRuntime.configure()
-        .with_starting_world(&"training_room", preload("res://world.tscn"))
-        .with_player(preload("res://player.tscn"))
+        .with_starting_world(WORLD_ID, WORLD_SCENE)
+        .with_player(PLAYER_SCENE)
         .boot(self)
     )
     if game == null:
@@ -40,15 +44,17 @@ func _ready() -> void:
     print("Solo ready: ", game.get_local_player().name)
 ```
 
-Press **F6** with `main.tscn` open, or set it as the main scene and press **F5**. When the box appears, open **Output** and look for a line starting with `Solo ready:`. The player scene in this example is stationary. Add your own controller and input actions when you're ready to move the camera.
-
-[`boot(self)`](/api/classes/GameDefinition#boot) attaches [`GameRuntime`](/api/classes/GameRuntime) to the main scene, which stays alive while it hosts the world. [`play_solo()`](/api/classes/GameRuntime#play_solo) returns a [`GameOperation`](/api/classes/GameOperation). Use [`wait()`](/api/classes/GameOperation#wait) to get a result with `ok`, `code`, and `message`. After success, [`get_world()`](/api/classes/GameRuntime#get_world) and [`get_local_player()`](/api/classes/GameRuntime#get_local_player) return the live nodes. Call [`game.leave()`](/api/classes/GameRuntime#leave) when you're ready to end the session.
+[`boot(self)`](/api/classes/GameDefinition/methods/boot) attaches [`GameRuntime`](/api/classes/GameRuntime) to the main scene, which stays alive while it hosts the world. [`play_solo()`](/api/classes/GameRuntime/methods/play_solo) returns a [`GameOperation`](/api/classes/GameOperation). Use [`wait()`](/api/classes/GameOperation/methods/wait) to get a result with `ok`, `code`, and `message`. After success, [`get_world()`](/api/classes/GameRuntime/methods/get_world) and [`get_local_player()`](/api/classes/GameRuntime/methods/get_local_player) return the live nodes. Call [`game.leave()`](/api/classes/GameRuntime/methods/leave) when you're ready to end the session.
 
 ## Configure the same game in the Inspector
 
-To keep your game configuration in the scene, add a [`GameRuntime`](/api/classes/GameRuntime) child named `Game` under `Main`. Create a [`GameDefinition`](/api/classes/GameDefinition#properties) in its **Definition** property and set **Starting World** to `training_room`, **Starting World Scene** to `world.tscn`, and **Player Scene** to `player.tscn`.
+To keep the configuration in the scene, add a [`GameRuntime`](/api/classes/GameRuntime) child named `Game` under `Main`. Create a [`GameDefinition`](/api/classes/GameDefinition) resource in the **[Definition](/api/classes/GameRuntime/properties/definition)** property. Use the world and player scenes you created above.
 
-Attach this script to `Main` to start the game configured in the Inspector.
+- **[Starting World](/api/classes/GameDefinition/properties/starting_world)** to `training_room`
+- **[Starting World Scene](/api/classes/GameDefinition/properties/starting_world_scene)** to `res://world.tscn`
+- **[Player Scene](/api/classes/GameDefinition/properties/player_scene)** to `res://player.tscn`
+
+Attach this script to `Main` in place of the code configuration script.
 
 ```gdscript
 extends Node
@@ -63,6 +69,10 @@ func _ready() -> void:
 
     print("Solo ready: ", game.get_local_player().name)
 ```
+
+## Run the scene
+
+Press **F6** with `main.tscn` open, or set it as the main scene and press **F5**. You should see the box through the spawned player's camera and a line starting with `Solo ready:` in **Output**. The player stays at the spawn point until you add a controller and input actions.
 
 Look up the game, scene loading, and player classes. [API reference](/api/overview)
 

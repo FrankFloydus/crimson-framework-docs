@@ -27,9 +27,11 @@ For a step-by-step example, start with [your first solo game](/quickstart) or th
 
 ## Read a class page
 
-Follow **Module** to browse related classes, or **Inherits** when it links to another Crimson class. Properties list their type, default, and accessors. Methods list their argument and return types. Larger classes provide a linked method index so you can jump to a signature and its full description.
+Expand a module in the sidebar, open a class, then expand **Properties** or **Methods**. For example, open [Game runtime](/api/modules/game-runtime), choose [`GameRuntime`](/api/classes/GameRuntime), and follow [`play_solo()`](/api/classes/GameRuntime/methods/play_solo). Follow **Inherits** on a class page to find members of its base class when that class is also part of Crimson.
 
-Signals list the values passed to connected callbacks. Enums and constants belong to their declaring class. For asynchronous calls, check the method description to see whether `OK` means the work started or completed, and use the returned operation or request to read the final result.
+Each property page shows its type, access, any documented default, and a GDScript example. Each method page shows its signature, any parameters and return value, and an example. Signals, enums, and constants are listed on their declaring class.
+
+The return value section explains how to receive an asynchronous result. Some methods return an operation and ask you to await its [`wait()`](/api/classes/GameOperation/methods/wait) method. Others, such as [`web_ticket()`](/api/classes/SteamAuth/methods/web_ticket), can be awaited directly.
 
 ## Steam availability
 

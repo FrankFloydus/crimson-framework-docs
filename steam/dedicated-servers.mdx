@@ -7,71 +7,200 @@ description: "Run a dedicated server that Steam players can join directly or fin
 
 ## Start a playerless authority
 
-A dedicated server runs the game world independently of any player. Use the world and player setup from the quickstart and add the Steam runtime to your server project or export. [Getting started](/quickstart) · [Steamworks setup](/steam/setup)
+A dedicated server runs the game world independently of any player. Use the world and player setup from the quickstart. Add one [`PlayerSpawnPoint`](/api/classes/PlayerSpawnPoint) at a distinct position for each remote seat. The dedicated process uses the Steam runtime and the launch AppID. For a development run, set up `steam_appid.txt` on the server as well as on the guest. [Getting started](/quickstart) · [Steamworks setup](/steam/setup#launch-with-an-appid)
 
-In this example, `definition` holds your world and player settings and `app_id` is your game's Steam AppID. The default anonymous server login runs without an interactive Steam account.
+Create a [`GameDefinition`](/api/classes/GameDefinition) with a starting world, its scene, and the player scene. Set its [`Multiplayer Rules`](/api/classes/GameDefinition/properties/multiplayer_rules) to a new `MultiplayerRules` resource, enable **Join In Progress**, and set **Max Players** to your remote seat count. Use the same definition and root node name on the host and guest so their game node paths match.
+
+Attach this script to the root `Node` of the server scene and assign **Game Definition** in the Inspector. Run it with `--headless` and look for `Steam server locator` in the output. The example uses the Spacewar test AppID and its product metadata. Set those values for your own app before deploying. The default anonymous server login runs without an interactive Steam account.
 
 ```gdscript
-var settings := SteamServer.configure("Transfer Hall", 27015, 27016) \
-    .with_product_metadata("1.2.0.0", "Transfer Hall", "TransferHall")
-var provider := SteamProvider.configure().for_app(app_id) \
-    .with_lobby_namespace("my-studio-crimson-demo").dedicated(settings)
-var game := definition.with_provider(provider).boot(self)
-if game == null:
-    return
-var started: Dictionary = await game.start_dedicated_online().wait()
-if started.ok:
+extends Node
+
+const APP_ID: int = 480
+const GAME_PORT: int = 27015
+const QUERY_PORT: int = 27016
+const SESSION_NAMESPACE: String = "crimson-dedicated-example"
+const SERVER_NAME: String = "Crimson Dedicated Example"
+const PRODUCT_VERSION: String = "1.0.0.0"
+const GAME_DESCRIPTION: String = "Spacewar"
+const INSTALL_DIR: String = "Spacewar"
+
+@export var game_definition: GameDefinition
+@export var advertise_in_browser: bool = false
+@export var bind_address: String = "*"
+@export var public_address: String = ""
+@export var login_environment_key: StringName = &""
+
+func _ready() -> void:
+    if game_definition == null or game_definition.multiplayer_rules == null:
+        push_error("Assign a game definition with multiplayer rules for the server.")
+        return
+
+    var settings: SteamServer = SteamServer.configure(SERVER_NAME, GAME_PORT, QUERY_PORT)
+    settings = settings.with_product_metadata(PRODUCT_VERSION, GAME_DESCRIPTION, INSTALL_DIR)
+    settings = settings.bind_to(bind_address)
+    if not login_environment_key.is_empty():
+        settings = settings.with_login(login_environment_key)
+    if advertise_in_browser:
+        settings = settings.advertise_on(SteamServer.INTERNET)
+
+    var provider: SteamProvider = SteamProvider.configure().for_app(APP_ID)
+    provider = provider.with_lobby_namespace(SESSION_NAMESPACE).dedicated(settings)
+    var game: GameRuntime = game_definition.with_provider(provider).boot(self)
+    if game == null:
+        push_error("Could not create the dedicated game.")
+        return
+
+    var operation: GameOperation = game.start_dedicated_online(public_address)
+    var started: Dictionary = await operation.wait()
+    if not started.get("ok", false):
+        push_error("Dedicated server failed to start. %s" % started.get("message", ""))
+        return
     print("Steam server locator: ", game.get_online_listing())
 ```
 
-Use distinct UDP ports for gameplay and queries. Set [`bind_to(address)`](/api/classes/SteamServer#bind_to) for a specific local IPv4 interface. Pass a reachable literal IPv4 address to [`start_dedicated_online(public_address)`](/api/classes/GameRuntime#start_dedicated_online) when clients need an address different from the bound or Steam-reported address. For an operator login, call [`with_login(&"MY_STEAM_SERVER_TOKEN")`](/api/classes/SteamServer#with_login) and set that environment variable only in the dedicated process. [Valve GameServer API](https://partner.steamgames.com/doc/api/ISteamGameServer)
+Use distinct UDP ports for gameplay and queries. Set **Bind Address** to a specific local IPv4 interface if needed. The script passes it to [`bind_to()`](/api/classes/SteamServer/methods/bind_to). Set **Public Address** to a reachable literal IPv4 address when clients need an address different from the bound or Steam-reported address. The script passes it to [`start_dedicated_online()`](/api/classes/GameRuntime/methods/start_dedicated_online). For an operator login, set **Login Environment Key** to the name of the environment variable that holds the token. The script configures the name with [`with_login()`](/api/classes/SteamServer/methods/with_login). Crimson reads the variable from the dedicated process at server startup. [Valve GameServer API](https://partner.steamgames.com/doc/api/ISteamGameServer)
+
+Get the server attachment with [`SteamServices.server_for(game)`](/api/classes/SteamServices/methods/server_for). Its [`status()`](/api/classes/SteamDedicatedServer/methods/status) reports playerless-world readiness, secure state, advertisement request, and admitted remote player count. Store the result as an observation. Query again or subscribe to [`status_changed`](/api/classes/SteamDedicatedServer#status_changed) for the current state. [SteamServerStatus](/api/classes/SteamServerStatus)
 
 ## Join an exact server
 
-Start the guest with a Steam client provider that uses the same AppID and namespace. Pass the server's locator to [`game.join_online(listing_id)`](/api/classes/GameRuntime#join_online) and await the [operation](/api/classes/GameOperation#wait). Crimson checks the server identity and verifies the guest's Steam ticket before admitting the guest. Check the operation's `ok` and `message` fields to show the result in your join UI. [Valve authentication and ownership](https://partner.steamgames.com/doc/features/auth)
+Attach this script to the root `Node` of a separate guest scene with the same root node name as the server. Assign the configured **Game Definition**, including its multiplayer rules, and paste the value printed by the server into **Server Locator**. Use the server's AppID and namespace. Run the scene from a signed-in Steam client and look for `Joined the dedicated server` in **Output**. The script passes the locator to [`game.join_online(listing_id)`](/api/classes/GameRuntime/methods/join_online) and awaits the [operation](/api/classes/GameOperation/methods/wait). Crimson checks the server identity and verifies the guest's Steam ticket before admitting the guest. [Valve authentication and ownership](https://partner.steamgames.com/doc/features/auth)
 
 ```gdscript
-func join_dedicated_server(game: GameRuntime, listing_id: String) -> Dictionary:
-    return await game.join_online(listing_id).wait()
-```
+extends Node
 
-Get the server attachment with [`SteamServices.server_for(game)`](/api/classes/SteamServices#server_for). Its [`status()`](/api/classes/SteamDedicatedServer#status) reports playerless-world readiness, secure state, advertisement request, and admitted remote player count. Store the result as an observation. Query again or subscribe to [`status_changed`](/api/classes/SteamDedicatedServer#status_changed) for the current state. [SteamServerStatus](/api/classes/SteamServerStatus)
+const APP_ID: int = 480
+const SESSION_NAMESPACE: String = "crimson-dedicated-example"
+
+@export var game_definition: GameDefinition
+@export var server_locator: String = ""
+
+func _ready() -> void:
+    if game_definition == null or game_definition.multiplayer_rules == null:
+        push_error("Assign a game definition with multiplayer rules for the guest.")
+        return
+    if server_locator.strip_edges().is_empty():
+        push_error("Enter the server locator.")
+        return
+
+    var provider: SteamProvider = SteamProvider.configure().for_app(APP_ID)
+    provider = provider.with_lobby_namespace(SESSION_NAMESPACE)
+    var game: GameRuntime = game_definition.with_provider(provider).boot(self)
+    if game == null:
+        push_error("Could not create the guest game.")
+        return
+
+    var operation: GameOperation = game.join_online(server_locator.strip_edges())
+    var joined: Dictionary = await operation.wait()
+    if not joined.get("ok", false):
+        push_error("Could not join the dedicated server. %s" % joined.get("message", ""))
+        return
+    print("Joined the dedicated server.")
+```
 
 ## List the server in Steam
 
-Direct mode is the default and provides an explicit locator. To request browser discovery, use [`settings.advertise_on()`](/api/classes/SteamServer#advertise_on) with [`SteamServer.INTERNET`](/api/classes/SteamServer#advertisement). Supply your game's Steam master-server version, description, and installation folder through [`with_product_metadata()`](/api/classes/SteamServer#with_product_metadata). Advertisement starts after the server is logged in and has a secure policy, current certificate, listener, and ready world. [`advertisement_requested`](/api/classes/SteamServerStatus#properties) confirms the local request. Confirm discovery from a separate Steam client. [Valve dedicated servers](https://partner.steamgames.com/doc/features/multiplayer/game_servers)
+Direct mode is the default and provides an explicit locator. To request browser discovery, use [`settings.advertise_on()`](/api/classes/SteamServer/methods/advertise_on) with [`SteamServer.INTERNET`](/api/classes/SteamServer#advertisement). Supply your game's Steam master-server version, description, and installation folder through [`with_product_metadata()`](/api/classes/SteamServer/methods/with_product_metadata). Advertisement starts after the server is logged in and has a secure policy, current certificate, listener, and ready world. [`advertisement_requested`](/api/classes/SteamServerStatus/properties/advertisement_requested) confirms the local request. Confirm discovery from a separate Steam client. [Valve dedicated servers](https://partner.steamgames.com/doc/features/multiplayer/game_servers)
+
+Enable **Advertise In Browser** on the server scene and start it. Attach the following script to the root `Node` of a guest scene with the same root node name and assign the configured **Game Definition**, including its multiplayer rules. The query uses the definition's starting world to match the server. Run the guest scene to refresh and join the first matching result. In a server picker, pass the listing the player selects to [`inspect()`](/api/classes/SteamServerBrowser/methods/inspect).
 
 ```gdscript
-var browser := steam.server_browser()
-var servers: SteamListingsResult = await browser.query() \
-    .on_map(&"transfer_hall").with_room_for(1).fetch()
-if servers.ok and not servers.value.is_empty():
-    var refreshed: SteamServerDetailsResult = await browser.inspect(servers.value[0]).wait()
-    if refreshed.ok:
-        await game.join_listing(refreshed.value.listing).wait()
+extends Node
+
+const APP_ID: int = 480
+const SESSION_NAMESPACE: String = "crimson-dedicated-example"
+const MIN_FREE_SEATS: int = 1
+
+@export var game_definition: GameDefinition
+
+func _ready() -> void:
+    if game_definition == null or game_definition.multiplayer_rules == null:
+        push_error("Assign a game definition with multiplayer rules for the guest.")
+        return
+
+    var provider: SteamProvider = SteamProvider.configure().for_app(APP_ID)
+    provider = provider.with_lobby_namespace(SESSION_NAMESPACE)
+    var game: GameRuntime = game_definition.with_provider(provider).boot(self)
+    if game == null:
+        push_error("Could not create the guest game.")
+        return
+
+    var steam: SteamScope = SteamServices.for_game(game)
+    if steam == null:
+        push_error("No Steam scope is attached to the guest game.")
+        return
+    if not steam.is_ready():
+        push_error(steam.get_initialization_error())
+        return
+
+    var browser: SteamServerBrowser = steam.server_browser()
+    if browser == null:
+        push_error("The Steam server browser is unavailable.")
+        return
+
+    var world_id: StringName = game_definition.starting_world
+    var query: SteamServerQuery = browser.query().on_map(world_id).with_room_for(MIN_FREE_SEATS)
+    var servers: SteamListingsResult = await query.fetch()
+    if not servers.ok:
+        push_error(servers.message)
+        return
+    if servers.value.is_empty():
+        print("No matching Steam servers.")
+        return
+
+    var selected: SteamListing = servers.value.front()
+    var refreshed: SteamServerDetailsResult = await browser.inspect(selected).wait()
+    if not refreshed.ok:
+        push_error(refreshed.message)
+        return
+
+    var operation: GameOperation = game.join_listing(refreshed.value.listing)
+    var joined: Dictionary = await operation.wait()
+    if not joined.get("ok", false):
+        push_error("Could not join the selected server. %s" % joined.get("message", ""))
+        return
+    print("Joined the selected Steam server.")
 ```
 
-Browser results are observations. The join performs its own server and guest checks. The current Steam SDK supports joint Internet and LAN advertisement. A LAN-only host request reports unavailable. The browser's [`query()`](/api/classes/SteamServerBrowser#query) can read compatible LAN announcements when given [`SteamServer.LAN`](/api/classes/SteamServer#advertisement).
+Browser results are observations. The join performs its own server and guest checks. The current Steam SDK supports joint Internet and LAN advertisement. A LAN-only host request reports unavailable. The browser's [`query()`](/api/classes/SteamServerBrowser/methods/query) can read compatible LAN announcements when given [`SteamServer.LAN`](/api/classes/SteamServer#advertisement).
 
 ## Record server-owned progression
 
-Configure the relevant stats or achievements as **Game Server** or **Official GS** in Steamworks. After a peer is admitted, call [`SteamServices.server_for(game).stats(peer_id)`](/api/classes/SteamDedicatedServer#stats). The returned handle belongs to that admission and expires when the peer leaves.
+Configure the relevant stats or achievements as **Game Server** or **Official GS** in Steamworks. After a peer is admitted, call [`SteamServices.server_for(game).stats(peer_id)`](/api/classes/SteamDedicatedServer/methods/stats). The returned handle belongs to that admission and expires when the peer leaves.
+
+Attach this script to a `Node` on the dedicated server. From your authoritative match-end logic, call `record_match_win()` with the running game, the admitted peer's Godot peer ID, and the player's new total match count. Set both constants to names published for your app before calling it.
 
 ```gdscript
-var server := SteamServices.server_for(game)
-var stats := server.stats(peer_id)
-if stats != null:
-    var stored: SteamServerStatsResult = await stats.edit() \
-        .set_int(&"official_matches", authoritative_match_count) \
-        .unlock(&"official_first_win").submit().wait()
+extends Node
+
+const MATCH_COUNT_STAT: StringName = &"official_matches"
+const FIRST_WIN_ACHIEVEMENT: StringName = &"official_first_win"
+
+func record_match_win(game: GameRuntime, peer_id: int, authoritative_match_count: int) -> void:
+    var server: SteamDedicatedServer = SteamServices.server_for(game)
+    if server == null:
+        push_warning("No Steam dedicated server is attached to this game.")
+        return
+
+    var stats: SteamServerPlayerStats = server.stats(peer_id)
+    if stats == null:
+        push_warning("The peer has no active Steam progression handle.")
+        return
+
+    var edit: SteamServerStatsEdit = stats.edit()
+    edit = edit.set_int(MATCH_COUNT_STAT, authoritative_match_count)
+    edit = edit.unlock(FIRST_WIN_ACHIEVEMENT)
+    var operation: SteamServerStatsOperation = edit.submit()
+    var stored: SteamServerStatsResult = await operation.wait()
     if not stored.ok:
         push_warning(stored.message)
 ```
 
-An edit can load the Steam cache as needed. For explicit cached reads, call [`stats.load()`](/api/classes/SteamServerPlayerStats#load) and await its [`wait()`](/api/classes/SteamServerStatsOperation#wait) result. After a failed edit, check the [result properties](/api/classes/SteamServerStatsResult#properties) `applied`, `failed_at`, and `store_submitted`. If the setters succeeded and persistence failed, use [`store()`](/api/classes/SteamServerPlayerStats#store) to retry persistence without replaying the edits. [Valve GameServer stats](https://partner.steamgames.com/doc/api/ISteamGameServerStats)
+An edit can load the Steam cache as needed. For explicit cached reads, call [`stats.load()`](/api/classes/SteamServerPlayerStats/methods/load) and await its [`wait()`](/api/classes/SteamServerStatsOperation/methods/wait) result. After a failed edit, check [`applied`](/api/classes/SteamServerStatsResult/properties/applied), [`failed_at`](/api/classes/SteamServerStatsResult/properties/failed_at), and [`store_submitted`](/api/classes/SteamServerStatsResult/properties/store_submitted). If the setters succeeded and persistence failed, use [`store()`](/api/classes/SteamServerPlayerStats/methods/store) to retry persistence without replaying the edits. [Valve GameServer stats](https://partner.steamgames.com/doc/api/ISteamGameServerStats)
 
 ## Use hosted Steam Datagram Relay
 
-Hosted dedicated relay requires a Crimson addon variant with hosted relay support, a Valve-provisioned endpoint, and your own Game Coordinator. Select a provisioned profile with [`SteamServer.via_sdr()`](/api/classes/SteamServer#via_sdr) and pass a [`SteamRelayCoordinator`](/api/classes/SteamRelayCoordinator) adapter to [`SteamProvider.with_relay_coordinator()`](/api/classes/SteamProvider#with_relay_coordinator).
+Hosted dedicated relay requires a Crimson addon variant with hosted relay support, a Valve-provisioned endpoint, and your own Game Coordinator. Select a provisioned profile with [`SteamServer.via_sdr()`](/api/classes/SteamServer/methods/via_sdr) and pass a [`SteamRelayCoordinator`](/api/classes/SteamRelayCoordinator) adapter to [`SteamProvider.with_relay_coordinator()`](/api/classes/SteamProvider/methods/with_relay_coordinator).
 
 The trusted coordinator registers the server's relay route and issues a signed relay ticket for each authorized client. Keep the signing key in the coordinator. After the relay connects, Crimson still verifies the client's Steam authentication ticket before admitting the player. Verify the route in Valve's provisioned test environment. [Valve hosted relay](https://partner.steamgames.com/doc/features/multiplayer/steamdatagramrelay)
