@@ -50,7 +50,3 @@ Returns steam's result timestamp in Unix seconds, or zero if unavailable.
 | `FRESHNESS_FRESH` | `1` | Steam announced a newer full view for this exact request. |
 | `FRESHNESS_UNCONFIRMED` | `0` | Steam supplied no freshness evidence. This includes selected reads and full results that Steam may have served from cache or found unchanged. |
 | `FRESHNESS_VERIFIED_PROOF` | `3` | A dedicated server verified the signed selection and its age for a currently authenticated owner. The snapshot describes the selected instances at the proof timestamp. |
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/doc_classes/SteamInventorySnapshot.xml)

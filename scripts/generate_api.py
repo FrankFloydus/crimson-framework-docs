@@ -109,7 +109,6 @@ class ClassDoc:
     group: str
     authored: ET.Element | None
     reflected: ET.Element | None
-    source_path: str | None
 
 
 @dataclass
@@ -151,7 +150,7 @@ def read_release(framework: Path, ref: str) -> tuple[dict[str, ClassDoc], bytes]
             name = root.attrib["name"]
             if name in classes:
                 raise ValueError(f"Duplicate authored XML for {name}.")
-            classes[name] = ClassDoc(name, SOURCE_GROUPS[area], root, None, path)
+            classes[name] = ClassDoc(name, SOURCE_GROUPS[area], root, None)
         if not classes:
             raise ValueError(f"No authored class XML at {ref}.")
         addon = contents.read(f"framework/releases/crimson-framework-{ref.removeprefix('v')}.zip")
@@ -223,12 +222,12 @@ def add_bindings(classes: dict[str, ClassDoc], runtime: dict[str, ET.Element], p
             if publisher == (doc.group == "Steam publisher"):
                 doc.reflected = reflected
         elif publisher:
-            classes[name] = ClassDoc(name, "Steam publisher", None, reflected, None)
+            classes[name] = ClassDoc(name, "Steam publisher", None, reflected)
         else:
             group = "Inventory" if name.startswith("SpatialInventory") else by_class.get(name)
             if group is None:
                 raise ValueError(f"Assign newly reflected class {name} to its API group.")
-            classes[name] = ClassDoc(name, group, None, reflected, None)
+            classes[name] = ClassDoc(name, group, None, reflected)
     expected = {name for name, doc in classes.items() if publisher == (doc.group == "Steam publisher")}
     missing = expected - runtime.keys() - INTERNAL_CLASSES
     if missing:
@@ -475,7 +474,6 @@ def render_class(
     members: dict[str, dict[str, MemberDoc]],
     supplemental: str,
     known_classes: set[str],
-    ref: str,
 ) -> str:
     """Render one class and its Godot-visible API as Mintlify MDX."""
     root = doc.reflected if doc.reflected is not None else doc.authored
@@ -497,7 +495,7 @@ def render_class(
     if base:
         lines.extend([f"**Inherits** {class_link(base, known_classes)}", ""])
     if doc.group == "Steam publisher":
-        lines.extend(["**Availability** [Trusted Steam publisher build](/steam/publisher).", ""])
+        lines.extend(["**Availability** [Trusted Steam publisher addon](/steam/publisher).", ""])
     if doc.name in INTERNAL_CLASSES:
         lines.extend(["Crimson creates this class internally. You can use the instances exposed by the framework.", ""])
     for block in dict.fromkeys((brief, description)):
@@ -513,8 +511,6 @@ def render_class(
             url = (item.text or "").strip()
             if urlsplit(url).scheme == "https" and urlsplit(url).netloc:
                 links.append(f"- [{plain(item.get('title') or url)}]({url})")
-    if doc.source_path:
-        links.append(f"- [Crimson class XML at {ref}](https://github.com/FrankFloydus/crimson-framework/blob/{ref}/{doc.source_path})")
     if links:
         lines.extend(["## See also", "", *links, ""])
     return "\n".join(lines).rstrip() + "\n"
@@ -558,7 +554,7 @@ def sync_navigation(classes: dict[str, ClassDoc], check: bool) -> None:
     """Update generated groups beneath the authored API overview."""
     path = DOCS_ROOT / "docs.json"
     config = json.loads(path.read_text(encoding="utf-8"))
-    api = next(tab for tab in config["navigation"]["tabs"] if tab["tab"] == "API reference")
+    api = next(tab for tab in config["navigation"]["tabs"] if tab["tab"] == "API Reference")
     groups = api["groups"]
     if not groups or "api/overview" not in groups[0]["pages"]:
         raise ValueError("The API reference tab must start with the authored overview group.")
@@ -633,7 +629,7 @@ def main() -> None:
         stale = []
         existing = {path.stem for path in output.glob("*.mdx")}
         for name, doc in sorted(classes.items()):
-            content = render_class(doc, members[name], descriptions.get(name, ""), classes.keys(), args.ref)
+            content = render_class(doc, members[name], descriptions.get(name, ""), classes.keys())
             path = output / f"{name}.mdx"
             if args.check:
                 if not path.is_file() or path.read_text(encoding="utf-8") != content:

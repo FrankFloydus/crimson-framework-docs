@@ -1,13 +1,15 @@
 ---
-title: Use Steam client services
-description: "Start a persistent Steam scope and use typed services for your app."
+title: Steam client services
+description: "Connect your game to Steam and use achievements, Cloud saves, the Overlay, and other player features."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
+Use the Steam client services when you want player features in your game. You can start with one feature, such as saving a profile to Steam Cloud, and add others as you need them.
+
 ## Start a client
 
-Once the [runtime is staged](/steam/setup), attach a script to a persistent node and boot the Steam client in `_ready()`. This example uses Valve's Spacewar AppID. Replace `480` with the AppID you expect for your game.
+After setting up the Steam runtime, attach this script to a node that stays in the scene tree when your game changes levels. It connects to Steam when the node is ready. The example uses Valve's Spacewar AppID. Replace `480` with your game's AppID. [Steamworks setup](/steam/setup)
 
 ```gdscript
 extends Node
@@ -25,9 +27,9 @@ func _ready() -> void:
     print("Steam online: ", steam.is_online())
 ```
 
-`boot()` returns `null` if it cannot attach to an owner in the tree. If attachment succeeds but initialization fails, the attached client reports the cause through `get_initialization_error()`. An initialized local client may still be offline. For example, Steam Offline Mode can retain cached progression. Call Steam services on Godot's main thread. [SteamClient](/api/classes/SteamClient)
+`is_ready()` tells you whether the local Steam client initialized. `is_online()` checks whether it is connected. In Steam Offline Mode, some cached features may still be available. Call Steam services from Godot's main thread. [SteamClient](/api/classes/SteamClient)
 
-If you already booted a game with a Steam provider, get the game's scope with `SteamServices.for_game(game)`. Pass that scope or an individual typed service to your UI or game code. Removing the scope owner from the tree expires its service handles. If Steam reports `runtime_lost`, defer restarting a standalone client until the callback returns and obtain new handles after recovery. [SteamServices](/api/classes/SteamServices)
+If you already started a game with a Steam provider, use `SteamServices.for_game(game)` to access that game's Steam services. Get fresh service handles after replacing the game or restarting Steam. If a standalone client reports `runtime_lost`, wait for its callback to return before you restart it. [SteamServices](/api/classes/SteamServices)
 
 ## Choose a service
 

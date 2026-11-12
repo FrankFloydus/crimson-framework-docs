@@ -8,7 +8,7 @@ description: "Verifies Steam Web API tickets and current ownership on the truste
 
 **Inherits** `RefCounted`
 
-**Availability** [Trusted Steam publisher build](/steam/publisher).
+**Availability** [Trusted Steam publisher addon](/steam/publisher).
 
 Verifies Steam Web API tickets and current ownership on the trusted backend.
 
@@ -33,7 +33,3 @@ Sends the configured AppID, exact `audience`, and hex-encoded ticket to Valve. U
 `verify_ownership(ticket: PackedByteArray, expected_challenge: PackedByteArray, dlc_ids: PackedInt64Array = PackedInt64Array()) -> SteamOwnershipResult`
 
 Verifies an encrypted app ticket locally against the configured AppID, exact `expected_challenge`, and optional DLC AppIDs. Checks the fresh ticket and consumes the one-time challenge through the trusted store before issuing an identity. Returns a typed error for invalid tickets, replay, or unavailable configuration.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/publisher/doc_classes/SteamPublisherAuth.xml)

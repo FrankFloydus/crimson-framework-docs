@@ -2,7 +2,7 @@
 
 # Crimson Framework documentation
 
-This repository contains the Mintlify guides and Godot scripting API reference for [Crimson Framework](https://github.com/FrankFloydus/crimson-framework). The current documentation covers [v0.0.3](https://github.com/FrankFloydus/crimson-framework/releases/tag/v0.0.3).
+This repository contains the Mintlify documentation for Crimson Framework v0.0.3. **Docs** contains articles and examples for customers using the purchased addon. **API Reference** contains the Godot class catalog.
 
 ## Preview and check a change
 
@@ -23,15 +23,13 @@ npx mint@latest broken-links --check-anchors
 
 The reference generator combines the framework's class XML prose with signatures exported by Godot from the release addon. The `scripts/api-prose/` files supply descriptions that have yet to be added to the framework's class XML. Update descriptions in the framework XML when you change a binding there. Remove any overlapping supplement when you regenerate this site.
 
-Keep the guides and the generated reference tied to the same framework release. Review the release notes, update affected examples and download links, regenerate the reference, and review class and navigation changes together. Use the class pages in `api/classes/` as generated output. Edit guides and `api/overview.mdx` directly.
+Keep the guides and the generated reference tied to the same framework release. Update affected examples, regenerate the reference, and review class and navigation changes together. Edit guides and `api/overview.mdx` directly. Regenerate class pages in `api/classes/` when their inputs change.
 
-Fetch the release tag in your local framework checkout. Build a trusted Debug publisher DLL from that tag with the fixture transport disabled. The standard addon comes from the ZIP already tracked in the release tag. The publisher build steps are in the [trusted publisher guide](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/STEAM_PUBLISHER.md).
-
-Run from the docs repository. Here `..` is the framework checkout. Update the DLL paths for your machine.
+For maintenance, use a local framework checkout with the matching release tag, the Godot 4.7 console executable, and the trusted Debug publisher DLL for that release. Run from the docs repository. Here `..` is the local framework checkout.
 
 ```powershell
 $godot = 'C:\path\to\Godot_v4.7-stable_win64_console.exe'
-$publisher = '..\framework\bin\publisher\windows\crimson_framework.windows.template_debug.x86_64.dll'
+$publisher = 'C:\path\to\trusted\crimson_framework.windows.template_debug.x86_64.dll'
 python scripts/generate_api.py --framework .. --ref v0.0.3 --godot $godot --publisher-dll $publisher
 ```
 

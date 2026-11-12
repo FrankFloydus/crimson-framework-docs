@@ -1,13 +1,15 @@
 ---
 title: Dedicated servers
-description: "Start a playerless Steam server, verify guests, and publish it for discovery."
+description: "Run a dedicated server that Steam players can join directly or find in a server browser."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
 ## Start a playerless authority
 
-Prepare your fixed-world `GameDefinition` as in [Getting started](/quickstart), then set up the [Steam runtime](/steam/setup) in the headless project or export. In this example, `definition` is your configured game before `boot()` and `app_id` is its Steam AppID. A dedicated authority uses the native Steam GameServer connection. The default anonymous server login can run without an interactive Steam account.
+A dedicated server runs the game world independently of any player. Use the world and player setup from the quickstart and add the Steam runtime to your server project or export. [Getting started](/quickstart) · [Steamworks setup](/steam/setup)
+
+In this example, `definition` holds your world and player settings and `app_id` is your game's Steam AppID. The default anonymous server login runs without an interactive Steam account.
 
 ```gdscript
 var settings := SteamServer.configure("Transfer Hall", 27015, 27016) \
@@ -26,7 +28,7 @@ Use distinct UDP ports for gameplay and queries. Set `bind_to(address)` for a sp
 
 ## Join an exact server
 
-Boot the guest with a Steam client provider and the same AppID and namespace. Give it the locator printed by the authority, then call `await game.join_online(listing_id).wait()`. The locator identifies the server's certified Steam account. The guest issues a ticket for that server, and the authority binds ticket validation to the guest's certified transport identity before opening gameplay admission. An invalid follow-up retires that exact peer. [Valve authentication and ownership](https://partner.steamgames.com/doc/features/auth)
+Start the guest with a Steam client provider that uses the same AppID and namespace. Give it the server's locator as `listing_id`, then call `await game.join_online(listing_id).wait()`. Crimson checks the server identity and verifies the guest's Steam ticket before admitting the guest. Check the operation's `ok` and `message` fields to show the result in your join UI. [Valve authentication and ownership](https://partner.steamgames.com/doc/features/auth)
 
 `SteamServices.server_for(game).status()` reports playerless-world readiness, secure state, advertisement request, and admitted remote player count. Store the result as an observation. Query again or subscribe to `status_changed` for the current state. [SteamDedicatedServer](/api/classes/SteamDedicatedServer) · [SteamServerStatus](/api/classes/SteamServerStatus)
 
@@ -65,6 +67,6 @@ An edit can load the Steam cache as needed. For explicit cached reads, call `awa
 
 ## Use hosted Steam Datagram Relay
 
-Hosted dedicated relay requires a Valve-provisioned hosted endpoint and Game Coordinator SDK. Place the separate SDK under `framework/vendor/steamworks/sdr` so the build can find `include/steam/steamdatagram_tickets.h`. Select a provisioned profile with `SteamServer.via_sdr()` and supply your [SteamRelayCoordinator](/api/classes/SteamRelayCoordinator) adapter through `SteamProvider.with_relay_coordinator()`.
+Hosted dedicated relay requires a Crimson addon variant with hosted relay support, a Valve-provisioned endpoint, and your own Game Coordinator. Select a provisioned profile with `SteamServer.via_sdr()` and pass a `SteamRelayCoordinator` adapter to `SteamProvider.with_relay_coordinator()`. [SteamRelayCoordinator](/api/classes/SteamRelayCoordinator)
 
-The trusted coordinator registers the exact server publication and authorizes each client before issuing its relay ticket. Keep the ticket signing key in that coordinator. A separate Steam authentication ticket gates Game admission after transport connects. Use Valve's provisioned test environment to verify an observed relay route. [Crimson coordinator contract](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/PUBLIC_API.md#hosted-steam-datagram-relay) · [Valve hosted relay](https://partner.steamgames.com/doc/features/multiplayer/steamdatagramrelay)
+The trusted coordinator registers the server's relay route and issues a signed relay ticket for each authorized client. Keep the signing key in the coordinator. After the relay connects, Crimson still verifies the client's Steam authentication ticket before admitting the player. Verify the route in Valve's provisioned test environment. [Valve hosted relay](https://partner.steamgames.com/doc/features/multiplayer/steamdatagramrelay)

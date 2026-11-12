@@ -20,7 +20,3 @@ Use the session ID to associate a stream with a game-owned local player seat. Ta
 | `session_id` | `int` | `0` | `get_session_id()` | Steam's transient stream ID. Use it to match input and disconnect signals to the active seat. |
 | `steam_id` | `String` | `""` | `get_steam_id()` | Decimal SteamID64, or an empty string when Steam has no individual account ID for the guest. |
 | `together` | `bool` | `false` | `get_together()` | Whether the stream was created using a Remote Play Together invitation. |
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/doc_classes/SteamRemotePlaySession.xml)

@@ -18,7 +18,3 @@ The native handle stays internal. This snapshot describes metadata submissions o
 | --- | --- | --- | --- | --- |
 | `annotation_errors` | `int[]` | `[]` | `get_annotation_errors()` | Read-only `Error` codes for failed annotation requests, in location, user, and Workshop item order. Steam's rejection maps to `FAILED`. A missing native action maps to `ERR_UNAVAILABLE`. A saved image stays available even when metadata fails. |
 | `annotations_accepted` | `bool` | `true` | `get_annotations_accepted()` | Whether Steam accepted every annotation requested by this scope. Ordinary screenshots and saves from other scopes have no local annotations to reject. |
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/doc_classes/SteamScreenshot.xml)

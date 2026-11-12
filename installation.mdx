@@ -1,21 +1,22 @@
 ---
 title: "Installation"
-description: "Install and verify the Crimson Framework addon in a Godot project on Windows."
+description: "Add the purchased Crimson Framework package to a Godot project on Windows."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-## Requirements
+## Before you start
 
-- Godot 4.7 stable for Windows x86-64 with standard single precision. The release ZIP includes the native DLLs for the editor and for both debug and release exports. [Godot 4.7 downloads](https://godotengine.org/download/archive/4.7-stable/)
-- A Godot project with a `project.godot` file.
+- The addon ZIP from your Crimson Framework purchase. It includes the Windows DLLs for the editor and for debug and release exports.
+- Godot 4.7 stable for Windows x86-64 with standard single precision. [Godot 4.7 downloads](https://godotengine.org/download/archive/4.7-stable/)
+- A new or existing Godot project.
 
-You can run offline sessions and direct ENet multiplayer with the addon ZIP alone. Steam features need Valve's runtime, which you can add later. [Steam setup](/steam/overview)
+The addon is enough for solo play and direct multiplayer by IP address. To use Steam features, add Valve's runtime after installing Crimson. [Steam setup](/steam/setup)
 
 ## Install the addon
 
-1. Close the Godot editor if the project is open. Download the Crimson addon ZIP from the release's **Assets** list. [Download the addon ZIP](https://github.com/FrankFloydus/crimson-framework/releases/download/v0.0.3/crimson-framework-0.0.3.zip) · [Release notes](https://github.com/FrankFloydus/crimson-framework/releases/tag/v0.0.3)
-2. Extract `crimson-framework-0.0.3.zip` into the directory that contains `project.godot`. If the project already has an `addons/` directory, merge the directory and keep the other addons. Check the installed files against this layout.
+1. Close Godot if your project is open.
+2. Extract the addon ZIP into the folder that contains `project.godot`. If the project already has an `addons/` folder, merge the folders so your other addons stay in place. Check that the installed files have this layout.
 
    ```text
    your-game/
@@ -31,24 +32,20 @@ You can run offline sessions and direct ENet multiplayer with the addon ZIP alon
            └── licenses/
    ```
 
-3. Open the project in Godot and wait for it to scan the files. Godot loads the native extension from `crimson-framework.gdextension`. [Godot GDExtension descriptors](https://docs.godotengine.org/en/4.7/engine_details/engine_api/gdextension/gdextension_file.html)
+3. Open the project in Godot and wait for it to scan the files. Godot loads Crimson automatically.
 
 ## Verify the installation
 
-Open or create a scene and open the **Add Child Node** dialog. Search for `GameRuntime`. If the class appears, Godot loaded the addon. Select it to inspect its properties or follow the quickstart to run a complete solo session. [Quickstart](/quickstart)
+In any scene, open **Add Child Node** and search for `GameRuntime`. If it appears in the results, Crimson is ready to use. [Start a solo game](/quickstart)
 
-If `GameRuntime` is missing, check the editor **Output** for errors when it loads the extension. Confirm the descriptor and both DLLs are under the paths shown above and that you're running Godot 4.7 for Windows x86-64 with single precision. If Godot reports a duplicate class, check for an older Crimson descriptor or an earlier standalone inventory or save extension that registers the same class names.
+If `GameRuntime` is missing, check **Output** for a loading error. Verify your Godot version and check the folder layout above. If Godot reports a duplicate class, look for an older Crimson install or a standalone inventory or save addon that registers the same class name.
 
 ## Update an existing project
 
-Back up or commit the project, close Godot, and replace the `addons/crimson-framework/` directory with the copy from the new ZIP. Reopen the project and check that scripts and scenes load. If your project stages a Steam runtime, follow the Steam setup again to restore it. For projects that still use older class names such as `CrimsonGame`, follow the migration before reopening the project. [Godot class-name migration](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/API_NAME_MIGRATION.md)
+Back up or commit the project, close Godot, and replace `addons/crimson-framework/` with the folder from the updated package. If you added Valve's runtime to that folder, restore it before testing the update. Reopen the project and check that your scenes and scripts load. [Steam setup](/steam/setup)
 
 ## Export for Windows
 
 Install Godot 4.7's matching export templates through **Editor → Manage Export Templates**. In **Project → Export**, add a **Windows Desktop** preset with **Architecture** set to `x86_64`. Godot selects Crimson's debug or release DLL for the export. Keep the generated files together and run the exported game to verify it starts. [Godot export guide](https://docs.godotengine.org/en/4.7/tutorials/export/exporting_projects.html)
 
-For a Steam build, configure the optional DLL and export feature before exporting. [Steam setup](/steam/overview)
-
-## Build from source
-
-To rebuild the addon, use the source build instructions for MSVC, the Windows SDK, Python, and SCons or CMake. [Crimson Framework build instructions](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/README.md#build)
+For a Steam build, add the runtime DLL and configure the Steam export feature before exporting. [Steam setup](/steam/setup)

@@ -1,11 +1,13 @@
 ---
-title: "API reference"
-description: "Browse the classes, methods, properties, signals, and constants exposed by Crimson Framework for Godot."
+title: "API Reference"
+description: "Look up the Godot classes, methods, properties, signals, and constants in Crimson Framework."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-This reference covers the Godot scripting API in Crimson Framework v0.0.3. Each class page lists the members declared by the class. When a class extends another Crimson class, follow **Inherits** to find its inherited members. [Framework release](https://github.com/FrankFloydus/crimson-framework/releases/tag/v0.0.3)
+This reference covers the scripting API for Crimson Framework v0.0.3 on Godot 4.7. Use the sidebar or the list below to find a class. Each page lists the members that class defines. When a class extends another Crimson class, follow **Inherits** to look up members on its base class.
+
+For a step-by-step example, start with [your first solo game](/quickstart) or the [Steamworks guides](/steam/overview).
 
 ## Find a class
 
@@ -26,8 +28,6 @@ Method signatures use Godot types. `void` means the method returns no value. Rea
 
 A property can have a setter, a getter, or both. A listed default is the value declared for a fresh instance. A signal lists the values passed to its connected callbacks. Enum values and constants are scoped to their declaring class.
 
-## Choose the Steam build
+## Steam availability
 
-Steamworks classes use the [Steam runtime setup](/steam/setup). Publisher classes have their own group and require the separate [trusted publisher build](/steam/publisher). Use those classes in the backend that holds your publisher credentials.
-
-For workflows that compose several classes, start with the [quickstart](/quickstart) or the framework's [public API guide](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/PUBLIC_API.md). The API reference documents the Godot bindings. The [architecture guide](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/ARCHITECTURE.md) covers the native C++ module boundaries.
+Steamworks classes need the Steam runtime. Use the separate trusted publisher addon for the publisher classes on the backend that holds your publisher credentials. [Steam runtime setup](/steam/setup) · [Publisher backend](/steam/publisher)

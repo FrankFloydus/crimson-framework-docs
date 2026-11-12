@@ -8,7 +8,7 @@ description: "Trusted app-scoped Steam asynchronous notifications."
 
 **Inherits** `RefCounted`
 
-**Availability** [Trusted Steam publisher build](/steam/publisher).
+**Availability** [Trusted Steam publisher addon](/steam/publisher).
 
 Trusted app-scoped Steam asynchronous notifications.
 
@@ -51,7 +51,3 @@ Reads up to 128 sessions returned for a user verified by this exact publisher an
 `update(session_id: String, spec: SteamNotificationSessionSpec, operation_key: String) -> SteamNotificationSessionOperation`
 
 Replaces the full participant state of an owned session. Supply all users who should remain in the session and a stable operation key. The creation context remains as it was.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/publisher/doc_classes/SteamGameNotifications.xml)

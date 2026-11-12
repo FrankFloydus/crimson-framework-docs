@@ -49,7 +49,3 @@ Returns a branch that reads `count` global ranks from the one-based `first_rank`
 `users(steam_ids: PackedStringArray) -> SteamLeaderboardQuery`
 
 Returns a branch for 1 to 100 distinct individual SteamID64 values in decimal. Only players with scores appear in the page. Steam accepts one selected-user download at a time across the shared runtime. An overlapping download returns `@GlobalScope.ERR_BUSY`.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/doc_classes/SteamLeaderboardQuery.xml)

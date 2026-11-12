@@ -43,7 +43,3 @@ Publishes Steam Join Game for the exact Game's current friends-only or public lo
 `show(display_token: StringName, values: Dictionary[String, String] = {}, party_id: String = "", party_size: int = 0) -> Error`
 
 Publishes a Steamworks localization token beginning with `#` and its optional replacements. To group players, provide both a nonempty `party_id` and a positive `party_size`. Use the defaults for no grouping. Replacement keys must fit Steam's byte and key limits and must avoid `connect`, `status`, and names beginning with `steam_`. Returns `@GlobalScope.ERR_BUSY` when another scope owns the status or unrelated keys leave insufficient capacity. Steam applies each key separately. `@GlobalScope.OK` acknowledges local acceptance. Configure the token in Steamworks to display the label for other players.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/doc_classes/SteamPresence.xml)

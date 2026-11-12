@@ -8,7 +8,7 @@ description: "Owns one trusted Steam Web API scope."
 
 **Inherits** `RefCounted`
 
-**Availability** [Trusted Steam publisher build](/steam/publisher).
+**Availability** [Trusted Steam publisher addon](/steam/publisher).
 
 Owns one trusted Steam Web API scope.
 
@@ -69,7 +69,3 @@ Returns the scoped publisher moderation service, or null if the scope has closed
 `purchases() -> SteamPublisherPurchases`
 
 Returns the scoped trusted Steam Wallet service, or null if the scope has closed. Actions require an injected `SteamPublisherSettings.purchase_store`.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/publisher/doc_classes/SteamPublisher.xml)

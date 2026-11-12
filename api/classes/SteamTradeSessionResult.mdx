@@ -8,7 +8,7 @@ description: "The result of requesting a trade from the trusted Steam publisher.
 
 **Inherits** [`SteamResult`](/api/classes/SteamResult)
 
-**Availability** [Trusted Steam publisher build](/steam/publisher).
+**Availability** [Trusted Steam publisher addon](/steam/publisher).
 
 The result of requesting a trade from the trusted Steam publisher.
 
@@ -27,7 +27,3 @@ Check `SteamResult.ok` before using the acknowledgment. A timeout or unrecognize
 `get_value() -> SteamTradeSession`
 
 Returns the acknowledged trade request, or `null` on failure.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/publisher/doc_classes/SteamTradeSessionResult.xml)

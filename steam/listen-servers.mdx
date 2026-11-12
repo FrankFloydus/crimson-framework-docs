@@ -5,9 +5,11 @@ description: "Host, discover, and join a Steam game, or create a standalone soci
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
+A listen server runs on a player's machine. Steam lobbies help that player invite friends and help guests find the game. You can also use a lobby for a social space such as a waiting room before a game starts.
+
 ## Host a game from a player's machine
 
-Use the world and player scenes from [Getting started](/quickstart). In the persistent game owner, replace the solo setup with a Steam provider and call `host_online()` on the host. Use the same AppID, lobby namespace, virtual port, and compatible build on all peers. Keep the returned game in your persistent menu or game controller.
+Use the world and player scenes from the quickstart. In the node that owns your game, add a Steam provider to your game setup and call `host_online()` when the player chooses to host. Use the same AppID, lobby namespace, virtual port, and compatible build for the host and guests. Keep the returned game in a menu or controller that stays in the scene tree. [Getting started](/quickstart)
 
 ```gdscript
 var provider := SteamProvider.configure().for_app(480) \

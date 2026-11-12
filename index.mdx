@@ -1,25 +1,22 @@
 ---
 title: "Crimson Framework"
-description: "Build offline and multiplayer games with a native Godot 4.7 extension."
+description: "Reusable game systems for solo and multiplayer games in Godot."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Crimson Framework is a C++ GDExtension for Godot 4.7. Use `GameRuntime` to start a local session, host or join a shared world, or coordinate a match with scene travel and checkpoints. Your project supplies the scenes, player controls, gameplay rules, and saved state.
+Crimson Framework gives your Godot game the systems to start a session, bring players into a shared world, travel between levels, and pick up from a checkpoint. You decide how the game plays, what players see, and what progress they keep.
 
-You can also use the modules independently. For example, use `SpatialInventory` for a grid inventory or `SaveCoordinator` to capture and restore a checkpoint. Steamworks services can run on their own or provide discovery, invitations, and multiplayer for a Crimson game.
+Use the systems together or add them as your game needs them. A solo game can use Crimson for an item inventory and saved progress. A co-op game can let one player host and invite friends through Steam. You can also add Steam features such as achievements and cloud saves to an existing game.
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Install Crimson" icon="download" href="/installation">
-    Add the Windows release to a Godot project and verify that Godot can load it.
+    Add Crimson to your Godot project.
   </Card>
   <Card title="Start a solo game" icon="play" href="/quickstart">
-    Create a world and a player scene, then start your first session in GDScript.
+    Run your first game with a world and a player scene.
   </Card>
   <Card title="Integrate Steam" icon="gamepad" href="/steam/overview">
-    Set up Steamworks and choose standalone services, listen hosting, or dedicated hosting.
-  </Card>
-  <Card title="Browse the API" icon="code" href="/api/overview">
-    Find Crimson's Godot classes and their members.
+    Add Steam features or set up online play.
   </Card>
 </CardGroup>

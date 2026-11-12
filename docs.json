@@ -10,7 +10,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Getting started",
+        "tab": "Docs",
         "groups": [
           {
             "group": "Getting started",
@@ -19,12 +19,7 @@
               "installation",
               "quickstart"
             ]
-          }
-        ]
-      },
-      {
-        "tab": "Steam",
-        "groups": [
+          },
           {
             "group": "Steamworks",
             "pages": [
@@ -40,7 +35,7 @@
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
         "groups": [
           {
             "group": "Reference",
@@ -486,23 +481,5 @@
         ]
       }
     ]
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Source code",
-        "href": "https://github.com/FrankFloydus/crimson-framework"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Releases",
-      "href": "https://github.com/FrankFloydus/crimson-framework/releases"
-    }
-  },
-  "footer": {
-    "socials": {
-      "github": "https://github.com/FrankFloydus/crimson-framework"
-    }
   }
 }

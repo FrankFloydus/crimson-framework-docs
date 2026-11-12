@@ -8,7 +8,7 @@ description: "Typed outcome and session receipt."
 
 **Inherits** [`SteamResult`](/api/classes/SteamResult)
 
-**Availability** [Trusted Steam publisher build](/steam/publisher).
+**Availability** [Trusted Steam publisher addon](/steam/publisher).
 
 Typed outcome and session receipt.
 
@@ -25,7 +25,3 @@ Typed outcome and session receipt.
 `get_value() -> SteamNotificationSession`
 
 The typed receipt on success. If Steam accepted a write and the durable store could not commit it, the known receipt can still be available for trusted reconciliation.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/publisher/doc_classes/SteamNotificationSessionResult.xml)

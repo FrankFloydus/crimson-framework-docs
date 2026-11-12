@@ -8,7 +8,7 @@ description: "Steam Wallet quote metadata for a verified account."
 
 **Inherits** `RefCounted`
 
-**Availability** [Trusted Steam publisher build](/steam/publisher).
+**Availability** [Trusted Steam publisher addon](/steam/publisher).
 
 Steam Wallet quote metadata for a verified account.
 
@@ -59,7 +59,3 @@ Returns the state or region Steam supplied, or an empty string.
 | `LOCKED` | `3` | Steam reports that purchasing is blocked. |
 | `TRUSTED` | `2` | Steam reports an established purchase history. |
 | `UNKNOWN` | `0` | Steam omitted the status or supplied a value Crimson does not recognize. |
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/publisher/doc_classes/SteamPurchaseBuyerInfo.xml)

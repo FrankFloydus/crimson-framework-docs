@@ -49,7 +49,3 @@ Open a listener on the configured Steam virtual port or dedicated gameplay port.
 `static route(owner_id: int, virtual_port: int = 0) -> SessionEndpoint`
 
 Construct a versioned P2P endpoint for a valid individual SteamID64 and virtual port from 0 to 65535. Return null when unavailable or invalid. Dedicated locators are resolved by the Steam game provider instead.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/integration/online/steam/doc_classes/SteamSessionTransport.xml)

@@ -55,7 +55,3 @@ Returns the detached [`SteamLeaderboardInfo`](/api/classes/SteamLeaderboardInfo)
 `upload(score: int, details: PackedInt32Array = PackedInt32Array(), force_update: bool = false) -> SteamScoreUploadOperation`
 
 Uploads the signed-in user's signed 32-bit score with up to 64 optional signed 32-bit details. Steam keeps the best score by default. Set `force_update` to replace it. Await a [`SteamScoreUploadResult`](/api/classes/SteamScoreUploadResult) for the typed score receipt. An overlapping write returns `@GlobalScope.ERR_BUSY`.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/doc_classes/SteamLeaderboard.xml)

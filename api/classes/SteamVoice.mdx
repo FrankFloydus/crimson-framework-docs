@@ -23,7 +23,3 @@ Returns the scope's microphone controls without starting capture. A new unattach
 `decode(bytes: PackedByteArray, sample_rate_hz: int = 0) -> SteamVoicePcmResult`
 
 Decodes one complete Steam voice frame of 1 to 8192 bytes. Zero chooses Steam's recommended rate, or pass a rate from 11025 to 48000 Hz. The result contains up to 131072 bytes of signed 16-bit mono PCM. Unavailable codecs and invalid input return a typed error.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/doc_classes/SteamVoice.xml)

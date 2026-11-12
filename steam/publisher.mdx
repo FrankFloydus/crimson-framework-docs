@@ -1,22 +1,15 @@
 ---
 title: Publisher backend
-description: "Run Steam publisher operations in a trusted build with server-side credentials."
+description: "Verify player ownership and process Steam purchases from a trusted backend."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-## Build a trusted host
+Publisher operations belong in your backend. It verifies players, authorizes orders, and holds the Steamworks credentials those operations require.
 
-Use a separate server or operator project for publisher operations. The default addon supplies the client and game bindings. Publisher bindings require an opt-in build and can run in headless Godot without initializing the signed-in Steam client.
+## Install the publisher addon
 
-From the framework checkout root, build for the target you will run. This example uses Debug. Set the target to `template_release` for a Release build.
-
-```powershell
-Set-Location framework
-scons platform=windows arch=x86_64 target=template_debug steam_publisher=yes
-```
-
-SCons stages the trusted DLL under `framework/bin/publisher/windows`. CMake uses `-DCRIMSON_STEAM_PUBLISHER=ON` and stages it under the selected build directory. Use the trusted DLL in your backend's addon. Keep publisher test transports and credentials out of production client exports. [Trusted build guide](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/docs/STEAM_PUBLISHER.md)
+If you have the separate trusted publisher addon, install it in a dedicated Godot project for your backend or operator tools. Use the standard Crimson addon in your game client. The publisher backend can run in headless Godot without a signed-in Steam client. [Installation](/installation)
 
 ## Resolve the publisher key on the backend
 
@@ -83,4 +76,4 @@ Use `SteamPublisherSettings.SANDBOX` to exercise the Wallet flow with Valve's sa
 | [Game Notifications](/api/classes/SteamNotificationStore) | Durably claim one opt-in request per player launch. When a client opens a Steam session link, verify the player's membership before restoring the session. |
 | [Moderation](/api/classes/SteamPublisherModeration) | Authorize the report and duration before submitting a suspension or permanent ban. |
 
-Use the [publisher mock suite](/steam/testing#verify-publisher-operations) to exercise these flows with controlled inputs. Run live publisher tests with a production trusted build, a test AppID you administer, and permission to use the selected feature.
+Verify your backend using your AppID, a Steam test account, and credentials authorized for the feature you use. Start with a license check. Test purchases in Valve's sandbox before you enable live fulfillment. [Verify publisher operations](/steam/testing#verify-publisher-operations)

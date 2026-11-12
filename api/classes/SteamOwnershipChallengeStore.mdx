@@ -8,7 +8,7 @@ description: "Trusted durable store for one-time encrypted ownership challenges.
 
 **Inherits** `RefCounted`
 
-**Availability** [Trusted Steam publisher build](/steam/publisher).
+**Availability** [Trusted Steam publisher addon](/steam/publisher).
 
 Trusted durable store for one-time encrypted ownership challenges.
 
@@ -23,7 +23,3 @@ Inject this adapter through `SteamPublisherSettings.ownership_challenge_store`. 
 **Virtual method.**
 
 Atomically matches the exact backend-issued challenge and AppID, verifies the record is unexpired and unused, checks its request and expected-account bindings, and retires it before returning `true`. `steam_id` is the verified ticket account. Times use Unix seconds. Return `false` when any check fails. Keep challenge bytes and account identifiers out of logs.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/publisher/doc_classes/SteamOwnershipChallengeStore.xml)

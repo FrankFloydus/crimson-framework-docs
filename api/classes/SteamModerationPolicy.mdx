@@ -8,7 +8,7 @@ description: "Authorizes moderation and records audited outcomes in the trusted 
 
 **Inherits** `RefCounted`
 
-**Availability** [Trusted Steam publisher build](/steam/publisher).
+**Availability** [Trusted Steam publisher addon](/steam/publisher).
 
 Authorizes moderation and records audited outcomes in the trusted game backend.
 
@@ -31,7 +31,3 @@ Return `null` to deny `request`. For a reviewed write, check moderator authoriza
 **Virtual method.**
 
 Durably record the publisher-observed terminal `error` and `receipt` in the matching audit record. Return `true` after persistence succeeds. A missing or failed write returns `ERR_DATABASE_CANT_WRITE` from the moderation action and preserves its receipt for reconciliation. This hook runs before the caller resumes.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/publisher/doc_classes/SteamModerationPolicy.xml)

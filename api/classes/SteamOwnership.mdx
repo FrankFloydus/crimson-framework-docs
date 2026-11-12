@@ -8,7 +8,7 @@ description: "Detached base app and DLC ownership from a verified encrypted app 
 
 **Inherits** `RefCounted`
 
-**Availability** [Trusted Steam publisher build](/steam/publisher).
+**Availability** [Trusted Steam publisher addon](/steam/publisher).
 
 Detached base app and DLC ownership from a verified encrypted app ticket.
 
@@ -61,7 +61,3 @@ Returns whether this receipt proves ownership of its base app.
 `owns_dlc(app_id: int) -> bool`
 
 Returns `true` when the ticket confirms ownership of the requested DLC AppID.
-
-## See also
-
-- [Crimson class XML at v0.0.3](https://github.com/FrankFloydus/crimson-framework/blob/v0.0.3/framework/src/modules/steam/publisher/doc_classes/SteamOwnership.xml)
