@@ -44,10 +44,11 @@
             ]
           },
           {
-            "group": "Classes",
+            "group": "Modules",
             "pages": [
               {
                 "group": "Game runtime",
+                "root": "api/modules/game-runtime",
                 "expanded": false,
                 "pages": [
                   "api/classes/DedicatedServerBoot",
@@ -65,6 +66,7 @@
               },
               {
                 "group": "Steam multiplayer",
+                "root": "api/modules/steam-multiplayer",
                 "expanded": false,
                 "pages": [
                   "api/classes/GameInvites",
@@ -82,6 +84,7 @@
               },
               {
                 "group": "World sessions",
+                "root": "api/modules/world-sessions",
                 "expanded": false,
                 "pages": [
                   "api/classes/LocalPlayerView",
@@ -92,6 +95,7 @@
               },
               {
                 "group": "Inventory",
+                "root": "api/modules/inventory",
                 "expanded": false,
                 "pages": [
                   "api/classes/InventoryTransactionAdapter",
@@ -108,6 +112,7 @@
               },
               {
                 "group": "Match runtime",
+                "root": "api/modules/match-runtime",
                 "expanded": false,
                 "pages": [
                   "api/classes/CommandRouter",
@@ -119,6 +124,7 @@
               },
               {
                 "group": "Replication",
+                "root": "api/modules/replication",
                 "expanded": false,
                 "pages": [
                   "api/classes/StateReplication"
@@ -126,6 +132,7 @@
               },
               {
                 "group": "Save and restore",
+                "root": "api/modules/save-and-restore",
                 "expanded": false,
                 "pages": [
                   "api/classes/SaveCoordinator",
@@ -136,6 +143,7 @@
               },
               {
                 "group": "Scene loading",
+                "root": "api/modules/scene-loading",
                 "expanded": false,
                 "pages": [
                   "api/classes/SceneLoadManager"
@@ -143,6 +151,7 @@
               },
               {
                 "group": "Sessions and transport",
+                "root": "api/modules/sessions-and-transport",
                 "expanded": false,
                 "pages": [
                   "api/classes/ENetSessionTransport",
@@ -158,10 +167,13 @@
               },
               {
                 "group": "Steamworks",
+                "root": "api/modules/steamworks",
                 "expanded": false,
                 "pages": [
                   {
                     "group": "Client and results",
+                    "root": "api/modules/steamworks/client-and-results",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamApps",
                       "api/classes/SteamBoolResult",
@@ -183,6 +195,8 @@
                   },
                   {
                     "group": "Lobbies and social",
+                    "root": "api/modules/steamworks/lobbies-and-social",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamFriend",
                       "api/classes/SteamFriends",
@@ -214,6 +228,8 @@
                   },
                   {
                     "group": "Servers and networking",
+                    "root": "api/modules/steamworks/servers-and-networking",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamConnectionPath",
                       "api/classes/SteamConnectionPathResult",
@@ -245,6 +261,8 @@
                   },
                   {
                     "group": "Stats and leaderboards",
+                    "root": "api/modules/steamworks/stats-and-leaderboards",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamAchievement",
                       "api/classes/SteamLeaderboard",
@@ -273,6 +291,8 @@
                   },
                   {
                     "group": "Inventory and purchases",
+                    "root": "api/modules/steamworks/inventory-and-purchases",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamCommerceBackend",
                       "api/classes/SteamCommerceRequest",
@@ -303,6 +323,8 @@
                   },
                   {
                     "group": "Cloud and Workshop",
+                    "root": "api/modules/steamworks/cloud-and-workshop",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamCloud",
                       "api/classes/SteamCloudChange",
@@ -341,6 +363,8 @@
                   },
                   {
                     "group": "Input and device",
+                    "root": "api/modules/steamworks/input-and-device",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamAnalogInput",
                       "api/classes/SteamAnalogInputResult",
@@ -358,6 +382,8 @@
                   },
                   {
                     "group": "Media and voice",
+                    "root": "api/modules/steamworks/media-and-voice",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamBroadcastStatus",
                       "api/classes/SteamBroadcastStatusResult",
@@ -392,6 +418,8 @@
                   },
                   {
                     "group": "Auth, HTTP, and diagnostics",
+                    "root": "api/modules/steamworks/auth-http-and-diagnostics",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamAuth",
                       "api/classes/SteamAuthOperation",
@@ -418,10 +446,13 @@
               },
               {
                 "group": "Steam publisher",
+                "root": "api/modules/steam-publisher",
                 "expanded": false,
                 "pages": [
                   {
                     "group": "Host and authorization",
+                    "root": "api/modules/steam-publisher/host-and-authorization",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamAppOwnership",
                       "api/classes/SteamAppOwnershipResult",
@@ -440,6 +471,8 @@
                   },
                   {
                     "group": "Commerce and inventory",
+                    "root": "api/modules/steam-publisher/commerce-and-inventory",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamPublisherInventory",
                       "api/classes/SteamPublisherPurchaseLine",
@@ -457,6 +490,8 @@
                   },
                   {
                     "group": "Notifications",
+                    "root": "api/modules/steam-publisher/notifications",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamGameNotifications",
                       "api/classes/SteamLocalizedText",
@@ -475,6 +510,8 @@
                   },
                   {
                     "group": "Moderation and leaderboards",
+                    "root": "api/modules/steam-publisher/moderation-and-leaderboards",
+                    "expanded": false,
                     "pages": [
                       "api/classes/SteamCheatEvidence",
                       "api/classes/SteamCheatReport",

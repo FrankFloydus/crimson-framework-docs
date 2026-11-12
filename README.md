@@ -25,7 +25,7 @@ npx mint@latest broken-links --check-anchors
 
 The reference generator combines the framework's class XML prose with signatures exported by Godot from the release addon. The `scripts/api-prose/` files supply descriptions that have yet to be added to the framework's class XML. Update descriptions in the framework XML when you change a binding there. Remove any overlapping supplement when you regenerate this site.
 
-Keep the guides and the generated reference tied to the same framework release. Update affected examples, regenerate the reference, and review class and navigation changes together. Edit guides and `api/overview.mdx` directly. Regenerate class pages in `api/classes/` when their inputs change.
+Keep the guides and the generated reference tied to the same framework release. Update affected examples, regenerate the reference, and review class and navigation changes together. Edit guides and `api/overview.mdx` directly. Edit module and service descriptions in `scripts/api-module-prose.json`. The generator builds `api/modules/` and `api/classes/` from the catalog and class descriptions.
 
 For maintenance, use a local framework checkout with the matching release tag, the Godot 4.7 console executable, and the trusted Debug publisher DLL for that release. Run from the docs repository. Here `..` is the local framework checkout.
 
@@ -35,4 +35,4 @@ $publisher = 'C:\path\to\trusted\crimson_framework.windows.template_debug.x86_64
 python scripts/generate_api.py --framework .. --ref v0.0.3 --godot $godot --publisher-dll $publisher
 ```
 
-The generator writes the class pages and their navigation. Add `--check` to compare the checkout with the expected output. Add `--gaps` to list descriptions that still need prose. Use `--binding-docs` and `--publisher-binding-docs` if you already exported the Godot class XML for both builds. Run `python scripts/generate_api.py --help` for all options.
+The generator writes the module indexes, class pages, and sidebar navigation. Add `--check` to compare the checkout with the expected output. Add `--gaps` to list descriptions that still need prose. Use `--binding-docs` and `--publisher-binding-docs` if you already exported the Godot class XML for both builds. Run `python scripts/generate_api.py --help` for all options.
