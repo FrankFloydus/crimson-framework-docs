@@ -1,23 +1,25 @@
 ---
 title: "Wallets, shops, and player trades"
-description: "Track integer balances and settle inventory and currency changes together."
+description: "Charge for an item only when it fits in the bag, and let two players agree on a trade."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Use a wallet for game-owned currency. Use a checked wallet commit for a shop purchase, or let the trade model manage an exchange that both players must approve. In multiplayer, run these examples' decisions on the authority. Resolve actor IDs from the session and read prices and eligibility from game-owned state.
+A shop should only charge the player if it can hand over the item. A trade between players should wait until both agree. In multiplayer, let the host or server make these decisions. Use the session to identify the player who asked to buy or trade, and look up prices and trade rules in your game.
 
 Each example runs on its own. Attach one script to a **Node** in an empty scene, run it, and read Godot's **Output**.
 
-## Track integer balances
+## Keep track of credits
 
-[`SpatialInventoryWallet`](/api/classes/SpatialInventoryWallet) indexes balances by a positive actor ID and a nonempty currency ID. Store nonnegative integers in the smallest unit your game uses, such as credits or cents. Use [`set_balance()`](/api/classes/SpatialInventoryWallet/methods/set_balance) to load a starting balance and [`get_balance()`](/api/classes/SpatialInventoryWallet/methods/get_balance) to read it. A custom scripted wallet implements [`_get_balance()`](/api/classes/SpatialInventoryWallet/methods/_get_balance) and [`_apply_balance_changes()`](/api/classes/SpatialInventoryWallet/methods/_apply_balance_changes) to provide the same checks and rollback against its own data.
+[`SpatialInventoryWallet`](/api/classes/SpatialInventoryWallet) keeps a balance for each player and currency. It calls the player's positive numeric ID an actor ID. Give the currency a name, such as `&"credits"`, and use whole amounts of zero or more. If your game uses dollars and cents, store the amount in cents. Set the starting amount with [`set_balance()`](/api/classes/SpatialInventoryWallet/methods/set_balance) and read it with [`get_balance()`](/api/classes/SpatialInventoryWallet/methods/get_balance).
+
+To use your own wallet storage, implement [`_get_balance()`](/api/classes/SpatialInventoryWallet/methods/_get_balance) and [`_apply_balance_changes()`](/api/classes/SpatialInventoryWallet/methods/_apply_balance_changes). The same rules apply. Check the old amounts first and put them back if handing over the item fails.
 
 ## Buy a medkit without losing credits when the bag is full
 
-A shop purchase has two parts: changing the balance and handing over the item. [`apply_balance_changes()`](/api/classes/SpatialInventoryWallet/methods/apply_balance_changes) accepts rows with `actor`, `currency`, `before`, and `after`. The wallet verifies the expected balances, stages the new amounts, and runs the synchronous placement callback. If the callback returns an error, the wallet restores the balances. Keep the callback focused on one checked inventory change. For several placement writes, use a single [`apply_placement_changes()`](/api/classes/SpatialInventory/methods/apply_placement_changes) batch.
+Buy a medkit from the outpost shop. The player's only backpack cell holds an empty ration tin, so the first attempt fails and the player keeps all 20 credits. Discard the tin and try again. The medkit fits and the player has 14 credits left.
 
-This player's only backpack cell is occupied by an empty ration tin. The first purchase fails and leaves the balance at 20 credits. Once the player discards the tin, the second purchase adds the medkit and deducts 6 credits.
+[`apply_balance_changes()`](/api/classes/SpatialInventoryWallet/methods/apply_balance_changes) checks that the current balance matches `before`, then sets it to `after` and calls the function that hands over the medkit. That function runs right away. If the medkit cannot fit, it returns an error and the wallet puts the credits back. If a purchase delivers several items, use one [`apply_placement_changes()`](/api/classes/SpatialInventory/methods/apply_placement_changes) call so the items are placed together.
 
 ```gdscript
 extends Node
@@ -68,13 +70,13 @@ func _deliver_medkit(bag: SpatialInventory) -> Error:
     return bag.add(MEDKIT_ID, ITEM_SIZE)
 ```
 
-The script uses a fixed instance ID for a one-time shop item. For repeat purchases, allocate a fresh stable ID for each unit or route the purchase through your stack records. Notify the player after the purchase result. Saving wallets and item data is the game's responsibility.
+This shop sells one medkit. Give each additional medkit its own ID, or add it to an existing [stack](/inventory/items#split-ammunition-for-a-teammate). Show the purchase message after Crimson returns the result. Save wallets and item data with the rest of the game.
 
 ## Trade a toolkit for credits
 
-[`SpatialInventoryTrade`](/api/classes/SpatialInventoryTrade) registers two participants with separate backpacks and offer grids. One participant [`requests a trade`](/api/classes/SpatialInventoryTrade/methods/request) and the other [`accepts`](/api/classes/SpatialInventoryTrade/methods/accept). A [`whole item offer`](/api/classes/SpatialInventoryTrade/methods/offer_item) reserves the item. A [`currency offer`](/api/classes/SpatialInventoryTrade/methods/set_currency_offer) promises funds. Review both offers and [`lock each one`](/api/classes/SpatialInventoryTrade/methods/set_lock). An offer edit clears the locks. The second lock checks funds, placements, and available room and attempts settlement.
+At the salvage camp, trade a toolkit for 7 credits. The first try fails because the buyer's backpack is full. Once the buyer makes room and both players agree again, the buyer gets the toolkit and the seller gets the credits.
 
-At the salvage camp, one player offers a toolkit and the other offers 7 credits. The first settlement fails because the buyer's backpack is full. After clearing room and locking again, the buyer receives the toolkit and the balances read 7 and 13.
+[`SpatialInventoryTrade`](/api/classes/SpatialInventoryTrade) keeps track of both backpacks and what each player is offering. One player [requests the trade](/api/classes/SpatialInventoryTrade/methods/request) and the other [accepts](/api/classes/SpatialInventoryTrade/methods/accept). The seller [sets aside the toolkit](/api/classes/SpatialInventoryTrade/methods/offer_item) and the buyer [offers credits](/api/classes/SpatialInventoryTrade/methods/set_currency_offer). Each player [locks their offer](/api/classes/SpatialInventoryTrade/methods/set_lock) to confirm it. After the second confirmation, Crimson checks the balances and available space before exchanging anything.
 
 ```gdscript
 extends Node
@@ -150,8 +152,8 @@ func _accepted(result: Dictionary) -> bool:
     return true
 ```
 
-Check `completed` before marking a trade finished. A failed settlement clears both locks. When an incoming item cannot fit, help the player make room and lock both offers again. Prevent other inventory actions from touching [`reserved items`](/api/classes/SpatialInventoryTrade/methods/is_reserved). [`cancel()`](/api/classes/SpatialInventoryTrade/methods/cancel) attempts to return active offers. Check the [`recovery grid`](/api/classes/SpatialInventoryTrade/methods/get_recovery) when an original backpack cannot accept a return.
+Use `completed` to tell whether the exchange went through. An edit or failed exchange clears both confirmations, so both players need to confirm again. While a trade is open, keep other inventory actions away from [items set aside for the trade](/api/classes/SpatialInventoryTrade/methods/is_reserved). [`cancel()`](/api/classes/SpatialInventoryTrade/methods/cancel) tries to send offered items back. If a backpack is full, check the [recovery grid](/api/classes/SpatialInventoryTrade/methods/get_recovery), which can hold returned items temporarily.
 
-For partial stack offers, configure the trade's [`describe_stack`](/api/classes/SpatialInventoryTrade/properties/describe_stack), [`allocate_stack_id`](/api/classes/SpatialInventoryTrade/properties/allocate_stack_id), and [`apply_stack_changes`](/api/classes/SpatialInventoryTrade/properties/apply_stack_changes) callbacks before calling [`offer_quantity()`](/api/classes/SpatialInventoryTrade/methods/offer_quantity). The quantity records follow the same compare, stage, commit, and rollback pattern shown in [Manage items, stacks, and sorting](/inventory/items#split-ammunition-for-a-teammate). If you save an active trade, persist the [`trade snapshot`](/api/classes/SpatialInventoryTrade/methods/export_snapshot), item records, wallets, and backpacks as one game checkpoint.
+To offer part of a stack, use [`offer_quantity()`](/api/classes/SpatialInventoryTrade/methods/offer_quantity). Give the trade functions to [read the stack](/api/classes/SpatialInventoryTrade/properties/describe_stack), [make an ID for the part being offered](/api/classes/SpatialInventoryTrade/properties/allocate_stack_id), and [update the counts](/api/classes/SpatialInventoryTrade/properties/apply_stack_changes). The counts and placements change together, as in the [ammunition split example](/inventory/items#split-ammunition-for-a-teammate). If you save while a trade is open, save the [trade snapshot](/api/classes/SpatialInventoryTrade/methods/export_snapshot), item records, wallets, and backpacks in the same checkpoint.
 
 [Inventory overview](/inventory)

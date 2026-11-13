@@ -16,7 +16,11 @@ Crimson attaches a game to a node you already own, such as the `Main` node that 
 
 ## Start and stop a training session
 
-Create `res://training_room.tscn` with a `Node3D` root and a `Node3D` child named `SpawnPoints` containing one `Marker3D`. Create `res://training_player.tscn` with a `Node3D` root and a `Camera3D` child. Create a third scene with a `Node` root, attach this script, and run that scene. Press **P** to start play or **L** to leave. The script reports the transition in Godot's **Output**. Add a visible object and a light to the level if you want to see a change in the game window too.
+Use `res://training_room.tscn` with a `Node3D` root and a `Marker3D` under `SpawnPoints`. Use `res://training_player.tscn` with a `Node3D` root and one `Camera3D`. The script goes on a separate `Node` root.
+
+1. Boot once and read [`boot_result()`](/api/classes/Game/methods/boot_result). A successful boot leaves the game idle and ready to take input.
+2. On **P**, await [`play()`](/api/classes/Game/methods/play). The level loads and the player spawns. Print the ready message only after the action succeeds.
+3. On **L**, await [`leave()`](/api/classes/Game/methods/leave). The session ends and **P** can start a new one with the same `Game`.
 
 ```gdscript
 extends Node
@@ -64,8 +68,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
             push_error(left.message)
 ```
 
-[`boot_result()`](/api/classes/Game/methods/boot_result) reports whether configuration attached successfully. [`play()`](/api/classes/Game/methods/play) settles when play is ready or startup fails. [`leave()`](/api/classes/Game/methods/leave) retires the session, so **P** can start another one on the same attachment. Removing the owning node retires the attachment itself. [Game scopes and service overrides](/game-services)
+Run the scene and press **P**, **L**, then **P** again. **Output** should report ready, closed, then ready. If the owning node leaves the scene tree, its `Game` handle stops working. [Game scopes and service overrides](/game-services)
 
 ## Choose how worlds progress
 
-Use [`Game.configure(level, player)`](/api/classes/Game/methods/configure) for a fixed world with automatic spawning. Use [`Game.campaign(start)`](/api/classes/Game/methods/campaign) when you want to register multiple worlds, coordinate gameplay commands, or save match state. Your game supplies its own actors and rules in a coordinated world. [Checkpoints](/checkpoints) · [Coordinated LAN](/coordinated-lan)
+Use [`Game.configure(level, player)`](/api/classes/Game/methods/configure) when Crimson should load one level and spawn the player for you. Use [`Game.campaign(start)`](/api/classes/Game/methods/campaign) when your game needs to move between registered worlds, handle shared gameplay commands, or save game state. In a campaign, your game supplies its own players and rules. Both options can run offline. [Solo quickstart](/quickstart) · [Checkpoints](/checkpoints) · [Coordinated LAN](/coordinated-lan)

@@ -7,13 +7,15 @@ description: "Save a safe-room checkpoint, spend a medkit, and reload the saved 
 
 Give the player a safe room where they can save their supplies before continuing. In this example the player starts with one medkit. Save the checkpoint, use the medkit, then load the checkpoint to get it back.
 
-## Create the scenes
+## Set up the safe room
 
-1. Create a scene with a `Node3D` root named `SafeRoom`. Save it as `res://levels/safe_room.tscn`. The safe room can be empty for this test. To show a room behind the menu, add a floor mesh and a `Camera3D` as children and enable the camera's **Current** property.
-2. Create a separate scene with a `Node` root named `Main`. Under a `CanvasLayer`, add a `VBoxContainer` with three `Button` nodes labeled **Save Checkpoint**, **Use Medkit**, and **Load Checkpoint**. Add a `Label` to show supplies and results.
-3. Attach the script below to `Main`. Assign the buttons and label to the four exported fields in the Inspector. Keep these controls in `Main` so they remain available when loading the checkpoint replaces the safe-room scene.
+Use an empty `Node3D` scene at `res://levels/safe_room.tscn`. Put the script and its assigned **Save Checkpoint**, **Use Medkit**, **Load Checkpoint**, and status controls in a separate `Main` scene. The controls stay on screen when the safe room reloads.
 
-[`WorldDefinition.at()`](/api/classes/WorldDefinition/methods/at) gives the scene a stable world ID. [`Game.campaign()`](/api/classes/Game/methods/campaign) sets up a coordinated game that can save and restore world state. After [booting the game](/api/classes/GameConfig/methods/boot), the script registers a supplies store before starting the world. The **Use Medkit** button commits a change to that store. [`Game.save_slot()`](/api/classes/Game/methods/save_slot) addresses the same profile and slot for both save and load.
+## Save the room and its supplies
+
+1. Give the room an ID with [`WorldDefinition.at()`](/api/classes/WorldDefinition/methods/at) and pass it to [`Game.campaign()`](/api/classes/Game/methods/campaign). The save uses that ID to find the room again.
+2. Register the medkit count with [`register_store()`](/api/classes/TransactionCoordinator/methods/register_store) before play. **Use Medkit** updates that same count, so Crimson can capture and restore it.
+3. Choose a slot with [`game.save_slot()`](/api/classes/Game/methods/save_slot). Save writes the current room and supplies to the slot. Load brings both back together.
 
 ```gdscript
 extends Node
@@ -122,6 +124,6 @@ func _set_busy(busy: bool) -> void:
 
 Run `Main`. Wait for **Medkits: 1**, then click **Save Checkpoint**, **Use Medkit**, and **Load Checkpoint**. The count drops to **0** when you use a medkit and returns to **1** after loading. Stop the game and run `Main` again. **Load Checkpoint** still opens the saved generation from disk.
 
-[`submit()`](/api/classes/SaveRequest/methods/submit) captures the committed stores and active world ID from a ready authority. Wait for its result before reporting a successful save. [`restore_latest()`](/api/classes/SaveSlot/methods/restore_latest) loads the slot's latest committed generation and activates its saved world and stores. The player can keep the menu open while the script awaits either result. To build a load menu for earlier generations, use [`history()`](/api/classes/SaveSlot/methods/history) and pass the selected generation's sequence and ID to [`restore()`](/api/classes/SaveSlot/methods/restore).
+[`submit()`](/api/classes/SaveRequest/methods/submit) saves the current world ID and game data. Wait for success before showing **Checkpoint saved**. [`restore_latest()`](/api/classes/SaveSlot/methods/restore_latest) brings back the last successful save in that slot. For a menu with older saves, list them with [`history()`](/api/classes/SaveSlot/methods/history) and pass the chosen save's sequence and ID to [`restore()`](/api/classes/SaveSlot/methods/restore).
 
-Register the same store IDs and compatible restore validation before loading. With no separate restore validator, [`register_store()`](/api/classes/TransactionCoordinator/methods/register_store) uses the preparer with an empty operation array to check the loaded state. The sample checks the medkit count there. For player position, inventory, or quest progress, store those values under stable game IDs and rebuild their scene representation from the loaded data. Scene nodes and live Godot objects have their own lifetimes. Keep the world ID stable if you move its scene file.
+Use the same store IDs when you load and check that the saved values still make sense. Without a separate load check, [`register_store()`](/api/classes/TransactionCoordinator/methods/register_store) calls your usual update function with an empty list of changes. This example checks that the saved medkit count is a nonnegative integer. Save values such as positions and quest progress, then use them to rebuild the scene. Keep the world ID the same if you move its scene file.

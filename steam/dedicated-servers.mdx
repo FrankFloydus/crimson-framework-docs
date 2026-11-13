@@ -9,15 +9,20 @@ A dedicated server runs the world without a local player. The examples below use
 
 ## Prepare the test scenes
 
-1. Save a `Node3D` scene as `res://server_level.tscn`. Add a `Node3D` named `SpawnPoints` under its root. Add four `Marker3D` children under `SpawnPoints`, spaced apart.
-2. Save another `Node3D` scene as `res://server_player.tscn`. Add a single `Camera3D` at `(0, 1.5, 5)`. To see when the guest enters the level, add a visible mesh to `server_level.tscn` in front of the first spawn marker.
-3. Create two scenes with ordinary `Node` roots. Name both roots `Main` and save the scenes as `res://steam_server.tscn` and `res://steam_guest.tscn`. Using the same root name keeps the internal game node path the same on both peers.
+| Scene | Required nodes |
+| --- | --- |
+| `res://server_level.tscn` | `Node3D` root with a `SpawnPoints` child containing four `Marker3D` children at distinct positions. |
+| `res://server_player.tscn` | `Node3D` root with one `Camera3D`. |
+| `res://steam_server.tscn` and `res://steam_guest.tscn` | Each has a `Node` root named `Main`. The shared root name gives Crimson the same internal game path on both peers. |
 
 ## Start a playerless authority
 
 For a Steam dedicated server, use the AppID and Steam runtime from the dedicated process's launch context. An anonymous Steam server does not require an interactive Steam client. Guests sign in with an account entitled to that AppID. Use your app's Steam product metadata before deployment. [Steamworks setup](/steam/setup#launch-with-an-appid) · [Valve GameServer API](https://partner.steamgames.com/doc/api/ISteamGameServer)
 
 Attach this script to the root of `steam_server.tscn`. It starts a four-seat server and prints its locator only after the playerless world is ready. By default the server publishes a direct locator. Enable **Advertise In Browser** to also request Steam discovery.
+
+- [`SteamServer.configure()`](/api/classes/SteamServer/methods/configure) sets the game and query ports. Pass those settings and the remote seat count to [`.steam_server()`](/api/classes/GameConfig/methods/steam_server).
+- [`boot(self)`](/api/classes/GameConfig/methods/boot) attaches the game. Await [`serve()`](/api/classes/Game/methods/serve) for playerless startup and read the locator from its successful `GameResult`.
 
 ```gdscript
 extends Node
@@ -76,7 +81,9 @@ For a local fixed-world LAN server, use [`GameConfig.boot_server(self)`](/api/cl
 
 Enable **Advertise In Browser** in the server script and run it with your app's Steam launch context. Steam discovery starts after the server logs in and has a ready world, listener, and certificate. [`advertisement_requested`](/api/classes/SteamServerStatus/properties/advertisement_requested) confirms the local request. Verify that a separate Steam client can see the server. The guest profile uses the same four-seat limit as the authority. [Valve dedicated servers](https://partner.steamgames.com/doc/features/multiplayer/game_servers)
 
-Attach this guest script to the root of `steam_guest.tscn`. Add a `CanvasLayer` with an `OptionButton`, a status label, and **Refresh** and **Join** buttons. Assign them in the Inspector. The game lists servers for the training room and checks the exact selection again before joining.
+This guest script runs on the `steam_guest.tscn` root. Bind the `OptionButton`, status label, and **Refresh** and **Join** buttons to its exports. The game lists servers for the training room and checks the selected listing again before joining.
+
+Use the game’s Steamworks attachment to query for the map and an open seat. [`inspect()`](/api/classes/SteamServerBrowser/methods/inspect) refreshes the player’s selected listing. [`join_listing()`](/api/classes/Game/methods/join_listing) then verifies the server and authenticates the guest.
 
 ```gdscript
 extends Node
@@ -146,7 +153,7 @@ func join_selected_server() -> void:
     status.text = "Joined the training room." if joined.ok else joined.message
 ```
 
-A browser row is an observation. [`inspect()`](/api/classes/SteamServerBrowser/methods/inspect) refreshes it, and [`join_listing()`](/api/classes/Game/methods/join_listing) verifies the server and authenticates the guest independently. The current Steam SDK advertises Internet and LAN together. A request for LAN-only Steam hosting reports unavailable. [`query(SteamServer.LAN)`](/api/classes/SteamServerBrowser/methods/query) can read compatible LAN announcements.
+The Steam SDK advertises Internet and LAN together. A request for LAN-only Steam hosting reports unavailable. [`query(SteamServer.LAN)`](/api/classes/SteamServerBrowser/methods/query) can read compatible LAN announcements.
 
 ## Join an exact server
 

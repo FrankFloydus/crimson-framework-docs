@@ -1,19 +1,19 @@
 ---
 title: "Manage items, stacks, and sorting"
-description: "Place items in exact cells, split and merge quantities, and preview a backpack sort before applying it."
+description: "Choose where items go, share ammunition, and tidy a backpack without moving favorite items."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Use [`Inventory.grid()`](/api/classes/Inventory/methods/grid) to create a grid and [`add()`](/api/classes/SpatialInventory/methods/add) to pack an item into the first available space. Use exact placement when the player picks a cell or the game reserves part of a grid.
+Use [`Inventory.grid()`](/api/classes/Inventory/methods/grid) to make a bag and [`add()`](/api/classes/SpatialInventory/methods/add) to put an item in the first space it fits. To put it in a specific spot, give Crimson the cell and tell it whether to turn the item sideways.
 
 Each example runs on its own. Attach one script to a **Node** in an empty scene, run the scene, and read Godot's **Output**.
 
 ## Place an item at an exact cell
 
-A placement keeps the item's stable ID, original footprint, top-left cell, and rotation. A rotated 2 × 1 medkit occupies one column and two rows. Pass its original footprint and set rotation to `true`. Use [`check_placement()`](/api/classes/SpatialInventory/methods/check_placement) to inspect a candidate. [`try_place()`](/api/classes/SpatialInventory/methods/try_place) checks the live grid again before it commits. Use [`check_move()`](/api/classes/SpatialInventory/methods/check_move) and [`try_move()`](/api/classes/SpatialInventory/methods/try_move) for an existing placement. The item's current cells are available to its own move.
+Keep the top row free for loot by packing a medkit vertically along the right side. First [`check_placement()`](/api/classes/SpatialInventory/methods/check_placement) asks whether the medkit fits. Then [`try_place()`](/api/classes/SpatialInventory/methods/try_place) checks again and places it. The script reads the lower cell to show that both cells belong to the same medkit.
 
-The field medic keeps the top row free for loot. Pack a medkit vertically along the right side and look it up from the second occupied cell.
+A footprint is an item's width and height in cells before you turn it. Pass `Vector2i(2, 1)` for the medkit and set rotation to `true` so Crimson uses one column and two rows. The cell you pass is the top-left corner of that space.
 
 ```gdscript
 extends Node
@@ -41,15 +41,15 @@ func _ready() -> void:
         print("The lower cell belongs to ", medkit.id, " at ", medkit.origin)
 ```
 
-If the player can swap items or drop across grids, use [`SpatialInventoryActions.move_item()`](/api/classes/SpatialInventoryActions/methods/move_item) with the expected source and swap placements. [Build a drag-and-drop inventory](/inventory/drag-and-drop)
+Use [`check_move()`](/api/classes/SpatialInventory/methods/check_move) and [`try_move()`](/api/classes/SpatialInventory/methods/try_move) to move an item that's already in the bag. Crimson lets the item overlap its own cells while it moves. For swaps or moves between bags, pass the starting positions you saw to [`SpatialInventoryActions.move_item()`](/api/classes/SpatialInventoryActions/methods/move_item) so it can reject a move if those items have changed. [Build a drag-and-drop inventory](/inventory/drag-and-drop)
 
 ## Split ammunition for a teammate
 
-A stack uses one grid placement and one host-owned quantity record. Each stack has its own instance ID. The shared stack key decides which units can merge. The record's `quantity` and `max_quantity` describe its current count and capacity.
+Give a teammate four rounds, then merge those rounds back into the original box. The script prints 8 rounds in the box and 4 in the pouch after the split, then 12 rounds in the box after the merge.
 
-Attach a [`SpatialInventoryStackAdapter`](/api/classes/SpatialInventoryStackAdapter) to [`SpatialInventoryActions`](/api/classes/SpatialInventoryActions). The adapter reads records through [`describe_stack`](/api/classes/SpatialInventoryStackAdapter/properties/describe_stack) and applies them through [`apply_changes`](/api/classes/SpatialInventoryStackAdapter/properties/apply_changes). An edit row carries the ID, expected `before` record, and proposed `after` record. An empty record means absence. Compare every expectation first, stage the records, call the supplied placement commit synchronously, and restore the previous records if it fails. Placement listeners can read the updated quantities as soon as the grid reports a change.
+The grid knows where each box sits. Your game keeps the number of rounds in each box. Give each stack a unique ID and use the same `key` for stacks that can combine. `quantity` is the count and `max_quantity` is how many the stack can hold.
 
-Split four rounds into a teammate's pouch, then return the pouch's stack to the original box. The pack count falls from 12 to 8 and rises back to 12.
+[`SpatialInventoryActions`](/api/classes/SpatialInventoryActions) uses a [`SpatialInventoryStackAdapter`](/api/classes/SpatialInventoryStackAdapter) to change the count and grid together. [`describe_stack`](/api/classes/SpatialInventoryStackAdapter/properties/describe_stack) reads a stack. [`apply_changes`](/api/classes/SpatialInventoryStackAdapter/properties/apply_changes) checks that each stack still matches its `before` record, then installs the `after` records. An empty record means the stack is absent. The function calls `commit` immediately to update the grid. If the grid update fails, the function puts the old counts back. On success, anyone reading the bag after its change signal sees the new counts.
 
 ```gdscript
 extends Node
@@ -119,13 +119,13 @@ func _apply_stack_changes(rows: Array[Dictionary], commit: Callable) -> Error:
     return committed
 ```
 
-[`split_stack()`](/api/classes/SpatialInventoryActions/methods/split_stack) needs a fresh instance ID, a valid destination rectangle, and a quantity smaller than the source. A [`merge_stacks()`](/api/classes/SpatialInventoryActions/methods/merge_stacks) can succeed partially when the destination runs out of capacity. Read `moved`, `remaining`, and `completed` before updating the UI. Call [`invalidate_stack_records()`](/api/classes/SpatialInventoryStackAdapter/methods/invalidate_stack_records) if your game changes quantities outside the adapter.
+[`split_stack()`](/api/classes/SpatialInventoryActions/methods/split_stack) needs a new ID, a space where the split stack fits, and a count smaller than the original stack. [`merge_stacks()`](/api/classes/SpatialInventoryActions/methods/merge_stacks) moves only as many rounds as the destination can hold. Use `moved` and `remaining` for the counts and `completed` to tell whether the whole stack moved. If your game updates counts directly, call [`invalidate_stack_records()`](/api/classes/SpatialInventoryStackAdapter/methods/invalidate_stack_records) so the adapter reads the new values.
 
 ## Preview and undo a sort
 
-A sort can compact the grid while keeping a quick-access item fixed. Use one [`SpatialInventorySorter`](/api/classes/SpatialInventorySorter) per independent sort history. [`preview()`](/api/classes/SpatialInventorySorter/methods/preview) returns detached `placements` and a `changed_count`. A UI can draw these placements as a ghost layout. [`apply_preview()`](/api/classes/SpatialInventorySorter/methods/apply_preview) checks the live baseline and policy before it commits. Use [`cancel_preview()`](/api/classes/SpatialInventorySorter/methods/cancel_preview) when the player declines. [`undo()`](/api/classes/SpatialInventorySorter/methods/undo) restores the last applied sort while its expectations still hold.
+Tidy the bag while leaving the radio in the cell the player uses to reach it quickly. [`preview()`](/api/classes/SpatialInventorySorter/methods/preview) plans a new spot for the cable. [`apply_preview()`](/api/classes/SpatialInventorySorter/methods/apply_preview) checks that the bag and placement rules still allow the sort, then moves the cable. [`undo()`](/api/classes/SpatialInventorySorter/methods/undo) puts it back if the items are still where the sort left them.
 
-Preview, apply, and undo a sort. The field radio stays pinned at its quick-access cell.
+Use one [`SpatialInventorySorter`](/api/classes/SpatialInventorySorter) for each bag that should have its own undo history. The preview's `placements` show where items would go, and `changed_count` tells you how many would move. Use [`cancel_preview()`](/api/classes/SpatialInventorySorter/methods/cancel_preview) if the player declines.
 
 ```gdscript
 extends Node

@@ -1,21 +1,33 @@
 ---
 title: "Start a solo game"
-description: "Load a level and spawn a player with one Crimson script."
+description: "Learn when to use Crimson for a single-player game and start your first offline session."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Start with an empty Godot 4.7 project with Crimson installed. [Installation](/installation)
+A **solo game** is a session for one player on their own machine. Crimson starts it offline, so there is no host to find or server to join.
 
-## Set up the scenes
+Use Crimson when you want your game to manage a play session. For example, a title screen can stay open until the player chooses **New Game**. Crimson then loads the level, places the player at a spawn marker, and turns on their camera. When the player returns to the menu, `game.leave()` unloads the session so they can start again. Your game still supplies the level, movement, and rules. [Game lifecycle](/game-runtime)
+
+If your game just opens a scene with the player already in it, Godot's normal scene startup may be all you need. You can still use a standalone Crimson module such as [Inventory](/inventory) without booting a `Game`. For a solo game that needs to travel between levels or save world state, use `Game.campaign()`. [Checkpoints](/checkpoints)
+
+To try solo startup, use an empty Godot 4.7 project with Crimson installed. [Installation](/installation)
+
+## 1. Choose a level and a player
 
 - `res://world.tscn`: A `Node3D` with a child named `SpawnPoints`. Put one `Marker3D` under it and add something visible to the world.
 - `res://player.tscn`: A `Node3D` with one `Camera3D` facing the world from the spawn point.
 - `res://main.tscn`: A plain `Node` with the script below.
 
-## Start play
+The level supplies the spawn position. Crimson places the player there and selects its camera.
 
-[`Game.configure()`](/api/classes/Game/methods/configure) takes the two scenes. [`boot(self)`](/api/classes/GameConfig/methods/boot) attaches the game to the main node. Await [`game.play()`](/api/classes/Game/methods/play) for the result of loading the world and spawning the player.
+## 2. Configure and boot
+
+[`Game.configure(LEVEL, PLAYER)`](/api/classes/Game/methods/configure) tells Crimson which scenes to use. [`boot(self)`](/api/classes/GameConfig/methods/boot) prepares the game under `Main`. This example calls `play()` right away. A title screen can wait until the player chooses **New Game**.
+
+## 3. Start play and check the result
+
+[`await game.play()`](/api/classes/Game/methods/play) waits for Crimson to load the world and spawn the player. Check [`result.ok`](/api/classes/GameResult/properties/ok) to see if the game is ready. If startup fails, `result.message` explains why.
 
 ```gdscript
 extends Node
@@ -34,7 +46,7 @@ func _ready() -> void:
     print("Solo ready.")
 ```
 
-Run `main.tscn`. The player spawns at the marker, its camera becomes active, and **Output** shows `Solo ready.`.
+Run `main.tscn`. The player spawns at the marker, its camera becomes active, and the game logs `Solo ready.`
 
 <Frame caption="Example solo scene viewed through the spawned player’s camera">
   ![A red box in a small 3D room.](/images/getting-started/solo.png)

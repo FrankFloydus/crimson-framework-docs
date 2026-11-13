@@ -9,7 +9,11 @@ Use standalone Steamworks to add app services to an existing game. This connecti
 
 ## Connect your game to Steam
 
-In Godot, create a scene with an ordinary `Node` root named SteamCheck. Save it as `res://steam_check.tscn` and attach the script below as `res://steam_check.gd`. Set the scene as your project’s main scene if you are testing in an empty project. Launch with Steam running and signed in. For a direct Spacewar test, follow the platform setup to launch under AppID `480`. The script reports which app connected and whether Steam is online. [Launch with an AppID](/steam/setup#launch-with-an-appid)
+Run this script on a `Node` with Steam running and signed in. For Spacewar, set `use_spacewar` to `true` and launch under AppID `480`. For your own app, leave the default to use the AppID Steam supplies. [Launch with an AppID](/steam/setup#launch-with-an-appid)
+
+- [`SteamConfig.spacewar()`](/api/classes/SteamConfig/methods/spacewar) selects a test profile and checks for a Spacewar launch. A null settings value uses the current launch context.
+- [`Steamworks.boot(self, settings)`](/api/classes/Steamworks/methods/boot) attaches the Steam client to this node for as long as the node stays in the tree.
+- [`boot_result()`](/api/classes/Steamworks/methods/boot_result) reports whether attachment succeeded. After success, [`is_online()`](/api/classes/Steamworks/methods/is_online) reports the live Steam connection separately.
 
 ```gdscript
 extends Node
@@ -35,6 +39,4 @@ func _ready() -> void:
     print("Steam AppID %d ready. Online: %s" % [_steam.get_app_id(), _steam.is_online()])
 ```
 
-Select the root node and enable **Use Spacewar** in the Inspector when running this script under AppID `480`. For your own app, leave it off to use the AppID Steam supplies. [SteamConfig](/api/classes/SteamConfig) · [Steamworks.boot()](/api/classes/Steamworks/methods/boot)
-
-The success message confirms local initialization. `Online: true` also confirms the client is connected to Steam. If setup fails, the script prints the startup message. [Troubleshoot startup](/steam/testing#diagnose-common-failures)
+For a successful Spacewar launch, the expected output is `Steam AppID 480 ready. Online: true`. [Troubleshoot startup](/steam/testing#diagnose-common-failures)

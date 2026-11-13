@@ -19,7 +19,7 @@ Set [`publisher_key_ref`](/api/classes/SteamPublisherSettings/properties/publish
 
 ### Set up the backend
 
-Attach this script to a persistent `Node` in the backend scene. It creates a scripted [`SteamPublisherHost`](/api/classes/SteamPublisherHost) under that node. Set **Steam App ID** in the Inspector and supply `MY_GAME_STEAM_PUBLISHER_KEY` in the backend process environment. The script calls [`SteamPublisher.boot(settings)`](/api/classes/SteamPublisher/methods/boot) after the host enters the tree.
+The backend script runs on a persistent `Node`. Set `steam_app_id` to your app and supply `MY_GAME_STEAM_PUBLISHER_KEY` in the backend process environment. The script creates a [`SteamPublisherHost`](/api/classes/SteamPublisherHost) and calls [`SteamPublisher.boot(settings)`](/api/classes/SteamPublisher/methods/boot) once the host enters the tree.
 
 ```gdscript
 extends Node
@@ -84,7 +84,7 @@ When your backend receives a ticket, pass its bytes to `await verify_player(tick
 
 ### Request a ticket on the client
 
-On the game client, attach this script to a persistent `Node` and set **Steam App ID** to the same AppID as the backend. For a game that already booted with Steam, enable **Use Game Scope** and call `bind_game(game)` after it boots. Call `await verify_with_backend(send_ticket)` from your sign-in flow once the Steam attachment is available. Pass a `Callable` that sends the bytes over your authenticated connection and returns `true` when the backend accepts the player.
+The client script runs on a persistent `Node` with the same `steam_app_id` as the backend. If the game already owns a Steam attachment, set `use_game_scope` to `true` and call `bind_game(game)` after boot. In your sign-in flow, await `verify_with_backend(send_ticket)`. The callable sends the bytes over your authenticated connection and returns `true` when the backend accepts the player.
 
 The script requests a [Web API ticket](/api/classes/SteamAuth/methods/web_ticket) for `game-profile`, checks [`ok`](/api/classes/SteamResult/properties/ok), sends the [ticket bytes](/api/classes/SteamWebTicket/methods/bytes), and [closes the ticket](/api/classes/SteamWebTicket/methods/close) when the exchange finishes.
 

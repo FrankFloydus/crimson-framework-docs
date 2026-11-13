@@ -5,9 +5,13 @@ description: "Let the authority commit a world pickup and its backpack placement
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-This example represents two items in an aid station. The backpack holds one item, so taking the medkit consumes it and leaves the flare available. The authority decides whether the player can take each item and commits both changes together.
+An aid station has a medkit and a flare, but the backpack has room for one item. If you take the medkit first, the flare should stay available. In multiplayer, the host or server decides what a player can take. In this solo example, your own game makes that decision.
 
-Save a separate world scene as `res://levels/aid_station.tscn` with an ordinary `Node` root. Attach the script to a persistent main scene outside that world. Assign two buttons labeled **Take medkit** and **Take flare**, and a status label, to its exports. The buttons stand in for interactions with the two world items.
+Use a `Node` root in `res://levels/aid_station.tscn`. Attach the script to a persistent main-scene `Node` and assign its `medkit_button`, `flare_button`, and `status` exports to two buttons (**Take medkit** and **Take flare**) and a label.
+
+1. Give the game a one-cell backpack and a source that keeps track of the two supplies. [`InventoryConfig.backpack()`](/api/classes/InventoryConfig/methods/backpack) · [`pickups()`](/api/classes/InventoryConfig/methods/pickups)
+2. When a player asks to take an item, check whether they can reach it and whether it is still there. Return the item size and the change that removes it from the world. This example checks the local player and the supply record. [`_resolve_pickup()`](/api/classes/InventoryPickupSource/methods/_resolve_pickup) · [`InventoryPickup.take()`](/api/classes/InventoryPickup/methods/take)
+3. Await the pickup result before hiding the item. Crimson places it in the backpack and removes it from the world together. If either change fails, both stay as they were. [`pick_up()`](/api/classes/MatchInventory/methods/pick_up)
 
 ```gdscript
 extends Node
@@ -96,15 +100,12 @@ func _take(pickup_id: StringName, pickup_button: Button) -> void:
 
 Press **Take medkit**. The button disappears and the label reports the placement at `(0, 0)`. Press **Take flare**. The label reports that the backpack has no room and the flare button stays visible.
 
-### Authority and commit
+### Use the same rule in multiplayer
 
-1. Configure [`InventoryConfig.backpack()`](/api/classes/InventoryConfig/methods/backpack) and [`pickups()`](/api/classes/InventoryConfig/methods/pickups) before booting a coordinated [`Game.campaign()`](/api/classes/Game/methods/campaign). The authority calls [`_register_stores()`](/api/classes/InventoryPickupSource/methods/_register_stores) once for each fresh authority match. It registers the game-owned source records and their prepare callback.
-2. After the world is ready, resolve [`game.inventory()`](/api/classes/Game/methods/inventory) and its local [`backpack()`](/api/classes/GameInventory/methods/backpack). Call [`pick_up()`](/api/classes/MatchInventory/methods/pick_up) with the stable pickup ID and await an [`InventoryResult`](/api/classes/InventoryResult). The authority resolves the player from the admitted command scope.
-3. Implement [`_resolve_pickup()`](/api/classes/InventoryPickupSource/methods/_resolve_pickup) to check eligibility against committed authority state. The solo example accepts the local player. In a networked game, check the admitted player's access to the item using your authority's rules and state. Return `null` to deny the request or [`InventoryPickup.take()`](/api/classes/InventoryPickup/methods/take) with the footprint and the source edit.
-4. Keep the source's prepare callback synchronous. It rechecks availability and stages removal in detached data. If validation and placement succeed, the coordinator publishes both changes at the same revision. A denial, a rejected source edit, or `InventoryFull` leaves the source and backpack unchanged.
+The host or server knows which player sent the request. Use that player ID and the server's own records to decide whether they can take the item. Return `null` to refuse. [`_register_stores()`](/api/classes/InventoryPickupSource/methods/_register_stores) registers the supplies for each new match. Its prepare callback rechecks that the item is still available. The callback must finish without `await` and leave visible effects until after success.
 
-Run world and UI effects after the commit. The caller can use `result.item_id`, `result.origin`, and `result.revision` from a successful result. In a networked game, project the committed world pickup state to the peers that should see it. The backpack store stays private to the authority, and your game chooses which inventory details to show to each player.
+Read `item_id`, `origin`, and `revision` from a successful [`InventoryResult`](/api/classes/InventoryResult). Your game decides which players see the item disappear and which backpack details they receive. The host or server keeps the backpack records private by default.
 
-Resolve a fresh backpack when a new match becomes ready. A retained handle expires when its match retires. A headless server with no local player has no local backpack handle.
+Get the local [`backpack()`](/api/classes/GameInventory/methods/backpack) again when a new match starts. A backpack handle stops working when its match ends. A dedicated server has no local player, so it has no local backpack.
 
 For explicit grid placement, stack and equipment policies, containers, and trade, see the [Inventory API module](/api/modules/inventory).

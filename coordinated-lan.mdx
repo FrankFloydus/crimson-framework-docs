@@ -9,21 +9,17 @@ Use a coordinated game when the host needs a lobby before the first match or the
 
 ## Prepare the world catalog
 
-1. In a new scene, click **3D Scene** and rename the root `Training`. Add a `MeshInstance3D` child named `Box`. In the Inspector, assign **New BoxMesh** to **Mesh**. Under **Geometry → Material Override**, add a **New StandardMaterial3D** and set **Albedo → Color** to `#C63858`.
-2. Add a `Camera3D` under `Training`. Set **Transform → Position** to `(0, 0, 4)` and enable **Current**. Add a `DirectionalLight3D` and set its **Transform → Rotation** to `(-45°, -30°, 0°)`. Save the scene as `res://training.tscn`.
-3. In **FileSystem**, duplicate `training.tscn` as `foundry.tscn` and open the new scene. Rename the root `Foundry`. In the box's **Material Override** menu, choose **Make Unique** before changing **Albedo → Color** to `#1F6BD1`. Save the scene.
-
-The level cameras make the change from red to blue visible on both peers. A coordinated game supplies its own actors and controllers.
+Use two level scenes at `res://training.tscn` and `res://foundry.tscn`. For a visual check, give each level an active camera and something distinct to see. A coordinated game supplies its own actors and controllers.
 
 Give each level a stable ID with [`WorldDefinition.at()`](/api/classes/WorldDefinition/methods/at). Start with [`Game.campaign()`](/api/classes/Game/methods/campaign) and register the second level with [`with_world()`](/api/classes/GameConfig/methods/with_world). Keep the same world IDs and scene catalog on both peers, and include both scenes when exporting. Keep each ID stable if you move its scene file.
 
 ## Host the lobby and bind players
 
-On the host, [`open_lobby()`](/api/classes/Game/methods/open_lobby) opens admission. On the guest, [`join_lobby()`](/api/classes/Game/methods/join_lobby) reports whether the connection request started. Watch [`phase_changed`](/api/classes/Game#signals) for `Game.LOBBY` on the guest to tell when admission has completed.
+The host calls [`open_lobby()`](/api/classes/Game/methods/open_lobby) to let players connect. The guest calls [`join_lobby()`](/api/classes/Game/methods/join_lobby) to request a connection. When the guest's [`phase_changed`](/api/classes/Game#signals) signal reports `Game.LOBBY`, the guest is in the lobby. The host binds both players, then calls [`start_match()`](/api/classes/Game/methods/start_match) to load the first level.
 
-The host uses [`bind_player()`](/api/classes/Game/methods/bind_player) to associate each admitted peer with a game-owned identity, including the host at ENet peer ID `1`. This loopback test has two reserved identities. In a real game, resolve the guest’s verified identity on the authority before binding. A peer ID identifies a connection, and a display name supplied by the guest cannot establish identity.
+[`bind_player()`](/api/classes/Game/methods/bind_player) links a connection to your game's player ID. The LAN host has connection ID `1`. This local test gives both players fixed IDs. In a real game, the host must verify a guest's identity before assigning a player ID.
 
-Create a new scene with a plain `Node` root named `Main` and save it as `res://main.tscn`. Attach an empty GDScript file at `res://main.gd` to the root and paste in this script. **H** opens the lobby and **J** joins. Once the host has bound the guest, **Enter** awaits [`start_match()`](/api/classes/Game/methods/start_match). The host can then press **T** to await [`scenes().load(foundry)`](/api/classes/GameScenes/methods/load). Both peers observe [`world_ready`](/api/classes/Game#signals) when the new world becomes playable.
+Use this script on the `Node` root of `res://main.tscn`. **H** opens the lobby and **J** joins. Once the host has bound the guest, **Enter** awaits [`start_match()`](/api/classes/Game/methods/start_match). The host can then press **T** to await [`scenes().load(foundry)`](/api/classes/GameScenes/methods/load). Both peers observe [`world_ready`](/api/classes/Game#signals) when the new world becomes playable.
 
 ```gdscript
 extends Node
@@ -129,11 +125,6 @@ func _check_result(result: GameResult) -> bool:
 
 ## Run both peers
 
-1. Open **Debug → Customize Run Instances…**, enable **Enable Multiple Instances**, and set the count to `2`.
-2. Open `main.tscn` and press **F5**. If prompted to choose a main scene, choose **Select Current**.
-3. Press **H** in the first instance. After `Lobby open.` appears in **Output**, press **J** in the second. Look for `Lobby phase reached.` and `Guest bound. Press Enter to start.`.
-4. Press **Enter** in the host instance. Both copies print `World ready: training` and show the red box.
-5. Press **T** on the host. Both copies print `World ready: foundry` with a newer epoch and show the blue box. The guest follows the host's world transition.
-6. Press **F8** to stop both copies.
+Run two instances of `main.tscn`. Press **H** in the first and wait for `Lobby open.` Press **J** in the second. Once the host logs `Guest bound. Press Enter to start.`, press **Enter** there. Both instances log `World ready: training`. Press **T** on the host and both instances log `World ready: foundry`. The epoch in the log identifies the active world load and increases after travel.
 
-Once play starts, the authority controls travel and synchronized game state. Keep match rules in the game and route player requests through its coordinated actions. [Game runtime reference](/api/modules/game-runtime)
+Once play starts, the host decides when both players travel and which game state they share. [Game runtime reference](/api/modules/game-runtime)

@@ -11,7 +11,7 @@ Start Steamworks from a persistent scene node for app services alone. If your ga
 
 ### Start a standalone client
 
-Save a scene with a `Node` root as `res://steam_services.tscn` and attach the script below. It reads the current language for your app after Steam initializes. For a basic Spacewar connection check, see [Connect to Steam](/steam/connect).
+Run this script on a `Node` that stays in the tree. It reads the current language for your app after Steam initializes. [Spacewar connection check](/steam/connect)
 
 ```gdscript
 extends Node
@@ -33,7 +33,7 @@ func _ready() -> void:
 
 ### Reuse a Steam game's attachment
 
-On a Steam multiplayer project, get the service through [`game.steam()`](/api/classes/Game/methods/steam). This startup script reads the app's language from the same scope that can host or join later. To try it in a new project, save a `Node3D` scene as `res://steam_services_level.tscn` and another as `res://steam_services_player.tscn`. Attach the script to a separate ordinary `Node` scene and run that scene. This check only attaches the game, so it leaves the level and player unloaded.
+On a Steam multiplayer project, get the service through [`game.steam()`](/api/classes/Game/methods/steam). Run the script on a `Node` with `res://steam_services_level.tscn` and `res://steam_services_player.tscn` available. Empty `Node3D` scenes suffice for this check. Boot attaches the game, and the script reads the app language before any level or player loads.
 
 ```gdscript
 extends Node
@@ -105,7 +105,7 @@ Resolve new service handles after reattaching. A temporary loss of connectivity 
 
 ## Open the Steam Overlay
 
-Create a scene with a `Node` root and a button labeled **Achievements**. Attach this script to the root and assign the button in the Inspector. Press it to request the panel through [`Steamworks.open_achievements()`](/api/classes/Steamworks/methods/open_achievements).
+Bind an **Achievements** button to `achievements_button`. [`Steamworks.open_achievements()`](/api/classes/Steamworks/methods/open_achievements) returns a `SteamResult` for the panel request. A successful result means Steam received the request. Check that the panel appears in a rendered window.
 
 ```gdscript
 extends Node
@@ -126,11 +126,15 @@ func _open_achievements() -> void:
         push_warning(request.message)
 ```
 
-A successful result means Steam received the request. Verify that the panel appears in a rendered window. Enable the Overlay in Steam and use the early Overlay argument for direct development launches. Use [`activation_changed(active)`](/api/classes/SteamOverlay#activation_changed) to suspend local gameplay input and restore focus when the Overlay closes. Keep the multiplayer simulation running. [Graphical launch setup](/steam/setup#launch-with-an-appid) · [Overlay test](/steam/testing#check-the-overlay-and-achievements)
+Enable the Overlay in Steam and use the early Overlay argument for direct development launches. Use [`activation_changed(active)`](/api/classes/SteamOverlay#activation_changed) to suspend local gameplay input and restore focus when the Overlay closes. Keep the multiplayer simulation running. [Graphical launch setup](/steam/setup#launch-with-an-appid) · [Overlay test](/steam/testing#check-the-overlay-and-achievements)
 
 ## Unlock an achievement
 
-Publish an achievement for your AppID that the client can update. Replace the sample API name with the published name. In a test scene, attach this script to a `Node` root and assign a button labeled **Complete Training**. Press the button on a test account to simulate completing the objective. In a game, connect the actual objective to `record_training_completed()`.
+Use a published achievement that the client can update. Set `TRAINING_COMPLETE` to its API name and bind a **Complete Training** button to `complete_training_button` for the test. In a game, call `record_training_completed()` when the objective is complete.
+
+- [`unlock()`](/api/classes/SteamAchievements/methods/unlock) applies the edit and asks Steam to store it. The return value reports submission.
+- [`stats_stored`](/api/classes/SteamStats#stats_stored) reports the app-wide store result. [`achievement_stored`](/api/classes/SteamStats#achievement_stored) identifies the achievement. Zero progress and maximum indicate a full unlock.
+- After restarting, [`achievement()`](/api/classes/SteamStats/methods/achievement) reads the achievement state again to confirm persistence.
 
 ```gdscript
 extends Node
@@ -176,11 +180,11 @@ func _on_achievement_stored(name: String, current: int, maximum: int) -> void:
         print("Steam reported a full training achievement unlock.")
 ```
 
-[`unlock()`](/api/classes/SteamAchievements/methods/unlock) applies the achievement edit and asks Steam to store it. A successful submission confirms that request. [`stats_stored`](/api/classes/SteamStats#stats_stored) reports the app-wide store callback. [`achievement_stored`](/api/classes/SteamStats#achievement_stored) reports the named achievement, with zero progress and maximum for a full unlock. Check for `Training achievement is already unlocked.` after restarting the example. Observe a new unlock notification separately in a rendered test. [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
+Check for `Training achievement is already unlocked.` after restarting the example. Observe the unlock notification separately in a rendered test with an account that has yet to earn it. [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
 
 ## Record progression
 
-Publish an integer stat and achievement the client can update, then set the constants to their exact API names. In a test scene, attach the script to a `Node` and assign a button labeled **Record Test Win**. Press it on a test account to submit one known victory total. A game can call `record_win()` with the actual total at the end of a match. The script collects changes with [`edit()`](/api/classes/SteamStats/methods/edit) and applies them with [`submit()`](/api/classes/SteamStatsEdit/methods/submit). [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
+Use a published integer stat and achievement that the client can update, and set the constants to their API names. Bind a **Record Test Win** button to `record_button` to submit a known test total. A game can call `record_win()` with the actual total after a match. The script collects changes with [`edit()`](/api/classes/SteamStats/methods/edit) and applies them with [`submit()`](/api/classes/SteamStatsEdit/methods/submit). [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
 
 ```gdscript
 extends Node
@@ -220,11 +224,11 @@ The result describes the submission. [`value.applied`](/api/classes/SteamStatsSu
 
 ## Save a profile to Cloud
 
-Enable Cloud and allocate quota for your AppID in Steamworks. Use a test account with access to that app. Choose one of the scripts below, attach it to the `Node` root of a new test scene, and assign its buttons. These scripts write sample JSON under dedicated test file names. [`SteamCloud`](/api/classes/SteamCloud)
+Enable Cloud and allocate quota for your AppID in Steamworks. Use a test account with access to that app. Each script writes sample JSON under dedicated test file names. [`SteamCloud`](/api/classes/SteamCloud)
 
 ### Await the result directly
 
-Assign **Save Profile** and **Read Profile** buttons. Save writes a sample profile with [`write()`](/api/classes/SteamCloud/methods/write). Read loads the stored bytes with [`read()`](/api/classes/SteamCloud/methods/read) and prints the profile. Keeping the actions separate lets you read the original file on another machine.
+Bind **Save Profile** and **Read Profile** to `save_button` and `read_button`. The first writes a sample profile with [`write()`](/api/classes/SteamCloud/methods/write). The second loads it with [`read()`](/api/classes/SteamCloud/methods/read) and prints the profile. Keeping the actions separate lets you read the original file on another machine.
 
 ```gdscript
 extends Node
@@ -278,7 +282,7 @@ func _set_busy(busy: bool) -> void:
 
 ### Keep the operation handle
 
-Assign **Save and Read** and **Cancel** buttons. The script keeps the operation from [`write_file()`](/api/classes/SteamCloud/methods/write_file) or [`read_file()`](/api/classes/SteamCloud/methods/read_file) so the screen can stop waiting. Press **Cancel** while a request is pending to try that path.
+Bind **Save and Read** and **Cancel** to `save_button` and `cancel_button`. The script keeps the operation from [`write_file()`](/api/classes/SteamCloud/methods/write_file) or [`read_file()`](/api/classes/SteamCloud/methods/read_file) so **Cancel** can stop waiting while a request is pending.
 
 ```gdscript
 extends Node
@@ -338,7 +342,7 @@ Calling [`cancel()`](/api/classes/SteamOperation/methods/cancel) stops waiting l
 
 ### Group related writes
 
-Assign a **Save Profile and Settings** button. Press it to group two writes with [`begin_write_batch()`](/api/classes/SteamCloud/methods/begin_write_batch). Each write still has its own result. The script closes the batch after the last write, including on failure. [Steam Cloud write batches](https://partner.steamgames.com/doc/api/ISteamRemoteStorage#BeginFileWriteBatch)
+Bind **Save Profile and Settings** to `save_button`. It groups two writes with [`begin_write_batch()`](/api/classes/SteamCloud/methods/begin_write_batch). Each write has its own result. The script closes the batch after the last write or on failure. [Steam Cloud write batches](https://partner.steamgames.com/doc/api/ISteamRemoteStorage#BeginFileWriteBatch)
 
 ```gdscript
 extends Node

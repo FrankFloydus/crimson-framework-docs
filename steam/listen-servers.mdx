@@ -9,15 +9,21 @@ Select Steam with [`.steam()`](/api/classes/GameConfig/methods/steam) before you
 
 ## Prepare the test scenes
 
-1. Save a `Node3D` scene as `res://steam_level.tscn`. Under its root, add a `Node3D` named `SpawnPoints` with two `Marker3D` children. Set their positions to `(0, 0, 0)` and `(2.5, 0, 0)`.
-2. Save a second `Node3D` scene as `res://steam_player.tscn`. Add one `Camera3D` at `(0, 1.5, 5)` and a `MeshInstance3D` child at `(0, 1, 0)` with a capsule mesh. Use an unshaded material so the capsule is visible without lights. Add the mesh child to the `crimson_local_hidden` group so each player sees the other capsule.
-3. Save an ordinary `Node` scene as `res://steam_main.tscn`. Use it as the main scene on both computers. Attach one of the scripts below to its root. Add its buttons and label under a `CanvasLayer` so the menu stays visible as the world loads.
+| Scene | Required nodes |
+| --- | --- |
+| `res://steam_level.tscn` | `Node3D` root with a `SpawnPoints` child containing two `Marker3D` children at distinct positions. |
+| `res://steam_player.tscn` | `Node3D` root with one `Camera3D`. A visible mesh in the `crimson_local_hidden` group lets each player see the other avatar. |
+| `res://steam_main.tscn` | `Node` root with one of the scripts below and its exported controls. Both peers use the same entry scene. |
 
 ## Host a game from a player's machine
 
-Attach this script to the root of `steam_main.tscn`. In the Inspector assign **Status** and **Invite Prompt** labels and five buttons labeled **Host**, **Invite**, **Accept**, **Dismiss**, and **Leave**. The script connects their signals. The host starts the training room and can open the Steam invite picker when ready.
+This script runs on the `steam_main.tscn` root. Bind **Status** and **Invite Prompt** labels and the **Host**, **Invite**, **Accept**, **Dismiss**, and **Leave** buttons to its exports. The host can open the Steam invite picker once the training room is ready.
 
 Enable **Use Spacewar** for a development launch under AppID `480`. Use a test group unique to your project and match it across host and guest. Leave it off to use your own launch AppID. [`SteamConfig.spacewar()`](/api/classes/SteamConfig/methods/spacewar)
+
+- Boot both peers with the same [`.steam(settings)`](/api/classes/GameConfig/methods/steam) profile and check `boot_result()`. Boot attaches the game and its Steam services. The world opens when a player hosts or joins.
+- Await [`host()`](/api/classes/Game/methods/host) and check the `GameResult`. Success means the host can play and open the Steam invite picker with [`invite_friends()`](/api/classes/Game/methods/invite_friends).
+- The guest reads [`pending_invite()`](/api/classes/Game/methods/pending_invite) at startup and listens for [`invite_changed`](/api/classes/Game#invite_changed). Pass the exact offer shown in the prompt to [`accept_invite()`](/api/classes/Game/methods/accept_invite) or [`dismiss_invite()`](/api/classes/Game/methods/dismiss_invite).
 
 ```gdscript
 extends Node
@@ -105,17 +111,19 @@ func _leave_session() -> void:
     status.text = "Back at the menu." if result.ok else result.message
 ```
 
-[`host()`](/api/classes/Game/methods/host) completes when the world is playable. [`invite_friends()`](/api/classes/Game/methods/invite_friends) submits a picker request for the host's active lobby. `OverlayBusy` means Steam is still loading the Overlay. A successful picker request tells you that Steam received it. Check the actual picker in a rendered window. [Overlay launch setup](/steam/setup#launch-with-an-appid)
+`OverlayBusy` means Steam is still loading the Overlay. Check that the picker appears in a rendered window after a successful request. [Overlay launch setup](/steam/setup#launch-with-an-appid)
 
 ## Invite and join
 
 Use two signed-in Steam accounts on separate machines. On the host, press **Host**, then **Invite** and select the guest. On the guest, accept the invitation through Steam, then press **Accept** in the game's prompt. The guest can also dismiss the prompt and stay at the menu. Enable **Use launch command line** for your app in Steamworks if you use Steam launch arguments to deliver an invitation at startup. [Valve launch arguments](https://partner.steamgames.com/doc/api/ISteamApps#GetLaunchCommandLine)
 
-The example subscribes to [`invite_changed`](/api/classes/Game#invite_changed) and reads [`pending_invite()`](/api/classes/Game/methods/pending_invite) when the menu attaches. Pass the exact [`SteamInvite`](/api/classes/SteamInvite) shown in the prompt to [`accept_invite(offer)`](/api/classes/Game/methods/accept_invite) or [`dismiss_invite(offer)`](/api/classes/Game/methods/dismiss_invite). If a newer offer replaces it, the action reports `InviteChanged` and leaves the new offer pending. Accepting goes through authenticated game admission. [`leave()`](/api/classes/Game/methods/leave) waits for the active session or pending start to retire.
+If a newer [`SteamInvite`](/api/classes/SteamInvite) replaces the confirmed offer, the action reports `InviteChanged` and leaves the new offer pending. Accepting goes through authenticated game admission. [`leave()`](/api/classes/Game/methods/leave) waits for the active session or pending start to retire.
 
 ## Find an open game
 
-For a discoverable Spacewar test, use the same build, AppID, and test group on both machines. Attach this script to the root of `steam_main.tscn`. Assign a status label and three buttons labeled **Host**, **Quick Join**, and **Cancel Search**. Start a host first to test joining. To check an empty search, use a test group without an active host.
+Run this script on the `steam_main.tscn` root with a status label and **Host**, **Quick Join**, and **Cancel Search** buttons bound to its exports. For Spacewar, match the build, AppID, and test group on both machines. Use a test group without an active host to check an empty search.
+
+Use [`public_games()`](/api/classes/SteamConfig/methods/public_games) so Steam can discover the hosted lobby. [`find_and_join()`](/api/classes/Game/methods/find_and_join) finds a compatible listing with room and attempts one join. Await [`leave()`](/api/classes/Game/methods/leave) to cancel the pending start.
 
 ```gdscript
 extends Node
@@ -175,11 +183,11 @@ func cancel_search() -> void:
     status.text = "Search canceled." if result.ok else result.message
 ```
 
-[`public_games()`](/api/classes/SteamConfig/methods/public_games) returns a profile that makes hosted games discoverable. For your own AppID, use `SteamConfig.new().public_games()` to use the launch context. [`find_and_join()`](/api/classes/Game/methods/find_and_join) searches for a compatible listing with room and attempts one join. An empty search returns a typed failure you can show to the player. Cancel through `leave()`. Steam can still finish the underlying search before another native search is available. If you present your own server or lobby browser, pass the player's selected listing to [`join_listing(listing)`](/api/classes/Game/methods/join_listing). [Choose a listing from a server browser](/steam/dedicated-servers#list-the-server-in-steam)
+An empty search returns a typed failure you can show to the player. After cancellation, the underlying Steam search can still finish before the next search begins. For your own AppID, use `SteamConfig.new().public_games()` to use the launch context. To let players choose a listing, pass their selection to [`join_listing(listing)`](/api/classes/Game/methods/join_listing). [Choose a listing from a server browser](/steam/dedicated-servers#list-the-server-in-steam)
 
 ## Run a social lobby without a game
 
-Use a standalone attachment for a social lobby that needs membership, metadata, and chat. For this example, save a scene with a `Node` root as `res://social_lobby.tscn`. Attach the script to the root. Add three buttons labeled **Create Private**, **Create Public**, and **Find and Join**, and connect their `pressed` signals to `create_private_lobby()`, `create_public_lobby()`, and `find_and_join_social_lobby()` respectively. Launch both clients under Spacewar. Create a public lobby on one account and search from a second account. [Steam launch setup](/steam/setup#launch-with-an-appid)
+Use a standalone attachment for social lobby membership, metadata, and chat. The script runs on a `Node`. Wire **Create Private** to `create_private_lobby()`, **Create Public** to `create_public_lobby()`, and **Find and Join** to `find_and_join_social_lobby()`. Under Spacewar, create a public lobby on one account and search from a second account. [Steam launch setup](/steam/setup#launch-with-an-appid)
 
 The default social lobby is private with four seats including its owner, in the `crimson` namespace. To customize it, use [`SteamLobbyOptions.configure()`](/api/classes/SteamLobbyOptions/methods/configure) and set its namespace, player limit, and visibility with [`in_namespace()`](/api/classes/SteamLobbyOptions/methods/in_namespace), [`for_players()`](/api/classes/SteamLobbyOptions/methods/for_players), and [`with_visibility()`](/api/classes/SteamLobbyOptions/methods/with_visibility). Pass the options to [`create()`](/api/classes/SteamLobbies/methods/create). The public action creates an eight-player [public lobby](/api/classes/SteamLobbyOptions#visibility) in the example namespace.
 

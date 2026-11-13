@@ -7,13 +7,13 @@ description: "Pass a game into your scene, resolve the nearest scope, and provid
 
 Boot once from a persistent node such as `Main`. [`Game.configure(LEVEL, PLAYER).boot(self)`](/api/classes/Game/methods/configure) gives you a [`Game`](/api/classes/Game) handle for that scene branch. Pass it directly to menus and other consumers you wire up in the boot script.
 
-## Create the two scene assets
+## Scene requirements
 
-Make `res://scope_level.tscn` with a `Node3D` root and a `Node3D` child named `SpawnPoints`. Add two `Marker3D` children under `SpawnPoints` and move the second away from the first. Make `res://scope_player.tscn` with a `Node3D` root and a single `Camera3D` child. Each example below uses these assets and has its own main scene and script.
+The examples use `res://scope_level.tscn` with two `Marker3D` nodes at distinct positions under `SpawnPoints`, and `res://scope_player.tscn` with one `Camera3D`. Both scenes have `Node3D` roots. Each script runs in its own `Node` scene.
 
 ## Find the game from a pause menu
 
-Create a `Node` scene with a `Button` child labeled **Return to title** and a `Label` child. Attach the script to the root and assign both controls. The root starts a solo game. The button looks up its owning game when clicked, then waits for that session to close before displaying **Title screen**. A child can resolve the scope after the parent has booted it. [`Game.for_node()`](/api/classes/Game/methods/for_node)
+Assign a **Return to title** button and a status label to the script. The parent starts the game. When the player presses the button, [`Game.for_node(return_button)`](/api/classes/Game/methods/for_node) finds the nearest game above it in the scene tree. Wait for `game.leave()` to finish before showing **Title screen** so the old session has time to close.
 
 ```gdscript
 extends Node
@@ -57,7 +57,7 @@ func _return_to_title() -> void:
 
 ## Select a game from a debug panel
 
-[`Game.current()`](/api/classes/Game/methods/current) returns the selected game or the only live game. When several games are live and none is selected, it returns `null`. Create a new `Node` scene with a `CheckButton` labeled **Use match as default**. Attach the script to the root and assign the button. The script boots two scopes, `Preview` and `Match`, without starting a session in either. Toggle the button and check **Output** to see [`Game.set_default()`](/api/classes/Game/methods/set_default) select or clear the match.
+Assign a **Use match as default** check button. The script boots two games on separate branches, `Preview` and `Match`. A debug panel outside both branches can use [`Game.set_default()`](/api/classes/Game/methods/set_default) to choose the match. Toggle the button off and [`Game.current()`](/api/classes/Game/methods/current) returns `null` because both games are still attached and neither is selected.
 
 ```gdscript
 extends Node
@@ -119,9 +119,9 @@ func _select_default(use_match: bool) -> void:
 
 ## Override the LAN transport
 
-LAN uses ENet by default. To exercise your project's provider path during a local smoke test, register a factory that logs when the transport is created and returns a fresh ENet adapter. Later you can have the factory supply a different [`SessionTransport`](/api/classes/SessionTransport) without changing the menu’s game actions.
+LAN uses ENet by default. To choose how the game opens a connection, give it a [`GameProvider`](/api/classes/GameProvider). In `_register()`, use [`session_transport()`](/api/classes/GameBindings/methods/session_transport) to tell Crimson how to create a fresh transport for this game. This example returns the usual ENet transport and prints when it creates it, so you can see the override run.
 
-Create a `Node` scene and attach the script to its root. Run it by itself. Look for `Created the test transport.` and then `Test host ready.` in **Output**. Those messages show that boot called the factory and the game successfully opened a LAN session with its adapter.
+Pass the provider to [`provider()`](/api/classes/GameConfig/methods/provider) before `boot(self)`. The rest of the script still calls `game.host()` normally. Run the scene and look for `Created the test transport.` followed by `Test host ready.`.
 
 ```gdscript
 extends Node
@@ -157,4 +157,4 @@ func _ready() -> void:
     print("Test host ready.")
 ```
 
-[`GameConfig.provider()`](/api/classes/GameConfig/methods/provider) calls the [`GameProvider`](/api/classes/GameProvider) hook during boot. Register the factory with [`GameBindings.session_transport()`](/api/classes/GameBindings/methods/session_transport). Crimson seals the bindings and resolves the factory on the scene thread before attaching the game. Each boot needs its own adapter. Use the transport override with direct LAN play. A configured Steam or other online provider owns its connection. [Migrate an existing project](/migration)
+Crimson creates the transport during boot. Return a new transport each time. Use this override with direct LAN play. Steam and other configured online providers supply their own connection. [Migrate an existing project](/migration)

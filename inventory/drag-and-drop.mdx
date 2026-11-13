@@ -5,11 +5,48 @@ description: "Move items with the mouse, preview valid cells, and keep the old p
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-This backpack opens with a medkit and a radio. Drag either item to a free spot to move it. Drop it over the other item or outside the grid to leave it in its original cells.
+This backpack opens with a medkit and a radio. A drag keeps track of the cell you grabbed so an item can follow the pointer from any of its occupied cells. The excerpts below show how the complete script reads, checks, and commits a move.
 
-1. Create a new scene with a **Control** root named `DragBackpack` and save it as `res://drag_backpack.tscn`.
-2. With the root selected, click **Attach Script** in the **Scene** dock. Save the script as `res://drag_backpack.gd` and replace its contents with the code below. The script creates and draws its own backpack.
-3. Press **F6**. Grab the lower half of the radio and drop it into the lower half of a free two-cell space. The grabbed cell stays under the pointer. Try an overlap next and check that the radio stays put.
+## Record the grabbed cell
+
+When the drag starts, convert the pointer position to a cell and look up its placement with [`item_at()`](/api/classes/SpatialInventory/methods/item_at). An empty cell returns `null`.
+
+```gdscript
+var cell: Vector2i = _cell_at(at_position)
+var item: InventoryItemView = _bag.item_at(cell)
+if item == null:
+    return null
+
+var drag: ItemDrag = ItemDrag.new()
+drag.source = self
+drag.id = item.id
+drag.grab_offset = cell - item.origin
+drag.rotated = item.rotated
+```
+
+Grabbing the radio's lower cell records an offset of `(0, 1)`. The ghost uses that offset while the item stays in its original cells.
+
+## Check the destination
+
+Subtract the grab offset from the hovered cell to find the proposed top-left cell. [`check_move()`](/api/classes/SpatialInventory/methods/check_move) checks the whole footprint at that position. The dragged item's own cells count as free, so the new placement can overlap its old one.
+
+```gdscript
+var origin: Vector2i = _cell_at(at_position) - drag.grab_offset
+return _bag.check_move(drag.id, origin, drag.rotated) == OK
+```
+
+## Commit and redraw
+
+On drop, [`try_move()`](/api/classes/SpatialInventory/methods/try_move) checks the destination again and commits the move if it still fits. On `OK`, redraw from the latest placements. An invalid drop leaves the original placement intact.
+
+```gdscript
+var origin: Vector2i = _cell_at(at_position) - drag.grab_offset
+var error: Error = _bag.try_move(drag.id, origin, drag.rotated)
+```
+
+## Run the draggable backpack
+
+Use a `Control` root with this complete script. It creates and draws the backpack.
 
 ```gdscript
 extends Control
@@ -150,8 +187,6 @@ func _occupied_size(item: InventoryItemView) -> Vector2i:
     return item.footprint
 ```
 
-Godot asks `_get_drag_data()` for the item under the pointer. The script converts the pointer position to a cell, reads the item with [`item_at()`](/api/classes/SpatialInventory/methods/item_at), and records the offset from the item's top-left cell. The ghost follows the mouse while the original placement remains in the grid.
-
-[`check_move()`](/api/classes/SpatialInventory/methods/check_move) checks whether the proposed placement fits, allowing the dragged item's own cells. [`try_move()`](/api/classes/SpatialInventory/methods/try_move) validates again and commits the move on drop. An invalid drop preserves the original placement. The display reads the committed placements when it redraws.
+Run the scene and drag the radio by its lower cell to the bottom-right cell. The radio's top-left cell moves to `(3, 1)`. Drag it back over the medkit or outside the grid to check that it stays put.
 
 To add item quantities or choose a rotation, see [Items and stacks](/inventory/items). To move between separate grids, see [Inventory transactions](/inventory/transactions).

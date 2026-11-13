@@ -38,7 +38,7 @@ If your project already uses Crimson, follow the [update steps](#update-an-exist
 
 ## Verify the installation
 
-In Godot, open the **Script** workspace and click **Search Help**. Search for [`Game`](/api/classes/Game) and open the Crimson class that lists `configure()` and `play()`. Those bindings are available when the addon has loaded. [Start a solo game](/quickstart)
+Look up [`Game`](/api/classes/Game) in Godot's built-in class reference. If it lists `configure()` and `play()`, the addon loaded and GDScript can use it. [Start a solo game](/quickstart)
 
 If the Crimson class is missing, check **Output** for a loading error. Verify your Godot version and check the folder layout above. If Godot reports a duplicate class, look for an older Crimson install or a standalone inventory or save addon that registers the same class name.
 
@@ -50,6 +50,6 @@ If the Crimson class is missing, check **Output** for a loading error. Verify yo
 
 ## Export for Windows
 
-Install Godot 4.7's matching export templates through **Editor → Manage Export Templates**. In **Project → Export**, add a **Windows Desktop** preset with **Architecture** set to `x86_64`. Godot selects Crimson's debug or release DLL for the export. Keep the generated files together and run the exported game to verify it starts. [Godot export guide](https://docs.godotengine.org/en/4.7/tutorials/export/exporting_projects.html)
+Use Godot 4.7 export templates and a Windows Desktop `x86_64` preset. Godot includes the matching Crimson debug or release DLL. Keep the exported files together and launch the game to check that it starts. [Godot export guide](https://docs.godotengine.org/en/4.7/tutorials/export/exporting_projects.html)
 
 For a Steam build, add the runtime DLL and configure the Steam export feature before exporting. [Steam setup](/steam/setup)

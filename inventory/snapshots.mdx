@@ -9,7 +9,7 @@ A snapshot captures the grid size, item IDs, and placements. Save it with the ga
 
 ## Restore a backpack layout
 
-Create a scene with a `Node` root and attach this script. When you run the scene, it packs a medkit, saves a copy of the grid state, and moves the medkit. It then imports the saved layout. Watch Godot's **Output** to see the change signal report one item for the move and a full refresh for the restore.
+Use a `Node` root with the script below. First, [`export_snapshot()`](/api/classes/SpatialInventory/methods/export_snapshot) records where the medkit sits. Moving it changes the live grid. Importing the snapshot puts it back. In **Output**, the move reports one changed item and the restore asks for the whole grid to be redrawn.
 
 ```gdscript
 extends Node

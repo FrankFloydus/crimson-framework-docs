@@ -42,7 +42,7 @@ Test your Debug export and your Release export. For the distribution check, put 
 
 ### Relaunch an unwrapped export through Steam
 
-Use this option for an unwrapped, rendered Windows export with an authorized shipping AppID. Attach the script to your startup node, assign **Shipping App ID**, and run it before any Steam client or game provider initializes. For this launch, leave the early `--crimson-steam-overlay` bootstrap disabled. [`Steamworks.restart_through_steam_if_needed()`](/api/classes/Steamworks/methods/restart_through_steam_if_needed) requests a Steam relaunch on `ERR_SKIP` and allows normal startup on `OK`. Use an installed copy of your game and leave the development `steam_appid.txt` out of the export when testing the relaunch. [Valve's relaunch check](https://partner.steamgames.com/doc/sdk/api#SteamAPI_RestartAppIfNecessary)
+Use this option in the startup script for an unwrapped, rendered Windows export. Set `shipping_app_id` to your authorized AppID. Run [`Steamworks.restart_through_steam_if_needed()`](/api/classes/Steamworks/methods/restart_through_steam_if_needed) before any Steam initialization, including the early `--crimson-steam-overlay` bootstrap. The call requests a Steam relaunch on `ERR_SKIP` and allows normal startup on `OK`. Use an installed copy of the game without `steam_appid.txt` to test the relaunch. [Valve's relaunch check](https://partner.steamgames.com/doc/sdk/api#SteamAPI_RestartAppIfNecessary)
 
 ```gdscript
 extends Node
@@ -72,7 +72,7 @@ func _ready() -> void:
     print("Steam client ready.")
 ```
 
-For a multiplayer export, use this startup script instead. Assign **Shipping App ID** to the AppID of your installed Steam game. Assign a level scene with a `SpawnPoints` node and at least two `Marker3D` children, and a player scene with one `Camera3D`. After the launch check succeeds, the script attaches the game and prints when Steam is ready.
+For a multiplayer export, use this startup script with the installed game's `shipping_app_id`. Bind `level_scene` to a level with at least two `Marker3D` children under `SpawnPoints` and `player_scene` to a player with one `Camera3D`. After the launch check succeeds, the script attaches the game and checks its Steamworks scope.
 
 ```gdscript
 extends Node

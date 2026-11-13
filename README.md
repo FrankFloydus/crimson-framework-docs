@@ -27,7 +27,7 @@ The reference generator combines the framework's class XML prose with signatures
 
 Keep the guides and the generated reference tied to the same framework build. Update affected examples, regenerate the reference, and review class and navigation changes together. Edit guides and `api/overview.mdx` directly. Edit module and service descriptions in `scripts/api-module-prose.json`.
 
-For a shared gameplay example, add an entry to `scripts/api-workflow-examples/` with a task title, a short description of the trigger and result, a complete GDScript script, and the member keys used in the script. Link to a guide if the reader needs editor steps. Member keys use the form `GameResult.properties.ok` or `Game.methods.host`. Shared examples take precedence over individual examples in `scripts/api-member-examples.json`.
+For a shared gameplay example, add an entry to `scripts/api-workflow-examples/` with a task title, a short description of the trigger and result, a complete GDScript script, and the member keys used in the script. Link to a guide if the reader needs more context. Member keys use the form `GameResult.properties.ok` or `Game.methods.host`. Shared examples take precedence over individual examples in `scripts/api-member-examples.json`.
 
 To update the development reference, use the local framework checkout with the current Windows Debug addon and Godot 4.7 console executable. Run from the docs repository. Here `..` is the local framework checkout.
 

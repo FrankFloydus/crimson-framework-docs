@@ -7,10 +7,34 @@ description: "Run a visible backpack with buttons that pack supplies and a grid 
 
 Build a backpack with four columns and three rows. Add a wide medkit or a tall radio and watch the item fill its cells. When there is no room, the bag keeps the items it already holds.
 
-1. Open a Godot project with Crimson enabled. [Install Crimson Framework](/installation)
-2. Choose **Scene → New Scene**, then **Other Node**. Select **VBoxContainer** and name it `Backpack`. Save the scene as `res://backpack.tscn`.
-3. With `Backpack` selected, click **Attach Script** in the **Scene** dock. Save it as `res://backpack.gd` and replace its contents with the script below. The script creates the buttons, status label, and grid.
-4. Open the scene and press **F6**. Click **Pack medkit** and **Pack radio**. Keep packing until the status says the next item does not fit, then click **Empty bag** to start over.
+The grid stores placements in cells. Your interface turns each placement into a rectangle on screen. The excerpts below show how the complete script connects the two.
+
+## Pack an item
+
+[`Inventory.grid(BAG_SIZE)`](/api/classes/Inventory/methods/grid) creates an empty grid. The medkit uses two columns by one row. The radio uses one column by two rows. Each click generates a unique instance ID so the grid can hold several items of the same kind.
+
+```gdscript
+var id: StringName = StringName("%s_%d" % [item_name.to_lower(), _next_id])
+var error: Error = _bag.add(id, footprint)
+```
+
+[`add()`](/api/classes/SpatialInventory/methods/add) places the unrotated footprint at the first fit, scanning each row from left to right. If it returns `ERR_CANT_CREATE`, the bag stays as it was. After `OK`, store the display name under the new ID and redraw the grid.
+
+## Draw the committed placement
+
+Each [`InventoryItemView`](/api/classes/InventoryItemView) from [`items()`](/api/classes/SpatialInventory/methods/items) supplies the top-left cell and the unrotated footprint. Swap width and height for a rotated item, then multiply the origin and size by the cell's pixel size to get the rectangle.
+
+```gdscript
+for item: InventoryItemView in _bag.items():
+    var footprint: Vector2i = item.footprint
+    if item.rotated:
+        footprint = Vector2i(footprint.y, footprint.x)
+    var bounds: Rect2 = Rect2(Vector2(item.origin * CELL_PIXELS), Vector2(footprint * CELL_PIXELS))
+```
+
+## Run the backpack
+
+Use a `VBoxContainer` root with this complete script. It creates the grid and controls. [Install Crimson Framework](/installation)
 
 ```gdscript
 extends VBoxContainer
@@ -102,8 +126,6 @@ func _draw_grid() -> void:
         _grid.draw_string(font, bounds.position + TEXT_INSET, _names[item.id])
 ```
 
-The grid comes from [`Inventory.grid()`](/api/classes/Inventory/methods/grid). It returns `null` for invalid dimensions. The sample uses a fixed valid size. Each click generates a unique instance ID so two medkits can occupy different cells. [`add()`](/api/classes/SpatialInventory/methods/add) searches for the first fit and returns `ERR_CANT_CREATE` when the footprint cannot fit.
-
-The display redraws from [`items()`](/api/classes/SpatialInventory/methods/items) after each successful change. Each [`InventoryItemView`](/api/classes/InventoryItemView) supplies the origin and the unrotated footprint. Swap its width and height when the item is rotated. The game keeps display names in `_names`, keyed by instance ID.
+Run the scene and select **Pack medkit**, then **Pack radio**. The medkit starts at cell `(0, 0)` and the radio at `(2, 0)`. Keep packing until the next item does not fit, then select **Empty bag** to start over.
 
 Next, pick up an item with the mouse and move it to a new spot. [Drag and drop](/inventory/drag-and-drop)

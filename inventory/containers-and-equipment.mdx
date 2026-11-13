@@ -1,19 +1,19 @@
 ---
 title: "Containers, staging, and equipment"
-description: "Move items between registered grids, protect nested containers, and equip items in named slots."
+description: "Put supplies in a toolbox, set items aside at a workbench, and equip a tool in both hands."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-A backpack and a camp chest are separate grids. A toolbox is both an item placed in a grid and a container with a grid of its own. Equipment uses named slots, so one item can occupy both hands without duplicating its instance ID.
+A backpack and a camp chest each have their own grid. A toolbox can sit in the backpack and hold items in a grid of its own. Equipment can use named slots such as the player's two hands.
 
 Each example runs on its own. Attach one script to a **Node** in an empty scene, run it, and read Godot's **Output**.
 
-## Move supplies without creating a container loop
+## Put supplies in a toolbox
 
-Use [`SpatialInventoryContainers.register_inventory()`](/api/classes/SpatialInventoryContainers/methods/register_inventory) to register each independent grid and each container's contents. An empty container ID means the grid has no owner item. For a container's contents, supply the stable ID of its item. The registry's [`placement_policy()`](/api/classes/SpatialInventoryContainers/methods/placement_policy) prevents duplicate ownership and prevents a container from entering its own contents or a descendant's contents.
+At camp, put a repair kit in a toolbox, then see what happens if you try to put the toolbox inside itself. [`register_inventory()`](/api/classes/SpatialInventoryContainers/methods/register_inventory) tells Crimson which grids belong together. Register the backpack on its own. Register the toolbox grid with the toolbox item's ID so Crimson knows which item holds those contents.
 
-At camp, put a repair kit inside a toolbox. The same policy rejects putting the toolbox inside itself.
+Give [`placement_policy()`](/api/classes/SpatialInventoryContainers/methods/placement_policy) to the move action so Crimson checks the move before changing either grid. It lets the kit move and keeps the toolbox in the backpack. The same check keeps an item out of two grids and prevents putting a container inside anything it already holds.
 
 ```gdscript
 extends Node
@@ -55,13 +55,13 @@ func _ready() -> void:
     print("Toolbox stayed in the backpack: ", containers.get_owner_inventory(TOOLBOX_ID) == pack)
 ```
 
-Call [`validate_changes()`](/api/classes/SpatialInventoryContainers/methods/validate_changes) before committing a raw [`apply_placement_changes()`](/api/classes/SpatialInventory/methods/apply_placement_changes) batch that can change ownership. The registry checks the final ownership graph. The grid batch then checks placement expectations and geometry before writing. Keep both steps on the main thread and avoid unrelated changes between them. For game-specific restrictions, set [`host_placement_policy`](/api/classes/SpatialInventoryContainers/properties/host_placement_policy).
+When several items need to move together, [`validate_changes()`](/api/classes/SpatialInventoryContainers/methods/validate_changes) checks which grid would hold each item at the end. Then [`apply_placement_changes()`](/api/classes/SpatialInventory/methods/apply_placement_changes) checks that each item is where you expect and that everything fits. Run both checks on Godot's main thread with no other edits in between. Use [`host_placement_policy`](/api/classes/SpatialInventoryContainers/properties/host_placement_policy) for game rules such as keeping quest items out of shared chests.
 
-## Temporarily stage an item
+## Set items aside at a workbench
 
-Use [`SpatialInventoryStaging`](/api/classes/SpatialInventoryStaging) for a workbench tray that physically holds items while remembering their original cells and orientation. [`stage_from()`](/api/classes/SpatialInventoryStaging/methods/stage_from) moves an item onto the tray. [`place_item()`](/api/classes/SpatialInventoryStaging/methods/place_item) moves it to a final destination and clears its return record. [`try_close(true)`](/api/classes/SpatialInventoryStaging/methods/try_close) attempts to restore everything still on the tray. If an original cell is blocked, leave the tray open and let the player make room or choose another destination.
+Set a repair tool and a fuel canister on a workbench. [`stage_from()`](/api/classes/SpatialInventoryStaging/methods/stage_from) moves them onto the tray and remembers where they came from. [`place_item()`](/api/classes/SpatialInventoryStaging/methods/place_item) puts the tool in the cabinet for good. [`try_close(true)`](/api/classes/SpatialInventoryStaging/methods/try_close) tries to put the fuel back in the backpack.
 
-This workbench stores a repair tool in a cabinet. It keeps the unused fuel on the tray while a spare part blocks the return cell, then restores the fuel once the player clears that cell.
+A spare part now occupies the fuel's old cell. The fuel stays on the tray until the player clears the cell and tries again.
 
 ```gdscript
 extends Node
@@ -128,13 +128,13 @@ func _ready() -> void:
     print("Fuel back in its original cell: ", pack.get_item_at(ORIGINAL_FUEL_CELL) == FUEL_ID)
 ```
 
-The tray's [`drop_policy`](/api/classes/SpatialInventoryStaging/properties/drop_policy) validates each move. Its [`batch_policy`](/api/classes/SpatialInventoryStaging/properties/batch_policy) validates the entire restoration. Use the tray operations to move tracked items so the return records stay in sync.
+The tray's [`drop_policy`](/api/classes/SpatialInventoryStaging/properties/drop_policy) checks each move. Its [`batch_policy`](/api/classes/SpatialInventoryStaging/properties/batch_policy) checks the whole set of items before returning any of them. Move items through the [`tray`](/api/classes/SpatialInventoryStaging) so it knows which ones still need to go back.
 
 ## Equip a two-handed tool
 
-[`SpatialInventoryEquipment.configure()`](/api/classes/SpatialInventoryEquipment/methods/configure) links a backpack to named slots. A [`slot_requirements`](/api/classes/SpatialInventoryEquipment/properties/slot_requirements) callback returns every slot the item occupies, or a reason string to reject the request. A [`move_policy`](/api/classes/SpatialInventoryEquipment/properties/move_policy) can apply restrictions such as combat locks and rules for returning displaced equipment.
+Take the engineer's cutter out of the backpack, equip it in both hands, then put it away. [`configure()`](/api/classes/SpatialInventoryEquipment/methods/configure) links the backpack to the hand slots. The [`slot_requirements`](/api/classes/SpatialInventoryEquipment/properties/slot_requirements) function tells Crimson that this cutter takes both hands. Both slots point to the same cutter.
 
-Preview the engineer's two-handed cutter, equip it in both hands, and return it to the backpack. The two occupied slots point to the same item.
+The script previews each move first so the player can see what would happen. Your slot function can also return a message explaining why the item cannot go in that slot. Use a [`move_policy`](/api/classes/SpatialInventoryEquipment/properties/move_policy) for rules such as preventing gear changes during combat.
 
 ```gdscript
 extends Node
@@ -188,6 +188,6 @@ func _slots_for_tool(id: StringName, requested_slot: StringName) -> Variant:
     return [requested_slot]
 ```
 
-Send the preview to [`equip()`](/api/classes/SpatialInventoryEquipment/methods/equip) or [`unequip()`](/api/classes/SpatialInventoryEquipment/methods/unequip) as the expected result. If the slots, backpack, or policies change while the player reviews the move, request a new preview. When an equip displaces another item, Crimson checks room for that item and publishes both the slot and backpack changes together. Save the [`equipment snapshot`](/api/classes/SpatialInventoryEquipment/methods/export_snapshot) alongside the backpack snapshot and your game's item records.
+Pass the preview to [`equip()`](/api/classes/SpatialInventoryEquipment/methods/equip) or [`unequip()`](/api/classes/SpatialInventoryEquipment/methods/unequip) to tell Crimson which move the player saw. Show a fresh preview if the backpack, slots, or rules have changed. If equipping the cutter would push another tool out of a hand, Crimson checks that the tool fits back in the bag before changing anything. Save the [`equipment snapshot`](/api/classes/SpatialInventoryEquipment/methods/export_snapshot) with the backpack and your game's item data.
 
 [Build a shop purchase or a two-player trade](/inventory/transactions)
