@@ -1,7 +1,7 @@
 ---
 title: "host_placement_policy"
 sidebarTitle: "host_placement_policy"
-description: "Optional game rule receiving the placement context after ownership and nesting validation."
+description: "Optional game rule called with the placement context after the container ownership checks pass."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var host_placement_policy: Callable = Callable()
 
 ## Description
 
-Return an empty String to accept or a reason to deny the placement.
+Return an empty String to allow the placement or a reason to deny it. The default empty callable adds no game-specific restriction.

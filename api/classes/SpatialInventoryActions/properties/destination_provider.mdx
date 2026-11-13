@@ -1,7 +1,7 @@
 ---
 title: "destination_provider"
 sidebarTitle: "destination_provider"
-description: "Optional callback used when a quick transfer receives no explicit destinations."
+description: "Optional callback used when a quick transfer receives an empty destination list."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,7 +27,7 @@ var destination_provider: Callable = Callable()
 
 ## Description
 
-It receives the proposed transfer context and returns an Array of destination grids in preference order.
+It receives the source item context and returns an Array of destination grids in priority order. The default empty callable supplies no destinations.
 
 ## Example
 

@@ -1,7 +1,7 @@
 ---
 title: "operation_guard"
 sidebarTitle: "operation_guard"
-description: "Optional guard(source, destination) -> bool callback."
+description: "Optional callback that receives the source grid and the destination grid, which can be null."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var operation_guard: Callable = Callable()
 
 ## Description
 
-Return true while both grids are available to this action.
+Return `true` to allow the operation. The default empty callable applies no additional guard.

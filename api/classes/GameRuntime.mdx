@@ -25,15 +25,15 @@ description: "The persistent entry point for starting and coordinating a Crimson
 
 **[`definition`](/api/classes/GameRuntime/properties/definition)**
 
-Assign the world, player scene, and multiplayer rules used to start the game.
+Assign the world, player scene, and multiplayer rules before starting, hosting, or joining a session.
 
 **[`possession`](/api/classes/GameRuntime/properties/possession)**
 
-Read-only possession service for the current coordinated match.
+Read-only reference to the coordinated authority's possession service for inspecting and changing player control assignments.
 
 **[`transactions`](/api/classes/GameRuntime/properties/transactions)**
 
-Read-only authority transaction coordinator for registering game stores and committing coordinated match state.
+Read-only reference to the coordinated authority's transaction coordinator for registering stores and committing match state.
 
 ## Methods
 
@@ -259,8 +259,8 @@ Emitted when a world with the given ID and epoch is ready for play. Coordinated 
 
 | Name | Value | Description |
 | --- | --- | --- |
-| `IDLE` | `0` | No active game session. An online listing lookup may still be pending. |
-| `LOBBY` | `1` | A coordinated session is open and the first world is pending. |
-| `RECOVERING` | `4` | A failure after publication closed command admission. Leave the game before starting a new session. |
-| `RUNNING` | `3` | The published world is ready for play. |
-| `TRANSITIONING` | `2` | A world startup, travel, or restore is in progress. |
+| `IDLE` | `0` | No gameplay session is active. |
+| `LOBBY` | `1` | The coordinated session is open for admission and player binding before a match begins. |
+| `RECOVERING` | `4` | World synchronization failed after publication. Gameplay commands remain paused while the session recovers. |
+| `RUNNING` | `3` | The world is ready for gameplay. |
+| `TRANSITIONING` | `2` | A world is loading or synchronizing with the required participants. |

@@ -1,7 +1,7 @@
 ---
 title: "participant_eligibility"
 sidebarTitle: "participant_eligibility"
-description: "Optional rule receiving stage, actor, and other_actor."
+description: "Optional callback that receives the trade stage and both actor IDs."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var participant_eligibility: Callable = Callable()
 
 ## Description
 
-Return an empty string to allow the operation.
+Return an empty String or StringName to allow the stage, or a reason to deny it. Defaults to an empty callable.

@@ -38,13 +38,6 @@
       "projection_updated": "Emitted after a guest applies a visible projection at revision. baseline is true when the update establishes a new baseline. Read get_projection to obtain the applied view.",
       "session_ended": "Emitted after the game releases session resources. The reason identifies what ended the session.",
       "world_ready": "Emitted when a world with the given ID and epoch is ready for play. Coordinated network games wait for required scene and baseline acknowledgments."
-    },
-    "constants": {
-      "IDLE": "No active game session. An online listing lookup may still be pending.",
-      "LOBBY": "A coordinated session is open and the first world is pending.",
-      "TRANSITIONING": "A world startup, travel, or restore is in progress.",
-      "RUNNING": "The published world is ready for play.",
-      "RECOVERING": "A failure after publication closed command admission. Leave the game before starting a new session."
     }
   },
   "GameServices": {

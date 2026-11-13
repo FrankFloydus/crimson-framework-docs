@@ -1,7 +1,7 @@
 ---
 title: "backpack"
 sidebarTitle: "backpack"
-description: "The configured backpack used for incoming equipment and returning items."
+description: "Grid associated with this equipment set."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -22,3 +22,7 @@ var backpack: SpatialInventory
 | Type | [`SpatialInventory`](/api/classes/SpatialInventory) |
 | Access | Read only |
 | Getter | [`get_backpack()`](/api/classes/SpatialInventoryEquipment/methods/get_backpack) |
+
+## Description
+
+It supplies items to equip and receives items returned from slots. It is `null` until configured.

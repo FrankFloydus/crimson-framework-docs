@@ -18,11 +18,11 @@ description: "Configuration for the standalone World Session API."
 
 **[`local_camera_path`](/api/classes/WorldSessionDefinition/properties/local_camera_path)**
 
-Optional path relative to the assigned player scene root.
+Path from the root of the instantiated `player_scene` to the `Camera3D` that becomes current for the local player.
 
 **[`local_hidden_path`](/api/classes/WorldSessionDefinition/properties/local_hidden_path)**
 
-Optional path relative to the assigned player scene root.
+Path from the root of the instantiated `player_scene` to the visual subtree hidden on the local player instance.
 
 **[`player_scene`](/api/classes/WorldSessionDefinition/properties/player_scene)**
 
@@ -34,7 +34,7 @@ UDP port used to host or join the standalone session.
 
 **[`spawn_points_path`](/api/classes/WorldSessionDefinition/properties/spawn_points_path)**
 
-Path relative to the assigned world scene root.
+Path from the root of the instantiated `world_scene` to the spawn container.
 
 **[`world_scene`](/api/classes/WorldSessionDefinition/properties/world_scene)**
 

@@ -23,6 +23,18 @@
     {
       "source": "/api/classes/DedicatedServerBoot/properties/game",
       "destination": "/api/classes/GameConfig/methods/boot_server"
+    },
+    {
+      "source": "/api/classes/MoverComponent/properties/movement_rule",
+      "destination": "/player-controls#tune-movement-in-the-inspector"
+    },
+    {
+      "source": "/api/classes/MoverComponent/methods/get_movement_rule",
+      "destination": "/player-controls#tune-movement-in-the-inspector"
+    },
+    {
+      "source": "/api/classes/MoverComponent/methods/set_movement_rule",
+      "destination": "/player-controls#tune-movement-in-the-inspector"
     }
   ],
   "navigation": {
@@ -52,7 +64,17 @@
             "pages": [
               "multiplayer",
               "coordinated-lan",
-              "dedicated-lan"
+              "dedicated-lan",
+              "networked-movement",
+              "network-diagnostics",
+              "binary-messages"
+            ]
+          },
+          {
+            "group": "Player movement",
+            "pages": [
+              "player-controls",
+              "scripted-movement"
             ]
           },
           {
@@ -128,6 +150,7 @@
                               "api/classes/Game/methods/bind_player",
                               "api/classes/Game/methods/boot_result",
                               "api/classes/Game/methods/campaign",
+                              "api/classes/Game/methods/codecs",
                               "api/classes/Game/methods/configure",
                               "api/classes/Game/methods/current",
                               "api/classes/Game/methods/dismiss_invite",
@@ -141,10 +164,12 @@
                               "api/classes/Game/methods/host",
                               "api/classes/Game/methods/inventory",
                               "api/classes/Game/methods/invite_friends",
+                              "api/classes/Game/methods/is_player_controlled",
                               "api/classes/Game/methods/join",
                               "api/classes/Game/methods/join_listing",
                               "api/classes/Game/methods/join_lobby",
                               "api/classes/Game/methods/leave",
+                              "api/classes/Game/methods/network_diagnostics",
                               "api/classes/Game/methods/open_lobby",
                               "api/classes/Game/methods/pending_invite",
                               "api/classes/Game/methods/perform",
@@ -194,11 +219,68 @@
                               "api/classes/GameConfig/methods/inventory",
                               "api/classes/GameConfig/methods/lan",
                               "api/classes/GameConfig/methods/on_port",
+                              "api/classes/GameConfig/methods/player_controls",
                               "api/classes/GameConfig/methods/provider",
                               "api/classes/GameConfig/methods/steam",
                               "api/classes/GameConfig/methods/steam_server",
                               "api/classes/GameConfig/methods/with_world",
                               "api/classes/GameConfig/methods/world_id"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "GameNetworkDiagnostics",
+                        "icon": "cube",
+                        "root": "api/classes/GameNetworkDiagnostics",
+                        "expanded": false,
+                        "pages": [
+                          {
+                            "group": "Properties",
+                            "icon": "sliders",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameNetworkDiagnostics/properties/acknowledged_input",
+                              "api/classes/GameNetworkDiagnostics/properties/authority_position",
+                              "api/classes/GameNetworkDiagnostics/properties/connected_peers",
+                              "api/classes/GameNetworkDiagnostics/properties/correction_distance",
+                              "api/classes/GameNetworkDiagnostics/properties/corrections",
+                              "api/classes/GameNetworkDiagnostics/properties/movement_mode",
+                              "api/classes/GameNetworkDiagnostics/properties/peer_id",
+                              "api/classes/GameNetworkDiagnostics/properties/pending_inputs",
+                              "api/classes/GameNetworkDiagnostics/properties/phase",
+                              "api/classes/GameNetworkDiagnostics/properties/player_number",
+                              "api/classes/GameNetworkDiagnostics/properties/predicted_position",
+                              "api/classes/GameNetworkDiagnostics/properties/replayed_inputs",
+                              "api/classes/GameNetworkDiagnostics/properties/role",
+                              "api/classes/GameNetworkDiagnostics/properties/round_trip_ms",
+                              "api/classes/GameNetworkDiagnostics/properties/simulation_tick",
+                              "api/classes/GameNetworkDiagnostics/properties/state_age_ms",
+                              "api/classes/GameNetworkDiagnostics/properties/transport"
+                            ]
+                          },
+                          {
+                            "group": "Methods",
+                            "icon": "code",
+                            "expanded": false,
+                            "pages": [
+                              "api/classes/GameNetworkDiagnostics/methods/get_acknowledged_input",
+                              "api/classes/GameNetworkDiagnostics/methods/get_authority_position",
+                              "api/classes/GameNetworkDiagnostics/methods/get_connected_peers",
+                              "api/classes/GameNetworkDiagnostics/methods/get_correction_distance",
+                              "api/classes/GameNetworkDiagnostics/methods/get_corrections",
+                              "api/classes/GameNetworkDiagnostics/methods/get_movement_mode",
+                              "api/classes/GameNetworkDiagnostics/methods/get_peer_id",
+                              "api/classes/GameNetworkDiagnostics/methods/get_pending_inputs",
+                              "api/classes/GameNetworkDiagnostics/methods/get_phase",
+                              "api/classes/GameNetworkDiagnostics/methods/get_player_number",
+                              "api/classes/GameNetworkDiagnostics/methods/get_predicted_position",
+                              "api/classes/GameNetworkDiagnostics/methods/get_replayed_inputs",
+                              "api/classes/GameNetworkDiagnostics/methods/get_role",
+                              "api/classes/GameNetworkDiagnostics/methods/get_round_trip_ms",
+                              "api/classes/GameNetworkDiagnostics/methods/get_simulation_tick",
+                              "api/classes/GameNetworkDiagnostics/methods/get_state_age_ms",
+                              "api/classes/GameNetworkDiagnostics/methods/get_transport"
                             ]
                           }
                         ]
@@ -1045,6 +1127,299 @@
                 ]
               },
               {
+                "group": "Player controls",
+                "icon": "layer-group",
+                "root": "api/modules/player-controls",
+                "expanded": false,
+                "pages": [
+                  {
+                    "group": "ControlsComponent",
+                    "icon": "cube",
+                    "root": "api/classes/ControlsComponent",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Properties",
+                        "icon": "sliders",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/ControlsComponent/properties/capture_pointer_on_boot",
+                          "api/classes/ControlsComponent/properties/input_layout",
+                          "api/classes/ControlsComponent/properties/jump_action",
+                          "api/classes/ControlsComponent/properties/mouse_look_action",
+                          "api/classes/ControlsComponent/properties/mouse_sensitivity",
+                          "api/classes/ControlsComponent/properties/move_action",
+                          "api/classes/ControlsComponent/properties/stick_look_action",
+                          "api/classes/ControlsComponent/properties/stick_look_speed"
+                        ]
+                      },
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/ControlsComponent/methods/boot",
+                          "api/classes/ControlsComponent/methods/for_body",
+                          "api/classes/ControlsComponent/methods/get_capture_pointer_on_boot",
+                          "api/classes/ControlsComponent/methods/get_input_layout",
+                          "api/classes/ControlsComponent/methods/get_jump_action",
+                          "api/classes/ControlsComponent/methods/get_mouse_look_action",
+                          "api/classes/ControlsComponent/methods/get_mouse_sensitivity",
+                          "api/classes/ControlsComponent/methods/get_move_action",
+                          "api/classes/ControlsComponent/methods/get_stick_look_action",
+                          "api/classes/ControlsComponent/methods/get_stick_look_speed",
+                          "api/classes/ControlsComponent/methods/set_capture_pointer_on_boot",
+                          "api/classes/ControlsComponent/methods/set_input_layout",
+                          "api/classes/ControlsComponent/methods/set_jump_action",
+                          "api/classes/ControlsComponent/methods/set_mouse_look_action",
+                          "api/classes/ControlsComponent/methods/set_mouse_sensitivity",
+                          "api/classes/ControlsComponent/methods/set_move_action",
+                          "api/classes/ControlsComponent/methods/set_stick_look_action",
+                          "api/classes/ControlsComponent/methods/set_stick_look_speed"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "PlayerControl",
+                    "icon": "cube",
+                    "root": "api/classes/PlayerControl",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/PlayerControl/methods/clear_lock_on",
+                          "api/classes/PlayerControl/methods/controls",
+                          "api/classes/PlayerControl/methods/get_error",
+                          "api/classes/PlayerControl/methods/get_message",
+                          "api/classes/PlayerControl/methods/is_ready",
+                          "api/classes/PlayerControl/methods/lock_on",
+                          "api/classes/PlayerControl/methods/mover"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "PlayerControlProfile",
+                    "icon": "cube",
+                    "root": "api/classes/PlayerControlProfile",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Properties",
+                        "icon": "sliders",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/PlayerControlProfile/properties/capture_pointer_on_boot",
+                          "api/classes/PlayerControlProfile/properties/controller_style",
+                          "api/classes/PlayerControlProfile/properties/forward_direction",
+                          "api/classes/PlayerControlProfile/properties/input_layout",
+                          "api/classes/PlayerControlProfile/properties/jump_action",
+                          "api/classes/PlayerControlProfile/properties/mouse_look_action",
+                          "api/classes/PlayerControlProfile/properties/mouse_sensitivity",
+                          "api/classes/PlayerControlProfile/properties/move_action",
+                          "api/classes/PlayerControlProfile/properties/move_relative_to",
+                          "api/classes/PlayerControlProfile/properties/move_speed",
+                          "api/classes/PlayerControlProfile/properties/movement_rule",
+                          "api/classes/PlayerControlProfile/properties/predict_movement",
+                          "api/classes/PlayerControlProfile/properties/stick_look_action",
+                          "api/classes/PlayerControlProfile/properties/stick_look_speed"
+                        ]
+                      },
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/PlayerControlProfile/methods/boot",
+                          "api/classes/PlayerControlProfile/methods/configure",
+                          "api/classes/PlayerControlProfile/methods/get_capture_pointer_on_boot",
+                          "api/classes/PlayerControlProfile/methods/get_controller_style",
+                          "api/classes/PlayerControlProfile/methods/get_input_layout",
+                          "api/classes/PlayerControlProfile/methods/get_jump_action",
+                          "api/classes/PlayerControlProfile/methods/get_mouse_look_action",
+                          "api/classes/PlayerControlProfile/methods/get_mouse_sensitivity",
+                          "api/classes/PlayerControlProfile/methods/get_move_action",
+                          "api/classes/PlayerControlProfile/methods/get_move_relative_to",
+                          "api/classes/PlayerControlProfile/methods/get_move_speed",
+                          "api/classes/PlayerControlProfile/methods/get_movement_rule",
+                          "api/classes/PlayerControlProfile/methods/get_stick_look_action",
+                          "api/classes/PlayerControlProfile/methods/get_stick_look_speed",
+                          "api/classes/PlayerControlProfile/methods/is_predict_movement_enabled",
+                          "api/classes/PlayerControlProfile/methods/set_capture_pointer_on_boot",
+                          "api/classes/PlayerControlProfile/methods/set_controller_style",
+                          "api/classes/PlayerControlProfile/methods/set_input_layout",
+                          "api/classes/PlayerControlProfile/methods/set_jump_action",
+                          "api/classes/PlayerControlProfile/methods/set_mouse_look_action",
+                          "api/classes/PlayerControlProfile/methods/set_mouse_sensitivity",
+                          "api/classes/PlayerControlProfile/methods/set_move_action",
+                          "api/classes/PlayerControlProfile/methods/set_move_relative_to",
+                          "api/classes/PlayerControlProfile/methods/set_move_speed",
+                          "api/classes/PlayerControlProfile/methods/set_movement_rule",
+                          "api/classes/PlayerControlProfile/methods/set_predict_movement_enabled",
+                          "api/classes/PlayerControlProfile/methods/set_stick_look_action",
+                          "api/classes/PlayerControlProfile/methods/set_stick_look_speed"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Mover",
+                "icon": "layer-group",
+                "root": "api/modules/mover",
+                "expanded": false,
+                "pages": [
+                  {
+                    "group": "Locomotion",
+                    "icon": "cube",
+                    "root": "api/classes/Locomotion",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/Locomotion/methods/ground"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "MotionRule",
+                    "icon": "cube",
+                    "root": "api/classes/MotionRule",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Properties",
+                        "icon": "sliders",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/MotionRule/properties/acceleration",
+                          "api/classes/MotionRule/properties/air_control",
+                          "api/classes/MotionRule/properties/deceleration",
+                          "api/classes/MotionRule/properties/gravity_scale",
+                          "api/classes/MotionRule/properties/ground_friction",
+                          "api/classes/MotionRule/properties/grounded",
+                          "api/classes/MotionRule/properties/jump_speed"
+                        ]
+                      },
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/MotionRule/methods/get_acceleration",
+                          "api/classes/MotionRule/methods/get_air_control",
+                          "api/classes/MotionRule/methods/get_deceleration",
+                          "api/classes/MotionRule/methods/get_gravity_scale",
+                          "api/classes/MotionRule/methods/get_ground_friction",
+                          "api/classes/MotionRule/methods/get_jump_speed",
+                          "api/classes/MotionRule/methods/is_grounded",
+                          "api/classes/MotionRule/methods/set_acceleration",
+                          "api/classes/MotionRule/methods/set_air_control",
+                          "api/classes/MotionRule/methods/set_deceleration",
+                          "api/classes/MotionRule/methods/set_gravity_scale",
+                          "api/classes/MotionRule/methods/set_ground_friction",
+                          "api/classes/MotionRule/methods/set_grounded",
+                          "api/classes/MotionRule/methods/set_jump_speed"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Mover",
+                    "icon": "cube",
+                    "root": "api/classes/Mover",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Properties",
+                        "icon": "sliders",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/Mover/properties/velocity"
+                        ]
+                      },
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/Mover/methods/attach",
+                          "api/classes/Mover/methods/for_node",
+                          "api/classes/Mover/methods/get_velocity",
+                          "api/classes/Mover/methods/jump",
+                          "api/classes/Mover/methods/move",
+                          "api/classes/Mover/methods/stop",
+                          "api/classes/Mover/methods/use_rule"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "MoverComponent",
+                    "icon": "cube",
+                    "root": "api/classes/MoverComponent",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Properties",
+                        "icon": "sliders",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/MoverComponent/properties/acceleration",
+                          "api/classes/MoverComponent/properties/air_control",
+                          "api/classes/MoverComponent/properties/controller_style",
+                          "api/classes/MoverComponent/properties/deceleration",
+                          "api/classes/MoverComponent/properties/forward_direction",
+                          "api/classes/MoverComponent/properties/gravity_scale",
+                          "api/classes/MoverComponent/properties/ground_friction",
+                          "api/classes/MoverComponent/properties/jump_speed",
+                          "api/classes/MoverComponent/properties/move_relative_to",
+                          "api/classes/MoverComponent/properties/move_speed",
+                          "api/classes/MoverComponent/properties/predict_movement"
+                        ]
+                      },
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/MoverComponent/methods/get_acceleration",
+                          "api/classes/MoverComponent/methods/get_air_control",
+                          "api/classes/MoverComponent/methods/get_controller_style",
+                          "api/classes/MoverComponent/methods/get_deceleration",
+                          "api/classes/MoverComponent/methods/get_gravity_scale",
+                          "api/classes/MoverComponent/methods/get_ground_friction",
+                          "api/classes/MoverComponent/methods/get_jump_speed",
+                          "api/classes/MoverComponent/methods/get_move_relative_to",
+                          "api/classes/MoverComponent/methods/get_move_speed",
+                          "api/classes/MoverComponent/methods/is_predict_movement_enabled",
+                          "api/classes/MoverComponent/methods/mover",
+                          "api/classes/MoverComponent/methods/set_acceleration",
+                          "api/classes/MoverComponent/methods/set_air_control",
+                          "api/classes/MoverComponent/methods/set_controller_style",
+                          "api/classes/MoverComponent/methods/set_deceleration",
+                          "api/classes/MoverComponent/methods/set_gravity_scale",
+                          "api/classes/MoverComponent/methods/set_ground_friction",
+                          "api/classes/MoverComponent/methods/set_jump_speed",
+                          "api/classes/MoverComponent/methods/set_move_relative_to",
+                          "api/classes/MoverComponent/methods/set_move_speed",
+                          "api/classes/MoverComponent/methods/set_predict_movement_enabled"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
                 "group": "Inventory",
                 "icon": "layer-group",
                 "root": "api/modules/inventory",
@@ -1699,11 +2074,148 @@
                 ]
               },
               {
-                "group": "Replication",
+                "group": "Network",
                 "icon": "layer-group",
                 "root": "api/modules/replication",
                 "expanded": false,
                 "pages": [
+                  {
+                    "group": "NetworkCodecs",
+                    "icon": "cube",
+                    "root": "api/classes/NetworkCodecs",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/NetworkCodecs/methods/decode",
+                          "api/classes/NetworkCodecs/methods/encode",
+                          "api/classes/NetworkCodecs/methods/register_codec"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "NetworkDecodeResult",
+                    "icon": "cube",
+                    "root": "api/classes/NetworkDecodeResult",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Properties",
+                        "icon": "sliders",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/NetworkDecodeResult/properties/error",
+                          "api/classes/NetworkDecodeResult/properties/ok",
+                          "api/classes/NetworkDecodeResult/properties/value"
+                        ]
+                      },
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/NetworkDecodeResult/methods/get_error",
+                          "api/classes/NetworkDecodeResult/methods/get_value",
+                          "api/classes/NetworkDecodeResult/methods/is_ok"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "NetworkEncodeResult",
+                    "icon": "cube",
+                    "root": "api/classes/NetworkEncodeResult",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Properties",
+                        "icon": "sliders",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/NetworkEncodeResult/properties/bytes",
+                          "api/classes/NetworkEncodeResult/properties/error",
+                          "api/classes/NetworkEncodeResult/properties/ok"
+                        ]
+                      },
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/NetworkEncodeResult/methods/get_bytes",
+                          "api/classes/NetworkEncodeResult/methods/get_error",
+                          "api/classes/NetworkEncodeResult/methods/is_ok"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "NetworkReader",
+                    "icon": "cube",
+                    "root": "api/classes/NetworkReader",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/NetworkReader/methods/fail",
+                          "api/classes/NetworkReader/methods/finish",
+                          "api/classes/NetworkReader/methods/get_error",
+                          "api/classes/NetworkReader/methods/get_remaining",
+                          "api/classes/NetworkReader/methods/open",
+                          "api/classes/NetworkReader/methods/read_bool",
+                          "api/classes/NetworkReader/methods/read_bytes",
+                          "api/classes/NetworkReader/methods/read_f32",
+                          "api/classes/NetworkReader/methods/read_f64",
+                          "api/classes/NetworkReader/methods/read_i16",
+                          "api/classes/NetworkReader/methods/read_i32",
+                          "api/classes/NetworkReader/methods/read_i64",
+                          "api/classes/NetworkReader/methods/read_i8",
+                          "api/classes/NetworkReader/methods/read_string",
+                          "api/classes/NetworkReader/methods/read_u16",
+                          "api/classes/NetworkReader/methods/read_u32",
+                          "api/classes/NetworkReader/methods/read_u8"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "NetworkWriter",
+                    "icon": "cube",
+                    "root": "api/classes/NetworkWriter",
+                    "expanded": false,
+                    "pages": [
+                      {
+                        "group": "Methods",
+                        "icon": "code",
+                        "expanded": false,
+                        "pages": [
+                          "api/classes/NetworkWriter/methods/create",
+                          "api/classes/NetworkWriter/methods/finish",
+                          "api/classes/NetworkWriter/methods/get_error",
+                          "api/classes/NetworkWriter/methods/get_size",
+                          "api/classes/NetworkWriter/methods/write_bool",
+                          "api/classes/NetworkWriter/methods/write_bytes",
+                          "api/classes/NetworkWriter/methods/write_f32",
+                          "api/classes/NetworkWriter/methods/write_f64",
+                          "api/classes/NetworkWriter/methods/write_i16",
+                          "api/classes/NetworkWriter/methods/write_i32",
+                          "api/classes/NetworkWriter/methods/write_i64",
+                          "api/classes/NetworkWriter/methods/write_i8",
+                          "api/classes/NetworkWriter/methods/write_string",
+                          "api/classes/NetworkWriter/methods/write_u16",
+                          "api/classes/NetworkWriter/methods/write_u32",
+                          "api/classes/NetworkWriter/methods/write_u8"
+                        ]
+                      }
+                    ]
+                  },
                   {
                     "group": "StateReplication",
                     "icon": "cube",
@@ -1839,7 +2351,7 @@
                 ]
               },
               {
-                "group": "Scene loading",
+                "group": "Scene Manager",
                 "icon": "layer-group",
                 "root": "api/modules/scene-loading",
                 "expanded": false,

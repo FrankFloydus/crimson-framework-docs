@@ -18,7 +18,7 @@ description: "Standalone fixed-world session for existing integrations."
 
 **[`definition`](/api/classes/WorldSession/properties/definition)**
 
-Standalone scene and spawn settings applied on the next start.
+Scene and spawn settings applied on the next standalone start.
 
 ## Methods
 
@@ -96,6 +96,6 @@ Emitted when the session changes state. RUNNING means the world and local player
 
 | Name | Value | Description |
 | --- | --- | --- |
-| `IDLE` | `0` | No active session. The definition can be set before the next start. |
-| `RUNNING` | `2` | The session has finished startup and the world is available. |
-| `STARTING` | `1` | The session is starting or a guest is waiting for its world and player. |
+| `IDLE` | `0` | No world or transport is active. |
+| `RUNNING` | `2` | The world and readiness requirements for the local role are satisfied. |
+| `STARTING` | `1` | The world or its initial player assignments are still being prepared. |

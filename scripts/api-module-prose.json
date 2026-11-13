@@ -42,6 +42,51 @@
       "Migrate an existing project": "/migration"
     }
   },
+  "Player controls": {
+    "summary": "Give the local player movement and look controls.",
+    "description": "Use [ControlsComponent] to start movement and look for a local player after their body enters the scene. [PlayerControl] reports whether the attachment is ready and can steer the player around a game-selected lock-on target. [PlayerControlProfile] supplies an explicit set of settings when a game needs to override the scene defaults.",
+    "guides": {
+      "Set up local movement and look": "/player-controls",
+      "Synchronize player movement": "/networked-movement"
+    }
+  },
+  "Input": {
+    "summary": "Read and rebind keyboard, mouse, and gamepad actions for a local player.",
+    "description": "[Controls] reads named actions and owns the local pointer. An [InputLayout] combines standalone [InputActionMap] resources for situations such as on-foot play and driving. Share the same Controls handle with your settings screen so changes from [Rebinding] apply during play.",
+    "guides": {
+      "Author actions and input maps": "/input-maps",
+      "Set up local movement and look": "/player-controls"
+    },
+    "sections": {
+      "Actions and bindings": {
+        "summary": "Author input actions and read the local player's controls.",
+        "description": "An [InputAction] defines the value produced by an action such as jump or look. An [InputActionMapping] assigns the definition an action ID and physical [InputBinding] slots in an [InputActionMap]. Compose maps in an [InputLayout] and read actions through the player's [Controls]."
+      },
+      "Modifiers": {
+        "summary": "Adjust one binding before the action combines it with other sources.",
+        "description": "Apply [InputDeadZone] to suppress small analog movements or [InputSwapAxis] to change which source component supplies each output axis. Add them to [InputBinding] in application order.",
+        "guides": {
+          "Tune a stick binding": "/input-maps#tune-a-stick-binding"
+        }
+      },
+      "Rebinding": {
+        "summary": "Let players change and save the controls they use.",
+        "description": "Open [Rebinding] on an existing [Controls] scope. Each [BindingSlot] describes an editable binding. Await a capture to get a [RebindResult], or save the player's overrides for their next session.",
+        "guides": {
+          "Try the demo Controls screen": "/input-maps#try-player-rebinding-in-the-demo"
+        }
+      }
+    }
+  },
+  "Mover": {
+    "summary": "Move an actor using steering, velocities, and motion rules.",
+    "description": "Use [MoverComponent] to choose how the player's body turns and tune ground movement, air steering, and jump takeoff. For an AI or scripted body, attach [Mover] and supply a [MotionRule]. [Locomotion] supplies standard rules, including grounded movement with a jump that starts on the floor.",
+    "guides": {
+      "Tune movement in the Inspector": "/player-controls#tune-movement-in-the-inspector",
+      "Move an actor from a script": "/scripted-movement",
+      "Synchronize player movement": "/networked-movement"
+    }
+  },
   "Inventory": {
     "summary": "Place, move, and exchange game items across inventory grids.",
     "description": "Start a standalone grid with [code]Inventory.grid(size)[/code] and add items by ID and footprint. Read their placements as [InventoryItemView] values. In coordinated games, use [InventoryConfig] to enable backpacks and provide pickup rules. A [MatchInventory] backpack places an authorized pickup and consumes it in one commit. [SpatialInventory] and the lower-level adapters provide explicit placement, equipment, container, sorting, and trade tools.",
@@ -55,9 +100,13 @@
     "summary": "Coordinate authoritative game state and route player commands.",
     "description": "Use the transaction coordinator to prepare, validate, and publish changes across game state stores. Player bindings map admitted peers to stable player IDs, possession tracks primary control, and the command router checks the match and player context before calling your gameplay handler."
   },
-  "Replication": {
-    "summary": "Synchronize each peer's view of committed game state.",
-    "description": "Use StateReplication to send an initial snapshot and subsequent changes to admitted peers in a Godot multiplayer scope. The game decides which state each recipient can see. Clients read the resulting projection and track when it is ready for the current world."
+  "Network": {
+    "summary": "Distribute committed game state and serialize compact gameplay messages.",
+    "description": "Use [StateReplication] to send an initial snapshot and subsequent changes to admitted peers. The game decides what each peer can see. [NetworkCodecs] registers game-specific binary message layouts. [NetworkWriter] and [NetworkReader] encode and decode fields for a known layout. Sample [GameNetworkDiagnostics] to inspect fixed-world movement and the local connection.",
+    "guides": {
+      "Encode a custom binary message": "/binary-messages",
+      "Synchronize player movement": "/networked-movement"
+    }
   },
   "Save and restore": {
     "summary": "Capture checkpoints, inspect saved generations, and restore game state.",
@@ -66,7 +115,7 @@
       "Save and restore a checkpoint": "/checkpoints"
     }
   },
-  "Scene loading": {
+  "Scene Manager": {
     "summary": "Load a registered world offline or coordinate its replacement across peers.",
     "description": "Use [GameScenes] to travel to registered worlds in a coordinated game. [SceneLoadManager] provides lower-level control over world replacement. Register scene IDs, choose a world container, and request a local or coordinated load. The manager prepares the scene asynchronously and reports completion or failure."
   },

@@ -1,7 +1,7 @@
 ---
 title: "wallet"
 sidebarTitle: "wallet"
-description: "Wallet consulted for proposed amounts and updated as part of settling currency offers."
+description: "Optional wallet that supplies balances and commits currency transfers during settlement."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -23,3 +23,7 @@ var wallet: SpatialInventoryWallet
 | Access | Read and write |
 | Getter | [`get_wallet()`](/api/classes/SpatialInventoryTrade/methods/get_wallet) |
 | Setter | [`set_wallet()`](/api/classes/SpatialInventoryTrade/methods/set_wallet) |
+
+## Description
+
+Set it before participants make currency offers. Defaults to `null`.

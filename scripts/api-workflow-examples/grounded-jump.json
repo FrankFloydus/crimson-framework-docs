@@ -1,0 +1,11 @@
+[
+  {
+    "title": "Make a practice target hop on a timer",
+    "setup": "Attach this script to a visible CharacterBody3D with a CollisionShape3D on a floor with static collision. During target practice the body hops at regular intervals once it has floor contact.",
+    "code": "extends CharacterBody3D\n\nconst TAKEOFF_SPEED: float = 4.0\nconst HOP_INTERVAL: float = 2.0\n\nvar _mover: Mover\n\n\nfunc _ready() -> void:\n    var rule: MotionRule = Locomotion.ground()\n    rule.jump_speed = TAKEOFF_SPEED\n    _mover = Mover.attach(self, rule)\n    if _mover == null:\n        push_error(\"Could not attach the practice target's mover.\")\n        return\n\n    var timer: Timer = Timer.new()\n    add_child(timer)\n    timer.timeout.connect(_hop)\n    timer.start(HOP_INTERVAL)\n\n\nfunc _hop() -> void:\n    if not is_on_floor():\n        return\n    var result: Error = _mover.jump()\n    if result != OK:\n        push_warning(\"Could not queue the target's hop: %s\" % error_string(result))\n",
+    "members": [
+      "Mover.methods.jump",
+      "MotionRule.properties.jump_speed"
+    ]
+  }
+]

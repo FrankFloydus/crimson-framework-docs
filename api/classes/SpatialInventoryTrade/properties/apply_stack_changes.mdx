@@ -1,7 +1,7 @@
 ---
 title: "apply_stack_changes"
 sidebarTitle: "apply_stack_changes"
-description: "Optional callback for synchronous expected-value stack edits."
+description: "Callback that receives proposed stack edits and a placement commit callable."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var apply_stack_changes: Callable = Callable()
 
 ## Description
 
-It receives the change rows and a commit callable and owns rollback of the staged stack records if the paired commit fails.
+Stage the quantity changes, invoke the commit once, and roll back the stack edits if the placement commit fails. Return a Godot Error. Defaults to an empty callable.

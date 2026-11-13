@@ -1,6 +1,6 @@
 ---
 title: "SpatialInventoryContainers"
-description: "Tracks which grid owns each item and which grid represents a container's contents. Use its policies to reject duplicate ownership and cycles before committing inventory moves. The registry does not move items on its own."
+description: "Tracks which inventory grid owns each placed item and nested container."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -10,11 +10,15 @@ description: "Tracks which grid owns each item and which grid represents a conta
 
 **Inherits** `RefCounted`
 
+## Description
+
+Associate container items with their contents grids to enforce unique item IDs and prevent a container from moving into its own contents or descendants.
+
 ## Properties
 
 **[`host_placement_policy`](/api/classes/SpatialInventoryContainers/properties/host_placement_policy)**
 
-Optional game rule receiving the placement context after ownership and nesting validation.
+Optional game rule called with the placement context after the container ownership checks pass.
 
 ## Methods
 

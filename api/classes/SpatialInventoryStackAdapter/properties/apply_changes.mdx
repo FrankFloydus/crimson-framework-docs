@@ -1,7 +1,7 @@
 ---
 title: "apply_changes"
 sidebarTitle: "apply_changes"
-description: "Host apply_changes(rows, commit) -> Error callback."
+description: "Callback that receives the proposed stack edits and an optional placement commit callable."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var apply_changes: Callable = Callable()
 
 ## Description
 
-Each row has `id`, `before`, and `after`, with optional `source_id` on creation. An empty record means absence. Validate the expected records and roll back on commit failure.
+Check the expected stack values and stage the edits. If the commit is valid, invoke it once on the same thread and roll back the staged edits if it fails. Return a Godot Error. Defaults to an empty callable.

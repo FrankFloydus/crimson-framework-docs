@@ -1,7 +1,7 @@
 ---
 title: "find_items()"
 sidebarTitle: "find_items"
-description: "Return IDs for placed items that pass the optional predicate."
+description: "Return the sorted IDs of placed items that pass the optional predicate."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -28,4 +28,4 @@ static find_items(inventory: SpatialInventory, predicate: Callable = Callable())
 
 ## Description
 
-The predicate receives one placement dictionary and must return true to include its ID. Without a predicate, every placement is included.
+The predicate receives one placement dictionary and must return a bool. Without a predicate, every placement is included. If the predicate is unavailable or returns a value other than bool while checking a placement, Crimson logs a diagnostic and returns an empty array.

@@ -1,6 +1,6 @@
 ---
 title: "SpatialInventoryEquipment"
-description: "Equipment slots backed by a SpatialInventory backpack. An item can occupy several slots while keeping a single equipped record. Preview an action before committing it when the player needs to review the displaced gear or destination."
+description: "Moves items between a backpack and named equipment slots."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -10,23 +10,27 @@ description: "Equipment slots backed by a SpatialInventory backpack. An item can
 
 **Inherits** `RefCounted`
 
+## Description
+
+An item can occupy multiple slots while keeping one equipment record. Equipping and returning displaced items apply together.
+
 ## Properties
 
 **[`backpack`](/api/classes/SpatialInventoryEquipment/properties/backpack)**
 
-The configured backpack used for incoming equipment and returning items.
+Grid associated with this equipment set.
 
 **[`move_policy`](/api/classes/SpatialInventoryEquipment/properties/move_policy)**
 
-Optional callback receiving the action, item ID, requested slot and occupied slots, backpack, source and destination placement dictionaries, and `displaced` flag.
+Optional callback that checks equips and returns to the backpack, including returns for displaced gear.
 
 **[`revision`](/api/classes/SpatialInventoryEquipment/properties/revision)**
 
-Revision of committed equipment state.
+Current committed equipment revision.
 
 **[`slot_requirements`](/api/classes/SpatialInventoryEquipment/properties/slot_requirements)**
 
-Optional `slot_requirements(id, requested_slot)` callback.
+Optional callback that receives an item ID and the requested slot.
 
 ## Methods
 
@@ -108,4 +112,4 @@ Set a callback taking the item ID and requested slot.
 
 `changed()`
 
-Emitted after committed equipment state changes, including configuration and successful item edits. Read the current model from the listener.
+Emitted after the equipment configuration or committed equipment contents change.

@@ -1,7 +1,7 @@
 ---
 title: "destination_policy"
 sidebarTitle: "destination_policy"
-description: "Optional String-returning callback that receives the proposed transfer context for each candidate destination."
+description: "Optional callback that checks each candidate grid during a quick transfer."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,7 +27,7 @@ var destination_policy: Callable = Callable()
 
 ## Description
 
-Return an empty string to accept it.
+It receives the transfer context. Return an empty String to consider the grid or a reason to skip it. The default empty callable considers every eligible grid.
 
 ## Example
 

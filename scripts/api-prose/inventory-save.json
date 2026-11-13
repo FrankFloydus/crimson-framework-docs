@@ -39,9 +39,8 @@
     }
   },
   "SpatialInventoryActions": {
-    "description": "Implements checked moves, swaps, quick transfers, and quantity edits across inventory grids. Use a [SpatialInventoryStackAdapter] for host-owned stack records. Action results report a Godot [code]error[/code], [code]reason[/code], how much moved and remains, a [code]selection[/code] identifying an inventory and item, and [code]changes[/code] identifying items whose views need refreshing.",
     "methods": {
-      "find_items": "Return IDs for placed items that pass the optional predicate. The predicate receives one placement dictionary and must return true to include its ID. Without a predicate, every placement is included.",
+      "find_items": "Return the sorted IDs of placed items that pass the optional predicate. The predicate receives one placement dictionary and must return a bool. Without a predicate, every placement is included. If the predicate is unavailable or returns a value other than bool while checking a placement, Crimson logs a diagnostic and returns an empty array.",
       "get_allow_rotation": "Return whether automatic placement searches may try a rotated footprint.",
       "get_destination_policy": "Return the policy that filters quick-transfer destination grids.",
       "get_destination_provider": "Return the callback that supplies fallback quick-transfer destination grids.",
@@ -61,19 +60,9 @@
       "set_pickup_policy": "Set the callback that checks whether the source item may be lifted. Return an empty String to allow it or a denial reason to reject it.",
       "set_stack_adapter": "Attach the adapter that reads and commits your stack records. Pass null to clear it.",
       "split_stack": "Move a positive quantity smaller than the source stack into a new item ID and place it at the requested destination. The source record, new record, and destination placement commit through the stack adapter."
-    },
-    "properties": {
-      "allow_rotation": "Whether automatic placement can try a rotated footprint. Defaults to true.",
-      "destination_policy": "Optional String-returning callback that receives the proposed transfer context for each candidate destination. Return an empty string to accept it.",
-      "destination_provider": "Optional callback used when a quick transfer receives no explicit destinations. It receives the proposed transfer context and returns an Array of destination grids in preference order.",
-      "drop_policy": "Optional callback receiving [code]id[/code], [code]footprint[/code], [code]source[/code], [code]destination[/code], [code]origin[/code], [code]rotated[/code], [code]swap_id[/code], and [code]action[/code]. Stack edits can add target or quantity fields. Return an empty String to allow the edit.",
-      "operation_guard": "Optional [code]guard(source, destination) -> bool[/code] callback. Return true while both grids are available to this action.",
-      "pickup_policy": "Optional callback receiving the source placement's [code]id[/code], [code]footprint[/code], [code]origin[/code], and [code]rotated[/code] fields together with its [code]source[/code] grid. Return an empty String to allow pickup.",
-      "stack_adapter": "Adapter for reading and committing game-owned stack records. Assign it before using split or merge actions."
     }
   },
   "SpatialInventoryContainers": {
-    "description": "Tracks which grid owns each item and which grid represents a container's contents. Use its policies to reject duplicate ownership and cycles before committing inventory moves. The registry does not move items on its own.",
     "methods": {
       "get_contents": "Return the registered contents grid for a container item ID, or null if it has no registered grid.",
       "get_host_placement_policy": "Return the optional game rule called after ownership and nesting checks.",
@@ -83,13 +72,9 @@
       "set_host_placement_policy": "Set an optional game rule that receives the placement context after built-in validation. The callback returns an empty String to accept the placement or a reason to deny it.",
       "unregister_inventory": "Remove a grid from ownership tracking without editing the grid. Returns [code]ERR_DOES_NOT_EXIST[/code] if it was not registered.",
       "validate_changes": "Check the projected ownership graph after applying the given [method SpatialInventory.apply_placement_changes] rows. Returns an empty String if the proposed batch preserves unique owners and acyclic nesting. Apply the batch separately to check geometry and commit."
-    },
-    "properties": {
-      "host_placement_policy": "Optional game rule receiving the placement context after ownership and nesting validation. Return an empty String to accept or a reason to deny the placement."
     }
   },
   "SpatialInventoryEquipment": {
-    "description": "Equipment slots backed by a [SpatialInventory] backpack. An item can occupy several slots while keeping a single equipped record. Preview an action before committing it when the player needs to review the displaced gear or destination.",
     "methods": {
       "configure": "Associate a configured backpack with an ordered list of 1 to 64 unique, nonempty slot IDs. Reconfiguration with different slots or a different backpack returns [code]ERR_BUSY[/code] while items are equipped.",
       "equip": "Equip a backpack item in the requested slot and return displaced equipment to the backpack in the same commit. Supply a preview as [code]expected[/code] to reject a stale result with [code]ERR_BUSY[/code]. Inspect [code]error[/code] and [code]committed[/code] in the result.",
@@ -108,15 +93,6 @@
       "set_move_policy": "Set a callback that can deny equipment moves, including returns for displaced items. Return an empty string to allow the move or a reason to deny it.",
       "set_slot_requirements": "Set a callback taking the item ID and requested slot. Return the full array of occupied slots, including the requested slot, or a denial string.",
       "unequip": "Return the item occupying the requested slot to the backpack. Pass the preview in [code]expected[/code] to require that the reviewed placement still matches before commit."
-    },
-    "properties": {
-      "backpack": "The configured backpack used for incoming equipment and returning items.",
-      "move_policy": "Optional callback receiving the action, item ID, requested slot and occupied slots, backpack, source and destination placement dictionaries, and [code]displaced[/code] flag. Return an empty string to allow the change.",
-      "revision": "Revision of committed equipment state. Compare it with a prior preview revision to detect changes.",
-      "slot_requirements": "Optional [code]slot_requirements(id, requested_slot)[/code] callback. Return all occupied slot IDs or a denial string. By default an item occupies just the requested slot."
-    },
-    "signals": {
-      "changed": "Emitted after committed equipment state changes, including configuration and successful item edits. Read the current model from the listener."
     }
   },
   "SpatialInventorySorter": {
@@ -126,12 +102,11 @@
       "can_undo": "Return whether the sorter retains a committed sort to undo. Intervening edits can still make undo fail.",
       "cancel_preview": "Discard the pending preview without changing the inventory.",
       "has_preview": "Return whether an unapplied sort plan is available.",
-      "preview": "Build a detached sort plan. Pinned items keep their positions and orientations. The optional policy receives [code]id[/code], [code]footprint[/code], [code]origin[/code], [code]rotated[/code], [code]source[/code], [code]destination[/code], [code]swap_id[/code], and [code]action[/code]. Return an empty String to accept a candidate. The result reports [code]error[/code], plus [code]grid_size[/code], [code]placements[/code], and [code]changed_count[/code] on success.",
+      "preview": "Build a detached sort plan. Pinned items keep their positions and orientations. The optional policy receives [code]id[/code], [code]footprint[/code], [code]origin[/code], [code]rotated[/code], [code]source[/code], [code]destination[/code], [code]swap_id[/code], and [code]action[/code]. Return an empty String to accept a candidate. The result reports [code]error[/code], plus [code]grid_size[/code], [code]placements[/code], and [code]changed_count[/code] on success. Crimson logs an unavailable policy and returns [code]ERR_UNAUTHORIZED[/code]. A policy reply of the wrong type logs a diagnostic and returns [code]ERR_CANT_CREATE[/code].",
       "undo": "Restore the placements before the last applied sort, checking expected state and any supplied placement policy. A conflict preserves the grid and keeps undo available."
     }
   },
   "SpatialInventoryStackAdapter": {
-    "description": "Connects placement operations to stack records stored by the game. Build a merge or split plan from live records, then commit it through your synchronous record callback. Use [method invalidate_stack_records] after external edits to the host records.",
     "methods": {
       "commit_detached_split": "Recheck and commit a split through the record callback. The [code]claim_cursor[/code] callable receives no arguments and returns a Godot Error. Use it to claim the newly created stack in the game's cursor or held-item model.",
       "commit_merge": "Recheck the merge plan against current records and commit the quantities through the host callback. Pass an optional no-argument placement callback returning a Godot Error to pair the record changes with placement changes.",
@@ -147,14 +122,9 @@
       "plan_split": "Plan a transfer of part of the source quantity to an unused [code]new_id[/code]. The amount must be positive and less than the source quantity. Returns an [code]error[/code] code and, on success, a plan for one of the split commit methods.",
       "set_apply_changes": "Set the callback taking expected record edits and a placement commit callable. It verifies and stages the edits, calls the commit synchronously when provided, and rolls back the staged records if that call fails.",
       "set_describe_stack": "Set the callback taking an item ID and returning [code]key[/code], [code]quantity[/code], and [code]max_quantity[/code], or an empty dictionary when no stack record exists."
-    },
-    "properties": {
-      "apply_changes": "Host [code]apply_changes(rows, commit) -> Error[/code] callback. Each row has [code]id[/code], [code]before[/code], and [code]after[/code], with optional [code]source_id[/code] on creation. An empty record means absence. Validate the expected records and roll back on commit failure.",
-      "describe_stack": "Host lookup callback taking an item ID. Return a dictionary with a nonempty compatibility [code]key[/code] and positive integer [code]quantity[/code] and [code]max_quantity[/code], with quantity at most the maximum. Return an empty dictionary when the ID has no stack record."
     }
   },
   "SpatialInventoryStaging": {
-    "description": "A temporary grid that remembers each staged item's original inventory and placement. Use its transfer methods to preserve origin tracking. An unsuccessful bulk restore leaves the staged items in the tray.",
     "methods": {
       "configure": "Set the staging grid dimensions in cells. Return [code]ERR_BUSY[/code] when trying to resize a tray with recorded items.",
       "get_batch_policy": "Return the optional policy that checks the complete restoration batch.",
@@ -170,17 +140,9 @@
       "set_pickup_policy": "Set a callback that checks whether the source item can be lifted. Return an empty String to allow pickup or a reason to reject it.",
       "stage_from": "Move a complete item from another grid into the tray and remember the original placement. Returns an error if the item is missing, already tracked, blocked by a policy, or does not fit.",
       "try_close": "Return [code]OK[/code] when the tray is empty. If [code]restore[/code] is true, attempt to restore everything first. Otherwise an occupied tray returns [code]ERR_BUSY[/code]."
-    },
-    "properties": {
-      "batch_policy": "Optional policy called with all before-and-after placement rows during a bulk restore. Return an empty String to approve the batch.",
-      "drop_policy": "Optional policy called with a destination placement context. Use the same context contract as [SpatialInventoryActions].",
-      "inventory": "The live grid used by the staging tray. Use the tray methods to keep placements and tracked origins in sync.",
-      "last_reason": "Explanation for the most recent staging outcome.",
-      "pickup_policy": "Optional policy called with a source placement context. Use the same context contract as [SpatialInventoryActions]."
     }
   },
   "SpatialInventoryTrade": {
-    "description": "Coordinates an invitation and item or currency exchange between two actors. Register each actor with a backpack and route all offer edits through this model. The game owns authoritative item and identity records. Trade actions return dictionaries with a Godot [code]error[/code], [code]reason[/code], changed placements, and completion details when applicable.",
     "methods": {
       "accept": "Accept a pending invitation as its receiver and enter the active phase if the eligibility policy allows it.",
       "cancel": "Cancel a pending or active trade as a participant. Active cancellation attempts to return offers to the owners, with recovery grids available when a backpack cannot accept the return.",
@@ -220,28 +182,6 @@
       "set_wallet": "Attach the wallet used to check funds and commit currency balances during settlement. Replace or clear it while no currency offers or commits are pending.",
       "withdraw": "Return the offered item or escrow stack to the actor's backpack. Optionally specify its destination origin and rotation, or a compatible target stack ID.",
       "withdraw_items": "Plan the return of several offered IDs to the actor's backpack and commit their returns together if the placement and record edits succeed."
-    },
-    "properties": {
-      "allocate_stack_id": "Optional callback taking a source item ID and returning a new unique ID for an escrow or split stack.",
-      "apply_stack_changes": "Optional callback for synchronous expected-value stack edits. It receives the change rows and a commit callable and owns rollback of the staged stack records if the paired commit fails.",
-      "describe_stack": "Optional callback taking an item ID and returning its stack compatibility key, quantity, and maximum quantity in a dictionary.",
-      "initiator": "Actor ID that requested the trade, or 0 when idle.",
-      "item_eligibility": "Optional rule receiving [code]stage[/code], [code]actor[/code], [code]other_actor[/code], [code]id[/code], [code]placement[/code], [code]stack[/code], and [code]quantity[/code]. Return an empty string to allow the offer or exchange.",
-      "participant_eligibility": "Optional rule receiving [code]stage[/code], [code]actor[/code], and [code]other_actor[/code]. Return an empty string to allow the operation.",
-      "phase": "Current trade phase. Use [code]IDLE[/code], [code]REQUESTED[/code], and [code]ACTIVE[/code] to check the lifecycle.",
-      "receiver": "Actor ID invited to trade, or 0 when idle.",
-      "revision": "Revision of committed trade edits.",
-      "wallet": "Wallet consulted for proposed amounts and updated as part of settling currency offers."
-    },
-    "constants": {
-      "ACTIVE": "Both actors have accepted the invitation. Unlocked offers can be edited.",
-      "IDLE": "There is no pending invitation or active trade.",
-      "MAX_BALANCE": "Largest supported nonnegative balance or currency amount.",
-      "MAX_CURRENCIES_PER_OFFER": "Maximum number of distinct currencies one actor may offer.",
-      "MAX_RETURN_SOURCES": "Maximum number of source allocations in a return.",
-      "MAX_SNAPSHOT_REVISION": "Largest trade revision accepted when importing a snapshot.",
-      "REQUESTED": "An invitation is waiting for the receiver to accept or a participant to cancel.",
-      "SNAPSHOT_VERSION": "Version of the exported trade snapshot schema."
     }
   },
   "SpatialInventoryWallet": {
@@ -249,8 +189,8 @@
     "methods": {
       "_apply_balance_changes": "Override to commit balances in a game-owned store. Verify expected amounts, stage all updates, invoke the supplied commit callable synchronously when present, and restore the previous balances if it returns an error.",
       "_get_balance": "Override to read the authoritative integer amount for the actor and currency. Return 0 when no balance is recorded.",
-      "apply_balance_changes": "Compare and update a batch of dictionaries with [code]actor[/code], [code]currency[/code], [code]before[/code], and [code]after[/code]. A stale expected balance returns [code]ERR_BUSY[/code]. Stage the full batch before the optional no-argument commit callback. A callback error rolls all balances back.",
-      "get_balance": "Return the current integer amount for the actor and currency, or 0 when no balance is recorded by the default store.",
+      "apply_balance_changes": "Compare and update a batch of dictionaries with [code]actor[/code], [code]currency[/code], [code]before[/code], and [code]after[/code]. A stale expected balance returns [code]ERR_BUSY[/code]. The default wallet stages the full batch before the optional no-argument commit callback. Any callback failure rolls those balances back. An invalid callback result is reported as [code]ERR_INVALID_DATA[/code]. A scripted wallet must implement rollback for its own store.",
+      "get_balance": "Return the current integer amount for the actor and currency, or 0 when no balance is recorded by the default store. If the scripted read cannot supply a nonnegative balance, Crimson logs a diagnostic and returns -1.",
       "set_balance": "Set a single balance through the expected-value batch operation. Amounts must be nonnegative, and setting 0 clears the stored amount in the default wallet."
     }
   }

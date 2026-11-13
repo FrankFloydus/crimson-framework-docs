@@ -15,11 +15,6 @@
     "signals": {
       "session_ended": "Emitted with the transport or startup failure reason after the world is cleared and the session returns to IDLE. Start another session from this signal.",
       "state_changed": "Emitted when the session changes state. RUNNING means the world and local player are available."
-    },
-    "constants": {
-      "IDLE": "No active session. The definition can be set before the next start.",
-      "STARTING": "The session is starting or a guest is waiting for its world and player.",
-      "RUNNING": "The session has finished startup and the world is available."
     }
   },
   "WorldSessionDefinition": {

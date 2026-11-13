@@ -1,7 +1,7 @@
 ---
 title: "describe_stack"
 sidebarTitle: "describe_stack"
-description: "Host lookup callback taking an item ID."
+description: "Callback that receives a placed item ID and returns a Dictionary with key, quantity, and max_quantity."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var describe_stack: Callable = Callable()
 
 ## Description
 
-Return a dictionary with a nonempty compatibility `key` and positive integer `quantity` and `max_quantity`, with quantity at most the maximum. Return an empty dictionary when the ID has no stack record.
+Return an empty Dictionary when the item has no stack record. Defaults to an empty callable.

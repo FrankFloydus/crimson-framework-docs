@@ -1,7 +1,7 @@
 ---
 title: "transactions"
 sidebarTitle: "transactions"
-description: "Read-only authority transaction coordinator for registering game stores and committing coordinated match state."
+description: "Read-only reference to the coordinated authority's transaction coordinator for registering stores and committing match state."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -22,5 +22,9 @@ var transactions: TransactionCoordinator
 | Type | [`TransactionCoordinator`](/api/classes/TransactionCoordinator) |
 | Access | Read only |
 | Getter | [`get_transactions()`](/api/classes/GameRuntime/methods/get_transactions) |
+
+## Description
+
+Returns `null` in immediate play and on guests.
 
 [See gameplay examples for `GameRuntime`](/api/classes/GameRuntime#examples).

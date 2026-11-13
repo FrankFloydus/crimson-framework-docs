@@ -1,6 +1,6 @@
 ---
 title: "GameSession"
-description: "Owns one offline or network session in the node's MultiplayerAPI scope. ENet handles network sessions by default. For RPC delivery, place the host and client session nodes at matching paths relative to their respective multiplayer roots. Add the node to the tree before starting a session and leave the MultiplayerAPI polling enabled or poll it yourself."
+description: "Owns one offline or networked session in a Godot multiplayer scope."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -9,6 +9,10 @@ description: "Owns one offline or network session in the node's MultiplayerAPI s
 [API Reference](/api/overview) › [Sessions and transport](/api/modules/sessions-and-transport)
 
 **Inherits** `Node`
+
+## Description
+
+Network sessions use ENet by default. A host and its guests use matching session node paths within their multiplayer scopes. Use the scene tree's normal multiplayer polling, or poll the configured `MultiplayerAPI` yourself when automatic polling is disabled. A guest becomes active once the host confirms admission.
 
 ## Methods
 
@@ -80,31 +84,31 @@ Install a Godot offline peer and make the local process authoritative with peer 
 
 `peer_joined(peer_id: int)`
 
-Emitted after a remote connection enters the admitted roster. On a verified host, get\_peer\_identity can read that guest's identity at this point.
+Emitted when an admitted remote peer enters this scope's roster. The peer ID identifies a connection.
 
 ### `peer_left`
 
 `peer_left(peer_id: int)`
 
-Emitted after a remote connection leaves the admitted roster during an active session. Session teardown clears the roster together.
+Emitted when a remote peer leaves the active roster. Ending the entire session clears the roster together.
 
 ### `session_ended`
 
 `session_ended(reason: StringName)`
 
-Emitted when the active session or a pending connection ends. Reasons include `left`, `connection\_failed`, `connection\_timeout`, `protocol\_mismatch`, `server\_disconnected`, `transport\_replaced`, and `transport\_disconnected`. Verified sessions can also end with `authentication\_failed` or `authentication\_replaced`. Removing the node from the tree closes it silently.
+Emitted when a session ends or a pending connection fails. Reasons include `left`, `connection_failed`, `connection_timeout`, `protocol_mismatch`, `server_disconnected`, `transport_replaced`, and `transport_disconnected`. Verified sessions can also report `authentication_failed` or `authentication_replaced`. Removing the session node closes it silently.
 
 ### `session_started`
 
 `session_started(state: int, local_peer_id: int)`
 
-Emitted when an offline session, host, or admitted client becomes active, with its state and local peer ID.
+Emitted after an offline or host session starts, or after the host admits this guest. The peer ID identifies the active connection.
 
 ### `state_changed`
 
 `state_changed(state: int)`
 
-Emitted when the session changes roles, including entering CONNECTING during a join attempt.
+Emitted when the session enters a new `State`, including while waiting for admission.
 
 ## Constants and enums
 
@@ -112,8 +116,8 @@ Emitted when the session changes roles, including entering CONNECTING during a j
 
 | Name | Value | Description |
 | --- | --- | --- |
-| `CLIENT` | `4` | The host has admitted the local client. |
-| `CONNECTING` | `3` | The client is waiting for the host to confirm admission. |
-| `HOSTING` | `2` | The local process is listening as the network authority. |
+| `CLIENT` | `4` | The host has admitted the local guest. |
+| `CONNECTING` | `3` | The guest is connecting or waiting for the host to confirm admission. |
+| `HOSTING` | `2` | The local process listens as the network authority. |
 | `IDLE` | `0` | The session owns no transport. |
-| `OFFLINE` | `1` | The local process is the authority for an offline game. |
+| `OFFLINE` | `1` | The local process owns an offline session and acts as authority. |

@@ -22,13 +22,13 @@ Start a standalone grid with `Inventory.grid(size)` and add items by ID and foot
 | [`InventoryTransactionAdapter`](/api/classes/InventoryTransactionAdapter) | Registers a SpatialInventory snapshot as an authority store so grid edits can commit atomically with other gameplay changes. |
 | [`MatchInventory`](/api/classes/MatchInventory) | A local player's backpack handle for one coordinated match. |
 | [`SpatialInventory`](/api/classes/SpatialInventory) | A native grid inventory keyed by game-supplied item instance IDs. |
-| [`SpatialInventoryActions`](/api/classes/SpatialInventoryActions) | Implements checked moves, swaps, quick transfers, and quantity edits across inventory grids. |
-| [`SpatialInventoryContainers`](/api/classes/SpatialInventoryContainers) | Tracks which grid owns each item and which grid represents a container's contents. |
-| [`SpatialInventoryEquipment`](/api/classes/SpatialInventoryEquipment) | Equipment slots backed by a [`SpatialInventory`](/api/classes/SpatialInventory) backpack. |
+| [`SpatialInventoryActions`](/api/classes/SpatialInventoryActions) | Moves, transfers, and splits placed items between inventory grids. |
+| [`SpatialInventoryContainers`](/api/classes/SpatialInventoryContainers) | Tracks which inventory grid owns each placed item and nested container. |
+| [`SpatialInventoryEquipment`](/api/classes/SpatialInventoryEquipment) | Moves items between a backpack and named equipment slots. |
 | [`SpatialInventorySorter`](/api/classes/SpatialInventorySorter) | Previews a new arrangement for a grid, applies the checked plan, and retains one level of undo. |
-| [`SpatialInventoryStackAdapter`](/api/classes/SpatialInventoryStackAdapter) | Connects placement operations to stack records stored by the game. |
-| [`SpatialInventoryStaging`](/api/classes/SpatialInventoryStaging) | A temporary grid that remembers each staged item's original inventory and placement. |
-| [`SpatialInventoryTrade`](/api/classes/SpatialInventoryTrade) | Coordinates an invitation and item or currency exchange between two actors. |
+| [`SpatialInventoryStackAdapter`](/api/classes/SpatialInventoryStackAdapter) | Connects grid stack operations to item records owned by the game. |
+| [`SpatialInventoryStaging`](/api/classes/SpatialInventoryStaging) | Holds items temporarily and remembers their original placements. |
+| [`SpatialInventoryTrade`](/api/classes/SpatialInventoryTrade) | Manages offers and settlement for a two-participant inventory trade. |
 | [`SpatialInventoryWallet`](/api/classes/SpatialInventoryWallet) | Stores nonnegative integer amounts for positive actor IDs and nonempty StringName currency IDs. |
 
 ## Enums

@@ -1,7 +1,7 @@
 ---
 title: "last_reason"
 sidebarTitle: "last_reason"
-description: "Explanation for the most recent staging outcome."
+description: "Reason reported by the most recent failed staging operation."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -12,7 +12,7 @@ description: "Explanation for the most recent staging outcome."
 ## Signature
 
 ```text
-var last_reason: String
+var last_reason: String = ""
 ```
 
 ## Property details
@@ -21,4 +21,9 @@ var last_reason: String
 | --- | --- |
 | Type | `String` |
 | Access | Read only |
+| Default | `""` |
 | Getter | [`get_last_reason()`](/api/classes/SpatialInventoryStaging/methods/get_last_reason) |
+
+## Description
+
+An operation that succeeds clears the reason.

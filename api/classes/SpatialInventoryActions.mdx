@@ -1,6 +1,6 @@
 ---
 title: "SpatialInventoryActions"
-description: "Implements checked moves, swaps, quick transfers, and quantity edits across inventory grids. Use a SpatialInventoryStackAdapter for host-owned stack records. Action results report a Godot error, reason, how much moved and remains, a selection identifying an inventory and item, and changes identifying items whose views need refreshing."
+description: "Moves, transfers, and splits placed items between inventory grids."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -10,35 +10,39 @@ description: "Implements checked moves, swaps, quick transfers, and quantity edi
 
 **Inherits** `RefCounted`
 
+## Description
+
+Set callbacks to apply game rules when an item leaves or enters a grid. Attach a stack adapter when the game owns stack quantities separately from placements.
+
 ## Properties
 
 **[`allow_rotation`](/api/classes/SpatialInventoryActions/properties/allow_rotation)**
 
-Whether automatic placement can try a rotated footprint.
+Whether automatic placement may try a rotated footprint when looking for a fit.
 
 **[`destination_policy`](/api/classes/SpatialInventoryActions/properties/destination_policy)**
 
-Optional String-returning callback that receives the proposed transfer context for each candidate destination.
+Optional callback that checks each candidate grid during a quick transfer.
 
 **[`destination_provider`](/api/classes/SpatialInventoryActions/properties/destination_provider)**
 
-Optional callback used when a quick transfer receives no explicit destinations.
+Optional callback used when a quick transfer receives an empty destination list.
 
 **[`drop_policy`](/api/classes/SpatialInventoryActions/properties/drop_policy)**
 
-Optional callback receiving `id`, `footprint`, `source`, `destination`, `origin`, `rotated`, `swap_id`, and `action`.
+Optional callback that receives the item and proposed destination placement, including the action and any swap target.
 
 **[`operation_guard`](/api/classes/SpatialInventoryActions/properties/operation_guard)**
 
-Optional `guard(source, destination) -> bool` callback.
+Optional callback that receives the source grid and the destination grid, which can be `null`.
 
 **[`pickup_policy`](/api/classes/SpatialInventoryActions/properties/pickup_policy)**
 
-Optional callback receiving the source placement's `id`, `footprint`, `origin`, and `rotated` fields together with its `source` grid.
+Optional callback that receives the item ID, unrotated footprint, rotation, origin, and source grid before a pickup.
 
 **[`stack_adapter`](/api/classes/SpatialInventoryActions/properties/stack_adapter)**
 
-Adapter for reading and committing game-owned stack records.
+Optional adapter that describes stack quantities and commits their changes together with grid placements.
 
 ## Methods
 
@@ -46,7 +50,7 @@ Adapter for reading and committing game-owned stack records.
 
 #### [`find_items`](/api/classes/SpatialInventoryActions/methods/find_items)
 
-Return IDs for placed items that pass the optional predicate.
+Return the sorted IDs of placed items that pass the optional predicate.
 
 ### Instance methods
 

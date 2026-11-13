@@ -19,3 +19,5 @@ A Crimson multiplayer session has one authority. In a listen game, one player ru
 ENet is the default direct transport. Peers use compatible game builds and the same UDP port. When the host and guest run on one computer, use `127.0.0.1`. Other machines on the LAN use the host's reachable LAN address. In fixed-world play the seat limit includes the listen host. Give the level one spawn marker per possible player.
 
 In coordinated play, a transport peer ID identifies a connection. The game verifies who owns the connection before the authority calls [`bind_player()`](/api/classes/Game/methods/bind_player) with a durable player ID. The authority then starts the match and coordinates scene changes. [Sessions and transport reference](/api/modules/sessions-and-transport) · [Match runtime reference](/api/modules/match-runtime)
+
+Once players can join, give them movement that stays in sync across copies of the game. Then test how it feels when the connection is slow. [Synchronize player movement](/networked-movement) · [Read network diagnostics](/network-diagnostics)

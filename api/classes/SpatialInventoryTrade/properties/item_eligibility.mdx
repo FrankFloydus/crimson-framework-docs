@@ -1,7 +1,7 @@
 ---
 title: "item_eligibility"
 sidebarTitle: "item_eligibility"
-description: "Optional rule receiving stage, actor, other_actor, id, placement, stack, and quantity."
+description: "Optional callback that receives the trade stage, both actor IDs, item ID, placement, stack data, and quantity."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var item_eligibility: Callable = Callable()
 
 ## Description
 
-Return an empty string to allow the offer or exchange.
+Return an empty String or StringName to allow the item, or a reason to deny it. Defaults to an empty callable.

@@ -399,4 +399,6 @@ func _write_profile_batch() -> void:
 
 ## Consume Steam results
 
-Read [`ok`](/api/classes/SteamResult/properties/ok) before using a result's `value`. Some operations expose [`wait()`](/api/classes/SteamOperation/methods/wait) on an operation handle, while convenience methods can be awaited directly. Check the signature in the [API reference](/api/overview). For Steam HTTP, a completed response can still have a 4xx or 5xx status. Check [`response.value.is_successful()`](/api/classes/SteamHttpResponse/methods/is_successful) when you need a 2xx response. For Steam IDs documented as decimal strings, keep them as strings to preserve their full range.
+Read [`ok`](/api/classes/SteamResult/properties/ok) before using a result's `value`. When the operation fails, [`message`](/api/classes/SteamResult/properties/message) describes the failure. Some operations expose [`wait()`](/api/classes/SteamOperation/methods/wait) on a handle, while convenience methods can be awaited directly.
+
+For Steam HTTP, a request can finish and return a 4xx or 5xx response. After checking the operation's `ok`, use [`response.value.is_successful()`](/api/classes/SteamHttpResponse/methods/is_successful) to check for a 2xx response. Keep Steam IDs documented as decimal strings in that form to preserve their full range.

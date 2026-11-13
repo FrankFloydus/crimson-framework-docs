@@ -33,7 +33,7 @@ To update the development reference, use the local framework checkout with the c
 
 ```powershell
 $godot = 'C:\path\to\Godot_v4.7-stable_win64_console.exe'
-python scripts/generate_api.py --framework .. --working-tree --godot $godot
+python scripts/generate_api.py --framework .. --working-tree --include-input --godot $godot
 ```
 
-Add `--check` to compare the checkout with the expected output or `--gaps` to list missing prose. Working tree generation uses the current class XML for trusted publisher pages. Supply a matching `--publisher-dll` or `--publisher-binding-docs` to reflect those bindings too. When tagging the documented API, use its release tag with `--ref` in place of `--working-tree` and supply the matching trusted build or binding export. Run `python scripts/generate_api.py --help` for all options.
+Add `--check` to compare the checkout with the expected output or `--gaps` to list missing prose. Working-tree output leaves out the draft Input and Rebinding pages. Use `--include-input` to preview them locally when the addon build matches. Working-tree generation uses the current class XML for trusted publisher pages. Supply a matching `--publisher-dll` or `--publisher-binding-docs` to reflect those bindings too. When tagging the documented API, use its release tag with `--ref` in place of `--working-tree` and supply the matching trusted build or binding export. Run `python scripts/generate_api.py --help` for all options.

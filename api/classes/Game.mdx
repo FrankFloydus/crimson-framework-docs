@@ -16,6 +16,7 @@ description: "Code-first game actions and services owned by a live scene scope."
 - [Start a training match after a LAN guest joins](/api/classes/Game/methods/bind_player#example)
 - [Open the training room from the title screen](/api/classes/Game/methods/boot_result#example)
 - [Travel to the foundry when the lift arrives](/api/classes/Game/methods/campaign#example)
+- [Encode an ammo update after a rifle burst](/api/classes/Game/methods/codecs#example)
 - [Choose the match for an external debug panel](/api/classes/Game/methods/current#example)
 - [Find an open Spacewar arena](/api/classes/Game/methods/find_and_join#example)
 - [Return to the title screen after a match](/api/classes/Game/methods/for_node#example)
@@ -23,6 +24,7 @@ description: "Code-first game actions and services owned by a live scene scope."
 - [Take a medkit from the aid station](/api/classes/Game/methods/inventory#example)
 - [Host an invite-only Steam arena](/api/classes/Game/methods/invite_friends#example)
 - [Let the player pick a nearby arena server](/api/classes/Game/methods/join_listing#example)
+- [Watch movement corrections on a LAN guest](/api/classes/Game/methods/network_diagnostics#example)
 - [Open a playerless LAN arena](/api/classes/Game/methods/serve#example)
 
 ## Methods
@@ -62,6 +64,10 @@ Bind an identity verified by the game to an admitted peer in the authority lobby
 #### [`boot_result`](/api/classes/Game/methods/boot_result)
 
 Return the original boot outcome.
+
+#### [`codecs`](/api/classes/Game/methods/codecs)
+
+Return the codec registry for this game attachment.
 
 #### [`dismiss_invite`](/api/classes/Game/methods/dismiss_invite)
 
@@ -103,6 +109,10 @@ Return the configured inventory service, or null when disabled.
 
 Request Steam’s invite picker for the current owned lobby.
 
+#### [`is_player_controlled`](/api/classes/Game/methods/is_player_controlled)
+
+Returns true when this fixed-world game was configured with authority-driven player movement.
+
 #### [`join`](/api/classes/Game/methods/join)
 
 Await a verified, playable direct join using the configured port.
@@ -118,6 +128,10 @@ Begin joining a coordinated ENet lobby.
 #### [`leave`](/api/classes/Game/methods/leave)
 
 Await retirement of the pending start or active session.
+
+#### [`network_diagnostics`](/api/classes/Game/methods/network_diagnostics)
+
+Sample local connection and movement state for a debugger.
 
 #### [`open_lobby`](/api/classes/Game/methods/open_lobby)
 

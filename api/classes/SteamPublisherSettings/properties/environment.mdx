@@ -1,7 +1,7 @@
 ---
 title: "environment"
 sidebarTitle: "environment"
-description: "Vendor environment for features with a separate sandbox."
+description: "Choose Live for real Steam Wallet transactions or Sandbox for test transactions through Steam's microtransaction sandbox."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -14,7 +14,7 @@ description: "Vendor environment for features with a separate sandbox."
 ## Signature
 
 ```text
-var environment: SteamPublisherSettings.Environment
+var environment: SteamPublisherSettings.Environment = 0
 ```
 
 ## Property details
@@ -23,9 +23,10 @@ var environment: SteamPublisherSettings.Environment
 | --- | --- |
 | Type | `SteamPublisherSettings.Environment` |
 | Access | Read and write |
+| Default | `0` |
 | Getter | [`get_environment()`](/api/classes/SteamPublisherSettings/methods/get_environment) |
 | Setter | [`set_environment()`](/api/classes/SteamPublisherSettings/methods/set_environment) |
 
 ## Description
 
-The default is `LIVE`.
+Other capabilities use their regular endpoints with the configured AppID in both modes.

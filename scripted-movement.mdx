@@ -1,0 +1,45 @@
+---
+title: "Move an actor from a script"
+description: "Send a supply drone across a room and stop it at the end of its pass."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Use [`Mover`](/api/classes/Mover) when a script or AI decides where an actor should go. In this example, a supply drone crosses a room under its own power. It needs neither player controls nor a game session.
+
+Use a `Node3D` as the drone and attach the script below. Give it a visible mesh and put a camera in the room if you want to watch the pass. The script also prints how far the drone moved.
+
+1. [`Mover.attach(self)`](/api/classes/Mover/methods/attach) makes Crimson update the drone on physics ticks. On a plain `Node3D`, it moves the node directly, so this drone can fly without gravity or collision.
+2. [`move()`](/api/classes/Mover/methods/move) sets a direction and speed in world space. The drone keeps going until you change the velocity or call [`stop()`](/api/classes/Mover/methods/stop).
+
+```gdscript
+extends Node3D
+
+const SPEED: float = 2.0
+const PASS_TIME: float = 2.0
+
+
+func _ready() -> void:
+    var mover: Mover = Mover.attach(self)
+    if mover == null:
+        push_error("Could not attach the supply drone's mover.")
+        return
+
+    var start: Vector3 = global_position
+    var started: Error = mover.move(Vector3.RIGHT * SPEED)
+    if started != OK:
+        push_error(error_string(started))
+        return
+
+    await get_tree().create_timer(PASS_TIME, false, true).timeout
+    var stopped: Error = mover.stop()
+    if stopped != OK:
+        push_error(error_string(stopped))
+        return
+
+    print("Supply drone stopped after %.1f m." % start.distance_to(global_position))
+```
+
+Run the room. The drone travels about four metres to the right and then stops. Check the distance in **Output**.
+
+If the actor needs to walk and collide with the floor, use a `CharacterBody3D` and pass [`Locomotion.ground()`](/api/classes/Locomotion/methods/ground) as the rule when you attach it. Grounded movement uses the rule's acceleration, braking, and gravity. [MotionRule reference](/api/classes/MotionRule) · [Player movement](/player-controls)

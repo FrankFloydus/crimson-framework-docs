@@ -1,7 +1,7 @@
 ---
 title: "initiator"
 sidebarTitle: "initiator"
-description: "Actor ID that requested the trade, or 0 when idle."
+description: "Actor ID that requested the trade."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -23,3 +23,7 @@ var initiator: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_initiator()`](/api/classes/SpatialInventoryTrade/methods/get_initiator) |
+
+## Description
+
+A value of `0` means there is no initiator.

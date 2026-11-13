@@ -1,6 +1,6 @@
 ---
 title: "SpatialInventoryTrade"
-description: "Coordinates an invitation and item or currency exchange between two actors. Register each actor with a backpack and route all offer edits through this model. The game owns authoritative item and identity records. Trade actions return dictionaries with a Godot error, reason, changed placements, and completion details when applicable."
+description: "Manages offers and settlement for a two-participant inventory trade."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -10,31 +10,35 @@ description: "Coordinates an invitation and item or currency exchange between tw
 
 **Inherits** `RefCounted`
 
+## Description
+
+Register the participants and their grids before requesting a trade. Once accepted, both participants can edit their offers until they lock them for settlement.
+
 ## Properties
 
 **[`allocate_stack_id`](/api/classes/SpatialInventoryTrade/properties/allocate_stack_id)**
 
-Optional callback taking a source item ID and returning a new unique ID for an escrow or split stack.
+Callback that receives the source stack ID and supplies a new, unused item ID when an operation splits a stack.
 
 **[`apply_stack_changes`](/api/classes/SpatialInventoryTrade/properties/apply_stack_changes)**
 
-Optional callback for synchronous expected-value stack edits.
+Callback that receives proposed stack edits and a placement commit callable.
 
 **[`describe_stack`](/api/classes/SpatialInventoryTrade/properties/describe_stack)**
 
-Optional callback taking an item ID and returning its stack compatibility key, quantity, and maximum quantity in a dictionary.
+Optional callback that receives an item ID and returns a Dictionary with `key`, `quantity`, and `max_quantity`.
 
 **[`initiator`](/api/classes/SpatialInventoryTrade/properties/initiator)**
 
-Actor ID that requested the trade, or 0 when idle.
+Actor ID that requested the trade.
 
 **[`item_eligibility`](/api/classes/SpatialInventoryTrade/properties/item_eligibility)**
 
-Optional rule receiving `stage`, `actor`, `other_actor`, `id`, `placement`, `stack`, and `quantity`.
+Optional callback that receives the trade stage, both actor IDs, item ID, placement, stack data, and quantity.
 
 **[`participant_eligibility`](/api/classes/SpatialInventoryTrade/properties/participant_eligibility)**
 
-Optional rule receiving `stage`, `actor`, and `other_actor`.
+Optional callback that receives the trade stage and both actor IDs.
 
 **[`phase`](/api/classes/SpatialInventoryTrade/properties/phase)**
 
@@ -42,15 +46,15 @@ Current trade phase.
 
 **[`receiver`](/api/classes/SpatialInventoryTrade/properties/receiver)**
 
-Actor ID invited to trade, or 0 when idle.
+Actor ID that received the trade request.
 
 **[`revision`](/api/classes/SpatialInventoryTrade/properties/revision)**
 
-Revision of committed trade edits.
+Current trade revision.
 
 **[`wallet`](/api/classes/SpatialInventoryTrade/properties/wallet)**
 
-Wallet consulted for proposed amounts and updated as part of settling currency offers.
+Optional wallet that supplies balances and commits currency transfers during settlement.
 
 ## Methods
 
@@ -214,16 +218,16 @@ Attach the wallet used to check funds and commit currency balances during settle
 
 | Name | Value | Description |
 | --- | --- | --- |
-| `MAX_BALANCE` | `9223372036854775807` | Largest supported nonnegative balance or currency amount. |
-| `MAX_CURRENCIES_PER_OFFER` | `32` | Maximum number of distinct currencies one actor may offer. |
-| `MAX_RETURN_SOURCES` | `64` | Maximum number of source allocations in a return. |
-| `MAX_SNAPSHOT_REVISION` | `4611686018427387903` | Largest trade revision accepted when importing a snapshot. |
-| `SNAPSHOT_VERSION` | `2` | Version of the exported trade snapshot schema. |
+| `MAX_BALANCE` | `9223372036854775807` | Largest supported nonnegative balance, expressed in whole currency units. |
+| `MAX_CURRENCIES_PER_OFFER` | `32` | Maximum number of distinct currency IDs in one participant's offer. |
+| `MAX_RETURN_SOURCES` | `64` | Maximum number of source allocations tracked for returning an offered stack. |
+| `MAX_SNAPSHOT_REVISION` | `4611686018427387903` | Exclusive upper bound for a revision restored from a trade snapshot. |
+| `SNAPSHOT_VERSION` | `2` | Version used when exporting a trade snapshot. |
 
 ### `Phase`
 
 | Name | Value | Description |
 | --- | --- | --- |
-| `ACTIVE` | `2` | Both actors have accepted the invitation. Unlocked offers can be edited. |
-| `IDLE` | `0` | There is no pending invitation or active trade. |
-| `REQUESTED` | `1` | An invitation is waiting for the receiver to accept or a participant to cancel. |
+| `ACTIVE` | `2` | The request was accepted. Participants can manage and lock their offers. |
+| `IDLE` | `0` | There is no open trade request or active trade. |
+| `REQUESTED` | `1` | The initiator sent a request and the receiver can accept it. |

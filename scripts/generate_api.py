@@ -38,27 +38,46 @@ SOURCE_GROUPS = {
     "integration/game": "Game runtime",
     "integration/online/steam": "Steam multiplayer",
     "integration/world_session": "World sessions",
+    "integration/player_control": "Player controls",
+    "modules/input": "Input",
+    "modules/input/rebinding": "Input",
+    "modules/mover": "Mover",
     "modules/inventory": "Inventory",
     "integration/adapters": "Inventory",
     "modules/match_runtime": "Match runtime",
-    "modules/replication": "Replication",
+    "modules/network": "Network",
     "modules/save": "Save and restore",
-    "modules/scene_load": "Scene loading",
+    "modules/scene_manager": "Scene Manager",
     "modules/session": "Sessions and transport",
     "modules/steam": "Steamworks",
     "modules/steam/publisher": TRUSTED_PUBLISHER,
+}
+LEGACY_SOURCE_GROUPS = {
+    "modules/rebinding": "Input",
+    "modules/replication": "Network",
+    "modules/scene_load": "Scene Manager",
+}
+PUBLISHED_MODULE_ROUTES = {
+    ("Input", "Rebinding"): "api/modules/rebinding",
+    ("Network", None): "api/modules/replication",
+    ("Scene Manager", None): "api/modules/scene-loading",
 }
 REFLECTED_GROUPS = {
     "Game runtime": "GameOperation GameServices OnlineDirectory OnlineDirectoryRequest SceneService",
     "Inventory": "InventoryTransactionAdapter",
     "Match runtime": "CommandRouter GameTransaction PlayerBindings PlayerPossession TransactionCoordinator",
-    "Replication": "StateReplication",
+    "Network": "StateReplication",
     "Save and restore": "SaveCoordinator SavePresentation SaveRequest SaveSlot",
-    "Scene loading": "SceneLoadManager",
+    "Scene Manager": "SceneLoadManager",
     "Sessions and transport": (
         "ENetSessionTransport GameSession SessionAuthenticator SessionAuthRequest SessionEndpoint "
         "SessionIdentity SessionTransport SessionTransportResult"
     ),
+}
+INPUT_GROUPS = {
+    "Actions and bindings": "Controls InputAction InputActionMap InputActionMapping InputBinding InputLayout",
+    "Modifiers": "InputDeadZone InputModifier InputSwapAxis",
+    "Rebinding": "BindingSlot Rebinding RebindResult",
 }
 STEAM_GROUPS = {
     "Client and results": (
@@ -85,7 +104,7 @@ STEAM_GROUPS = {
     ),
 }
 GAME_GROUPS = {
-    "Code-first game": "Game GameBindings GameConfig GameProvider GameResult GameScenes WorldDefinition",
+    "Code-first game": "Game GameBindings GameConfig GameNetworkDiagnostics GameProvider GameResult GameScenes WorldDefinition",
     "Lower-level runtime": (
         "GameDefinition GameOperation GameRuntime GameServiceProvider GameServices GameVoice MultiplayerRules "
         "OnlineDirectory SceneService"
@@ -114,6 +133,7 @@ AWAITED_RESULTS = {
     )},
     "GameOperation": {"wait": "Dictionary", "wait_result": "GameResult"},
     "GameScenes": {"load": "GameResult"},
+    "Rebinding": {"rebind": "RebindResult"},
 }
 BBCODE = re.compile(r"\[code\](.*?)\[/code\]|\[([A-Za-z_][\w.]*)(?: ([^\]\n]+))?\]", re.DOTALL)
 
@@ -175,7 +195,10 @@ def add_authored_class(classes: dict[str, ClassDoc], source_path: str, root: ET.
     name = root.attrib["name"]
     if name in classes:
         raise ValueError(f"Duplicate authored XML for {name}.")
-    classes[name] = ClassDoc(name, SOURCE_GROUPS[area], root, None)
+    group = SOURCE_GROUPS.get(area) or LEGACY_SOURCE_GROUPS.get(area)
+    if group is None:
+        raise ValueError(f"Assign {source_path} to an API module.")
+    classes[name] = ClassDoc(name, group, root, None)
 
 
 def read_working_tree(framework: Path) -> dict[str, ClassDoc]:
@@ -592,6 +615,9 @@ def render_class(
 
 def module_route(group: str, section: str | None = None) -> str:
     """Return the route of a module or service area landing page."""
+    published_route = PUBLISHED_MODULE_ROUTES.get((group, section))
+    if published_route:
+        return published_route
     labels = (group, section) if section else (group,)
     slugs = [re.sub(r"[^a-z0-9]+", "-", label.lower()).strip("-") for label in labels]
     return "/".join(("api/modules", *slugs))
@@ -599,7 +625,7 @@ def module_route(group: str, section: str | None = None) -> str:
 
 def service_sections(group: str) -> dict[str, str]:
     """Return the service or usage areas defined for a module."""
-    return {"Game runtime": GAME_GROUPS, "Steamworks": STEAM_GROUPS,
+    return {"Game runtime": GAME_GROUPS, "Input": INPUT_GROUPS, "Steamworks": STEAM_GROUPS,
             TRUSTED_PUBLISHER: PUBLISHER_GROUPS}.get(group, {})
 
 
@@ -685,7 +711,7 @@ def render_module_pages(classes: dict[str, ClassDoc], members: dict,
         if None in sections:
             lines.extend(render_catalog_listing(sections[None], members, descriptions, known_classes))
         else:
-            area_label = "API areas" if group == "Game runtime" else "Service areas"
+            area_label = "API areas" if group in {"Game runtime", "Input"} else "Service areas"
             lines.extend([f"## {area_label}", "", "| Area | Purpose |", "| --- | --- |"])
             for section, docs in sections.items():
                 area = entry["sections"][section]
@@ -945,17 +971,20 @@ def render_member_page(doc: ClassDoc, category: str, name: str, member: MemberDo
     return "\n".join(lines).rstrip() + "\n"
 
 
-def load_member_examples(example_keys: set[str]) -> dict[str, MemberExample]:
+def load_member_examples(example_keys: set[str], omitted_classes: set[str]) -> dict[str, MemberExample]:
     """Load authored examples and let shared gameplay workflows take precedence."""
     scripts = DOCS_ROOT / "scripts"
     overrides = json.loads((scripts / "api-member-examples.json").read_text(encoding="utf-8-sig"))
-    examples = {key: MemberExample(script) for key, script in overrides.items()}
+    examples = {key: MemberExample(script) for key, script in overrides.items()
+                if key.split(".", 1)[0] not in omitted_classes}
     workflows = {}
     for path in sorted((scripts / "api-workflow-examples").glob("*.json")):
         for workflow in json.loads(path.read_text(encoding="utf-8-sig")):
             example = MemberExample(workflow["code"], workflow["title"], workflow["setup"])
             if not workflow["members"] or not all(value.strip() for value in (example.script, example.title, example.setup)):
                 raise ValueError(f"Incomplete gameplay example in {path.name}.")
+            if any(key.split(".", 1)[0] in omitted_classes for key in workflow["members"]):
+                continue
             for key in workflow["members"]:
                 if key not in example_keys:
                     raise ValueError(f"Unknown member example {key} in {path.name}.")
@@ -978,6 +1007,7 @@ def main() -> None:
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--ref", help="Crimson Framework release tag, for example v0.0.3")
     source.add_argument("--working-tree", action="store_true", help="Use current source XML and the staged project addon")
+    parser.add_argument("--include-input", action="store_true", help="Include the draft Input and Rebinding API in working-tree output")
     parser.add_argument("--godot", type=Path, help="Path to the matching Windows Godot console executable")
     parser.add_argument("--binding-docs", type=Path, help="Previously extracted standard Godot class XML directory")
     publisher = parser.add_mutually_exclusive_group()
@@ -988,6 +1018,8 @@ def main() -> None:
     mode.add_argument("--gaps", action="store_true", help="Print undocumented declarations in overlay JSON format")
     mode.add_argument("--check", action="store_true", help="Check that generated API pages and navigation are current")
     args = parser.parse_args()
+    if args.include_input and not args.working_tree:
+        parser.error("--include-input applies only to --working-tree.")
     if args.binding_docs is None and args.godot is None:
         parser.error("Supply --godot or --binding-docs for the standard release.")
     if args.publisher_dll and args.godot is None:
@@ -1001,12 +1033,15 @@ def main() -> None:
             addon = framework / "framework" / "project" / Path(ADDON_PATH).parent
         else:
             classes, addon = read_release(framework, args.ref)
+        omitted = {name for name, doc in classes.items() if doc.group == "Input"
+                   and args.working_tree and not args.include_input}
+        classes = {name: doc for name, doc in classes.items() if name not in omitted}
         runtime = read_bindings(args.binding_docs) if args.binding_docs else reflect(args.godot, addon)
-        add_bindings(classes, runtime)
-        if args.publisher_binding_docs:
-            add_bindings(classes, read_bindings(args.publisher_binding_docs), publisher=True)
-        elif args.publisher_dll:
-            add_bindings(classes, reflect(args.godot, addon, args.publisher_dll), publisher=True)
+        add_bindings(classes, {name: root for name, root in runtime.items() if name not in omitted})
+        if args.publisher_binding_docs or args.publisher_dll:
+            publisher = (read_bindings(args.publisher_binding_docs) if args.publisher_binding_docs
+                         else reflect(args.godot, addon, args.publisher_dll))
+            add_bindings(classes, {name: root for name, root in publisher.items() if name not in omitted}, publisher=True)
         members = {name: collect_members(doc) for name, doc in classes.items()}
         descriptions = load_overlays(classes, members)
         add_property_accessors(members)
@@ -1022,7 +1057,7 @@ def main() -> None:
         example_keys = {f"{name}.{category}.{member_name}"
                         for name in classes for category in ("methods", "properties")
                         for member_name in members[name][category]}
-        examples = load_member_examples(example_keys)
+        examples = load_member_examples(example_keys, omitted)
         workflow_links = defaultdict(dict)
         for key, example in sorted(examples.items()):
             if example.title:

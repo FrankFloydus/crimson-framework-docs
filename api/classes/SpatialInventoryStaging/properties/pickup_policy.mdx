@@ -1,7 +1,7 @@
 ---
 title: "pickup_policy"
 sidebarTitle: "pickup_policy"
-description: "Optional policy called with a source placement context."
+description: "Optional callback that receives the item and source placement before an item is picked up."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var pickup_policy: Callable = Callable()
 
 ## Description
 
-Use the same context contract as [`SpatialInventoryActions`](/api/classes/SpatialInventoryActions).
+Return an empty String to allow the pickup or a reason to deny it. Defaults to an empty callable.

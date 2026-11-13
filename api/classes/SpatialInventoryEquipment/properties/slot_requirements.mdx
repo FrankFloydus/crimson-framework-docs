@@ -1,7 +1,7 @@
 ---
 title: "slot_requirements"
 sidebarTitle: "slot_requirements"
-description: "Optional slot_requirements(id, requested_slot) callback."
+description: "Optional callback that receives an item ID and the requested slot."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var slot_requirements: Callable = Callable()
 
 ## Description
 
-Return all occupied slot IDs or a denial string. By default an item occupies just the requested slot.
+Return an Array of distinct configured slot names that includes the requested slot, or a String or StringName explaining why the item cannot be equipped. The default empty callable uses just the requested slot.

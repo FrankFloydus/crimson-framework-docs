@@ -1,6 +1,6 @@
 ---
 title: "SpatialInventoryStaging"
-description: "A temporary grid that remembers each staged item's original inventory and placement. Use its transfer methods to preserve origin tracking. An unsuccessful bulk restore leaves the staged items in the tray."
+description: "Holds items temporarily and remembers their original placements."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -10,27 +10,31 @@ description: "A temporary grid that remembers each staged item's original invent
 
 **Inherits** `RefCounted`
 
+## Description
+
+A tray can return all its staged items as one checked operation. If the return fails, the tray retains the items.
+
 ## Properties
 
 **[`batch_policy`](/api/classes/SpatialInventoryStaging/properties/batch_policy)**
 
-Optional policy called with all before-and-after placement rows during a bulk restore.
+Optional callback that receives all proposed placement changes before the tray restores its contents.
 
 **[`drop_policy`](/api/classes/SpatialInventoryStaging/properties/drop_policy)**
 
-Optional policy called with a destination placement context.
+Optional callback that receives the item and proposed destination placement, including a placement in its original grid during restoration.
 
 **[`inventory`](/api/classes/SpatialInventoryStaging/properties/inventory)**
 
-The live grid used by the staging tray.
+The tray's own grid.
 
 **[`last_reason`](/api/classes/SpatialInventoryStaging/properties/last_reason)**
 
-Explanation for the most recent staging outcome.
+Reason reported by the most recent failed staging operation.
 
 **[`pickup_policy`](/api/classes/SpatialInventoryStaging/properties/pickup_policy)**
 
-Optional policy called with a source placement context.
+Optional callback that receives the item and source placement before an item is picked up.
 
 ## Methods
 

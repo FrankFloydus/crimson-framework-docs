@@ -28,4 +28,4 @@ apply_balance_changes(changes: Array, commit: Callable = Callable()) -> Error
 
 ## Description
 
-A stale expected balance returns `ERR_BUSY`. Stage the full batch before the optional no-argument commit callback. A callback error rolls all balances back.
+A stale expected balance returns `ERR_BUSY`. The default wallet stages the full batch before the optional no-argument commit callback. Any callback failure rolls those balances back. An invalid callback result is reported as `ERR_INVALID_DATA`. A scripted wallet must implement rollback for its own store.

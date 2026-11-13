@@ -8,7 +8,6 @@
     }
   },
   "GameSession": {
-    "description": "Owns one offline or network session in the node's MultiplayerAPI scope. ENet handles network sessions by default. For RPC delivery, place the host and client session nodes at matching paths relative to their respective multiplayer roots. Add the node to the tree before starting a session and leave the MultiplayerAPI polling enabled or poll it yourself.",
     "methods": {
       "get_authenticator": "Return the authenticator selected for network starts, or null when the scope uses its existing authentication policy.",
       "get_connected_peer_ids": "Return the current admitted remote connection IDs in ascending order. The scope's relay configuration determines which other guests a client sees.",
@@ -25,20 +24,6 @@
       "set_authenticator": "Select a SessionAuthenticator for future network sessions. Pass null to retain the multiplayer scope's own authentication policy. Returns ERR_BUSY unless the session is idle and no start or teardown is in progress.",
       "set_transport_adapter": "Select a SessionTransport for future network sessions. Pass null to use ENet. Offline startup always uses Godot's offline peer. Returns ERR_BUSY unless the session is idle and no start or teardown is in progress.",
       "start_offline": "Install a Godot offline peer and make the local process authoritative with peer ID 1. Returns OK on success or an error if the node cannot claim the multiplayer scope."
-    },
-    "signals": {
-      "peer_joined": "Emitted after a remote connection enters the admitted roster. On a verified host, get_peer_identity can read that guest's identity at this point.",
-      "peer_left": "Emitted after a remote connection leaves the admitted roster during an active session. Session teardown clears the roster together.",
-      "session_ended": "Emitted when the active session or a pending connection ends. Reasons include `left`, `connection_failed`, `connection_timeout`, `protocol_mismatch`, `server_disconnected`, `transport_replaced`, and `transport_disconnected`. Verified sessions can also end with `authentication_failed` or `authentication_replaced`. Removing the node from the tree closes it silently.",
-      "session_started": "Emitted when an offline session, host, or admitted client becomes active, with its state and local peer ID.",
-      "state_changed": "Emitted when the session changes roles, including entering CONNECTING during a join attempt."
-    },
-    "constants": {
-      "IDLE": "The session owns no transport.",
-      "OFFLINE": "The local process is the authority for an offline game.",
-      "HOSTING": "The local process is listening as the network authority.",
-      "CONNECTING": "The client is waiting for the host to confirm admission.",
-      "CLIENT": "The host has admitted the local client."
     }
   },
   "SessionAuthRequest": {

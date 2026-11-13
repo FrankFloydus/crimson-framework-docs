@@ -1,7 +1,7 @@
 ---
 title: "batch_policy"
 sidebarTitle: "batch_policy"
-description: "Optional policy called with all before-and-after placement rows during a bulk restore."
+description: "Optional callback that receives all proposed placement changes before the tray restores its contents."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var batch_policy: Callable = Callable()
 
 ## Description
 
-Return an empty String to approve the batch.
+Return an empty String to allow the batch or a reason to deny it. Defaults to an empty callable.

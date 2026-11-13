@@ -1,7 +1,7 @@
 ---
 title: "receiver"
 sidebarTitle: "receiver"
-description: "Actor ID invited to trade, or 0 when idle."
+description: "Actor ID that received the trade request."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -23,3 +23,7 @@ var receiver: int = 0
 | Access | Read only |
 | Default | `0` |
 | Getter | [`get_receiver()`](/api/classes/SpatialInventoryTrade/methods/get_receiver) |
+
+## Description
+
+A value of `0` means there is no receiver.

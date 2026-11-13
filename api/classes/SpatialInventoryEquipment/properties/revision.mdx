@@ -1,7 +1,7 @@
 ---
 title: "revision"
 sidebarTitle: "revision"
-description: "Revision of committed equipment state."
+description: "Current committed equipment revision."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -12,7 +12,7 @@ description: "Revision of committed equipment state."
 ## Signature
 
 ```text
-var revision: int
+var revision: int = 0
 ```
 
 ## Property details
@@ -21,8 +21,9 @@ var revision: int
 | --- | --- |
 | Type | `int` |
 | Access | Read only |
+| Default | `0` |
 | Getter | [`get_revision()`](/api/classes/SpatialInventoryEquipment/methods/get_revision) |
 
 ## Description
 
-Compare it with a prior preview revision to detect changes.
+Use it to tell whether equipment changed since a preview.

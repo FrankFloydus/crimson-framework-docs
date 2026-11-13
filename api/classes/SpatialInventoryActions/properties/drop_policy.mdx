@@ -1,7 +1,7 @@
 ---
 title: "drop_policy"
 sidebarTitle: "drop_policy"
-description: "Optional callback receiving id, footprint, source, destination, origin, rotated, swap_id, and action."
+description: "Optional callback that receives the item and proposed destination placement, including the action and any swap target."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -27,4 +27,4 @@ var drop_policy: Callable = Callable()
 
 ## Description
 
-Stack edits can add target or quantity fields. Return an empty String to allow the edit.
+Return an empty String to allow it or a reason to deny it. The default empty callable allows placements that pass the grid checks.

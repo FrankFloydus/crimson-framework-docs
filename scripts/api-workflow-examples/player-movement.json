@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Face a practice target and circle it",
+    "setup": "On an upright player with a camera and configured controls, choose **Lock-On** and assign the practice target. Press **L** to face it and circle, then press **L** again to return to moving relative to the view. [Set up the practice target](/player-controls#face-a-practice-target)",
+    "code": "extends CharacterBody3D\n\nconst CAMERA_PATH: NodePath = ^\"Camera3D\"\nconst LOCK_KEY: Key = KEY_L\n\n## The practice target this test can select.\n@export var practice_target: Node3D\n\nvar _player_control: PlayerControl\nvar _target_locked: bool = false\n\n\nfunc _ready() -> void:\n    var controls: ControlsComponent = ControlsComponent.for_body(self)\n    var camera: Camera3D = get_node_or_null(CAMERA_PATH) as Camera3D\n    if controls == null or camera == null:\n        push_error(\"Add one ControlsComponent and a Camera3D named Camera3D.\")\n        return\n\n    _player_control = controls.boot(camera)\n    if _player_control == null:\n        push_error(\"The player controls could not attach.\")\n    elif not _player_control.is_ready():\n        push_error(_player_control.get_message())\n\n\nfunc _unhandled_key_input(event: InputEvent) -> void:\n    var key: InputEventKey = event as InputEventKey\n    if key == null or not key.pressed or key.echo or key.keycode != LOCK_KEY:\n        return\n    if _player_control == null or not _player_control.is_ready():\n        return\n\n    if _target_locked:\n        _player_control.clear_lock_on()\n        _target_locked = false\n        return\n\n    var result: Error = _player_control.lock_on(practice_target)\n    if result != OK:\n        push_warning(\"Could not face the practice target: %s\" % error_string(result))\n        return\n\n    _target_locked = true\n",
+    "members": [
+      "ControlsComponent.methods.for_body",
+      "ControlsComponent.methods.boot",
+      "PlayerControl.methods.is_ready",
+      "PlayerControl.methods.lock_on",
+      "PlayerControl.methods.clear_lock_on"
+    ]
+  },
+  {
+    "title": "Watch movement corrections on a LAN guest",
+    "setup": "Put the label under the persistent game owner and move around as a predicting LAN guest. It shows outstanding inputs and the most recent correction in metres. [Synchronize player movement](/networked-movement)",
+    "code": "extends Label\n\nfunc _process(_delta: float) -> void:\n    var game: Game = Game.for_node(self)\n    if game == null:\n        text = \"Waiting for the game.\"\n        return\n\n    var sample: GameNetworkDiagnostics = game.network_diagnostics()\n    if sample.player_number == 0:\n        text = \"Waiting for a local player.\"\n        return\n\n    if sample.movement_mode != GameNetworkDiagnostics.GUEST_PREDICTED:\n        text = \"Player %d: %s\" % [sample.player_number, sample.authority_position]\n        return\n\n    text = \"Player %d: %d pending inputs, last correction %.2f m.\" % [\n        sample.player_number, sample.pending_inputs, sample.correction_distance\n    ]\n",
+    "members": [
+      "Game.methods.network_diagnostics",
+      "GameNetworkDiagnostics.properties.player_number",
+      "GameNetworkDiagnostics.properties.authority_position",
+      "GameNetworkDiagnostics.properties.movement_mode",
+      "GameNetworkDiagnostics.properties.pending_inputs",
+      "GameNetworkDiagnostics.properties.correction_distance"
+    ]
+  }
+]

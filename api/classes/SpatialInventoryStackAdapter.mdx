@@ -1,6 +1,6 @@
 ---
 title: "SpatialInventoryStackAdapter"
-description: "Connects placement operations to stack records stored by the game. Build a merge or split plan from live records, then commit it through your synchronous record callback. Use invalidate_stack_records after external edits to the host records."
+description: "Connects grid stack operations to item records owned by the game."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
@@ -10,15 +10,19 @@ description: "Connects placement operations to stack records stored by the game.
 
 **Inherits** `RefCounted`
 
+## Description
+
+Set both callbacks to support merges and splits while keeping placement and quantity changes consistent.
+
 ## Properties
 
 **[`apply_changes`](/api/classes/SpatialInventoryStackAdapter/properties/apply_changes)**
 
-Host `apply_changes(rows, commit) -> Error` callback.
+Callback that receives the proposed stack edits and an optional placement commit callable.
 
 **[`describe_stack`](/api/classes/SpatialInventoryStackAdapter/properties/describe_stack)**
 
-Host lookup callback taking an item ID.
+Callback that receives a placed item ID and returns a Dictionary with `key`, `quantity`, and `max_quantity`.
 
 ## Methods
 

@@ -1,0 +1,124 @@
+---
+title: "Synchronize player movement"
+description: "Give a LAN guest responsive movement while the server resolves collision and keeps players in sync."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Use networked movement when players need to walk and jump around the same level. The server decides the final position and collision result. With **prediction**, a guest sees their own character move immediately. When the server sends its latest position, the guest starts from that position and reapplies any newer input. This is called **reconciliation**. Other players see movement smoothed between server updates.
+
+## Prepare a level for prediction
+
+- `res://world.tscn` has a `Node3D` root, a visible floor with static collision, a light, and two `Marker3D` children under `SpawnPoints`. Place the markers apart and high enough for the player capsules to clear the floor.
+- `res://player.tscn` has an unscaled, upright `CharacterBody3D` root, one unrotated `CapsuleShape3D` on a direct `CollisionShape3D` child, and one `Camera3D` named `Camera3D`. Center the capsule on X and Z. You can raise it on Y. Add a direct child mesh to show other players. Put the mesh in the `crimson_local_hidden` group to hide it from its own player.
+- Add one [MoverComponent](/api/classes/MoverComponent) and one [ControlsComponent](/api/classes/ControlsComponent) directly under the body. Use a Controls component with an existing compatible layout for movement, look, and jump. For mouse look, enable [Capture Pointer on Boot](/api/classes/ControlsComponent/properties/capture_pointer_on_boot).
+- `res://main.tscn` has a `Node` root with the script below. Run the same project in both instances so their level collision, capsule settings, and physics tick rate match.
+
+Prediction uses static collision for replay. Use it for a level with fixed floors, walls, and obstacles. Under **Network** on the Mover component, leave [Predict Movement](/api/classes/MoverComponent/properties/predict_movement) off on the authority if players need collision with moving platforms, other players, or rigid bodies, or if the level changes gravity through an `Area3D`. A guest can leave its own prediction off to follow server position updates.
+
+## Use the same player scene in both windows
+
+1. Turn on **Network → Predict Movement** on the Mover component. Call [`player_controls()`](/api/classes/GameConfig/methods/player_controls) before boot so the game can read the scene's mover settings.
+2. Listen for [`world_ready`](/api/classes/Game#signals) and [boot the Controls component](/api/classes/ControlsComponent/methods/boot) on your local body with its camera. A dedicated server reads the same mover settings and has no local player to attach. [Dedicated LAN server](/dedicated-lan)
+3. Await [`host()`](/api/classes/Game/methods/host) or [`join()`](/api/classes/Game/methods/join). Check the result before reading the connection snapshot through [`network_diagnostics()`](/api/classes/Game/methods/network_diagnostics).
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://world.tscn")
+const PLAYER: PackedScene = preload("res://player.tscn")
+const ADDRESS: String = "127.0.0.1"
+const CAMERA_PATH: NodePath = ^"Camera3D"
+const HOST_KEY: Key = KEY_H
+const JOIN_KEY: Key = KEY_J
+const SNAPSHOT_KEY: Key = KEY_F9
+
+var game: Game
+var starting: bool = false
+
+
+func _ready() -> void:
+    game = Game.configure(LEVEL, PLAYER).lan().player_controls().boot(self)
+    var result: GameResult = game.boot_result()
+    if not result.ok:
+        push_error(result.message)
+        return
+    game.world_ready.connect(_attach_local_player)
+
+
+func _attach_local_player(_world: StringName, _epoch: int) -> void:
+    var body: CharacterBody3D = game.get_local_player() as CharacterBody3D
+    if body == null:
+        return
+    var controls: ControlsComponent = ControlsComponent.for_body(body)
+    if controls == null:
+        push_error("Add a ControlsComponent directly under the player body.")
+        return
+    var view: Camera3D = body.get_node_or_null(CAMERA_PATH) as Camera3D
+    if view == null:
+        push_error("Add a Camera3D named Camera3D to the player body.")
+        return
+    var player: PlayerControl = controls.boot(view)
+    if player == null:
+        push_error("Check the player's ControlsComponent.")
+    elif not player.is_ready():
+        push_error(player.get_message())
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+    if game == null or not game.boot_result().ok:
+        return
+    var key: InputEventKey = event as InputEventKey
+    if key == null or not key.pressed or key.echo or starting:
+        return
+    if key.keycode == SNAPSHOT_KEY:
+        _print_movement()
+        return
+    if game.get_phase() != Game.IDLE or key.keycode not in [HOST_KEY, JOIN_KEY]:
+        return
+
+    starting = true
+    var result: GameResult
+    if key.keycode == HOST_KEY:
+        result = await game.host(ADDRESS)
+    else:
+        result = await game.join(ADDRESS)
+    starting = false
+    if not result.ok:
+        push_error(result.message)
+        return
+    _print_movement()
+
+
+func _print_movement() -> void:
+    var stats: GameNetworkDiagnostics = game.network_diagnostics()
+    if stats.player_number == 0:
+        print("No local player is ready yet.")
+        return
+    print("Player ", stats.player_number, " at ", stats.authority_position)
+    if stats.movement_mode == GameNetworkDiagnostics.GUEST_PREDICTED:
+        print("Predicted position ", stats.predicted_position, ", pending inputs ", stats.pending_inputs)
+```
+
+Run two instances. Press **H** in the first window and wait for `Player 1`. Press **J** in the second and look for `Player 2` and its predicted position. Walk toward a wall and stop. Use your jump control once while standing on the floor. Watch the other player's body rise and land in each window. Press **F9** for a new snapshot. [`player_number`](/api/classes/GameNetworkDiagnostics/properties/player_number) is the local player's one-based spawn slot. A process with no local player reports `0`. [Run multiple Godot instances](https://docs.godotengine.org/en/4.7/tutorials/scripting/debug/overview_of_debugging_tools.html#customize-run-instances)
+
+## Choose how the player turns and jumps
+
+Set the Mover's [Controller Style](/api/classes/MoverComponent/properties/controller_style) in the shared player scene. Compare the guest's body in the host window to see what other players see.
+
+| Style | What the player sees |
+| --- | --- |
+| **FPS / Shoulder Aim** | With **View Heading**, the body turns with the horizontal camera angle. Forward moves where the player is looking. |
+| **Free-Orbit Third Person** | Looking around while standing still keeps the body's facing. Moving turns the body toward the direction of travel. |
+| **Forward-Only Third Person** | The body turns toward the requested direction, then moves along its own facing. A sharp turn can slow the player until they face the new direction. |
+| **Lock-On** | The body faces the selected target while the player circles or backs away. Your targeting code can call [`lock_on()`](/api/classes/PlayerControl/methods/lock_on) and [`clear_lock_on()`](/api/classes/PlayerControl/methods/clear_lock_on). |
+
+[Jump Speed](/api/classes/MoverComponent/properties/jump_speed) sets the upward takeoff speed. Set it to `0` to disable takeoff. [Air Control](/api/classes/MoverComponent/properties/air_control) controls how much the player can steer before landing. The server applies a jump press while the body is grounded. Holding the jump control through landing does not repeat the jump. In Lock-On, the network carries the requested heading. Validate the target on the server for gameplay such as hits and abilities.
+
+## Diagnose a failed join or unexpected movement
+
+- For `incompatible_rules`, check that both instances use the same level collision, capsule, physics tick rate, controller style, and movement tuning. Prediction supports physics rates up to 120 Hz. Restart both processes after editing movement settings.
+- If a player falls, check that the floor has static collision, the player's collision mask includes it, and each spawn marker places the capsule above it.
+- If a guest follows server snapshots, check that both peers enable prediction and use compatible bodies. Compare the latest server position and local prediction with [network diagnostics](/network-diagnostics#add-a-connection-hud).
+
+[`player_controls()`](/api/classes/GameConfig/methods/player_controls) reads the scene's [MoverComponent](/api/classes/MoverComponent). If you already configure movement in code, passing a [PlayerControlProfile](/api/classes/PlayerControlProfile) to the same method supplies movement settings for that session and takes precedence over the component's values. The profile can supply a [MotionRule](/api/classes/PlayerControlProfile/properties/movement_rule).
