@@ -1,0 +1,160 @@
+---
+title: "Game scopes and service overrides"
+description: "Pass a game into your scene, resolve the nearest scope, and provide a transport when you need to."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Boot once from a persistent node such as `Main`. [`Game.configure(LEVEL, PLAYER).boot(self)`](/api/classes/Game/methods/configure) gives you a [`Game`](/api/classes/Game) handle for that scene branch. Pass it directly to menus and other consumers you wire up in the boot script.
+
+## Scene requirements
+
+The examples use `res://scope_level.tscn` with two `Marker3D` nodes at distinct positions under `SpawnPoints`, and `res://scope_player.tscn` with one `Camera3D`. Both scenes have `Node3D` roots. Each script runs in its own `Node` scene.
+
+## Find the game from a pause menu
+
+Assign a **Return to title** button and a status label to the script. The parent starts the game. When the player presses the button, [`Game.for_node(return_button)`](/api/classes/Game/methods/for_node) finds the nearest game above it in the scene tree. Wait for `game.leave()` to finish before showing **Title screen** so the old session has time to close.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://scope_level.tscn")
+const PLAYER: PackedScene = preload("res://scope_player.tscn")
+
+@export var return_button: Button
+@export var status_label: Label
+
+
+func _ready() -> void:
+    return_button.disabled = true
+    return_button.pressed.connect(_return_to_title)
+    var game: Game = Game.configure(LEVEL, PLAYER).boot(self)
+    var started: GameResult = await game.play()
+    if not started.ok:
+        status_label.text = started.message
+        return
+
+    status_label.text = "Session ready"
+    return_button.disabled = false
+
+
+func _return_to_title() -> void:
+    var game: Game = Game.for_node(return_button)
+    if game == null:
+        status_label.text = "No game owns this button."
+        return
+
+    return_button.disabled = true
+    var result: GameResult = await game.leave()
+    if not result.ok:
+        status_label.text = result.message
+        return_button.disabled = false
+        return
+
+    return_button.hide()
+    status_label.text = "Title screen"
+```
+
+## Select a game from a debug panel
+
+Assign a **Use match as default** check button. The script boots two games on separate branches, `Preview` and `Match`. A debug panel outside both branches can use [`Game.set_default()`](/api/classes/Game/methods/set_default) to choose the match. Toggle the button off and [`Game.current()`](/api/classes/Game/methods/current) returns `null` because both games are still attached and neither is selected.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://scope_level.tscn")
+const PLAYER: PackedScene = preload("res://scope_player.tscn")
+
+@export var use_match_button: CheckButton
+
+var _match_owner: Node
+
+
+func _ready() -> void:
+    var preview_owner: Node = Node.new()
+    preview_owner.name = "Preview"
+    add_child(preview_owner)
+
+    _match_owner = Node.new()
+    _match_owner.name = "Match"
+    add_child(_match_owner)
+
+    var config: GameConfig = Game.configure(LEVEL, PLAYER)
+    var preview: Game = config.boot(preview_owner)
+    var match_game: Game = config.boot(_match_owner)
+    if not preview.boot_result().ok or not match_game.boot_result().ok:
+        push_error("Could not attach both game scopes.")
+        use_match_button.disabled = true
+        return
+
+    use_match_button.set_pressed_no_signal(false)
+    use_match_button.toggled.connect(_select_default)
+
+
+func _select_default(use_match: bool) -> void:
+    var selected: Game
+    if use_match:
+        selected = Game.for_node(_match_owner)
+        if selected == null:
+            use_match_button.set_pressed_no_signal(false)
+            push_warning("The match scope has retired.")
+            return
+
+    var status: int = Game.set_default(selected)
+    if status != OK:
+        use_match_button.set_pressed_no_signal(not use_match)
+        push_error("Could not update the default game.")
+        return
+
+    var current: Game = Game.current()
+    if current == null:
+        print("No default game selected.")
+    else:
+        print("Match selected. Current phase: %d" % current.get_phase())
+```
+
+## Know when a handle expires
+
+[`game.leave()`](/api/classes/Game/methods/leave) ends the session or cancels a pending start. The owner remains attached, so the same game can start another session. When the owner exits the scene tree, Crimson retires its attachment. A retained game handle and its scoped services cannot act on a replacement game. Boot again after the new owner enters the tree and give consumers the new handle.
+
+## Override the LAN transport
+
+LAN uses ENet by default. To choose how the game opens a connection, give it a [`GameProvider`](/api/classes/GameProvider). In `_register()`, use [`session_transport()`](/api/classes/GameBindings/methods/session_transport) to tell Crimson how to create a fresh transport for this game. This example returns the usual ENet transport and prints when it creates it, so you can see the override run.
+
+Pass the provider to [`provider()`](/api/classes/GameConfig/methods/provider) before `boot(self)`. The rest of the script still calls `game.host()` normally. Run the scene and look for `Created the test transport.` followed by `Test host ready.`.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://scope_level.tscn")
+const PLAYER: PackedScene = preload("res://scope_player.tscn")
+const LOOPBACK_ADDRESS: String = "127.0.0.1"
+
+var game: Game
+
+
+class TestTransportProvider extends GameProvider:
+    func _register(bindings: GameBindings) -> void:
+        var status: int = bindings.session_transport(_make_transport)
+        if status != OK:
+            push_error("Could not register the test transport.")
+
+
+    func _make_transport() -> SessionTransport:
+        print("Created the test transport.")
+        return ENetSessionTransport.new()
+
+
+func _ready() -> void:
+    var provider: GameProvider = TestTransportProvider.new()
+    game = Game.configure(LEVEL, PLAYER).lan().provider(provider).boot(self)
+
+    var result: GameResult = await game.host(LOOPBACK_ADDRESS)
+    if not result.ok:
+        push_error(result.message)
+        return
+
+    print("Test host ready.")
+```
+
+Crimson creates the transport during boot. Return a new transport each time. Use this override with direct LAN play. Steam and other configured online providers supply their own connection. [Migrate an existing project](/migration)

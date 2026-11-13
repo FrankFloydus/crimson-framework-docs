@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Start a training match after a LAN guest joins",
+    "setup": "Run two local copies with the same level. Enable Host on one copy so the match starts after the other copy joins and both test identities are bound. [Coordinated LAN setup](/coordinated-lan#host-the-lobby-and-bind-players)",
+    "code": "extends Node\n\nconst TRAINING_ID: StringName = &\"training\"\nconst LOOPBACK_ADDRESS: String = \"127.0.0.1\"\nconst HOST_PEER_ID: int = 1\nconst HOST_TEST_ID: String = \"test_host\"\nconst GUEST_TEST_ID: String = \"test_guest\"\n\n@export_file(\"*.tscn\") var training_scene: String\n@export var host: bool = false\n\nvar _game: Game\n\nfunc _ready() -> void:\n    var training: WorldDefinition = WorldDefinition.at(TRAINING_ID, training_scene)\n    _game = Game.campaign(training).lan().boot(self)\n    if not _report_failure(_game.boot_result()):\n        return\n    _game.world_ready.connect(_on_world_ready)\n    if host:\n        if not _report_failure(_game.open_lobby(LOOPBACK_ADDRESS)):\n            return\n        if _game.bind_player(HOST_PEER_ID, HOST_TEST_ID) != OK:\n            push_error(\"Could not bind the test host.\")\n            await _game.leave()\n            return\n        _game.peer_joined.connect(_start_with_guest)\n        print(\"Lobby open. Start the guest now.\")\n    else:\n        _report_failure(_game.join_lobby(LOOPBACK_ADDRESS))\n\nfunc _start_with_guest(peer_id: int) -> void:\n    # This loopback example reserves one identity for its test guest.\n    if _game.bind_player(peer_id, GUEST_TEST_ID) != OK:\n        push_error(\"Could not bind the test guest.\")\n        return\n    var started: GameResult = await _game.start_match()\n    _report_failure(started)\n\nfunc _on_world_ready(world_id: StringName, _epoch: int) -> void:\n    print(\"Match ready in \", world_id)\n\nfunc _report_failure(result: GameResult) -> bool:\n    if not result.ok:\n        push_error(result.message)\n    return result.ok\n",
+    "members": [
+      "Game.methods.open_lobby",
+      "Game.methods.join_lobby",
+      "Game.methods.bind_player",
+      "Game.methods.start_match"
+    ]
+  },
+  {
+    "title": "Travel to the foundry when the lift arrives",
+    "setup": "Connect the lift's arrival event to `arrive_at_foundry()`. When the destination loads, the travel panel names the new world. [World catalog setup](/coordinated-lan#prepare-the-world-catalog)",
+    "code": "extends Node\n\nconst TRAINING_ID: StringName = &\"training\"\nconst FOUNDRY_ID: StringName = &\"foundry\"\n\n@export_file(\"*.tscn\") var training_scene: String\n@export_file(\"*.tscn\") var foundry_scene: String\n@export var travel_status: Label\n\nvar _game: Game\nvar _foundry: WorldDefinition\n\nfunc _ready() -> void:\n    var training: WorldDefinition = WorldDefinition.at(TRAINING_ID, training_scene)\n    _foundry = WorldDefinition.at(FOUNDRY_ID, foundry_scene)\n    _game = Game.campaign(training).with_world(_foundry).boot(self)\n    var started: GameResult = await _game.play()\n    if not started.ok:\n        travel_status.text = started.message\n\nfunc arrive_at_foundry() -> void:\n    if _game.get_phase() != Game.RUNNING:\n        return\n    var scenes: GameScenes = _game.scenes()\n    var arrived: GameResult = await scenes.load(_foundry)\n    travel_status.text = \"Arrived at %s.\" % arrived.world_id if arrived.ok else arrived.message\n",
+    "members": [
+      "Game.methods.campaign",
+      "Game.methods.scenes",
+      "GameConfig.methods.with_world",
+      "GameScenes.methods.load",
+      "GameResult.properties.world_id",
+      "WorldDefinition.methods.at"
+    ]
+  }
+]

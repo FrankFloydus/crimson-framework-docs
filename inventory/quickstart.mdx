@@ -1,0 +1,131 @@
+---
+title: "Build a grid backpack"
+description: "Run a visible backpack with buttons that pack supplies and a grid that shows where each item fits."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Build a backpack with four columns and three rows. Add a wide medkit or a tall radio and watch the item fill its cells. When there is no room, the bag keeps the items it already holds.
+
+The grid stores placements in cells. Your interface turns each placement into a rectangle on screen. The excerpts below show how the complete script connects the two.
+
+## Pack an item
+
+[`Inventory.grid(BAG_SIZE)`](/api/classes/Inventory/methods/grid) creates an empty grid. The medkit uses two columns by one row. The radio uses one column by two rows. Each click generates a unique instance ID so the grid can hold several items of the same kind.
+
+```gdscript
+var id: StringName = StringName("%s_%d" % [item_name.to_lower(), _next_id])
+var error: Error = _bag.add(id, footprint)
+```
+
+[`add()`](/api/classes/SpatialInventory/methods/add) places the unrotated footprint at the first fit, scanning each row from left to right. If it returns `ERR_CANT_CREATE`, the bag stays as it was. After `OK`, store the display name under the new ID and redraw the grid.
+
+## Draw the committed placement
+
+Each [`InventoryItemView`](/api/classes/InventoryItemView) from [`items()`](/api/classes/SpatialInventory/methods/items) supplies the top-left cell and the unrotated footprint. Swap width and height for a rotated item, then multiply the origin and size by the cell's pixel size to get the rectangle.
+
+```gdscript
+for item: InventoryItemView in _bag.items():
+    var footprint: Vector2i = item.footprint
+    if item.rotated:
+        footprint = Vector2i(footprint.y, footprint.x)
+    var bounds: Rect2 = Rect2(Vector2(item.origin * CELL_PIXELS), Vector2(footprint * CELL_PIXELS))
+```
+
+## Run the backpack
+
+Use a `VBoxContainer` root with this complete script. It creates the grid and controls. [Install Crimson Framework](/installation)
+
+```gdscript
+extends VBoxContainer
+
+const BAG_SIZE: Vector2i = Vector2i(4, 3)
+const CELL_PIXELS: int = 80
+const WINDOW_MARGIN: Vector2 = Vector2(24, 24)
+const ITEM_INSET: float = 3.0
+const TEXT_INSET: Vector2 = Vector2(10, 25)
+const MEDKIT_SIZE: Vector2i = Vector2i(2, 1)
+const RADIO_SIZE: Vector2i = Vector2i(1, 2)
+const CELL_COLOR: Color = Color("#263546")
+const GRID_COLOR: Color = Color("#526780")
+const ITEM_COLOR: Color = Color("#29716d")
+
+var _bag: SpatialInventory
+var _grid: Control
+var _status: Label
+var _names: Dictionary[StringName, String] = {}
+var _next_id: int = 1
+
+
+func _ready() -> void:
+    position = WINDOW_MARGIN
+    var title: Label = Label.new()
+    title.text = "Supply backpack"
+    add_child(title)
+
+    _grid = Control.new()
+    _grid.custom_minimum_size = Vector2(BAG_SIZE * CELL_PIXELS)
+    _grid.draw.connect(_draw_grid)
+    add_child(_grid)
+
+    var buttons: HBoxContainer = HBoxContainer.new()
+    add_child(buttons)
+    _add_button(buttons, "Pack medkit", _pack.bind("Medkit", MEDKIT_SIZE))
+    _add_button(buttons, "Pack radio", _pack.bind("Radio", RADIO_SIZE))
+    _add_button(buttons, "Empty bag", _empty_bag)
+
+    _status = Label.new()
+    add_child(_status)
+    _empty_bag()
+
+
+func _add_button(parent: HBoxContainer, caption: String, action: Callable) -> void:
+    var button: Button = Button.new()
+    button.text = caption
+    button.pressed.connect(action)
+    parent.add_child(button)
+
+
+func _empty_bag() -> void:
+    _bag = Inventory.grid(BAG_SIZE)
+    _names.clear()
+    _status.text = "Pack supplies to fill the backpack."
+    _grid.queue_redraw()
+
+
+func _pack(item_name: String, footprint: Vector2i) -> void:
+    var id: StringName = StringName("%s_%d" % [item_name.to_lower(), _next_id])
+    var error: Error = _bag.add(id, footprint)
+    if error == ERR_CANT_CREATE:
+        _status.text = "%s does not fit in the backpack." % item_name
+        return
+    if error != OK:
+        _status.text = error_string(error)
+        return
+
+    _next_id += 1
+    _names[id] = item_name
+    _status.text = "Packed %s." % item_name
+    _grid.queue_redraw()
+
+
+func _draw_grid() -> void:
+    for row: int in range(BAG_SIZE.y):
+        for column: int in range(BAG_SIZE.x):
+            var cell: Rect2 = Rect2(Vector2(column, row) * CELL_PIXELS, Vector2.ONE * CELL_PIXELS)
+            _grid.draw_rect(cell, CELL_COLOR)
+            _grid.draw_rect(cell, GRID_COLOR, false)
+
+    var font: Font = _grid.get_theme_default_font()
+    for item: InventoryItemView in _bag.items():
+        var footprint: Vector2i = item.footprint
+        if item.rotated:
+            footprint = Vector2i(footprint.y, footprint.x)
+        var bounds: Rect2 = Rect2(Vector2(item.origin * CELL_PIXELS), Vector2(footprint * CELL_PIXELS))
+        _grid.draw_rect(bounds.grow(-ITEM_INSET), ITEM_COLOR)
+        _grid.draw_string(font, bounds.position + TEXT_INSET, _names[item.id])
+```
+
+Run the scene and select **Pack medkit**, then **Pack radio**. The medkit starts at cell `(0, 0)` and the radio at `(2, 0)`. Keep packing until the next item does not fit, then select **Empty bag** to start over.
+
+Next, pick up an item with the mouse and move it to a new spot. [Drag and drop](/inventory/drag-and-drop)

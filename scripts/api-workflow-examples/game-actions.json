@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Answer a Steam invitation from the title screen",
+    "setup": "Show the exact invitation, then let the player join the training room or dismiss the offer. [Steam invitation setup](/steam/listen-servers#invite-and-join)",
+    "code": "extends Node\n\n@export var level: PackedScene\n@export var player: PackedScene\n@export var accept_button: Button\n@export var dismiss_button: Button\n@export var prompt: Label\n@export var status: Label\n\nvar _game: Game\nvar _shown_offer: SteamInvite\nvar _joining: bool = false\n\nfunc _ready() -> void:\n    _update_buttons()\n    _game = Game.configure(level, player).steam().boot(self)\n    var startup: GameResult = _game.boot_result()\n    if not startup.ok:\n        status.text = startup.message\n        return\n\n    accept_button.pressed.connect(_accept_offer)\n    dismiss_button.pressed.connect(_dismiss_offer)\n    _game.invite_changed.connect(_show_offer)\n    _show_offer(_game.pending_invite())\n\nfunc _show_offer(offer: SteamInvite) -> void:\n    _shown_offer = offer\n    prompt.text = \"Join %s's training room?\" % offer.from_steam_id if offer != null else \"\"\n    _update_buttons()\n\nfunc _update_buttons() -> void:\n    var disabled: bool = _shown_offer == null or _joining\n    accept_button.disabled = disabled\n    dismiss_button.disabled = disabled\n\nfunc _accept_offer() -> void:\n    var confirmed: SteamInvite = _shown_offer\n    _joining = true\n    _update_buttons()\n    var joined: GameResult = await _game.accept_invite(confirmed)\n    status.text = \"Joined the training room.\" if joined.ok else joined.message\n    _joining = false\n    _update_buttons()\n\nfunc _dismiss_offer() -> void:\n    var dismissed: GameResult = _game.dismiss_invite(_shown_offer)\n    status.text = \"Invitation dismissed.\" if dismissed.ok else dismissed.message\n",
+    "members": [
+      "Game.methods.pending_invite",
+      "Game.methods.accept_invite",
+      "Game.methods.dismiss_invite",
+      "SteamInvite.properties.from_steam_id"
+    ]
+  },
+  {
+    "title": "Return to the title screen after a match",
+    "setup": "Click Return to title to end the training session and show the title screen. [Game scope setup](/game-services#find-the-game-from-a-pause-menu)",
+    "code": "extends Node\n\nconst LEVEL: PackedScene = preload(\"res://scope_level.tscn\")\nconst PLAYER: PackedScene = preload(\"res://scope_player.tscn\")\n\n@export var return_button: Button\n@export var status_label: Label\n\n\nfunc _ready() -> void:\n    return_button.disabled = true\n    return_button.pressed.connect(_return_to_title)\n    var game: Game = Game.configure(LEVEL, PLAYER).boot(self)\n    var started: GameResult = await game.play()\n    if not started.ok:\n        status_label.text = started.message\n        return\n\n    status_label.text = \"Session ready\"\n    return_button.disabled = false\n\n\nfunc _return_to_title() -> void:\n    var game: Game = Game.for_node(return_button)\n    if game == null:\n        status_label.text = \"No game owns this button.\"\n        return\n\n    return_button.disabled = true\n    var result: GameResult = await game.leave()\n    if not result.ok:\n        status_label.text = result.message\n        return_button.disabled = false\n        return\n\n    return_button.hide()\n    status_label.text = \"Title screen\"\n",
+    "members": [
+      "Game.methods.leave",
+      "Game.methods.for_node"
+    ]
+  },
+  {
+    "title": "Check the transport factory in a LAN test",
+    "setup": "The test host logs when its provider creates a fresh ENet adapter. [Transport override setup](/game-services#override-the-lan-transport)",
+    "code": "extends Node\n\nconst LEVEL: PackedScene = preload(\"res://scope_level.tscn\")\nconst PLAYER: PackedScene = preload(\"res://scope_player.tscn\")\nconst LOOPBACK_ADDRESS: String = \"127.0.0.1\"\n\nvar game: Game\n\n\nclass TestTransportProvider extends GameProvider:\n    func _register(bindings: GameBindings) -> void:\n        var status: int = bindings.session_transport(_make_transport)\n        if status != OK:\n            push_error(\"Could not register the test transport.\")\n\n\n    func _make_transport() -> SessionTransport:\n        print(\"Created the test transport.\")\n        return ENetSessionTransport.new()\n\n\nfunc _ready() -> void:\n    var provider: GameProvider = TestTransportProvider.new()\n    game = Game.configure(LEVEL, PLAYER).lan().provider(provider).boot(self)\n\n    var result: GameResult = await game.host(LOOPBACK_ADDRESS)\n    if not result.ok:\n        push_error(result.message)\n        return\n\n    print(\"Test host ready.\")\n",
+    "members": [
+      "GameProvider.methods._register",
+      "GameBindings.methods.session_transport",
+      "GameConfig.methods.provider"
+    ]
+  },
+  {
+    "title": "Award the training achievement",
+    "setup": "Call `training_completed()` from the training objective's completion signal. The results screen reports whether Steam accepted the unlock request. [Steam achievement setup](/steam/client-services#unlock-an-achievement)",
+    "code": "extends Node\n\nconst TRAINING_ACHIEVEMENT: String = \"TRAINING_COMPLETE\"\n\n@export var status: Label\n\nvar _steam: Steamworks\n\nfunc _ready() -> void:\n    _steam = Steamworks.boot(self)\n\nfunc training_completed() -> void:\n    var achievements: SteamAchievements = _steam.achievements()\n    var submitted: SteamStatsSubmissionResult = achievements.unlock(TRAINING_ACHIEVEMENT)\n    status.text = \"Achievement sent to Steam.\" if submitted.ok else submitted.message\n",
+    "members": [
+      "Steamworks.methods.achievements",
+      "SteamAchievements.methods.unlock"
+    ]
+  }
+]

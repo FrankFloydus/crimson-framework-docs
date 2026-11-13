@@ -1,0 +1,130 @@
+---
+title: "Start and travel from a LAN lobby"
+description: "Admit players, bind their identities, and move the match through two registered worlds."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Use a coordinated game when the host needs a lobby before the first match or the group needs to travel between levels. In this example, the host opens a lobby, waits for one guest, starts the match in a training room, then takes both players to a foundry. Start with an empty Godot 4.7 project with Crimson installed. [Installation](/installation)
+
+## Prepare the world catalog
+
+Use two level scenes at `res://training.tscn` and `res://foundry.tscn`. For a visual check, give each level an active camera and something distinct to see. A coordinated game supplies its own actors and controllers.
+
+Give each level a stable ID with [`WorldDefinition.at()`](/api/classes/WorldDefinition/methods/at). Start with [`Game.campaign()`](/api/classes/Game/methods/campaign) and register the second level with [`with_world()`](/api/classes/GameConfig/methods/with_world). Keep the same world IDs and scene catalog on both peers, and include both scenes when exporting. Keep each ID stable if you move its scene file.
+
+## Host the lobby and bind players
+
+The host calls [`open_lobby()`](/api/classes/Game/methods/open_lobby) to let players connect. The guest calls [`join_lobby()`](/api/classes/Game/methods/join_lobby) to request a connection. When the guest's [`phase_changed`](/api/classes/Game#signals) signal reports `Game.LOBBY`, the guest is in the lobby. The host binds both players, then calls [`start_match()`](/api/classes/Game/methods/start_match) to load the first level.
+
+[`bind_player()`](/api/classes/Game/methods/bind_player) links a connection to your game's player ID. The LAN host has connection ID `1`. This local test gives both players fixed IDs. In a real game, the host must verify a guest's identity before assigning a player ID.
+
+Use this script on the `Node` root of `res://main.tscn`. **H** opens the lobby and **J** joins. Once the host has bound the guest, **Enter** awaits [`start_match()`](/api/classes/Game/methods/start_match). The host can then press **T** to await [`scenes().load(foundry)`](/api/classes/GameScenes/methods/load). Both peers observe [`world_ready`](/api/classes/Game#signals) when the new world becomes playable.
+
+```gdscript
+extends Node
+
+const TRAINING_ID: StringName = &"training"
+const FOUNDRY_ID: StringName = &"foundry"
+const TRAINING_PATH: String = "res://training.tscn"
+const FOUNDRY_PATH: String = "res://foundry.tscn"
+const LOOPBACK_ADDRESS: String = "127.0.0.1"
+const HOST_PEER_ID: int = 1
+const HOST_PLAYER_ID: String = "local_test_host"
+const GUEST_PLAYER_ID: String = "local_test_guest"
+const HOST_KEY: Key = KEY_H
+const JOIN_KEY: Key = KEY_J
+const START_KEY: Key = KEY_ENTER
+const TRAVEL_KEY: Key = KEY_T
+
+var game: Game
+var _foundry: WorldDefinition
+var _hosting: bool = false
+var _guest_bound: bool = false
+
+
+func _ready() -> void:
+    var training: WorldDefinition = WorldDefinition.at(TRAINING_ID, TRAINING_PATH)
+    _foundry = WorldDefinition.at(FOUNDRY_ID, FOUNDRY_PATH)
+    game = Game.campaign(training).with_world(_foundry).lan().boot(self)
+    var setup: GameResult = game.boot_result()
+    if not setup.ok:
+        push_error(setup.message)
+        set_process_unhandled_key_input(false)
+        return
+
+    game.peer_joined.connect(_on_peer_joined)
+    game.phase_changed.connect(_on_phase_changed)
+    game.world_ready.connect(_on_world_ready)
+    print("Press H to open the lobby or J to join it.")
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+    var key: InputEventKey = event as InputEventKey
+    if key == null or not key.pressed or key.echo:
+        return
+
+    var phase: int = game.get_phase()
+    if phase == Game.IDLE and key.keycode == HOST_KEY:
+        await _open_lobby()
+    elif phase == Game.IDLE and key.keycode == JOIN_KEY:
+        _check_result(game.join_lobby(LOOPBACK_ADDRESS))
+    elif phase == Game.LOBBY and _hosting and key.keycode == START_KEY:
+        if not _guest_bound:
+            print("Wait for the guest to join.")
+            return
+
+        var result: GameResult = await game.start_match()
+        _check_result(result)
+    elif phase == Game.RUNNING and _hosting and key.keycode == TRAVEL_KEY:
+        var result: GameResult = await game.scenes().load(_foundry)
+        _check_result(result)
+
+
+func _open_lobby() -> void:
+    _hosting = true
+    if not _check_result(game.open_lobby(LOOPBACK_ADDRESS)):
+        _hosting = false
+        return
+
+    if game.bind_player(HOST_PEER_ID, HOST_PLAYER_ID) != OK:
+        push_error("Could not bind the host.")
+        _hosting = false
+        await game.leave()
+        return
+
+    print("Lobby open.")
+
+
+func _on_peer_joined(peer_id: int) -> void:
+    if not _hosting:
+        return
+
+    # This ID is reserved for the single guest in the loopback test.
+    _guest_bound = game.bind_player(peer_id, GUEST_PLAYER_ID) == OK
+    if _guest_bound:
+        print("Guest bound. Press Enter to start.")
+    else:
+        push_error("Could not bind the guest.")
+
+
+func _on_phase_changed(phase: int) -> void:
+    if phase == Game.LOBBY and not _hosting:
+        print("Lobby phase reached.")
+
+
+func _on_world_ready(world_id: StringName, epoch: int) -> void:
+    print("World ready: %s (epoch %d)" % [world_id, epoch])
+
+
+func _check_result(result: GameResult) -> bool:
+    if not result.ok:
+        push_error("%s: %s" % [result.code, result.message])
+    return result.ok
+```
+
+## Run both peers
+
+Run two instances of `main.tscn`. Press **H** in the first and wait for `Lobby open.` Press **J** in the second. Once the host logs `Guest bound. Press Enter to start.`, press **Enter** there. Both instances log `World ready: training`. Press **T** on the host and both instances log `World ready: foundry`. The epoch in the log identifies the active world load and increases after travel.
+
+Once play starts, the host decides when both players travel and which game state they share. [Game runtime reference](/api/modules/game-runtime)

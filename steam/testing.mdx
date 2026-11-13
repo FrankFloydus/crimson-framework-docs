@@ -1,0 +1,52 @@
+---
+title: Test and troubleshoot
+description: "Verify Steam startup, Overlay, multiplayer, and publisher features in your own game."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Test in your Godot project first, then repeat the checks that matter to your game on its Windows export. Use a Steam test account with access to your AppID. Use a private Steam branch for the final check so you can install and launch the same files your players will get. [Steam branches](https://partner.steamgames.com/doc/store/application/branches)
+
+## Verify Steam startup
+
+1. Launch your project using the development AppID setup. Enable **Use Spacewar** in the connection example and look for `Steam AppID 480 ready. Online: true` in **Output**. The script reads [`boot_result()`](/api/classes/Steamworks/methods/boot_result) before printing the result of [`is_online()`](/api/classes/Steamworks/methods/is_online). [Connect your game to Steam](/steam/connect)
+2. Run your Windows debug and release exports. Confirm `steam_api64.dll` is beside each executable. [Export and verify on Windows](/steam/setup#export-and-verify-on-windows)
+3. Install the release from your private Steam branch. Launch it from the Steam Library. Steam supplies the AppID for this test, so leave `steam_appid.txt` out of the depot. Confirm the Steam features you use still initialize.
+
+If your game supports offline play, repeat startup with Steam in Offline Mode. Make sure your game handles an offline connection and still offers its offline features.
+
+## Check the Overlay and achievements
+
+1. Enable the Steam Overlay and launch a windowed build. Request the achievements panel, verify it appears, then close it and check that input and focus return to the game. [Open the Steam Overlay](/steam/client-services#open-the-steam-overlay)
+2. Use a published achievement and a test account where it is still locked. Trigger it through your game, check Steam's store and achievement callbacks, and look for the notification. Restart the game and read the achievement to confirm the unlock persisted. [Unlock an achievement](/steam/client-services#unlock-an-achievement) · [Valve achievement setup](https://partner.steamgames.com/doc/features/achievements/ach_guide)
+
+## Verify Steam Cloud sync
+
+Use your own Cloud-enabled AppID and a test account with access to the app. Use **Save Profile** on the first machine, then close the game and allow Steam to sync. Launch on a second machine with the same account and press **Read Profile**. Check that the printed JSON matches the first machine's output. [Save a profile to Cloud](/steam/client-services#save-a-profile-to-cloud)
+
+## Verify multiplayer
+
+Use two machines and sign each player client into a different test account. Run compatible builds with the same AppID and game configuration. For a Spacewar discovery test, use the same `SteamConfig.spacewar()` test group on both machines. The anonymous dedicated server runs in its own process and does not need an interactive Steam account.
+
+- **Listen server.** Use the default private profile and wait for `Training room ready.` Open the Steam invite picker, accept the invitation through Steam on the guest, and then confirm the exact offer in your game's prompt. Check that the guest reaches the same world. Leave on both sides and repeat. To test discovery, boot both with a matching `SteamConfig.public_games()` profile and try **Quick Join**. Test canceling a pending search and searching without a host. [Lobbies and listen servers](/steam/listen-servers)
+- **Dedicated server.** Run the Steam headless server and wait for `Steam dedicated world ready.` Join from the guest using a selected browser listing or the explicit server locator. Confirm the admitted player count updates on join and leave. If you deploy through Steam, also verify that a separate client can see an advertised instance. [Dedicated servers](/steam/dedicated-servers)
+
+The code-first Spacewar smoke check covered signed-in hosting, invite dismissal, quick-join cancellation, and an empty search. Verify a live two-account join, Steam dedicated deployment, and the trusted publisher build with the test environment your game uses.
+
+## Verify publisher operations
+
+Use the separate trusted addon in your test backend, an account with access to the app, and authorized Steamworks credentials. Verify a fresh player ticket and read the account's license state. Confirm your backend rejects an expired ticket or a ticket issued for the wrong audience. [Verify a player and their license](/steam/publisher#verify-a-player-and-their-license)
+
+If you use Steam Wallet, use Valve's sandbox to run a checkout from your game through authorization, finalization, and fulfillment. Retry the same checkout to confirm your store records one entitlement. Verify that reconciliation leaves your order and entitlement records consistent. [Valve microtransactions sandbox](https://partner.steamgames.com/doc/features/microtransactions/implementation)
+
+## Diagnose common failures
+
+| Symptom | What to check |
+| --- | --- |
+| Crimson classes are missing in Godot | Check the Godot version, platform, precision, and addon folder. [Installation](/installation) |
+| The Steam client cannot initialize | Read [`steam.boot_result().message`](/api/classes/Steamworks/methods/boot_result). Check `steam_api64.dll`, the signed-in account, and whether the launch AppID matches `SteamConfig`. [Steamworks setup](/steam/setup) |
+| The Steam client starts, but online features fail | Check [`is_online()`](/api/classes/Steamworks/methods/is_online). Steam Offline Mode can still provide cached data for some features. |
+| A picker reports `OverlayBusy` or a panel reports `ERR_BUSY` | Make sure the Overlay is enabled, your game is rendering, and [`steam.overlay().is_ready()`](/api/classes/SteamOverlay/methods/is_ready) is true. For direct development launches, check the Overlay launch argument. [Open the Steam Overlay](/steam/client-services#open-the-steam-overlay) |
+| A lobby is missing or the guest cannot join | Check that the host is ready, has an open seat, and uses the same AppID as the guest. For Spacewar discovery, both players need the same test group and a public lobby. For a private lobby, have the guest accept the invitation through Steam. |
+| The server is ready but absent from the browser | Check that the server requested Internet advertisement, uses your app's product metadata, and has a reachable query port. Verify the listing from a separate Steam client. [Dedicated server discovery](/steam/dedicated-servers#list-the-server-in-steam) |
+| A service handle stops working after a restart or scope retirement | Get a fresh service from the new Steamworks attachment. |

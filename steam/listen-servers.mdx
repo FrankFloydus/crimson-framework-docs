@@ -1,0 +1,281 @@
+---
+title: Lobbies and listen servers
+description: "Host a Steam game from a player's computer, confirm invites, or find an open game."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Select Steam with [`.steam()`](/api/classes/GameConfig/methods/steam) before you boot. The default uses the launch AppID and private invitations. Two players fit by default, including the host. Run the same project on both computers. [Steam runtime and launch setup](/steam/setup#launch-with-an-appid)
+
+## Prepare the test scenes
+
+| Scene | Required nodes |
+| --- | --- |
+| `res://steam_level.tscn` | `Node3D` root with a `SpawnPoints` child containing two `Marker3D` children at distinct positions. |
+| `res://steam_player.tscn` | `Node3D` root with one `Camera3D`. A visible mesh in the `crimson_local_hidden` group lets each player see the other avatar. |
+| `res://steam_main.tscn` | `Node` root with one of the scripts below and its exported controls. Both peers use the same entry scene. |
+
+## Host a game from a player's machine
+
+This script runs on the `steam_main.tscn` root. Bind **Status** and **Invite Prompt** labels and the **Host**, **Invite**, **Accept**, **Dismiss**, and **Leave** buttons to its exports. The host can open the Steam invite picker once the training room is ready.
+
+Enable **Use Spacewar** for a development launch under AppID `480`. Use a test group unique to your project and match it across host and guest. Leave it off to use your own launch AppID. [`SteamConfig.spacewar()`](/api/classes/SteamConfig/methods/spacewar)
+
+- Boot both peers with the same [`.steam(settings)`](/api/classes/GameConfig/methods/steam) profile and check `boot_result()`. Boot attaches the game and its Steam services. The world opens when a player hosts or joins.
+- Await [`host()`](/api/classes/Game/methods/host) and check the `GameResult`. Success means the host can play and open the Steam invite picker with [`invite_friends()`](/api/classes/Game/methods/invite_friends).
+- The guest reads [`pending_invite()`](/api/classes/Game/methods/pending_invite) at startup and listens for [`invite_changed`](/api/classes/Game#invite_changed). Pass the exact offer shown in the prompt to [`accept_invite()`](/api/classes/Game/methods/accept_invite) or [`dismiss_invite()`](/api/classes/Game/methods/dismiss_invite).
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://steam_level.tscn")
+const PLAYER: PackedScene = preload("res://steam_player.tscn")
+const TEST_GROUP: String = "my-studio-training"
+
+@export var use_spacewar: bool = false
+@export var host_button: Button
+@export var invite_button: Button
+@export var accept_button: Button
+@export var dismiss_button: Button
+@export var leave_button: Button
+@export var status: Label
+@export var invite_prompt: Label
+
+var _game: Game
+var _shown_offer: SteamInvite
+
+
+func _ready() -> void:
+    var settings: SteamConfig
+    if use_spacewar:
+        settings = SteamConfig.spacewar(TEST_GROUP)
+    _game = Game.configure(LEVEL, PLAYER).steam(settings).boot(self)
+    invite_button.disabled = true
+    var startup: GameResult = _game.boot_result()
+    if not startup.ok:
+        status.text = startup.message
+        return
+
+    host_button.pressed.connect(_host_training_room)
+    invite_button.pressed.connect(_invite_friend)
+    accept_button.pressed.connect(_accept_offer)
+    dismiss_button.pressed.connect(_dismiss_offer)
+    leave_button.pressed.connect(_leave_session)
+    _game.invite_changed.connect(_show_offer)
+    _show_offer(_game.pending_invite())
+
+
+func _host_training_room() -> void:
+    var result: GameResult = await _game.host()
+    status.text = "Training room ready." if result.ok else result.message
+    if result.ok:
+        invite_button.disabled = false
+
+
+func _invite_friend() -> void:
+    var result: GameResult = _game.invite_friends()
+    status.text = "Invite picker requested." if result.ok else result.message
+
+
+func _show_offer(offer: SteamInvite) -> void:
+    _shown_offer = offer
+    accept_button.disabled = offer == null
+    dismiss_button.disabled = offer == null
+    if offer == null:
+        invite_prompt.text = ""
+        return
+    var sender: String = offer.from_steam_id
+    invite_prompt.text = "Join the invited training room?" if sender.is_empty() else "Join %s's training room?" % sender
+
+
+func _accept_offer() -> void:
+    var confirmed_offer: SteamInvite = _shown_offer
+    if confirmed_offer == null:
+        return
+    var result: GameResult = await _game.accept_invite(confirmed_offer)
+    status.text = "Joined the training room." if result.ok else result.message
+
+
+func _dismiss_offer() -> void:
+    var dismissed_offer: SteamInvite = _shown_offer
+    if dismissed_offer == null:
+        return
+    var result: GameResult = _game.dismiss_invite(dismissed_offer)
+    status.text = "Invitation dismissed." if result.ok else result.message
+
+
+func _leave_session() -> void:
+    var result: GameResult = await _game.leave()
+    if result.ok:
+        invite_button.disabled = true
+    status.text = "Back at the menu." if result.ok else result.message
+```
+
+`OverlayBusy` means Steam is still loading the Overlay. Check that the picker appears in a rendered window after a successful request. [Overlay launch setup](/steam/setup#launch-with-an-appid)
+
+## Invite and join
+
+Use two signed-in Steam accounts on separate machines. On the host, press **Host**, then **Invite** and select the guest. On the guest, accept the invitation through Steam, then press **Accept** in the game's prompt. The guest can also dismiss the prompt and stay at the menu. Enable **Use launch command line** for your app in Steamworks if you use Steam launch arguments to deliver an invitation at startup. [Valve launch arguments](https://partner.steamgames.com/doc/api/ISteamApps#GetLaunchCommandLine)
+
+If a newer [`SteamInvite`](/api/classes/SteamInvite) replaces the confirmed offer, the action reports `InviteChanged` and leaves the new offer pending. Accepting goes through authenticated game admission. [`leave()`](/api/classes/Game/methods/leave) waits for the active session or pending start to retire.
+
+## Find an open game
+
+Run this script on the `steam_main.tscn` root with a status label and **Host**, **Quick Join**, and **Cancel Search** buttons bound to its exports. For Spacewar, match the build, AppID, and test group on both machines. Use a test group without an active host to check an empty search.
+
+Use [`public_games()`](/api/classes/SteamConfig/methods/public_games) so Steam can discover the hosted lobby. [`find_and_join()`](/api/classes/Game/methods/find_and_join) finds a compatible listing with room and attempts one join. Await [`leave()`](/api/classes/Game/methods/leave) to cancel the pending start.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://steam_level.tscn")
+const PLAYER: PackedScene = preload("res://steam_player.tscn")
+const TEST_GROUP: String = "my-studio-training"
+
+@export var status: Label
+@export var host_button: Button
+@export var quick_join_button: Button
+@export var cancel_search_button: Button
+
+var _game: Game
+var _searching: bool = false
+var _canceling: bool = false
+
+
+func _ready() -> void:
+    var settings: SteamConfig = SteamConfig.spacewar(TEST_GROUP).public_games()
+    _game = Game.configure(LEVEL, PLAYER).steam(settings).boot(self)
+    var startup: GameResult = _game.boot_result()
+    if not startup.ok:
+        status.text = startup.message
+        return
+    host_button.pressed.connect(host_public_game)
+    quick_join_button.pressed.connect(quick_join)
+    cancel_search_button.pressed.connect(cancel_search)
+
+
+func host_public_game() -> void:
+    if _searching or _canceling:
+        return
+    var result: GameResult = await _game.host()
+    status.text = "Public training room ready." if result.ok else result.message
+
+
+func quick_join() -> void:
+    if _searching or _canceling:
+        return
+    _searching = true
+    status.text = "Looking for an open training room..."
+    var result: GameResult = await _game.find_and_join()
+    if not _searching:
+        return
+    _searching = false
+    status.text = "Joined the training room." if result.ok else result.message
+
+
+func cancel_search() -> void:
+    if not _searching:
+        return
+    _searching = false
+    _canceling = true
+    var result: GameResult = await _game.leave()
+    _canceling = false
+    status.text = "Search canceled." if result.ok else result.message
+```
+
+An empty search returns a typed failure you can show to the player. After cancellation, the underlying Steam search can still finish before the next search begins. For your own AppID, use `SteamConfig.new().public_games()` to use the launch context. To let players choose a listing, pass their selection to [`join_listing(listing)`](/api/classes/Game/methods/join_listing). [Choose a listing from a server browser](/steam/dedicated-servers#list-the-server-in-steam)
+
+## Run a social lobby without a game
+
+Use a standalone attachment for social lobby membership, metadata, and chat. The script runs on a `Node`. Wire **Create Private** to `create_private_lobby()`, **Create Public** to `create_public_lobby()`, and **Find and Join** to `find_and_join_social_lobby()`. Under Spacewar, create a public lobby on one account and search from a second account. [Steam launch setup](/steam/setup#launch-with-an-appid)
+
+The default social lobby is private with four seats including its owner, in the `crimson` namespace. To customize it, use [`SteamLobbyOptions.configure()`](/api/classes/SteamLobbyOptions/methods/configure) and set its namespace, player limit, and visibility with [`in_namespace()`](/api/classes/SteamLobbyOptions/methods/in_namespace), [`for_players()`](/api/classes/SteamLobbyOptions/methods/for_players), and [`with_visibility()`](/api/classes/SteamLobbyOptions/methods/with_visibility). Pass the options to [`create()`](/api/classes/SteamLobbies/methods/create). The public action creates an eight-player [public lobby](/api/classes/SteamLobbyOptions#visibility) in the example namespace.
+
+The join action searches for public social lobbies in the example namespace. Start with [`steam.lobbies().query()`](/api/classes/SteamLobbies/methods/query), select [`social()`](/api/classes/SteamLobbyQuery/methods/social), then call [`fetch()`](/api/classes/SteamLobbyQuery/methods/fetch). Call [`steam.lobbies().join(listing)`](/api/classes/SteamLobbies/methods/join) and await its [`wait()`](/api/classes/SteamLobbyOperation/methods/wait) result. Game joins accept gameplay listings.
+
+```gdscript
+extends Node
+
+const TEST_GROUP: String = "my-studio-training"
+const PUBLIC_LOBBY_NAMESPACE: StringName = &"my_game"
+const PUBLIC_LOBBY_CAPACITY: int = 8
+const LOBBY_NAME: String = "Crew staging"
+const LOBBY_MODE_KEY: StringName = &"mode"
+const LOBBY_MODE: String = "practice"
+
+var steam: Steamworks
+
+func _ready() -> void:
+    steam = Steamworks.boot(self, SteamConfig.spacewar(TEST_GROUP))
+    var startup: SteamResult = steam.boot_result()
+    if not startup.ok:
+        push_error(startup.message)
+
+func create_private_lobby() -> void:
+    await _create_lobby()
+
+func create_public_lobby() -> void:
+    var options: SteamLobbyOptions = (
+        SteamLobbyOptions.configure()
+        .in_namespace(PUBLIC_LOBBY_NAMESPACE)
+        .for_players(PUBLIC_LOBBY_CAPACITY)
+        .with_visibility(SteamLobbyOptions.PUBLIC)
+    )
+    await _create_lobby(options)
+
+func find_and_join_social_lobby() -> void:
+    var lobbies: SteamLobbies = _get_lobbies()
+    if lobbies == null:
+        return
+    var query: SteamLobbyQuery = lobbies.query(PUBLIC_LOBBY_NAMESPACE).social()
+    var found: SteamListingsResult = await query.fetch()
+    if not found.ok:
+        push_warning("Could not find Steam social lobbies: %s" % found.message)
+        return
+    if found.value.is_empty():
+        print("No matching Steam social lobbies.")
+        return
+
+    var listing: SteamListing = found.value[0]
+    var joined: SteamLobbyResult = await lobbies.join(listing).wait()
+    if not joined.ok:
+        push_warning("Could not join the Steam social lobby: %s" % joined.message)
+        return
+    print("Joined the Steam social lobby.")
+
+func _create_lobby(options: SteamLobbyOptions = null) -> void:
+    var lobbies: SteamLobbies = _get_lobbies()
+    if lobbies == null:
+        return
+    var created: SteamLobbyResult = await lobbies.create(options).wait()
+    if not created.ok:
+        push_warning("Could not create the Steam social lobby: %s" % created.message)
+        return
+
+    print("Steam social lobby ready.")
+    var lobby: SteamLobby = created.value
+    var edit: SteamLobbyEdit = lobby.edit().named(LOBBY_NAME).tag(LOBBY_MODE_KEY, LOBBY_MODE)
+    var status: Error = edit.submit()
+    if status != OK:
+        push_warning("Could not update the lobby metadata: %s" % error_string(status))
+
+func _get_lobbies() -> SteamLobbies:
+    if steam == null or not steam.is_ready():
+        push_warning("The standalone Steam client is not ready.")
+        return null
+    return steam.lobbies()
+```
+
+One signed-in Steam account can hold one lobby membership across standalone clients and games in a process. A standalone member can leave with [`lobby.leave()`](/api/classes/SteamLobby/methods/leave). A game member leaves through [`await game.leave()`](/api/classes/Game/methods/leave). Render text from [`chat_received(member, text)`](/api/classes/SteamLobby#chat_received) as plain text and use the game session's verified peer state for gameplay decisions.
+
+## Lower-level networking and social services
+
+These typed services cover custom connections and policies. The retained [`SteamProvider`](/api/classes/SteamProvider) and [`GameRuntime`](/api/classes/GameRuntime) APIs support existing projects that configure those features directly.
+
+- For game transport diagnostics, call [`steam.networking().peer_path(peer_id)`](/api/classes/SteamNetworking/methods/peer_path) for an admitted peer. [`SteamProvider.prefer_relay()`](/api/classes/SteamProvider/methods/prefer_relay) biases a listen connection toward relay. Check [`kind`](/api/classes/SteamConnectionPath/properties/kind) on the observed path because Steam can choose direct routing.
+- Use [SteamSockets](/api/classes/SteamSockets) when you own the connection protocol. Pin the expected peer for a direct connection or use a P2P endpoint with the expected Steam account. Wait for the connection before consuming remote identity or sending data.
+- Use [SteamMessages](/api/classes/SteamMessages) for bounded side-channel messages. Supply your game's channel allowlist with [`with_message_channels()`](/api/classes/SteamProvider/methods/with_message_channels) and request the scoped handle with [`steam.messages().for_peer(peer_id)`](/api/classes/SteamMessages/methods/for_peer) after that peer reaches the game.
+- Use [SteamParties](/api/classes/SteamParties) to publish a beacon for a ready, non-private hosted lobby at an eligible group-chat location. A guest reserves through Steam and then joins the returned listing through normal Game admission.
+- If you use a retained `GameRuntime`, its [`voice()`](/api/classes/GameRuntime/methods/voice) service supports push-to-talk and authority-owned recipient policy. Get player consent before capture and feed decoded PCM to your game's audio sink. [GameVoice](/api/classes/GameVoice)
+
+Use two distinct signed-in accounts for a real invite and remote join. Run the [multiplayer checks](/steam/testing#verify-multiplayer) before shipping.

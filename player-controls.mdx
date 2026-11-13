@@ -1,0 +1,125 @@
+---
+title: "Give a player movement and look controls"
+description: "Set up a walking character, choose how it turns, and tune how it moves."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Give a player the ability to walk, jump, and look around a 3D level. [`MoverComponent`](/api/classes/MoverComponent) holds the movement settings. [`ControlsComponent`](/api/classes/ControlsComponent) uses the local player's input to steer the body and turn the view. Use both on a player you want Crimson to drive. If your game already controls the body and camera, you can keep that controller.
+
+## Walk around a test room
+
+This example runs in a standalone scene with no game session. Use a `CharacterBody3D` above a visible floor with static collision. Give the body these direct children:
+
+- A `CollisionShape3D` with a capsule and one active `Camera3D` named `Camera3D`.
+- One `MoverComponent` named `Mover`. Leave **Controller → Controller Style** on **FPS / Shoulder Aim**.
+- One `ControlsComponent` named `Controls` with a compatible input layout already assigned. For mouse look, enable [**Capture Pointer on Boot**](/api/classes/ControlsComponent/properties/capture_pointer_on_boot).
+
+Attach this script to the body. [`for_body()`](/api/classes/ControlsComponent/methods/for_body) finds its Controls component. [`boot(view)`](/api/classes/ControlsComponent/methods/boot) starts the controller once the body and camera are in the scene. The [`PlayerControl`](/api/classes/PlayerControl) it returns reports whether startup worked.
+
+```gdscript
+extends CharacterBody3D
+
+const CAMERA_PATH: NodePath = ^"Camera3D"
+
+
+func _ready() -> void:
+    var controls: ControlsComponent = ControlsComponent.for_body(self)
+    if controls == null:
+        push_error("Add one ControlsComponent directly under the body.")
+        return
+
+    var camera: Camera3D = get_node_or_null(CAMERA_PATH) as Camera3D
+    if camera == null:
+        push_error("Add a Camera3D named Camera3D under the body.")
+        return
+
+    var player_control: PlayerControl = controls.boot(camera)
+    if not player_control.is_ready():
+        push_error(player_control.get_message())
+```
+
+Run the room scene. Move forward, look to one side, then move forward again. The player follows the view's new heading. Try a jump while standing on the floor. In a shared game, the server handles movement and each player starts controls only for their own body. [Networked player movement](/networked-movement)
+
+## Choose how the body turns
+
+In the player scene, set [**Mover → Controller → Controller Style**](/api/classes/MoverComponent/properties/controller_style). Use an upright body. For a third-person test, give it a visible mesh and put the camera where you can see the body turn.
+
+| Style | What happens when you move |
+| --- | --- |
+| **FPS / Shoulder Aim** | With the default **View Heading**, the body faces where the camera looks horizontally. Press left to sidestep. |
+| **Free-Orbit Third Person** | Looking around while standing still leaves the body facing the same way. Press left to move left of the camera as the body turns into the movement. |
+| **Forward-Only Third Person** | Press left and the body turns left of the camera, then moves forward along its own heading. It picks up speed as it lines up. |
+| **Lock-On** | The body faces a target chosen by the game. Move left or right to circle it while looking around freely. With no target, movement follows the view. |
+
+The demo opens behind the player in the third-person and Lock-On styles. Press **F6** or click the **right stick** to switch views. In **Lock-On**, press **L** or click the **left stick** to face the north doorway. Try moving around the doorway while the body keeps facing it.
+
+## Face a practice target
+
+Use a room with a floor and an upright `CharacterBody3D`. Give the body a collision capsule, a visible mesh, an active `Camera3D` named `Camera3D` that shows the body, one `MoverComponent` set to **Lock-On**, and one `ControlsComponent` with a compatible layout. Put a visible `Node3D` practice target beside the player and assign it to **Practice Target** on this script.
+
+Press **L** to face the target, then move left or right to circle it. Press **L** again to move relative to the camera. Your game picks the target. Crimson turns the player to face it. [`lock_on()`](/api/classes/PlayerControl/methods/lock_on) · [`clear_lock_on()`](/api/classes/PlayerControl/methods/clear_lock_on)
+
+```gdscript
+extends CharacterBody3D
+
+const CAMERA_PATH: NodePath = ^"Camera3D"
+const LOCK_KEY: Key = KEY_L
+
+## The practice target this test can select.
+@export var practice_target: Node3D
+
+var _player_control: PlayerControl
+var _target_locked: bool = false
+
+
+func _ready() -> void:
+    var controls: ControlsComponent = ControlsComponent.for_body(self)
+    var camera: Camera3D = get_node_or_null(CAMERA_PATH) as Camera3D
+    if controls == null or camera == null:
+        push_error("Add one ControlsComponent and a Camera3D named Camera3D.")
+        return
+
+    _player_control = controls.boot(camera)
+    if not _player_control.is_ready():
+        push_error(_player_control.get_message())
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+    var key: InputEventKey = event as InputEventKey
+    if key == null or not key.pressed or key.echo or key.keycode != LOCK_KEY:
+        return
+    if _player_control == null or not _player_control.is_ready():
+        return
+
+    if _target_locked:
+        _player_control.clear_lock_on()
+        _target_locked = false
+        return
+
+    var result: Error = _player_control.lock_on(practice_target)
+    if result != OK:
+        push_warning("Could not face the practice target: %s" % error_string(result))
+        return
+
+    _target_locked = true
+```
+
+If the target leaves the scene, the player returns to moving relative to the view. In multiplayer, the selected target affects the local player's requested facing. Your game still decides whether a target can be attacked.
+
+## Tune movement in the Inspector
+
+Change these settings on the player's `Mover` node, then start the scene again to try them.
+
+| Group | Setting | What it changes |
+| --- | --- | --- |
+| **Controller** | [Forward Direction](/api/classes/MoverComponent/properties/forward_direction) | In **FPS / Shoulder Aim**, forward follows the view, the character, or the world's negative Z axis. **Character Heading** uses the heading at spawn in a Crimson Game session. |
+| **Ground Movement** | [Move Speed](/api/classes/MoverComponent/properties/move_speed) | How fast the character tries to move at full input. |
+| **Ground Movement** | [Acceleration](/api/classes/MoverComponent/properties/acceleration), [Deceleration](/api/classes/MoverComponent/properties/deceleration), and [Ground Friction](/api/classes/MoverComponent/properties/ground_friction) | How quickly the character starts, stops, and changes direction. |
+| **Ground Movement** | [Gravity Scale](/api/classes/MoverComponent/properties/gravity_scale) | How strongly gravity pulls on the body. |
+| **Air Movement** | [Air Control](/api/classes/MoverComponent/properties/air_control) | How much the character can steer before landing. |
+| **Jumping** | [Jump Speed](/api/classes/MoverComponent/properties/jump_speed) | How fast the character rises at takeoff. Set it to `0` to disable jumping. |
+
+Try a running jump with **Air Control** at `0`. Press sideways in the air and the character keeps its horizontal momentum. Restart with **Air Control** at `1` and try the same jump to see the character steer before landing. Higher **Jump Speed** makes the character jump higher, while higher **Gravity Scale** brings it down sooner.
+
+For a drone or AI character that moves on its own, [drive the actor from a script](/scripted-movement).

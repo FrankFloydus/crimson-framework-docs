@@ -1,0 +1,170 @@
+[
+  {
+    "title": "Enable online play after Steam connects",
+    "setup": "The title screen enables Online Play when Steam connects and leaves Solo Play available during an outage. Launch the game through Steam.",
+    "code": "extends Control\n\nconst STEAM_CHECK_SECONDS: float = 1.0\n\n@export var online_play: Button\n@export var status: Label\n\nvar _steam: Steamworks\n\nfunc _ready() -> void:\n    online_play.disabled = true\n    _steam = Steamworks.boot(self)\n    var booted: SteamResult = _steam.boot_result()\n    if not booted.ok:\n        status.text = \"Steam unavailable. You can still play solo.\"\n        push_warning(booted.message)\n        return\n\n    var refresh: Timer = Timer.new()\n    refresh.wait_time = STEAM_CHECK_SECONDS\n    refresh.timeout.connect(_refresh_online_status)\n    add_child(refresh)\n    refresh.start()\n    _refresh_online_status()\n\nfunc _refresh_online_status() -> void:\n    var online: bool = _steam.is_ready() and _steam.is_online()\n    online_play.disabled = not online\n    status.text = \"Online play available.\" if online else \"Steam offline. Solo play available.\"\n",
+    "members": [
+      "Steamworks.methods.boot",
+      "Steamworks.methods.boot_result",
+      "Steamworks.methods.is_ready",
+      "Steamworks.methods.is_online"
+    ]
+  },
+  {
+    "title": "Host an invite-only Steam arena",
+    "setup": "Press Host to open a two-player arena, then Invite to choose a Steam friend. Launch the game through Steam. [Launch with an AppID](/steam/setup#launch-with-an-appid)",
+    "code": "extends Node\n\nconst TOTAL_SEATS: int = 2\n\n@export var arena: PackedScene\n@export var player: PackedScene\n@export var host_button: Button\n@export var invite_button: Button\n@export var status: Label\n\nvar _game: Game\n\nfunc _ready() -> void:\n    host_button.disabled = true\n    invite_button.disabled = true\n    var setup: GameConfig = Game.configure(arena, player).steam(null, TOTAL_SEATS)\n    _game = setup.boot(self)\n    var booted: GameResult = _game.boot_result()\n    if not booted.ok:\n        status.text = booted.message\n        return\n    var steam: Steamworks = _game.steam()\n    if not steam.is_ready():\n        status.text = steam.boot_result().message\n        return\n    host_button.pressed.connect(_host)\n    invite_button.pressed.connect(_invite)\n    host_button.disabled = false\n\nfunc _host() -> void:\n    host_button.disabled = true\n    var hosted: GameResult = await _game.host()\n    if not hosted.ok:\n        status.text = hosted.message\n        host_button.disabled = false\n        return\n    status.text = \"Arena open. Lobby %s.\" % hosted.listing_id\n    invite_button.disabled = false\n\nfunc _invite() -> void:\n    var requested: GameResult = _game.invite_friends()\n    status.text = \"Choose a friend in Steam.\" if requested.ok else requested.message\n",
+    "members": [
+      "GameConfig.methods.steam",
+      "Game.methods.steam",
+      "Game.methods.invite_friends",
+      "GameResult.properties.listing_id"
+    ]
+  },
+  {
+    "title": "Find an open Spacewar arena",
+    "setup": "Press Find Game to join an open test arena. Launch both copies in Spacewar with the same test group and have one copy host first. [Launch with an AppID](/steam/setup#launch-with-an-appid)",
+    "code": "extends Node\n\nconst TEST_GROUP: String = \"crimson-arena-test\"\nconst ARENA_ID: StringName = &\"arena\"\n\n@export var arena: PackedScene\n@export var player: PackedScene\n@export var find_game: Button\n@export var status: Label\n\nvar _game: Game\n\nfunc _ready() -> void:\n    find_game.disabled = true\n    var settings: SteamConfig = SteamConfig.spacewar(TEST_GROUP).public_games()\n    var setup: GameConfig = Game.configure(arena, player).world_id(ARENA_ID).steam(settings)\n    _game = setup.boot(self)\n    var booted: GameResult = _game.boot_result()\n    if not booted.ok:\n        status.text = booted.message\n        return\n    find_game.pressed.connect(_find_open_arena)\n    find_game.disabled = false\n\nfunc _find_open_arena() -> void:\n    find_game.disabled = true\n    status.text = \"Finding an open arena…\"\n    var joined: GameResult = await _game.find_and_join()\n    status.text = \"You joined the arena.\" if joined.ok else joined.message\n    find_game.disabled = joined.ok\n",
+    "members": [
+      "SteamConfig.methods.spacewar",
+      "SteamConfig.methods.public_games",
+      "Game.methods.find_and_join"
+    ]
+  },
+  {
+    "title": "Open achievements from the pause menu",
+    "setup": "Press Achievements to request the Steam overlay. This menu shares the Steam attachment of its owning game.",
+    "code": "extends Control\n\n@export var achievements_button: Button\n@export var status: Label\n\nvar _steam: Steamworks\n\nfunc _ready() -> void:\n    var game: Game = Game.for_node(self)\n    achievements_button.disabled = game == null\n    if game == null:\n        status.text = \"No game is attached.\"\n        return\n    _steam = game.steam()\n    achievements_button.pressed.connect(_open_achievements)\n\nfunc _open_achievements() -> void:\n    var requested: SteamResult = _steam.open_achievements()\n    status.text = \"\" if requested.ok else requested.message\n",
+    "members": [
+      "Game.methods.for_node",
+      "Steamworks.methods.open_achievements"
+    ]
+  },
+  {
+    "title": "Enable the online menu when Steam connects",
+    "setup": "A standalone Steam client enables Online Play when it connects. A runtime loss disables the button.",
+    "code": "extends Control\n\nconst STEAM_APP_ID: int = 480\nconst ONLINE_CHECK_SECONDS: float = 1.0\n\n@export var online_button: Button\n@export var status_label: Label\n\nvar _steam: SteamClient\nvar _online_timer: Timer\n\n\nfunc _ready() -> void:\n    online_button.disabled = true\n    _steam = SteamClient.boot(self, STEAM_APP_ID)\n    if _steam == null:\n        status_label.text = \"Online play unavailable.\"\n        return\n    if not _steam.is_ready():\n        status_label.text = \"Steam startup failed. Local play is available.\"\n        push_warning(_steam.get_initialization_error())\n        return\n\n    _online_timer = Timer.new()\n    _online_timer.wait_time = ONLINE_CHECK_SECONDS\n    _online_timer.timeout.connect(_update_online_menu)\n    add_child(_online_timer)\n    _steam.runtime_lost.connect(_disable_online_menu)\n    _online_timer.start()\n    _update_online_menu()\n\n\nfunc _update_online_menu() -> void:\n    var online: bool = _steam.is_online()\n    online_button.disabled = not online\n    status_label.text = \"Online play ready.\" if online else \"Steam offline. Local play is available.\"\n\n\nfunc _disable_online_menu() -> void:\n    _online_timer.stop()\n    online_button.disabled = true\n    status_label.text = \"Steam closed. Local play is available.\"",
+    "members": [
+      "SteamClient.methods.boot",
+      "SteamClient.methods.is_ready",
+      "SteamClient.methods.get_initialization_error",
+      "SteamClient.methods.is_online"
+    ]
+  },
+  {
+    "title": "Host a two-player game for Steam friends",
+    "setup": "A serialized game definition opens a friends-only lobby for a two-player arena.",
+    "code": "extends Node\n\nconst STEAM_APP_ID: int = 480\nconst LOBBY_NAMESPACE: String = \"crimson-arena\"\nconst ARENA_ID: StringName = &\"arena\"\nconst TOTAL_SEATS: int = 2\n\n@export var host_button: Button\n@export var status_label: Label\n@export var arena_scene: PackedScene\n@export var player_scene: PackedScene\n\nvar game: GameRuntime\n\nfunc _ready() -> void:\n    if host_button == null or status_label == null:\n        push_error(\"Assign the Host button and status label.\")\n        return\n    host_button.pressed.connect(_host_for_friends)\n\nfunc _host_for_friends() -> void:\n    if arena_scene == null or player_scene == null:\n        status_label.text = \"Assign the arena and player scenes.\"\n        return\n\n    host_button.disabled = true\n    var provider: SteamProvider = (\n        SteamProvider.configure()\n        .for_app(STEAM_APP_ID)\n        .with_lobby_namespace(LOBBY_NAMESPACE)\n        .friends_only()\n    )\n    var rules: MultiplayerRules = MultiplayerRules.listen_coop().with_max_players(TOTAL_SEATS)\n    var definition: GameDefinition = (\n        GameRuntime.configure()\n        .with_starting_world(ARENA_ID, arena_scene)\n        .with_player(player_scene)\n        .with_multiplayer(rules)\n        .with_provider(provider)\n    )\n    game = definition.boot(self)\n    if game == null:\n        status_label.text = \"Could not create the game.\"\n        host_button.disabled = false\n        return\n\n    status_label.text = \"Opening the arena…\"\n    var result: Dictionary = await game.host_online().wait()\n    if not result.ok:\n        status_label.text = result.message\n        game.queue_free()\n        game = null\n        host_button.disabled = false\n        return\n\n    status_label.text = \"Arena open to friends. Lobby %s\" % game.get_online_listing()",
+    "members": [
+      "SteamProvider.methods.configure",
+      "SteamProvider.methods.for_app",
+      "SteamProvider.methods.with_lobby_namespace",
+      "SteamProvider.methods.friends_only",
+      "GameDefinition.methods.with_provider",
+      "GameRuntime.methods.host_online",
+      "GameRuntime.methods.get_online_listing"
+    ]
+  },
+  {
+    "title": "Join the first public arena with room for a player",
+    "setup": "Press Find game to join the first public arena with a free seat. The search uses the [game's Steam provider and lobby namespace](/steam/listen-servers#find-an-open-game).",
+    "code": "extends Node\n\nconst ARENA_ID: StringName = &\"arena\"\nconst OPEN_SEATS: int = 1\n\n@export var game: GameRuntime\n@export var find_game_button: Button\n@export var status_label: Label\n\nfunc _ready() -> void:\n    if game == null or find_game_button == null or status_label == null:\n        push_error(\"Assign the game, Find game button, and status label.\")\n        return\n    find_game_button.pressed.connect(_find_arena)\n\nfunc _find_arena() -> void:\n    var scope: SteamScope = SteamServices.for_game(game)\n    if scope == null or not scope.is_ready():\n        status_label.text = \"Steam multiplayer is unavailable.\"\n        return\n\n    var lobbies: SteamLobbies = scope.lobbies()\n    if lobbies == null:\n        status_label.text = \"Steam lobbies are unavailable.\"\n        return\n\n    find_game_button.disabled = true\n    status_label.text = \"Looking for an open arena…\"\n    var query: SteamLobbyQuery = lobbies.query().on_map(ARENA_ID).with_room_for(OPEN_SEATS)\n    var found: SteamListingsResult = await query.fetch()\n    if not found.ok:\n        status_label.text = found.message\n        find_game_button.disabled = false\n        return\n    if found.value.is_empty():\n        status_label.text = \"No public arenas have a free seat.\"\n        find_game_button.disabled = false\n        return\n\n    var arena: SteamListing = found.value[0]\n    var joined: Dictionary = await game.join_listing(arena).wait()\n    if not joined.ok:\n        status_label.text = joined.message\n        find_game_button.disabled = false\n        return\n    status_label.text = \"Joined the arena.\"",
+    "members": [
+      "SteamServices.methods.for_game",
+      "SteamScope.methods.is_ready",
+      "SteamScope.methods.lobbies",
+      "SteamLobbies.methods.query",
+      "SteamLobbyQuery.methods.on_map",
+      "SteamLobbyQuery.methods.with_room_for",
+      "SteamLobbyQuery.methods.fetch",
+      "SteamListingsResult.properties.value",
+      "GameRuntime.methods.join_listing"
+    ]
+  },
+  {
+    "title": "Invite a friend to the arena from the pause menu",
+    "setup": "From the host's pause menu, press Invite friends to open Steam's invitation picker for the [active arena lobby](/steam/listen-servers#invite-and-join).",
+    "code": "extends Control\n\n@export var game: GameRuntime\n@export var invite_button: Button\n@export var status_label: Label\n\nfunc _ready() -> void:\n    if game == null or invite_button == null or status_label == null:\n        push_error(\"Assign the game, Invite friends button, and status label.\")\n        return\n    invite_button.pressed.connect(_invite_friends)\n\nfunc _invite_friends() -> void:\n    var invites: GameInvites = game.invites()\n    if invites == null:\n        status_label.text = \"Start a Steam lobby before inviting friends.\"\n        return\n\n    var status: Error = invites.open_overlay()\n    if status == OK:\n        status_label.text = \"Choose a friend in the Steam Overlay.\"\n    elif status == ERR_BUSY:\n        status_label.text = \"The Steam Overlay is still loading. Try again.\"\n    else:\n        status_label.text = \"Could not open invites. %s\" % error_string(status)",
+    "members": [
+      "GameRuntime.methods.invites",
+      "GameInvites.methods.open_overlay"
+    ]
+  },
+  {
+    "title": "Open the player's achievements from the pause menu",
+    "setup": "Press Achievements in the pause menu to open this game's achievement pane. [Enable the Steam Overlay](/steam/testing#check-the-overlay-and-achievements) before testing.",
+    "code": "extends Control\n\n@export var steam_client: SteamClient\n@export var achievements_button: Button\n@export var status_label: Label\n\nfunc _ready() -> void:\n    if achievements_button == null or status_label == null:\n        push_error(\"Assign the Achievements button and status label.\")\n        return\n    achievements_button.pressed.connect(_show_achievements)\n\nfunc _show_achievements() -> void:\n    if not is_instance_valid(steam_client) or not steam_client.is_ready():\n        status_label.text = \"Steam is unavailable.\"\n        return\n\n    var overlay: SteamOverlay = steam_client.overlay()\n    if overlay == null or not overlay.is_ready():\n        status_label.text = \"The Steam Overlay is unavailable or still loading.\"\n        return\n\n    var status: Error = overlay.open_achievements()\n    if status == OK:\n        status_label.text = \"\"\n    else:\n        status_label.text = \"Could not open achievements. %s\" % error_string(status)",
+    "members": [
+      "SteamClient.methods.overlay",
+      "SteamOverlay.methods.is_ready",
+      "SteamOverlay.methods.open_achievements"
+    ]
+  },
+  {
+    "title": "Update Steam progression after a match victory",
+    "setup": "After a match victory, update the player's lifetime win count and unlock the first-win achievement using [keys published in Steamworks](/steam/client-services#record-progression). The victory screen reports whether Steam accepted the update.",
+    "code": "extends Control\n\nconst WINS_STAT: String = \"total_wins\"\nconst FIRST_WIN_ACHIEVEMENT: String = \"first_win\"\nconst FIRST_WIN_COUNT: int = 1\n\n@export var steam_client: SteamClient\n@export var steam_status: Label\n\n\nfunc record_victory(total_wins: int) -> void:\n    if not is_instance_valid(steam_client) or not steam_client.is_online():\n        steam_status.text = \"Victory! Steam progression is unavailable.\"\n        return\n\n    var stats: SteamStats = steam_client.stats()\n    var edit: SteamStatsEdit = stats.edit().set_int(WINS_STAT, total_wins)\n    if total_wins == FIRST_WIN_COUNT:\n        edit = edit.unlock(FIRST_WIN_ACHIEVEMENT)\n\n    var result: SteamStatsSubmissionResult = edit.submit()\n    if not result.ok:\n        steam_status.text = \"Victory! Steam progression update failed: %s\" % result.message\n        return\n\n    steam_status.text = \"Victory! Steam accepted %d progression updates.\" % result.value.applied",
+    "members": [
+      "SteamClient.methods.stats",
+      "SteamStats.methods.edit",
+      "SteamStatsEdit.methods.set_int",
+      "SteamStatsEdit.methods.unlock",
+      "SteamStatsEdit.methods.submit",
+      "SteamStatsSubmissionResult.properties.value",
+      "SteamStatsSubmission.properties.applied"
+    ]
+  },
+  {
+    "title": "Resume a campaign at the last saved Steam Cloud checkpoint",
+    "setup": "Reaching a campaign checkpoint saves its ID to [Steam Cloud](/steam/client-services#save-a-profile-to-cloud). Press Continue to resume from the last saved checkpoint.",
+    "code": "extends Control\n\nsignal continue_requested(checkpoint_id: StringName)\n\nconst CHECKPOINT_FILE: String = \"campaign_checkpoint.json\"\nconst CHECKPOINT_KEY: String = \"checkpoint_id\"\n\n@export var steam_client: SteamClient\n@export var continue_button: Button\n@export var cloud_status: Label\n\nvar _cloud_busy: bool = false\n\n\nfunc _ready() -> void:\n    continue_button.pressed.connect(_continue_from_cloud)\n\n\nfunc save_checkpoint(checkpoint_id: StringName) -> void:\n    if not is_instance_valid(steam_client) or not steam_client.is_online():\n        cloud_status.text = \"Steam Cloud is unavailable.\"\n        return\n    if _cloud_busy:\n        cloud_status.text = \"Steam Cloud is busy. Try saving again.\"\n        return\n\n    _set_cloud_busy(true)\n    var cloud: SteamCloud = steam_client.cloud()\n    var payload: Dictionary = {CHECKPOINT_KEY: String(checkpoint_id)}\n    var bytes: PackedByteArray = JSON.stringify(payload).to_utf8_buffer()\n    var result: SteamResult = await cloud.write(CHECKPOINT_FILE, bytes)\n    _set_cloud_busy(false)\n\n    if result.ok:\n        cloud_status.text = \"Checkpoint saved to Steam Cloud.\"\n    else:\n        cloud_status.text = \"Could not save checkpoint: %s\" % result.message\n\n\nfunc _continue_from_cloud() -> void:\n    if not is_instance_valid(steam_client) or not steam_client.is_online():\n        cloud_status.text = \"Steam Cloud is unavailable.\"\n        return\n\n    _set_cloud_busy(true)\n    var cloud: SteamCloud = steam_client.cloud()\n    var result: SteamBytesResult = await cloud.read(CHECKPOINT_FILE)\n    _set_cloud_busy(false)\n    if not result.ok:\n        cloud_status.text = \"Could not load checkpoint: %s\" % result.message\n        return\n\n    var decoded: Variant = JSON.parse_string(result.value.get_string_from_utf8())\n    if not decoded is Dictionary:\n        cloud_status.text = \"The cloud checkpoint is invalid.\"\n        return\n    var payload: Dictionary = decoded\n    var checkpoint_id: Variant = payload.get(CHECKPOINT_KEY)\n    if not checkpoint_id is String or checkpoint_id.is_empty():\n        cloud_status.text = \"The cloud checkpoint has no checkpoint ID.\"\n        return\n\n    cloud_status.text = \"Resuming from checkpoint %s.\" % checkpoint_id\n    continue_requested.emit(StringName(checkpoint_id))\n\n\nfunc _set_cloud_busy(is_busy: bool) -> void:\n    _cloud_busy = is_busy\n    continue_button.disabled = is_busy",
+    "members": [
+      "SteamClient.methods.cloud",
+      "SteamCloud.methods.read",
+      "SteamCloud.methods.write",
+      "SteamBytesResult.properties.value",
+      "SteamResult.properties.ok",
+      "SteamResult.properties.message"
+    ]
+  },
+  {
+    "title": "Show subscribed Workshop maps in the custom map browser",
+    "setup": "Press Refresh in Custom Maps to load titles for maps the player subscribes to in Steam Workshop. Selecting a map passes its published ID to the game.",
+    "code": "extends Control\n\nsignal map_selected(published_id: String)\n\nconst MAPS_PER_REFRESH: int = 12\n\n@export var steam_client: SteamClient\n@export var refresh_button: Button\n@export var map_list: ItemList\n@export var workshop_status: Label\n\n\nfunc _ready() -> void:\n    refresh_button.pressed.connect(_refresh_maps)\n    map_list.item_selected.connect(_select_map)\n\n\nfunc _refresh_maps() -> void:\n    map_list.clear()\n    if not is_instance_valid(steam_client) or not steam_client.is_online():\n        workshop_status.text = \"Sign in to Steam to see your maps.\"\n        return\n\n    var workshop: SteamWorkshop = steam_client.workshop()\n    var result: SteamWorkshopSubscriptionsResult = workshop.subscriptions(MAPS_PER_REFRESH)\n    if not result.ok:\n        workshop_status.text = \"Could not load subscriptions: %s\" % result.message\n        return\n\n    var subscriptions: SteamWorkshopSubscriptions = result.value\n    if subscriptions.published_ids.is_empty():\n        workshop_status.text = \"Subscribe to a map in the Steam Workshop to see it here.\"\n        return\n\n    refresh_button.disabled = true\n    workshop_status.text = \"Loading map titles...\"\n    for published_id: String in subscriptions.published_ids:\n        var item: SteamWorkshopItemRef = workshop.item(published_id)\n        var details: SteamWorkshopItemResult = await item.fetch()\n        if not details.ok:\n            continue\n        var row: int = map_list.add_item(details.value.title)\n        map_list.set_item_metadata(row, published_id)\n    refresh_button.disabled = false\n    workshop_status.text = \"Showing %d of %d subscribed maps.\" % [\n        map_list.item_count, subscriptions.total_count,\n    ]\n\n\nfunc _select_map(index: int) -> void:\n    var published_id: String = map_list.get_item_metadata(index)\n    map_selected.emit(published_id)",
+    "members": [
+      "SteamClient.methods.workshop",
+      "SteamWorkshop.methods.subscriptions",
+      "SteamWorkshopSubscriptionsResult.properties.value",
+      "SteamWorkshopSubscriptions.properties.published_ids",
+      "SteamWorkshopSubscriptions.properties.total_count",
+      "SteamWorkshop.methods.item",
+      "SteamWorkshopItemRef.methods.fetch",
+      "SteamWorkshopItemResult.properties.value",
+      "SteamWorkshopItem.properties.title"
+    ]
+  },
+  {
+    "title": "Open a Steam practice room and show who joins",
+    "setup": "Press Create room in the Practice menu, then invite friends through the Steam Overlay. The [social lobby](/steam/listen-servers#run-a-social-lobby-without-a-game) updates the roster as players join or leave.",
+    "code": "extends Control\n\nconst PRACTICE_NAMESPACE: StringName = &\"arena-practice\"\nconst ROOM_TITLE: String = \"Arena practice room\"\nconst ROOM_SIZE: int = 4\n\n@export var steam_client: SteamClient\n@export var create_button: Button\n@export var invite_button: Button\n@export var leave_button: Button\n@export var member_list: ItemList\n@export var room_status: Label\n\nvar _lobby: SteamLobby\n\n\nfunc _ready() -> void:\n    _set_room_controls(false)\n    create_button.pressed.connect(_create_room)\n    invite_button.pressed.connect(_invite_friends)\n    leave_button.pressed.connect(_leave_room)\n\n\nfunc _create_room() -> void:\n    if not is_instance_valid(steam_client) or not steam_client.is_online():\n        room_status.text = \"Sign in to Steam to open a practice room.\"\n        return\n\n    create_button.disabled = true\n    room_status.text = \"Opening practice room...\"\n    var lobbies: SteamLobbies = steam_client.lobbies()\n    var options: SteamLobbyOptions = (\n        SteamLobbyOptions.configure()\n        .in_namespace(PRACTICE_NAMESPACE)\n        .for_players(ROOM_SIZE)\n        .with_visibility(SteamLobbyOptions.PRIVATE)\n    )\n    var result: SteamLobbyResult = await lobbies.create(options).wait()\n    if not result.ok:\n        room_status.text = \"Could not open practice room: %s\" % result.message\n        _set_room_controls(false)\n        return\n\n    _lobby = result.value\n    _lobby.closed.connect(_on_room_closed)\n    _lobby.members_changed.connect(_show_members)\n    _set_room_controls(true)\n    _show_members(_lobby.members())\n\n    var edit: SteamLobbyEdit = _lobby.edit().named(ROOM_TITLE)\n    var rename_error: Error = edit.submit()\n    room_status.text = ROOM_TITLE if rename_error == OK else \"Practice room opened without a title.\"\n\n\nfunc _show_members(members: Array[SteamLobbyMember]) -> void:\n    member_list.clear()\n    for member: SteamLobbyMember in members:\n        var player_name: String = member.display_name\n        if player_name.is_empty():\n            player_name = \"Steam player %s\" % member.steam_id\n        if member.is_owner:\n            player_name += \" (host)\"\n        member_list.add_item(player_name)\n\n\nfunc _invite_friends() -> void:\n    var result: Error = _lobby.open_invite_dialog()\n    if result == OK:\n        room_status.text = \"Choose a friend in the Steam Overlay.\"\n    else:\n        room_status.text = \"Could not open the invite picker: %s\" % error_string(result)\n\n\nfunc _leave_room() -> void:\n    var result: Error = _lobby.leave()\n    if result != OK:\n        room_status.text = \"Could not leave the room: %s\" % error_string(result)\n\n\nfunc _on_room_closed(reason: int) -> void:\n    _lobby = null\n    member_list.clear()\n    _set_room_controls(false)\n    room_status.text = \"You left the practice room.\" if reason == OK else \"Practice room closed.\"\n\n\nfunc _set_room_controls(in_room: bool) -> void:\n    create_button.disabled = in_room\n    invite_button.disabled = not in_room\n    leave_button.disabled = not in_room",
+    "members": [
+      "SteamClient.methods.lobbies",
+      "SteamLobbyOptions.methods.configure",
+      "SteamLobbyOptions.methods.in_namespace",
+      "SteamLobbyOptions.methods.for_players",
+      "SteamLobbyOptions.methods.with_visibility",
+      "SteamLobbies.methods.create",
+      "SteamLobbyOperation.methods.wait",
+      "SteamLobbyResult.properties.value",
+      "SteamLobby.methods.members",
+      "SteamLobby.methods.edit",
+      "SteamLobbyEdit.methods.named",
+      "SteamLobbyEdit.methods.submit",
+      "SteamLobbyMember.properties.display_name",
+      "SteamLobbyMember.properties.steam_id",
+      "SteamLobbyMember.properties.is_owner",
+      "SteamLobby.methods.open_invite_dialog",
+      "SteamLobby.methods.leave"
+    ]
+  }
+]

@@ -1,0 +1,83 @@
+{
+  "ENetSessionTransport": {
+    "description": "Crimson's default direct UDP transport. It creates ENet peers for GameSession and can also be used from a custom transport adapter. GameSession owns peer installation, admission, and teardown.",
+    "methods": {
+      "disconnect_after_flush": "Schedule the specified guest's ENet connection to close after outgoing reliable packets have been sent. Does nothing when the peer is not an ENet peer or the guest is absent.",
+      "open_client": "Create a fresh ENet client peer and begin connecting to a direct SessionEndpoint. An absent, opaque, or invalid endpoint produces ERR_INVALID_PARAMETER. A successful open starts the attempt, while GameSession confirms admission later.",
+      "open_server": "Create a fresh listening ENet peer. Provide a UDP port from 1 to 65535, a remote client limit from 1 to 4095, and either `*` for all interfaces or a literal bind IP. Invalid input produces ERR_INVALID_PARAMETER. Otherwise the result carries the new peer or the ENet startup error."
+    }
+  },
+  "GameSession": {
+    "methods": {
+      "get_authenticator": "Return the authenticator selected for network starts, or null when the scope uses its existing authentication policy.",
+      "get_connected_peer_ids": "Return the current admitted remote connection IDs in ascending order. The scope's relay configuration determines which other guests a client sees.",
+      "get_local_peer_id": "Return the active local connection ID. Offline and host sessions use ID 1. Returns 0 while idle or waiting for admission.",
+      "get_peer_identity": "Return the identity verified by this session for an admitted direct peer, or null when it has no such identity. A host can read verified guests and a guest can read its verified host.",
+      "get_state": "Return the current session role. CONNECTING lasts until the host confirms admission, even if the underlying transport has connected.",
+      "host": "Start a listening session as peer 1 with admission open. Provide a port from 1 to 65535, a remote client limit from 1 to 4095, and `*` or a literal bind IP. Returns OK when the host is installed, ERR_INVALID_PARAMETER for invalid settings, or the scope or transport setup error.",
+      "is_accepting_connections": "Return true when the active host peer allows new connections. Returns false outside the host role.",
+      "is_authority": "Return true in an active offline or host session. Authority assignments for individual Godot nodes still follow the project's multiplayer configuration.",
+      "join": "Begin connecting to a host by IP address or hostname and port using the selected adapter. The timeout is in seconds and must be greater than 0 and at most 120. OK means the attempt started. Wait for session_started before sending gameplay RPCs.",
+      "join_endpoint": "Begin connecting through the selected adapter to a SessionEndpoint. The timeout is in seconds and must be greater than 0 and at most 120. A null endpoint or invalid timeout returns ERR_INVALID_PARAMETER. OK means the attempt started. Wait for session_started to confirm admission.",
+      "leave": "End an active session or pending connection and clear the remote roster. Restore the previous multiplayer peer if this session still owns the slot. Calling while idle has no effect.",
+      "set_accepting_connections": "Open or close admission on the active host without removing admitted guests. Returns ERR_UNAUTHORIZED outside the host role, ERR_BUSY if ownership changes during the call, or ERR_UNAVAILABLE when the peer cannot apply the requested flag.",
+      "set_authenticator": "Select a SessionAuthenticator for future network sessions. Pass null to retain the multiplayer scope's own authentication policy. Returns ERR_BUSY unless the session is idle and no start or teardown is in progress.",
+      "set_transport_adapter": "Select a SessionTransport for future network sessions. Pass null to use ENet. Offline startup always uses Godot's offline peer. Returns ERR_BUSY unless the session is idle and no start or teardown is in progress.",
+      "start_offline": "Install a Godot offline peer and make the local process authoritative with peer ID 1. Returns OK on success or an error if the node cannot claim the multiplayer scope."
+    }
+  },
+  "SessionAuthRequest": {
+    "description": "A request to verify the proof from one pending connection. The authenticator can settle the request once on the scene thread. The request expires when its connection or session ends.",
+    "methods": {
+      "accept": "Complete local verification with a non-null verified SessionIdentity. Returns ERR_INVALID_PARAMETER for an invalid identity, ERR_BUSY off the scene thread, or ERR_DOES_NOT_EXIST when the request has expired or already settled. The remote end must also finish verification before admission.",
+      "get_challenge": "Return the 32-byte challenge issued to this connection for the remote proof to answer.",
+      "get_peer_id": "Return the engine-reported connection ID whose proof is being verified.",
+      "get_proof": "Return the remote proof bytes for verification. Keep proof bytes out of logs and persisted data.",
+      "is_authority": "Return whether the local verifier is acting as the session authority.",
+      "reject": "Deny the pending connection. Returns OK when recorded, ERR_BUSY off the scene thread, or ERR_DOES_NOT_EXIST when the request has expired or already settled."
+    }
+  },
+  "SessionAuthenticator": {
+    "description": "Subclass this resource to create and verify connection proofs from your game or platform credentials. Configure both peers before they start. GameSession holds each connection pending until both ends verify it, while the authenticator owns the provider's verification policy.",
+    "methods": {
+      "_make_proof": "Build a proof synchronously from prepared local credentials in response to the remote peer's 32-byte challenge. The authority flag describes the local process. Return 1 to 4096 bytes for a proof, or an empty array to deny the connection.",
+      "_verify": "Verify the request's remote proof against the provider, challenge, and session context. Accept with a SessionIdentity derived from verified evidence, or reject. You can settle the request during this call or later on the scene thread. The default implementation rejects the request."
+    }
+  },
+  "SessionEndpoint": {
+    "description": "An immutable connection target passed to a transport adapter. A direct endpoint carries an IP address or hostname and UDP port. An opaque endpoint carries route bytes understood by its named adapter.",
+    "methods": {
+      "direct": "Create an ENet endpoint for the address and port. Trims surrounding whitespace from the address. Returns null for an empty address or a port outside 1 to 65535.",
+      "get_address": "Return the direct host address, or an empty string for an opaque endpoint.",
+      "get_port": "Return the direct UDP port, or 0 for an opaque endpoint.",
+      "get_route": "Return a copy of the opaque route bytes, or an empty array for a direct endpoint.",
+      "get_transport": "Return the adapter name that handles the endpoint. Direct endpoints use `enet`.",
+      "opaque": "Create an endpoint from 1 to 512 route bytes. The adapter name must begin with a lowercase ASCII letter, contain at most 32 lowercase ASCII letters, digits, or underscores, and differ from `enet`. Invalid input returns null. Keep authentication credentials separate from the route."
+    }
+  },
+  "SessionIdentity": {
+    "description": "An immutable provider namespace and stable account identifier for a connection verified by a trusted authenticator. Keep persistent player bindings separate from Godot peer IDs, which identify individual connections.",
+    "methods": {
+      "get_provider": "Return the provider namespace used to interpret the account identifier.",
+      "get_subject": "Return the stable account identifier in that provider's namespace.",
+      "verified": "Construct an identity from a provider and subject that the authenticator has already verified. Returns null for a blank field, a provider longer than 64 characters, or a subject longer than 256 characters."
+    }
+  },
+  "SessionTransport": {
+    "description": "Subclass this resource to supply fresh Godot multiplayer peers for GameSession. The session installs each peer, controls admission, enforces the remote client limit, and cleans up the connection. Implement reliable ordered delivery on channel 0 and honor the host's refusal flag.",
+    "methods": {
+      "_disconnect_after_flush": "Disconnect an admitted guest after sending its queued reliable messages. If omitted, the adapter requests a regular Godot disconnect. Implement this hook when the guest needs to receive a final message before closure.",
+      "_open_client": "Create an initialized, uninstalled client peer for the supplied endpoint. The peer may still be connecting, and must have an ID above 1 when it receives admission. Return SessionTransportResult.opened or SessionTransportResult.failed. If omitted, opening fails with ERR_UNAVAILABLE.",
+      "_open_server": "Create an initialized, uninstalled server peer with ID 1 using the supplied port, remote client limit, and bind address. The session sets the admission flag before installation. Return SessionTransportResult.opened or SessionTransportResult.failed. If omitted, opening fails with ERR_UNAVAILABLE."
+    }
+  },
+  "SessionTransportResult": {
+    "description": "An immutable result from opening a transport. A successful result supplies a fresh Godot multiplayer peer to the session. A failed result carries the setup error.",
+    "methods": {
+      "failed": "Wrap a transport setup error. Passing OK produces ERR_INVALID_PARAMETER.",
+      "get_error": "Return OK for an opened peer or the stored setup error. A result created without either factory reports ERR_UNCONFIGURED.",
+      "get_peer": "Return the initialized peer supplied by a successful transport open, or null on failure.",
+      "opened": "Wrap an initialized peer in a successful result. A null peer produces a result with ERR_INVALID_PARAMETER."
+    }
+  }
+}

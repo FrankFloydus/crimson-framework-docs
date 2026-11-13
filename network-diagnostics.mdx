@@ -1,0 +1,101 @@
+---
+title: "Diagnose multiplayer connections"
+description: "Read a live connection snapshot and test movement under delay, packet loss, and outages in the Crimson demo."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+When a guest reports a hitch, check when the last update arrived, how far the server has caught up with the player's inputs, and where it placed that player. [`Game.network_diagnostics()`](/api/classes/Game/methods/network_diagnostics) reads a snapshot for a debug panel in your own game.
+
+## Add a connection HUD
+
+Attach this script to a `Label` inside a `CanvasLayer` under the same `Main` node that boots your game. Give it room for several lines. Start the host and join with a second window. The label changes from **Waiting for a session** to a peer count and round-trip time. With prediction enabled, the guest can also see its outstanding input count and both positions. [Create a LAN game](/multiplayer-quickstart) · [Enable networked movement](/networked-movement)
+
+```gdscript
+extends Label
+
+const SAMPLE_PERIOD: float = 0.25
+
+func _ready() -> void:
+    var sampler: Timer = Timer.new()
+    sampler.wait_time = SAMPLE_PERIOD
+    sampler.timeout.connect(_refresh)
+    add_child(sampler)
+    sampler.start()
+    _refresh()
+
+
+func _refresh() -> void:
+    var game: Game = Game.for_node(self)
+    if game == null:
+        text = "Waiting for a game"
+        return
+
+    var snapshot: GameNetworkDiagnostics = game.network_diagnostics()
+    if snapshot.role == GameNetworkDiagnostics.IDLE:
+        text = "Waiting for a session"
+        return
+
+    var player: String = "No local player"
+    if snapshot.player_number > 0:
+        player = "Player %d" % snapshot.player_number
+    var round_trip: String = "unavailable"
+    if snapshot.round_trip_ms >= 0.0:
+        round_trip = "%.0f ms" % snapshot.round_trip_ms
+
+    text = "%s | Remote peers: %d | RTT: %s" % [player, snapshot.connected_peers, round_trip]
+    if snapshot.movement_mode == GameNetworkDiagnostics.GUEST_PREDICTED:
+        text += "\nPending inputs: %d | Last confirmed: %d" % [
+            snapshot.pending_inputs, snapshot.acknowledged_input
+        ]
+        text += "\nServer: %s\nLocal: %s" % [
+            snapshot.authority_position, snapshot.predicted_position
+        ]
+```
+
+[`Game.for_node()`](/api/classes/Game/methods/for_node) finds the game that owns this part of the scene tree. The timer refreshes the local [diagnostics snapshot](/api/classes/GameNetworkDiagnostics) four times per second.
+
+- **Player** is the one-based spawn slot. A dedicated server has no local player. **Remote peers** counts admitted peers on this connection. An ENet guest connects to the server, so this number does not count all actors in the world. [Player number](/api/classes/GameNetworkDiagnostics/properties/player_number) · [Connected peers](/api/classes/GameNetworkDiagnostics/properties/connected_peers)
+- **RTT** is the estimated round-trip time for ENet. The guest shows its server link. The server shows the highest guest estimate. Other transports leave this unavailable. [Round-trip estimate](/api/classes/GameNetworkDiagnostics/properties/round_trip_ms)
+- **Pending inputs** are commands the server has yet to account for. With delay, a healthy link can have pending inputs even when acknowledgments keep advancing. If they stop advancing, check the age of the most recent server state. [Pending inputs](/api/classes/GameNetworkDiagnostics/properties/pending_inputs) · [Acknowledged input](/api/classes/GameNetworkDiagnostics/properties/acknowledged_input) · [State age](/api/classes/GameNetworkDiagnostics/properties/state_age_ms)
+- **Server** is the latest received authoritative position. **Local** is the guest's current predicted position. Compare them after releasing input. While moving, the samples represent different times. Use the correction distance to see the size of the last reconciliation. [Server position](/api/classes/GameNetworkDiagnostics/properties/authority_position) · [Predicted position](/api/classes/GameNetworkDiagnostics/properties/predicted_position) · [Correction distance](/api/classes/GameNetworkDiagnostics/properties/correction_distance)
+
+## Test prediction and recovery in the demo
+
+The next two sections are for developers running the Crimson demo project. The demo's **Network Debugger** and simulator shape the selected guest's same-machine ENet connection. For a project using the addon on its own, use the HUD above.
+
+From PowerShell in the directory containing the Windows demo launchers, run `./Run-LAN.bat 2` to start a listen host and one guest. The `2` is an argument to `Run-LAN.bat`. Double-click the batch file for four windows. If the default UDP port is unavailable, the launcher chooses an available port for the entire run. Focus the guest and press **F8** or controller **View** to open its **Network Debugger**. Select **Focus game** to move while the tool stays open. Press **F8** again to bring the debugger forward.
+
+1. In **Simulator**, apply **Clear** and walk toward a wall. Open **Monitor** to see the server and local positions. After you release input, the positions should settle together.
+2. Apply **150 ms RTT + 10% loss** and repeat. Expect a higher measured round-trip time (RTT) and drops in the relay counters. The guest still responds to input promptly and stops at the wall.
+3. Try **Slow 3G** from **Profile**. For your own link, edit upload and download in kilobits per second, one-way delay and jitter in milliseconds, and loss as a percentage. Use `0` for an unlimited rate. Click **Apply** to test it. Enter a name and click **Save profile** to reuse it across windows and later batch launches.
+4. In **Lag spike**, set **Extra one-way delay (ms)** to **300**, **Duration (ms)** to **1000**, and **Start delay (ms)** to **2000**. Click **Start lag spike** and focus the game. The relay temporarily adds delay to packets in the selected directions.
+5. Open **Scenarios**, select **Profile cycle** or **Uplink interruption**, and click **Load template**. Select **Run scenario** for one pass or check **Loop** to repeat it. You can edit the stages with a profile, a duration, and an optional outage per stage. **Events** records each change. Finishing or stopping the scenario restores the previously applied profile.
+6. Face open floor. In **Connection outage**, set **Direction** to **Uplink**, **Duration (ms)** to **1400**, and **Start delay (ms)** to **2000**. Click **Start outage**, focus the game, and hold a movement key as the countdown ends. Watch the server acknowledgment and outstanding inputs recover when forwarding resumes.
+7. Click **Drop link** and wait for the connection to time out, then click **Reconnect**. The guest joins the same host again. Use **Disconnect** to compare a normal leave.
+
+The simulation controls apply to ENet guests on the same machine. Use `Run-Dedicated.bat` to repeat the guest checks with a headless server. The monitor's RTT is a measurement, while the simulator's configured delay is the amount it adds to the connection. During movement, the server and local positions refer to different points in time. Compare them after stopping.
+
+## Run a network test without windows
+
+The demo's headless runner joins a local ENet host and executes a JSON plan. Use it to repeat a network scenario, drive the demo player's authored controls, and assert what the game and relay report. Start a local host from the demo directory that contains `project.godot`. Replace the executable path and use a free UDP port. On a fresh demo project, run one Godot editor import before starting the host.
+
+```powershell
+$GodotExe = 'C:\Godot\Godot_v4.7-stable_win64_console.exe'
+$Port = 24830
+& $GodotExe --headless --path . -- --crimson-role=listen --crimson-bind=127.0.0.1 "--crimson-port=$Port"
+```
+
+After the host prints `[Crimson] READY listen 24830`, run the example from a second PowerShell in the same project directory. Use the same executable and port.
+
+```powershell
+$GodotExe = 'C:\Godot\Godot_v4.7-stable_win64_console.exe'
+$Port = 24830
+$Trace = Join-Path $env:TEMP ("crimson-simulator-" + [guid]::NewGuid().ToString("N") + ".jsonl")
+& $GodotExe --headless --path . --script res://demo/session/network_simulator_cli.gd -- "--port=$Port" --plan=res://demo/session/simulator_example.json "--output=$Trace"
+$Result = $LASTEXITCODE
+Get-Content -LiteralPath $Trace -Tail 5
+$Result
+```
+
+The example applies a profile, moves during a lag spike, samples a scenario, checks that the original profile returns, and rejoins. Pass `--list` in place of the plan arguments to see available actions and profiles without connecting. The runner exits with `0` on success, `1` when a runtime check fails, or `2` for invalid arguments or a malformed plan. The trace contains one JSON record per line for observations, events, assertions, and the result. Stop the host when the test is done.

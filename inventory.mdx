@@ -1,0 +1,37 @@
+---
+title: "Inventory"
+description: "Build a grid backpack, move items between cells, and add equipment and world pickups."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Crimson's inventory module tracks which items fit in a grid and where they are placed. Your game supplies the items, controls, and presentation. A standalone grid works in a local backpack, a stash, or a loot chest without starting a game session.
+
+| Piece | What it represents |
+| --- | --- |
+| [`SpatialInventory`](/api/classes/SpatialInventory) | The grid and its occupancy. Create one with [`Inventory.grid(size)`](/api/classes/Inventory/methods/grid). |
+| Item instance ID | A stable `StringName` for one item. Two medkits can share a definition and have separate instance IDs. Your game keeps names, icons, and other item data keyed by those IDs. |
+| [`InventoryItemView`](/api/classes/InventoryItemView) | A read-only snapshot of an item's ID, zero-based top-left cell, unrotated footprint, and rotation. Read it again after a move. |
+| Your inventory UI | Godot controls that draw the grid and translate clicks or drags into inventory actions. Read committed placements to refresh the view. |
+
+## Pack a starting kit
+
+Use [`add(id, footprint)`](/api/classes/SpatialInventory/methods/add) to place an item in the first free position where it fits. Cells are searched left to right across each row from the top, with the footprint unrotated. To put an item at a specific cell, use [`try_place()`](/api/classes/SpatialInventory/methods/try_place).
+
+The backpack quickstart gives you a working scene where buttons pack supplies and the grid shows the result. [Build a visible backpack](/inventory/quickstart)
+
+## Extend the backpack
+
+| Add | Guide |
+| --- | --- |
+| Pick up a grid item with the mouse and drop it in a free spot. | [Drag and drop](/inventory/drag-and-drop) |
+| Define item records, choose cells and rotation, and handle stack quantities. | [Items and stacks](/inventory/items) |
+| Give an actor equipment slots and add containers or temporary staging. | [Containers and equipment](/inventory/containers-and-equipment) |
+| Apply several changes together when inventory moves or changes ownership. | [Inventory transactions](/inventory/transactions) |
+| Save grid layouts and refresh changed placements. | [Snapshots and change signals](/inventory/snapshots) |
+
+## Pick up an item in a coordinated game
+
+A coordinated backpack ties item placement to a world pickup. The authority checks the player and commits removal from the world and placement in the backpack at one revision. [Build a coordinated world pickup](/inventory/coordinated-pickups)
+
+For class signatures and lower-level actions, see the [Inventory API module](/api/modules/inventory).

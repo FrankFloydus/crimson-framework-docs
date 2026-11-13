@@ -1,0 +1,111 @@
+---
+title: "Coordinated world pickups"
+description: "Let the authority commit a world pickup and its backpack placement together."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+An aid station has a medkit and a flare, but the backpack has room for one item. If you take the medkit first, the flare should stay available. In multiplayer, the host or server decides what a player can take. In this solo example, your own game makes that decision.
+
+Use a `Node` root in `res://levels/aid_station.tscn`. Attach the script to a persistent main-scene `Node` and assign its `medkit_button`, `flare_button`, and `status` exports to two buttons (**Take medkit** and **Take flare**) and a label.
+
+1. Give the game a one-cell backpack and a source that keeps track of the two supplies. [`InventoryConfig.backpack()`](/api/classes/InventoryConfig/methods/backpack) · [`pickups()`](/api/classes/InventoryConfig/methods/pickups)
+2. When a player asks to take an item, check whether they can reach it and whether it is still there. Return the item size and the change that removes it from the world. This example checks the local player and the supply record. [`_resolve_pickup()`](/api/classes/InventoryPickupSource/methods/_resolve_pickup) · [`InventoryPickup.take()`](/api/classes/InventoryPickup/methods/take)
+3. Await the pickup result before hiding the item. Crimson places it in the backpack and removes it from the world together. If either change fails, both stay as they were. [`pick_up()`](/api/classes/MatchInventory/methods/pick_up)
+
+```gdscript
+extends Node
+
+const WORLD_ID: StringName = &"aid_station"
+const WORLD_PATH: String = "res://levels/aid_station.tscn"
+const BAG_SIZE: Vector2i = Vector2i.ONE
+
+@export var medkit_button: Button
+@export var flare_button: Button
+@export var status: Label
+
+var _game: Game
+var _pickup_pending: bool = false
+
+
+class AidStationPickups extends InventoryPickupSource:
+    const STORE: String = "aid_station_supplies"
+    const SOLO_PLAYER_ID: String = "local"
+    const MEDKIT_ID: StringName = &"medkit_17"
+    const FLARE_ID: StringName = &"flare_08"
+    const ITEM_SIZE: Vector2i = Vector2i.ONE
+
+    func _register_stores(stores: TransactionCoordinator) -> Error:
+        var available: Dictionary = {String(MEDKIT_ID): true, String(FLARE_ID): true}
+        return stores.register_store(STORE, available, _prepare_consumption)
+
+    func _resolve_pickup(
+        player_id: String, pickup_id: StringName, stores: TransactionCoordinator
+    ) -> InventoryPickup:
+        var id: String = String(pickup_id)
+        var available: Dictionary = stores.read_store(STORE)
+        if player_id != SOLO_PLAYER_ID or available.get(id, false) != true:
+            return null
+        return InventoryPickup.take(pickup_id, ITEM_SIZE, STORE, {"id": id})
+
+    func _prepare_consumption(
+        available: Dictionary, edits: Array, _context: Dictionary
+    ) -> Dictionary:
+        for edit: Dictionary in edits:
+            var id: String = edit.id
+            if available.get(id, false) != true:
+                return {"ok": false, "message": "That supply has already been taken."}
+            available[id] = false
+        return {"ok": true, "state": available}
+
+
+func _ready() -> void:
+    medkit_button.disabled = true
+    flare_button.disabled = true
+
+    var station: WorldDefinition = WorldDefinition.at(WORLD_ID, WORLD_PATH)
+    var config: InventoryConfig = InventoryConfig.backpack(BAG_SIZE)
+    _game = Game.campaign(station).inventory(config.pickups(AidStationPickups.new())).boot(self)
+    var started: GameResult = await _game.play()
+    if not started.ok:
+        status.text = started.message
+        return
+
+    medkit_button.pressed.connect(_take.bind(AidStationPickups.MEDKIT_ID, medkit_button))
+    flare_button.pressed.connect(_take.bind(AidStationPickups.FLARE_ID, flare_button))
+    medkit_button.disabled = false
+    flare_button.disabled = false
+    status.text = "The aid station has a medkit and a flare."
+
+
+func _take(pickup_id: StringName, pickup_button: Button) -> void:
+    if _pickup_pending:
+        return
+    var inventory: GameInventory = _game.inventory()
+    var bag: MatchInventory = inventory.backpack() if inventory != null else null
+    if bag == null:
+        status.text = "The backpack is unavailable."
+        return
+
+    _pickup_pending = true
+    var result: InventoryResult = await bag.pick_up(pickup_id)
+    _pickup_pending = false
+    if not result.ok:
+        status.text = result.message
+        return
+
+    pickup_button.hide()
+    status.text = "Packed %s at %s." % [result.item_id, result.origin]
+```
+
+Press **Take medkit**. The button disappears and the label reports the placement at `(0, 0)`. Press **Take flare**. The label reports that the backpack has no room and the flare button stays visible.
+
+### Use the same rule in multiplayer
+
+The host or server knows which player sent the request. Use that player ID and the server's own records to decide whether they can take the item. Return `null` to refuse. [`_register_stores()`](/api/classes/InventoryPickupSource/methods/_register_stores) registers the supplies for each new match. Its prepare callback rechecks that the item is still available. The callback must finish without `await` and leave visible effects until after success.
+
+Read `item_id`, `origin`, and `revision` from a successful [`InventoryResult`](/api/classes/InventoryResult). Your game decides which players see the item disappear and which backpack details they receive. The host or server keeps the backpack records private by default.
+
+Get the local [`backpack()`](/api/classes/GameInventory/methods/backpack) again when a new match starts. A backpack handle stops working when its match ends. A dedicated server has no local player, so it has no local backpack.
+
+For explicit grid placement, stack and equipment policies, containers, and trade, see the [Inventory API module](/api/modules/inventory).

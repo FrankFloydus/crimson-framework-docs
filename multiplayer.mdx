@@ -1,0 +1,23 @@
+---
+title: "Multiplayer models"
+description: "Choose drop-in play, coordinated lobby admission, or a dedicated server."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+A Crimson multiplayer session has one authority. In a listen game, one player runs the authority and plays in the world. In a dedicated game, a separate process runs the authority and every player connects as a guest. Crimson manages session startup and teardown. Your game defines what players can do and which state they can see.
+
+| Model | Choose it when | First action |
+| --- | --- | --- |
+| Drop-in LAN | Friends should enter one shared level as soon as the host is ready. | Boot a fixed-world [`Game`](/api/classes/Game) with [`lan()`](/api/classes/GameConfig/methods/lan). The host awaits [`host()`](/api/classes/Game/methods/host) and the guest awaits [`join(address)`](/api/classes/Game/methods/join). [Build a two-player LAN game](/multiplayer-quickstart) |
+| Coordinated LAN | The host needs to wait for players, bind verified identities, then start or travel with the group. | Boot [`Game.campaign()`](/api/classes/Game/methods/campaign) with `.lan()`, then open admission with [`open_lobby()`](/api/classes/Game/methods/open_lobby). [Start and travel from a lobby](/coordinated-lan) |
+| Dedicated LAN | A headless process should own the world and stay available without a local player. | Attach a fixed-world server with [`boot_server()`](/api/classes/GameConfig/methods/boot_server) and launch it with the server role. [Run a dedicated LAN server](/dedicated-lan) |
+| Steam | Players should connect through Steam invitations, discovery, or a Steam dedicated server. | Choose a Steam profile and launch with the intended AppID. [Steam Integration](/steam/overview) |
+
+## Connections and players
+
+ENet is the default direct transport. Peers use compatible game builds and the same UDP port. When the host and guest run on one computer, use `127.0.0.1`. Other machines on the LAN use the host's reachable LAN address. In fixed-world play the seat limit includes the listen host. Give the level one spawn marker per possible player.
+
+In coordinated play, a transport peer ID identifies a connection. The game verifies who owns the connection before the authority calls [`bind_player()`](/api/classes/Game/methods/bind_player) with a durable player ID. The authority then starts the match and coordinates scene changes. [Sessions and transport reference](/api/modules/sessions-and-transport) · [Match runtime reference](/api/modules/match-runtime)
+
+Once players can join, give them movement that stays in sync across copies of the game. Then test how it feels when the connection is slow. [Synchronize player movement](/networked-movement) · [Read network diagnostics](/network-diagnostics)

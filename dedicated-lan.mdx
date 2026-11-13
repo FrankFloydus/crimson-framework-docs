@@ -1,0 +1,66 @@
+---
+title: "Run a dedicated LAN server"
+description: "Start a playerless world from a Godot scene and wait for Crimson's native readiness marker."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+A dedicated server loads the world without spawning a local player. Every seat is available to remote players. You’ll create a server and a client that use the same world and player scenes. Start with an empty Godot 4.7 project with Crimson installed. [Installation](/installation)
+
+## Create the shared scenes
+
+- `res://world.tscn` has a `Node3D` root and two `Marker3D` spawn points at distinct positions under a child named `SpawnPoints`.
+- `res://player.tscn` has a `Node3D` root and one `Camera3D`.
+
+## Create the server scene
+
+Use this script on the `Node` root of `res://server.tscn`. Name the root `Main` on the server and client so their runtime paths match.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://world.tscn")
+const PLAYER: PackedScene = preload("res://player.tscn")
+
+
+func _ready() -> void:
+    Game.configure(LEVEL, PLAYER).lan().boot_server(self)
+```
+
+[`boot_server()`](/api/classes/GameConfig/methods/boot_server) prepares the LAN game. With the server role, Crimson loads the world and starts accepting players. Wait for the readiness line before connecting a client.
+
+## Create the client scene
+
+Use this script on the `Main` root of `res://client.tscn`. It uses the same world, player, and capacity as the server and calls [`join(address)`](/api/classes/Game/methods/join) when it starts.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://world.tscn")
+const PLAYER: PackedScene = preload("res://player.tscn")
+const SERVER_ADDRESS: String = "127.0.0.1"
+
+
+func _ready() -> void:
+    var game: Game = Game.configure(LEVEL, PLAYER).lan().boot(self)
+    var result: GameResult = await game.join(SERVER_ADDRESS)
+    if not result.ok:
+        push_error(result.message)
+        return
+
+    print("Joined the dedicated server.")
+```
+
+## Launch and connect
+
+From the directory containing `project.godot`, pass the scene path and put Crimson's arguments after Godot's `--` separator. Replace the executable path with the path to your Godot console build.
+
+```powershell
+& 'C:\path\to\Godot_v4.7-stable_win64_console.exe' --headless --path . res://server.tscn -- --crimson-role=server
+```
+
+Wait for `[Crimson] READY server 7000`, then run `client.tscn`. A successful join logs `Joined the dedicated server.` Stop the client and press **Ctrl+C** in the server terminal. If server launch fails, Crimson prints `[Crimson] ERROR server` with the reason and exits with status `1`.
+
+The launcher binds to `127.0.0.1` by default. For other machines on your LAN, use `--crimson-bind=<server-lan-address>` and tell clients to join that address. You can override the UDP port with `--crimson-port=<port>`. Set the same port on the client using [`on_port()`](/api/classes/GameConfig/methods/on_port).
+
+For a custom launch flow, call [`await game.serve()`](/api/classes/Game/methods/serve) on a booted server profile and handle its [`GameResult`](/api/classes/GameResult). For a Steam server, see [Steam dedicated servers](/steam/dedicated-servers).

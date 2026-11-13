@@ -1,0 +1,62 @@
+---
+title: "Snapshots and change signals"
+description: "Save a backpack layout and refresh the inventory display when a placement changes."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+A snapshot captures the grid size, item IDs, and placements. Save it with the game-owned item records that supply each item's name, icon, quantity, and other attributes. On load, [`import_snapshot()`](/api/classes/SpatialInventory/methods/import_snapshot) validates the entire layout before replacing the grid. A rejected layout preserves the current placements.
+
+## Restore a backpack layout
+
+Use a `Node` root with the script below. First, [`export_snapshot()`](/api/classes/SpatialInventory/methods/export_snapshot) records where the medkit sits. Moving it changes the live grid. Importing the snapshot puts it back. In **Output**, the move reports one changed item and the restore asks for the whole grid to be redrawn.
+
+```gdscript
+extends Node
+
+const BAG_SIZE: Vector2i = Vector2i(4, 3)
+const MEDKIT_ID: StringName = &"medkit_17"
+const MEDKIT_SIZE: Vector2i = Vector2i(2, 1)
+const POCKET_CELL: Vector2i = Vector2i(2, 2)
+
+var _bag: SpatialInventory
+
+
+func _ready() -> void:
+    _bag = Inventory.grid(BAG_SIZE)
+    if not _check(_bag.add(MEDKIT_ID, MEDKIT_SIZE)):
+        return
+
+    var saved_layout: PackedByteArray = var_to_bytes(_bag.export_snapshot())
+    _bag.set_placement_deltas_enabled(true)
+    _bag.placements_changed.connect(_on_placements_changed)
+
+    if not _check(_bag.try_move(MEDKIT_ID, POCKET_CELL, false)):
+        return
+
+    var snapshot: Dictionary = bytes_to_var(saved_layout)
+    if not _check(_bag.import_snapshot(snapshot)):
+        return
+
+    var restored: InventoryItemView = _bag.item_at(Vector2i.ZERO)
+    print("Restored %s to %s." % [restored.id, restored.origin])
+
+
+func _on_placements_changed(ids: Array, full_refresh: bool) -> void:
+    if full_refresh:
+        print("Redraw the entire backpack.")
+        return
+
+    for id: StringName in ids:
+        print("Refresh the tile for %s." % id)
+
+
+func _check(error: Error) -> bool:
+    if error != OK:
+        push_error(error_string(error))
+    return error == OK
+```
+
+[`export_snapshot()`](/api/classes/SpatialInventory/methods/export_snapshot) returns a versioned dictionary. The example keeps it in memory and uses Godot's Variant encoding to preserve vectors and `StringName` values. Persist those bytes with your game's save data. If your save format uses JSON, explicitly encode and reconstruct the Godot types before import.
+
+For a small grid, redraw the whole display on [`changed`](/api/classes/SpatialInventory#changed). To update only affected tiles, call [`set_placement_deltas_enabled(true)`](/api/classes/SpatialInventory/methods/set_placement_deltas_enabled) and listen to [`placements_changed`](/api/classes/SpatialInventory#placements_changed). Look up each reported ID in the current grid. If its placement is gone, remove its tile. Rebuild the entire view when `full_refresh` is `true`. Transfers and batch writes publish all affected placements before notifying listeners.

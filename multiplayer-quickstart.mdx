@@ -1,0 +1,75 @@
+---
+title: "Host and join a multiplayer game"
+description: "Run two copies of your game and connect them over LAN on one machine."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Start with an empty Godot 4.7 project with Crimson installed. [Installation](/installation)
+
+## 1. Choose a shared level and player scene
+
+- `res://world.tscn`: A `Node3D` with a child named `SpawnPoints`. Put two `Marker3D` nodes under it at distinct positions.
+- `res://player.tscn`: A `Node3D` with one `Camera3D` and a visible body mesh. Put the mesh directly under the root in the `crimson_local_hidden` group to hide it from its own player.
+- `res://main.tscn`: A plain `Node` with the script below. Run the same scene in both instances.
+
+Crimson uses the two markers to place players at separate spawn points.
+
+## 2. Configure LAN and boot
+
+`Game.configure(LEVEL, PLAYER).lan().boot(self)` prepares the game under `Main`. [`lan()`](/api/classes/GameConfig/methods/lan) gives it two seats, including the host, and uses UDP port `7000` by default.
+
+## 3. Host or join and check the result
+
+[`game.host(LOOPBACK_ADDRESS)`](/api/classes/Game/methods/host) opens the world to the second player. [`game.join(LOOPBACK_ADDRESS)`](/api/classes/Game/methods/join) connects that player to the host. Use `127.0.0.1` for both on the same computer. Await either action and check [`result.ok`](/api/classes/GameResult/properties/ok) to see if the player is ready.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://world.tscn")
+const PLAYER: PackedScene = preload("res://player.tscn")
+const LOOPBACK_ADDRESS: String = "127.0.0.1"
+
+var game: Game
+var _starting: bool = false
+
+
+func _ready() -> void:
+    game = Game.configure(LEVEL, PLAYER).lan().boot(self)
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+    var key: InputEventKey = event as InputEventKey
+    if key == null or not key.pressed or key.echo or _starting:
+        return
+    if game.get_phase() != Game.IDLE:
+        return
+
+    var result: GameResult
+    match key.keycode:
+        KEY_H:
+            _starting = true
+            result = await game.host(LOOPBACK_ADDRESS)
+        KEY_J:
+            _starting = true
+            result = await game.join(LOOPBACK_ADDRESS)
+        _:
+            return
+
+    _starting = false
+    if not result.ok:
+        push_error(result.message)
+        return
+
+    print("Host ready." if key.keycode == KEY_H else "Guest ready.")
+```
+
+## Connect two copies of the game
+
+Run two instances of `main.tscn`. Press **H** in the first and wait for `Host ready.` Press **J** in the second and look for `Guest ready.` Both players enter the same world with their own camera. [Run multiple Godot instances](https://docs.godotengine.org/en/4.7/tutorials/scripting/debug/overview_of_debugging_tools.html#customize-run-instances)
+
+<Frame caption="Example host view after the guest joins">
+  ![The host sees the guest’s blue capsule on the right.](/images/getting-started/multiplayer-host.png)
+</Frame>
+
+[Coordinated LAN](/coordinated-lan) · [Dedicated LAN server](/dedicated-lan) · [Steam lobbies and listen servers](/steam/listen-servers)

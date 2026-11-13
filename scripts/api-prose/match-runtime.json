@@ -1,0 +1,110 @@
+{
+  "SceneLoadManager": {
+    "description": "Replaces a managed world offline or across the connected peers in its Godot multiplayer scope. Keep a persistent manager at the same relative path on every peer and register the same scene IDs locally. The manager prepares each scene asynchronously and owns the child named `World` in its configured container.",
+    "methods": {
+      "cancel_load": "Cancels the pending offline or host transition before its commit decision and reports it through `load_failed`. Returns `ERR_DOES_NOT_EXIST` when idle, `ERR_UNAUTHORIZED` on a client, or `ERR_BUSY` if publication has begun.",
+      "clear_world": "Unmounts the local world and releases the admission gate held by this loader. Returns `ERR_BUSY` during an active transition. Call on each participant during network teardown.",
+      "get_current_scene": "Returns the managed world root while it belongs to the configured container, or `null`.",
+      "get_current_scene_id": "Returns the registered ID of the mounted world, or an empty `StringName` when no managed world is mounted.",
+      "get_load_timeout_msec": "Returns the configured preparation and activation confirmation timeout in milliseconds per phase.",
+      "get_manage_admission": "Returns whether the loader owns the host admission gate during and after a multiplayer transition.",
+      "get_world_container": "Returns the configured world container while it remains in the same scene tree, or `null`.",
+      "is_loading": "Returns whether a transition is pending, including the wait for multiplayer activation confirmation.",
+      "register_scene": "Adds a case-sensitive ID and canonical local `res://` path to a `.tscn` or `.scn` scene. IDs are 1 to 64 ASCII characters, begin with a letter or digit, and can contain letters, digits, dots, hyphens, and underscores. Duplicate IDs return `ERR_ALREADY_EXISTS`.",
+      "request_coordinated_load": "Requests an asynchronous transition with a zero-argument callback that returns a Godot `Error`. The authority calls it once after the candidate and mount are validated and all captured peers are prepared. Return `OK` to publish state before the new world enters the tree. On rejection, keep the current state intact. A return of `OK` from this method means admission. Signals report the outcome.",
+      "request_load": "Starts an asynchronous transition for a registered scene. Call offline or as host peer 1. A client receives `ERR_UNAUTHORIZED`, an overlapping request receives `ERR_BUSY`, and an unknown ID receives `ERR_DOES_NOT_EXIST`. Signals report the outcome after admission.",
+      "set_load_timeout_msec": "Sets the timeout for future preparation and activation confirmation phases. Accepts 1 through 120,000 milliseconds and defaults to 15,000. Returns `ERR_BUSY` during a transition or `ERR_INVALID_PARAMETER` for an out-of-range timeout.",
+      "set_manage_admission": "Selects who manages the host admission gate. The default is `true`. Set `false` when the orchestrator closes admission before a host transition and holds it through confirmation. Returns `ERR_BUSY` while a transition is active or this loader holds a gate.",
+      "set_world_container": "Assigns a live container in the manager's scene tree. Reserve the child name `World` for the loader. Keep the current container while a managed world is mounted."
+    },
+    "signals": {
+      "load_completed": "Emits after the offline scene mounts or the multiplayer host confirms activation by all participants. An orchestrator can wait for a separate gameplay baseline before opening input.",
+      "load_failed": "Emits for cancellation or failure before commit, including a rejected publisher or peer membership changes. The existing world stays mounted.",
+      "load_started": "Emits when the transition has been admitted. Use it to gate gameplay and show loading feedback.",
+      "load_sync_failed": "Emits if the transition fails after the multiplayer commit decision or after coordinated authority state publication. Keep gameplay gated until the game recovers or ends the session."
+    }
+  },
+  "StateReplication": {
+    "description": "Sends bounded, recipient-specific views of committed state over the node's Godot multiplayer scope. Keep the node at the same persistent path on the server and clients, retain server peer 1 as authority, and disable Object decoding in that scope. The game supplies the visibility policy and admitted player identities.",
+    "methods": {
+      "advance_world": "Sets a strictly newer positive world epoch and a nonnegative committed revision on the authority. Existing peer bindings survive, and each peer must acknowledge a baseline for the new epoch.",
+      "clear_projection": "Invalidates the client view and emits `projection_cleared` when a view was ready. Keeps the stream identity so the orchestrator can clear the view after mounting a new world and before receiving its baseline.",
+      "get_projection": "Returns a detached copy of the client's ready view, or an empty dictionary when the view is unavailable.",
+      "get_revision": "Returns the authority's current committed revision or the client's last accepted revision. Returns zero when the transport is no longer current.",
+      "get_world_epoch": "Returns the authority's current world epoch or the client's last accepted epoch. Returns zero when the transport is no longer current.",
+      "is_client_ready": "Returns whether the client has a live, continuous view on the current transport.",
+      "is_peer_ready": "On the authority, returns whether a connected peer has acknowledged this epoch's baseline and completed catch-up. Pass its admitted `binding_generation` when gating input. Zero accepts the current generation.",
+      "publish_changes": "Advances to a nondecreasing committed revision and sends changed or removed records to ready peers. Peers with a pending baseline catch up after acknowledgment. Hidden-only changes leave the recipient's delivery sequence unchanged. Returns the first delivery error and invalidates readiness for affected peers.",
+      "register_peer": "Registers a connected, admitted peer on the authority. Supply its stable player ID and a positive binding generation. A newer generation replaces the old stream. A repeated call with the same generation and player ID returns `OK`.",
+      "remove_peer": "Removes the peer's replication stream. Supply the binding generation to guard against a delayed disconnect for an older binding. Zero removes the current stream.",
+      "reset": "Drops active streams, the current epoch, and the revision. Keeps the configured projector.",
+      "send_baseline": "Sends a fresh snapshot from the authority to the registered peer after it has mounted the matching scene. Returns immediate errors. Wait for `peer_ready` before admitting that peer's commands.",
+      "set_projector": "Sets a synchronous callback receiving `(peer_id, player_id, world_epoch, committed_revision)`. Return a dictionary with `ok` set to `true` and `view` set to a bounded dictionary of records visible to that player. Configure before registering peers and keep the callback free of side effects."
+    },
+    "signals": {
+      "peer_ready": "Emits on the authority after the matching baseline acknowledgment and successful catch-up for the given world epoch and binding generation.",
+      "peer_sync_failed": "Emits on the authority if baseline acknowledgment times out or delivery fails. Readiness stays closed until the peer synchronizes successfully.",
+      "projection_cleared": "Emits on the client when its previously available view is invalidated.",
+      "projection_updated": "Emits on the client after applying a baseline or delta. The `baseline` argument is `true` for a baseline. Use `get_projection()` to read the updated view."
+    }
+  },
+  "GameTransaction": {
+    "description": "A single-use plan owned by a `TransactionCoordinator`. Obtain a writable plan from `TransactionCoordinator.begin()`. The coordinator also uses this type for detached restore candidates.",
+    "methods": {
+      "add_change": "Queues a detached copy of `operation` for `store_id` with the caller's observed store revision. The coordinator checks that revision during commit. Returns `ERR_UNAVAILABLE` for an unowned, consumed, restore-only, or wrong-thread handle, and `ERR_INVALID_DATA` if the operation exceeds the data limits or contains unsupported values."
+    }
+  },
+  "TransactionCoordinator": {
+    "description": "Owns authoritative dictionary stores and publishes prepared changes together at a single commit revision. Store preparers and cross-store validators operate on detached data. Use the coordinator on the thread that created it and keep callbacks free of external side effects.",
+    "methods": {
+      "begin": "Creates a writable transaction with a detached copy of the authority's `context`. Returns `null` if called from another thread, during protected mutation, or with an unsupported context.",
+      "capture_snapshot": "Captures the entire store registry at one revision. On success, read the detached store map from the result's `stores` field. The result also carries `ok`, `code`, `message`, and `revision`.",
+      "commit": "Submits a transaction owned by this coordinator. Checks each expected store revision, prepares candidates, validates them, and publishes every changed store before notification. Returns `ok`, `code`, `message`, and `revision`. A failed evaluation consumes the submitted transaction and leaves all committed states and revisions intact.",
+      "get_revision": "Returns the coordinator's global commit revision, or `-1` from another thread.",
+      "get_store_revision": "Returns the store's current committed revision, or `-1` when the store is unknown or accessed from another thread.",
+      "notify_restore_published": "Emits the deferred `committed` notification for the matching published revision. Mutation remains gated until observers return. An absent or mismatched pending revision returns `ERR_INVALID_PARAMETER`.",
+      "prepare_restore": "Validates a detached store map with exactly the registered store IDs. On success, the result's `candidate` field contains a single-use `GameTransaction` for `publish_restore()`. Live stores stay readable at their current committed revision during preparation.",
+      "publish_restore": "Publishes the candidate to all registered stores and advances the coordinator revision. Changes to the registry or revision since preparation make a candidate stale. Set `defer_notification` to hold the `committed` signal and mutation gate until `notify_restore_published()`. Returns `ok`, `code`, `message`, and `revision`.",
+      "read_store": "Returns a detached copy of the last committed state. Returns an empty dictionary for an unknown store or when called from another thread.",
+      "register_store": "Registers a unique store ID, detached initial dictionary, and `prepare(current, operations, context)` callback. Preparation returns a dictionary with boolean `ok`, a dictionary `state` on success, and an optional `message`. The optional `validate_restore(candidate, context)` callback returns boolean `ok` in a dictionary and can include `message`. Without it, restore calls the preparer with an empty operation array.",
+      "register_validator": "Registers a unique validator over existing `watched_stores`. The `validator(prepared, context)` callback receives detached candidates for changed stores. Read unchanged stores through the coordinator. Return a dictionary with boolean `ok` and an optional `message`."
+    },
+    "signals": {
+      "committed": "Emits after every prepared state is installed. The `revision` is the new coordinator revision and `stores` lists the changed store IDs. Observers can read committed data while nested mutation stays gated."
+    }
+  },
+  "PlayerBindings": {
+    "description": "Maps admitted transport peers to stable player IDs, with at most one live peer per player. A generation lets trusted ingress revoke the exact binding associated with a disconnect.",
+    "methods": {
+      "bind_peer": "Binds an admitted peer to an unused player ID and returns a positive generation. Returns zero for an invalid peer ID, a blank player ID, an occupied peer or player, or generation exhaustion.",
+      "get_binding_generation": "Returns the current binding generation, or zero if the peer is unbound.",
+      "get_player": "Returns the bound player ID, or an empty string if the peer is unbound.",
+      "unbind_peer": "Removes the binding only if `generation` matches the peer's current generation. Returns whether a binding was removed."
+    }
+  },
+  "PlayerPossession": {
+    "description": "Maintains the authoritative primary-control assignment. Each player has at most one primary character and each character has at most one primary controller. Switches, releases, and optional game eligibility rules run through the match transaction coordinator.",
+    "methods": {
+      "configure": "Registers possession state and its validator on the given coordinator. Supply two distinct, already registered stores containing dictionaries keyed by player and character ID. The optional `eligibility(player_id, old_id, new_id, context)` callback returns whether the proposed change is allowed.",
+      "get_controller": "Returns the committed player ID controlling the character as primary, or an empty string.",
+      "get_primary": "Returns the player's committed primary character ID, or an empty string.",
+      "get_revision": "Returns the revision of the player's committed assignment, or zero if no assignment record is available.",
+      "queue_primary_change": "Adds a switch or release to a transaction from the configured coordinator. Pass an empty `character_id` to release and use the last observed assignment revision as `expected_revision`. The coordinator checks the assignment when the transaction commits.",
+      "try_set_primary": "Creates and commits a transaction for one primary switch or release. Pass an empty `character_id` to release and supply the last observed assignment revision. Returns a transaction outcome with `ok`, `code`, `message`, and `revision`."
+    },
+    "signals": {
+      "primary_changed": "Emits after publication when the player's primary character ID changes. The old and new IDs use empty strings for unassigned control. The revision belongs to the new assignment record."
+    }
+  },
+  "CommandRouter": {
+    "description": "Dispatches validated gameplay intents on the authority using player identities resolved by trusted ingress. It validates the match, world epoch, and command sequence before invoking a handler, and checks possession when the command asserts or requires a primary character.",
+    "methods": {
+      "advance_world": "Sets a strictly newer world epoch, clears player sequence cursors, and closes command admission. Returns `ERR_INVALID_PARAMETER` for an epoch that does not advance.",
+      "configure": "Binds the router once to a valid match ID, positive initial world epoch, and possession service. Command admission starts closed.",
+      "register_handler": "Registers a unique command type and a `handler(player_id, intent)` callback. Set `requires_primary` when the intent must contain the matching character ID and possession revision. The handler returns plain dictionary data with boolean `ok` and optional string `code` and `message`.",
+      "reset_player_sequence": "Clears the dispatch cursor for one player. Call after trusted ingress revokes the old binding, before accepting commands on a replacement stream.",
+      "set_accepting_commands": "Opens or closes command admission after configuration. Returns `ERR_UNCONFIGURED` before configuration or `ERR_BUSY` during dispatch or from another thread.",
+      "submit": "Validates and dispatches an intent for the supplied trusted player ID. The dictionary contains `match_id`, `world_epoch`, `sequence`, `type`, and a `payload` dictionary. Supply `character_id` and `possession_revision` together when asserting primary control. Returns a result with `ok`, `code`, and `message`. The sequence is consumed once the handler runs, even if it rejects the intent."
+    }
+  }
+}

@@ -1,0 +1,118 @@
+---
+title: Set up and ship Steamworks
+description: "Stage the Steam runtime, verify your AppID, and prepare a Windows export."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Install Crimson in your Godot project before adding Steam. The setup is the same whether you want achievements for a solo game or a lobby for multiplayer. [Installation](/installation)
+
+## Add the Steam runtime
+
+1. Obtain Valve's Steamworks SDK. Crimson was verified with Steamworks SDK 1.65. Use the SDK version specified for your addon if it differs. [Steamworks SDK](https://partner.steamgames.com/doc/sdk)
+2. Copy `redistributable_bin/win64/steam_api64.dll` from the SDK into `addons/crimson-framework/bin/` in your Godot project. Put it beside the Crimson DLLs.
+3. For client testing, start Steam and sign in. Run Steam and Godot under the same Windows account and at the same elevation.
+
+## Launch with an AppID
+
+Steam supplies your AppID when you launch an installed game from the Steam Library. For a development launch, use a separate copy of Godot or a test export. Put a plain text file named `steam_appid.txt` beside the executable. Write only the AppID into the file and launch with that directory as the working directory. Use the same AppID in the script's configuration. The configured value checks the launch AppID and does not replace it. [Valve's initialization guide](https://partner.steamgames.com/doc/sdk/api#SteamAPI_Init)
+
+You can use Valve's Spacewar AppID `480` for a first connection check. Use your own AppID and a Steam test account with a license for your app to verify your achievements, Cloud settings, ownership, or purchases. [Valve's Spacewar example](https://partner.steamgames.com/doc/sdk/api/example)
+
+For a direct Spacewar test, stage the matching Godot 4.7 executable and console executable in the same test directory. Create `steam_appid.txt` there with `480`, sign in to Steam, and use that test directory as the working directory. This keeps the development AppID out of your regular editor and shipping builds.
+
+```powershell
+$crimsonSteamTestEngine = 'C:\SteamTest\Godot'
+$crimsonSteamTestProject = 'C:\Games\TrainingRoom'
+Push-Location $crimsonSteamTestEngine
+try {
+    & .\Godot_v4.7-stable_win64_console.exe --path $crimsonSteamTestProject -- --crimson-steam-overlay=480
+} finally {
+    Pop-Location
+}
+```
+
+The argument after Godot's `--` separator lets Crimson initialize the matching Steam client before the window opens. Enable the Steam Overlay in Steam for a graphical overlay test. For a connection-only test you can omit the overlay argument. Run the connection script with **Use Spacewar** enabled and look for `Steam AppID 480 ready` in Output. [Connect your game to Steam](/steam/connect) · [Valve Overlay requirements](https://partner.steamgames.com/doc/features/overlay#requirements)
+
+## Export and verify on Windows
+
+In your Windows export preset, add `crimson_steam` to **Custom Features**. Godot then includes `steam_api64.dll` beside the exported executable. If you also ship a direct ENet version without Steam, leave `crimson_steam` out of that export preset. Keep `steam_appid.txt` for local development and leave it out of your Steam depot. [Godot GDExtension dependencies](https://docs.godotengine.org/en/4.7/engine_details/engine_api/gdextension/gdextension_file.html#dependencies)
+
+Test your Debug export and your Release export. For the distribution check, put the final export on a private Steam branch. Install that build through the Steam Library with an entitled test account and verify startup, your app's features, and Overlay behavior. [SteamPipe upload](https://partner.steamgames.com/doc/sdk/uploading)
+
+### Relaunch an unwrapped export through Steam
+
+Use this option in the startup script for an unwrapped, rendered Windows export. Set `shipping_app_id` to your authorized AppID. Run [`Steamworks.restart_through_steam_if_needed()`](/api/classes/Steamworks/methods/restart_through_steam_if_needed) before any Steam initialization, including the early `--crimson-steam-overlay` bootstrap. The call requests a Steam relaunch on `ERR_SKIP` and allows normal startup on `OK`. Use an installed copy of the game without `steam_appid.txt` to test the relaunch. [Valve's relaunch check](https://partner.steamgames.com/doc/sdk/api#SteamAPI_RestartAppIfNecessary)
+
+```gdscript
+extends Node
+
+@export var shipping_app_id: int
+
+func _ready() -> void:
+    if shipping_app_id <= 0:
+        push_error("Assign your shipping AppID in the Inspector.")
+        return
+
+    var launch_status: Error = Steamworks.restart_through_steam_if_needed(shipping_app_id)
+    if launch_status == ERR_SKIP:
+        get_tree().quit()
+        return
+    if launch_status != OK:
+        push_error("Steam launch check failed: %s" % error_string(launch_status))
+        return
+
+    var settings: SteamConfig = SteamConfig.new()
+    settings.app_id = shipping_app_id
+    var steam: Steamworks = Steamworks.boot(self, settings)
+    var startup: SteamResult = steam.boot_result()
+    if not startup.ok:
+        push_error(startup.message)
+        return
+    print("Steam client ready.")
+```
+
+For a multiplayer export, use this startup script with the installed game's `shipping_app_id`. Bind `level_scene` to a level with at least two `Marker3D` children under `SpawnPoints` and `player_scene` to a player with one `Camera3D`. After the launch check succeeds, the script attaches the game and checks its Steamworks scope.
+
+```gdscript
+extends Node
+
+@export var shipping_app_id: int
+@export var level_scene: PackedScene
+@export var player_scene: PackedScene
+
+var game: Game
+
+
+func _ready() -> void:
+    if shipping_app_id <= 0 or level_scene == null or player_scene == null:
+        push_error("Assign your shipping AppID, level, and player scenes.")
+        return
+
+    var launch_status: Error = Steamworks.restart_through_steam_if_needed(shipping_app_id)
+    if launch_status == ERR_SKIP:
+        get_tree().quit()
+        return
+    if launch_status != OK:
+        push_error("Steam launch check failed: %s" % error_string(launch_status))
+        return
+
+    var settings: SteamConfig = SteamConfig.new()
+    settings.app_id = shipping_app_id
+    game = Game.configure(level_scene, player_scene).steam(settings).boot(self)
+    var game_startup: GameResult = game.boot_result()
+    if not game_startup.ok:
+        push_error(game_startup.message)
+        return
+
+    var steam: Steamworks = game.steam()
+    var steam_startup: SteamResult = steam.boot_result()
+    if not steam_startup.ok:
+        push_error(steam_startup.message)
+        return
+    print("Steam game ready.")
+```
+
+### Wrap an export for Steam DRM
+
+If you use Valve's optional DRM wrapper, follow Valve's SteamPipe instructions to wrap the exported game executable for your AppID. Keep the wrapped executable with its companion files. The wrapper handles Steam relaunch, so you can leave the separate relaunch call out of the wrapped export. Install the build from a private Steam branch to verify it. [Steam DRM](https://partner.steamgames.com/doc/features/drm)

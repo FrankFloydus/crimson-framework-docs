@@ -1,55 +1,39 @@
-# Mintlify Starter Kit
+<!-- Copyright Francesco Di Blasi 2026 - All Rights Reserved -->
 
-Use the starter kit to get your docs deployed and ready to customize.
+# Crimson Framework documentation
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+This repository contains the Mintlify documentation for the code-first Crimson Framework API. **Docs** contains articles and examples for customers using the purchased addon. **API Reference** contains the Godot class catalog. The current reference was generated from the framework working tree ahead of its next release.
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+## Preview and check a change
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+Run these commands from the directory containing `docs.json`. Install Node.js and use the Mintlify CLI through `npx`.
 
-## AI-assisted writing
-
-Set up your AI coding tool to work with Mintlify:
-
-```bash
-npx skills add https://mintlify.com/docs
+```powershell
+npx mint@latest dev --no-open
 ```
 
-This command installs Mintlify's documentation skill for your configured AI tools like Claude Code, Cursor, Windsurf, and others. The skill includes component reference, writing standards, and workflow guidance.
+Open the local URL printed by Mintlify. On Windows, run the preview command from the docs directory in WSL. The native Windows CLI can emit backslashes in nested routes, which prevents the sidebar from highlighting the current page.
 
-See the guides for [Claude Code](https://www.mintlify.com/docs/guides/claude-code), [Codex](https://www.mintlify.com/docs/guides/codex), [Cursor](https://www.mintlify.com/docs/guides/cursor), and [Devin Desktop](https://www.mintlify.com/docs/guides/devin-desktop) for tool-specific setup.
+Run these checks before opening a pull request.
 
-## Development
-
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
-
-```
-npm i -g mint
+```powershell
+npx mint@latest validate
+npx mint@latest broken-links --check-anchors
 ```
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
+## Update the API reference
 
+The reference generator combines the framework's class XML prose with signatures exported by Godot from a matching addon. The `scripts/api-prose/` files supply descriptions that have yet to be added to the framework's class XML. Update descriptions in the framework XML when you change a binding there. Remove any overlapping supplement when you regenerate this site.
+
+Keep the guides and the generated reference tied to the same framework build. Update affected examples, regenerate the reference, and review class and navigation changes together. Edit guides and `api/overview.mdx` directly. Edit module and service descriptions in `scripts/api-module-prose.json`.
+
+For a shared gameplay example, add an entry to `scripts/api-workflow-examples/` with a task title, a short description of the trigger and result, a complete GDScript script, and the member keys used in the script. Link to a guide if the reader needs more context. Member keys use the form `GameResult.properties.ok` or `Game.methods.host`. Shared examples take precedence over individual examples in `scripts/api-member-examples.json`.
+
+To update the development reference, use the local framework checkout with the current Windows Debug addon and Godot 4.7 console executable. Run from the docs repository. Here `..` is the local framework checkout.
+
+```powershell
+$godot = 'C:\path\to\Godot_v4.7-stable_win64_console.exe'
+python scripts/generate_api.py --framework .. --working-tree --include-input --godot $godot
 ```
-mint dev
-```
 
-View your local preview at `http://localhost:3000`.
-
-## Publishing changes
-
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
-
-## Need help?
-
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+Add `--check` to compare the checkout with the expected output or `--gaps` to list missing prose. Working-tree output leaves out the draft Input and Rebinding pages. Use `--include-input` to preview them locally when the addon build matches. Working-tree generation uses the current class XML for trusted publisher pages. Supply a matching `--publisher-dll` or `--publisher-binding-docs` to reflect those bindings too. When tagging the documented API, use its release tag with `--ref` in place of `--working-tree` and supply the matching trusted build or binding export. Run `python scripts/generate_api.py --help` for all options.

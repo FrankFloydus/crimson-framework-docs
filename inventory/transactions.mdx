@@ -1,0 +1,159 @@
+---
+title: "Wallets, shops, and player trades"
+description: "Charge for an item only when it fits in the bag, and let two players agree on a trade."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+A shop should only charge the player if it can hand over the item. A trade between players should wait until both agree. In multiplayer, let the host or server make these decisions. Use the session to identify the player who asked to buy or trade, and look up prices and trade rules in your game.
+
+Each example runs on its own. Attach one script to a **Node** in an empty scene, run it, and read Godot's **Output**.
+
+## Keep track of credits
+
+[`SpatialInventoryWallet`](/api/classes/SpatialInventoryWallet) keeps a balance for each player and currency. It calls the player's positive numeric ID an actor ID. Give the currency a name, such as `&"credits"`, and use whole amounts of zero or more. If your game uses dollars and cents, store the amount in cents. Set the starting amount with [`set_balance()`](/api/classes/SpatialInventoryWallet/methods/set_balance) and read it with [`get_balance()`](/api/classes/SpatialInventoryWallet/methods/get_balance).
+
+To use your own wallet storage, implement [`_get_balance()`](/api/classes/SpatialInventoryWallet/methods/_get_balance) and [`_apply_balance_changes()`](/api/classes/SpatialInventoryWallet/methods/_apply_balance_changes). The same rules apply. Check the old amounts first and put them back if handing over the item fails.
+
+## Buy a medkit without losing credits when the bag is full
+
+Buy a medkit from the outpost shop. The player's only backpack cell holds an empty ration tin, so the first attempt fails and the player keeps all 20 credits. Discard the tin and try again. The medkit fits and the player has 14 credits left.
+
+[`apply_balance_changes()`](/api/classes/SpatialInventoryWallet/methods/apply_balance_changes) checks that the current balance matches `before`, then sets it to `after` and calls the function that hands over the medkit. That function runs right away. If the medkit cannot fit, it returns an error and the wallet puts the credits back. If a purchase delivers several items, use one [`apply_placement_changes()`](/api/classes/SpatialInventory/methods/apply_placement_changes) call so the items are placed together.
+
+```gdscript
+extends Node
+
+const PLAYER_ID: int = 1
+const CREDITS: StringName = &"credits"
+const STARTING_CREDITS: int = 20
+const MEDKIT_PRICE: int = 6
+const BAG_SIZE: Vector2i = Vector2i(1, 1)
+const ITEM_SIZE: Vector2i = Vector2i(1, 1)
+const RATION_TIN: StringName = &"empty_ration_tin"
+const MEDKIT_ID: StringName = &"outpost_medkit"
+
+func _ready() -> void:
+    var bag: SpatialInventory = Inventory.grid(BAG_SIZE)
+    var wallet: SpatialInventoryWallet = SpatialInventoryWallet.new()
+    if bag.add(RATION_TIN, ITEM_SIZE) != OK or wallet.set_balance(PLAYER_ID, CREDITS, STARTING_CREDITS) != OK:
+        push_error("Could not prepare the outpost shop example.")
+        return
+
+    var first_purchase: Error = _buy_medkit(wallet, bag)
+    print("Full bag purchase: ", error_string(first_purchase), ". Credits: ", wallet.get_balance(PLAYER_ID, CREDITS))
+
+    if bag.remove(RATION_TIN) != OK:
+        push_error("Could not discard the empty tin.")
+        return
+    var second_purchase: Error = _buy_medkit(wallet, bag)
+    if second_purchase != OK:
+        push_error(error_string(second_purchase))
+        return
+    print("Medkit in bag: ", bag.get_item_at(Vector2i.ZERO) == MEDKIT_ID)
+    print("Remaining credits: ", wallet.get_balance(PLAYER_ID, CREDITS))
+
+func _buy_medkit(wallet: SpatialInventoryWallet, bag: SpatialInventory) -> Error:
+    var balance: int = wallet.get_balance(PLAYER_ID, CREDITS)
+    if balance < MEDKIT_PRICE:
+        return ERR_UNAUTHORIZED
+
+    var changes: Array[Dictionary] = [{
+        "actor": PLAYER_ID,
+        "currency": CREDITS,
+        "before": balance,
+        "after": balance - MEDKIT_PRICE,
+    }]
+    return wallet.apply_balance_changes(changes, _deliver_medkit.bind(bag))
+
+func _deliver_medkit(bag: SpatialInventory) -> Error:
+    return bag.add(MEDKIT_ID, ITEM_SIZE)
+```
+
+This shop sells one medkit. Give each additional medkit its own ID, or add it to an existing [stack](/inventory/items#split-ammunition-for-a-teammate). Show the purchase message after Crimson returns the result. Save wallets and item data with the rest of the game.
+
+## Trade a toolkit for credits
+
+At the salvage camp, trade a toolkit for 7 credits. The first try fails because the buyer's backpack is full. Once the buyer makes room and both players agree again, the buyer gets the toolkit and the seller gets the credits.
+
+[`SpatialInventoryTrade`](/api/classes/SpatialInventoryTrade) keeps track of both backpacks and what each player is offering. One player [requests the trade](/api/classes/SpatialInventoryTrade/methods/request) and the other [accepts](/api/classes/SpatialInventoryTrade/methods/accept). The seller [sets aside the toolkit](/api/classes/SpatialInventoryTrade/methods/offer_item) and the buyer [offers credits](/api/classes/SpatialInventoryTrade/methods/set_currency_offer). Each player [locks their offer](/api/classes/SpatialInventoryTrade/methods/set_lock) to confirm it. After the second confirmation, Crimson checks the balances and available space before exchanging anything.
+
+```gdscript
+extends Node
+
+const SELLER: int = 1
+const BUYER: int = 2
+const CREDITS: StringName = &"credits"
+const BUYER_CREDITS: int = 20
+const PRICE: int = 7
+const TOOLKIT_ID: StringName = &"salvage_toolkit"
+const SHIPPING_CRATE_ID: StringName = &"shipping_crate"
+const TOOLKIT_SIZE: Vector2i = Vector2i(2, 1)
+const BAG_SIZE: Vector2i = Vector2i(4, 3)
+const OFFER_SIZE: Vector2i = Vector2i(2, 2)
+
+func _ready() -> void:
+    var seller_bag: SpatialInventory = Inventory.grid(BAG_SIZE)
+    var buyer_bag: SpatialInventory = Inventory.grid(BAG_SIZE)
+    var wallet: SpatialInventoryWallet = SpatialInventoryWallet.new()
+    if seller_bag.add(TOOLKIT_ID, TOOLKIT_SIZE) != OK:
+        push_error("Could not give the seller a toolkit.")
+        return
+    if buyer_bag.add(SHIPPING_CRATE_ID, BAG_SIZE) != OK:
+        push_error("Could not pack the shipping crate.")
+        return
+    if wallet.set_balance(BUYER, CREDITS, BUYER_CREDITS) != OK:
+        push_error("Could not fund the buyer.")
+        return
+
+    var trade: SpatialInventoryTrade = SpatialInventoryTrade.new()
+    trade.wallet = wallet
+    if trade.register_participant(SELLER, seller_bag, OFFER_SIZE) != OK:
+        push_error("Could not register the seller.")
+        return
+    if trade.register_participant(BUYER, buyer_bag, OFFER_SIZE) != OK:
+        push_error("Could not register the buyer.")
+        return
+
+    if not _accepted(trade.request(SELLER)) or not _accepted(trade.accept(BUYER)):
+        return
+    if not _accepted(trade.offer_item(SELLER, TOOLKIT_ID)):
+        return
+    if not _accepted(trade.set_currency_offer(BUYER, CREDITS, PRICE)):
+        return
+
+    var seller_locked: Dictionary = trade.set_lock(SELLER, true)
+    if not _accepted(seller_locked):
+        return
+    var blocked: Dictionary = trade.set_lock(BUYER, true)
+    if blocked.error != ERR_CANT_CREATE or blocked.completed:
+        push_error("Expected the full backpack to block the trade.")
+        return
+    print(blocked.reason)
+    print("Buyer credits before clearing space: ", wallet.get_balance(BUYER, CREDITS))
+
+    if buyer_bag.remove(SHIPPING_CRATE_ID) != OK:
+        push_error("Could not unpack the shipping crate.")
+        return
+    if not _accepted(trade.set_lock(SELLER, true)):
+        return
+    var settled: Dictionary = trade.set_lock(BUYER, true)
+    if not _accepted(settled) or not settled.completed:
+        return
+
+    print("Buyer received the toolkit: ", not buyer_bag.get_placement(TOOLKIT_ID).is_empty())
+    print("Seller credits: ", wallet.get_balance(SELLER, CREDITS))
+    print("Buyer credits: ", wallet.get_balance(BUYER, CREDITS))
+
+func _accepted(result: Dictionary) -> bool:
+    if result.error != OK:
+        push_error(result.reason)
+        return false
+    return true
+```
+
+Use `completed` to tell whether the exchange went through. An edit or failed exchange clears both confirmations, so both players need to confirm again. While a trade is open, keep other inventory actions away from [items set aside for the trade](/api/classes/SpatialInventoryTrade/methods/is_reserved). [`cancel()`](/api/classes/SpatialInventoryTrade/methods/cancel) tries to send offered items back. If a backpack is full, check the [recovery grid](/api/classes/SpatialInventoryTrade/methods/get_recovery), which can hold returned items temporarily.
+
+To offer part of a stack, use [`offer_quantity()`](/api/classes/SpatialInventoryTrade/methods/offer_quantity). Give the trade functions to [read the stack](/api/classes/SpatialInventoryTrade/properties/describe_stack), [make an ID for the part being offered](/api/classes/SpatialInventoryTrade/properties/allocate_stack_id), and [update the counts](/api/classes/SpatialInventoryTrade/properties/apply_stack_changes). The counts and placements change together, as in the [ammunition split example](/inventory/items#split-ammunition-for-a-teammate). If you save while a trade is open, save the [trade snapshot](/api/classes/SpatialInventoryTrade/methods/export_snapshot), item records, wallets, and backpacks in the same checkpoint.
+
+[Inventory overview](/inventory)

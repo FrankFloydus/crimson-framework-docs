@@ -5,3 +5,8 @@
 # Draft content
 drafts/
 *.draft.mdx
+input-maps.mdx
+
+# Repository tooling
+AGENTS.md
+scripts/

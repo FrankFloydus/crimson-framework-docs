@@ -1,0 +1,144 @@
+---
+title: "Encode custom binary messages"
+description: "Use a game-scoped codec and typed fields to encode and validate a small gameplay payload."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+A multiplayer HUD might show how many rounds a teammate has left. A binary message gives that update a fixed layout and size. A **codec** is the pair of functions that writes the update to bytes and reads those bytes back. Choose a binary codec when you control both ends and want to specify exactly which fields travel with each update.
+
+Crimson's movement replication uses the same native binary primitives internally. Enable movement replication through the normal player setup. For coordinated gameplay views and commands, use the committed-state API with Godot values. [Networked movement](/networked-movement) · [Committed state replication](/api/classes/StateReplication)
+
+## Encode an ammo update
+
+Start with Godot 4.7 and Crimson installed. Make a `Node3D` scene at `res://world.tscn` with a `Marker3D` under a child named `SpawnPoints`. Make a `Node3D` scene at `res://player.tscn` with one `Camera3D`. Make a third scene with a `Label` root. Attach the script below to the label and run that scene. [Installation](/installation) · [Create a level and player](/quickstart)
+
+The script boots a game to get its codec catalog. It registers version 1 of `weapons.ammo`, then encodes and decodes a rifle update locally. It uses two bytes for the weapon ID, one for the remaining rounds, and one for the reload flag. The label displays **Rifle magazine: 18 rounds (4 bytes).** [Game codec catalog](/api/classes/Game/methods/codecs) · [Register a codec](/api/classes/NetworkCodecs/methods/register_codec)
+
+```gdscript
+extends Label
+
+const LEVEL: PackedScene = preload("res://world.tscn")
+const PLAYER: PackedScene = preload("res://player.tscn")
+const AMMO_CODEC: StringName = &"weapons.ammo"
+const AMMO_VERSION: int = 1
+const AMMO_BYTES: int = 4
+const RIFLE_ID: int = 7
+const RIFLE_CAPACITY: int = 30
+const ROUNDS_AFTER_BURST: int = 18
+
+class AmmoUpdate extends RefCounted:
+    var weapon_id: int
+    var rounds: int
+    var reloading: bool
+
+func _ready() -> void:
+    var game: Game = Game.configure(LEVEL, PLAYER).boot(self)
+    var boot: GameResult = game.boot_result()
+    if not boot.ok:
+        text = boot.message
+        return
+
+    var codecs: NetworkCodecs = game.codecs()
+    var registered: Error = codecs.register_codec(AMMO_CODEC, AMMO_VERSION, _write_ammo, _read_ammo)
+    if registered != OK:
+        text = "Could not register the ammo codec. %s" % error_string(registered)
+        return
+
+    var update: AmmoUpdate = AmmoUpdate.new()
+    update.weapon_id = RIFLE_ID
+    update.rounds = ROUNDS_AFTER_BURST
+    var encoded: NetworkEncodeResult = codecs.encode(AMMO_CODEC, AMMO_VERSION, update, AMMO_BYTES)
+    if not encoded.ok:
+        text = "Could not encode the ammo update. %s" % error_string(encoded.error)
+        return
+
+    var decoded: NetworkDecodeResult = codecs.decode(AMMO_CODEC, AMMO_VERSION, encoded.bytes, AMMO_BYTES)
+    if not decoded.ok:
+        text = "Could not decode the ammo update. %s" % error_string(decoded.error)
+        return
+
+    var received: AmmoUpdate = decoded.value as AmmoUpdate
+    if received == null:
+        text = "The ammo codec returned an unexpected value."
+        return
+    var reload_status: String = " Reloading." if received.reloading else ""
+    text = "Rifle magazine: %d rounds (%d bytes).%s" % [
+        received.rounds, encoded.bytes.size(), reload_status
+    ]
+
+
+func _write_ammo(writer: NetworkWriter, value: Variant) -> Error:
+    var update: AmmoUpdate = value as AmmoUpdate
+    if update == null or update.weapon_id != RIFLE_ID or update.rounds < 0 or update.rounds > RIFLE_CAPACITY:
+        return ERR_INVALID_DATA
+    writer.write_u16(update.weapon_id)
+    writer.write_u8(update.rounds)
+    return writer.write_bool(update.reloading)
+
+
+func _read_ammo(reader: NetworkReader) -> Variant:
+    var update: AmmoUpdate = AmmoUpdate.new()
+    update.weapon_id = reader.read_u16()
+    update.rounds = reader.read_u8()
+    update.reloading = reader.read_bool()
+    if update.weapon_id != RIFLE_ID or update.rounds > RIFLE_CAPACITY:
+        reader.fail()
+        return null
+    return update
+```
+
+The callbacks run synchronously. Keep their read and write order identical. The writer keeps the first error, so returning the final write's status also reports earlier failures. During decoding, call [`reader.fail()`](/api/classes/NetworkReader/methods/fail) when a field violates a game rule, such as a rifle carrying more rounds than its magazine holds. The catalog checks that the reader consumed the entire payload. Check `result.ok` before using the decoded value. [Encode](/api/classes/NetworkCodecs/methods/encode) · [Decode](/api/classes/NetworkCodecs/methods/decode)
+
+## Choose field sizes and byte limits
+
+| Field type | Bytes on the wire |
+| --- | --- |
+| Boolean, `u8`, `i8` | 1 |
+| `u16`, `i16` | 2 |
+| `u32`, `i32`, `f32` | 4 |
+| `i64`, `f64` | 8 |
+| UTF-8 string or byte array | 4 for the byte count, plus the field contents |
+
+Numbers and byte counts use little-endian order, with the least significant byte first. Float fields accept finite values. String fields accept UTF-8 without NUL or a leading byte order mark. [`read_string(max_bytes)`](/api/classes/NetworkReader/methods/read_string) and [`read_bytes(max_bytes)`](/api/classes/NetworkReader/methods/read_bytes) let you set a smaller limit for a particular field.
+
+The script-facing payload budget defaults to 1,200 bytes and can be set up to 1 MiB. Choose a budget for the message itself. Account for any extra bytes from the RPC and transport separately. [NetworkWriter](/api/classes/NetworkWriter) · [NetworkReader](/api/classes/NetworkReader)
+
+## Use the payload in your game
+
+Register the same ID, version, and layout wherever you send or receive the message. Use a stable codec ID of 1 to 64 ASCII letters, digits, underscores, periods, or hyphens. Versions range from 1 to 65,535. Each catalog holds up to 256 ID and version pairs, with one registration per pair. When a layout changes, use a new version and explicitly choose the version to decode. [NetworkCodecs](/api/classes/NetworkCodecs)
+
+The encoded bytes contain the fields your writer supplied. Your game supplies the message ID and version when sending and receiving the payload. The codec runs locally. Select the registered codec from your known message types and validate the sender and gameplay permissions before applying the result. Register codecs on the game that owns their callbacks. The catalog stays attached across session restarts and retires when that game scope closes. [Game scopes](/game-services#know-when-a-handle-expires)
+
+## Read and write fields directly
+
+Use the reader and writer directly when the caller already knows the layout. For example, a practice-range display can record a target's ID and distance in a fixed six-byte payload. Attach this script to a plain `Node` in a project with Crimson installed. Run the scene and look for `Target 12 at 42.5 m (6 bytes).` in Output. [Create a writer](/api/classes/NetworkWriter/methods/create) · [Open a reader](/api/classes/NetworkReader/methods/open)
+
+```gdscript
+extends Node
+
+const PAYLOAD_BYTES: int = 6
+const TARGET_ID: int = 12
+const TARGET_DISTANCE: float = 42.5
+
+
+func _ready() -> void:
+    var writer: NetworkWriter = NetworkWriter.create(PAYLOAD_BYTES)
+    writer.write_u16(TARGET_ID)
+    writer.write_f32(TARGET_DISTANCE)
+    var bytes: PackedByteArray = writer.finish()
+    if writer.get_error() != OK:
+        push_error("Could not encode the target reading.")
+        return
+
+    var reader: NetworkReader = NetworkReader.open(bytes, PAYLOAD_BYTES)
+    var target_id: int = reader.read_u16()
+    var distance: float = reader.read_f32()
+    if reader.finish() != OK:
+        push_error("Invalid target reading.")
+        return
+
+    print("Target %d at %.1f m (%d bytes)." % [target_id, distance, bytes.size()])
+```
+
+Check the writer's status after sealing it. An empty buffer can represent a successful zero-field payload or a failed write. Check the reader's `finish()` result before using values it read. [Finish a writer](/api/classes/NetworkWriter/methods/finish) · [Finish a reader](/api/classes/NetworkReader/methods/finish)

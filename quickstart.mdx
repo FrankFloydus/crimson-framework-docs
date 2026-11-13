@@ -1,47 +1,53 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Start a solo game"
+description: "Learn when to use Crimson for a single-player game and start your first offline session."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+A **solo game** is a session for one player on their own machine. Crimson starts it offline, so there is no host to find or server to join.
 
-## Prerequisites
+Use Crimson when you want your game to manage a play session. For example, a title screen can stay open until the player chooses **New Game**. Crimson then loads the level, places the player at a spawn marker, and turns on their camera. When the player returns to the menu, `game.leave()` unloads the session so they can start again. Your game still supplies the level, movement, and rules. [Game lifecycle](/game-runtime)
 
-Before you begin, you must have:
+If your game just opens a scene with the player already in it, Godot's normal scene startup may be all you need. You can still use a standalone Crimson module such as [Inventory](/inventory) without booting a `Game`. For a solo game that needs to travel between levels or save world state, use `Game.campaign()`. [Checkpoints](/checkpoints)
 
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
+To try solo startup, use an empty Godot 4.7 project with Crimson installed. [Installation](/installation)
 
-## Get started
+## 1. Choose a level and a player
 
-<Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+- `res://world.tscn`: A `Node3D` with a child named `SpawnPoints`. Put one `Marker3D` under it and add something visible to the world.
+- `res://player.tscn`: A `Node3D` with one `Camera3D` facing the world from the spawn point.
+- `res://main.tscn`: A plain `Node` with the script below.
 
-    ```bash
-    npm install your-package
-    ```
-  </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+The level supplies the spawn position. Crimson places the player there and selects its camera.
 
-    ```bash
-    your-cli init
-    ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+## 2. Configure and boot
 
-    ```bash
-    your-cli start
-    ```
-  </Step>
-</Steps>
+[`Game.configure(LEVEL, PLAYER)`](/api/classes/Game/methods/configure) tells Crimson which scenes to use. [`boot(self)`](/api/classes/GameConfig/methods/boot) prepares the game under `Main`. This example calls `play()` right away. A title screen can wait until the player chooses **New Game**.
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+## 3. Start play and check the result
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+[`await game.play()`](/api/classes/Game/methods/play) waits for Crimson to load the world and spawn the player. Check [`result.ok`](/api/classes/GameResult/properties/ok) to see if the game is ready. If startup fails, `result.message` explains why.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://world.tscn")
+const PLAYER: PackedScene = preload("res://player.tscn")
+
+
+func _ready() -> void:
+    var game: Game = Game.configure(LEVEL, PLAYER).boot(self)
+    var result: GameResult = await game.play()
+    if not result.ok:
+        push_error(result.message)
+        return
+
+    print("Solo ready.")
+```
+
+Run `main.tscn`. The player spawns at the marker, its camera becomes active, and the game logs `Solo ready.`
+
+<Frame caption="Example solo scene viewed through the spawned player’s camera">
+  ![A red box in a small 3D room.](/images/getting-started/solo.png)
+</Frame>

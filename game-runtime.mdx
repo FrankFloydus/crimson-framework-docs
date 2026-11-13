@@ -1,0 +1,75 @@
+---
+title: "Game lifecycle"
+description: "Learn how a scene owns a Crimson game, when its world becomes ready, and how to stop a session."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Crimson attaches a game to a node you already own, such as the `Main` node that also owns your menus. It creates a child named `Game` and mounts the active level beneath that attachment. Leave that child name available for Crimson. Keep your menus and game services outside the mounted level so they remain available when it unloads.
+
+| Class | What it does |
+| --- | --- |
+| [`GameConfig`](/api/classes/GameConfig) | Describes the level, player, and optional services. [`boot(owner)`](/api/classes/GameConfig/methods/boot) attaches them to a node in the scene tree. |
+| [`Game`](/api/classes/Game) | Gives your scripts a handle for starting play, reading session state, and leaving. |
+| [`GameResult`](/api/classes/GameResult) | Reports success, a stable outcome code, and a message. Some actions also report the activated world or published online listing. |
+| [`WorldDefinition`](/api/classes/WorldDefinition) | Gives a level a stable ID and scene path in a coordinated game. |
+
+## Start and stop a training session
+
+Use `res://training_room.tscn` with a `Node3D` root and a `Marker3D` under `SpawnPoints`. Use `res://training_player.tscn` with a `Node3D` root and one `Camera3D`. The script goes on a separate `Node` root.
+
+1. Boot once and read [`boot_result()`](/api/classes/Game/methods/boot_result). A successful boot leaves the game idle and ready to take input.
+2. On **P**, await [`play()`](/api/classes/Game/methods/play). The level loads and the player spawns. Print the ready message only after the action succeeds.
+3. On **L**, await [`leave()`](/api/classes/Game/methods/leave). The session ends and **P** can start a new one with the same `Game`.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://training_room.tscn")
+const PLAYER: PackedScene = preload("res://training_player.tscn")
+const PLAY_KEY: Key = KEY_P
+const LEAVE_KEY: Key = KEY_L
+
+var _game: Game
+var _busy: bool = false
+
+
+func _ready() -> void:
+    _game = Game.configure(LEVEL, PLAYER).boot(self)
+    var booted: GameResult = _game.boot_result()
+    if not booted.ok:
+        push_error(booted.message)
+        set_process_unhandled_key_input(false)
+        return
+
+    print("Press P to play or L to leave.")
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+    var key: InputEventKey = event as InputEventKey
+    if key == null or not key.pressed or key.echo or _busy:
+        return
+
+    if key.keycode == PLAY_KEY and _game.get_phase() == Game.IDLE:
+        _busy = true
+        var started: GameResult = await _game.play()
+        _busy = false
+        if started.ok:
+            print("Training room ready.")
+        else:
+            push_error(started.message)
+    elif key.keycode == LEAVE_KEY and _game.get_phase() == Game.RUNNING:
+        _busy = true
+        var left: GameResult = await _game.leave()
+        _busy = false
+        if left.ok:
+            print("Training room closed. Press P to restart.")
+        else:
+            push_error(left.message)
+```
+
+Run the scene and press **P**, **L**, then **P** again. **Output** should report ready, closed, then ready. If the owning node leaves the scene tree, its `Game` handle stops working. [Game scopes and service overrides](/game-services)
+
+## Choose how worlds progress
+
+Use [`Game.configure(level, player)`](/api/classes/Game/methods/configure) when Crimson should load one level and spawn the player for you. Use [`Game.campaign(start)`](/api/classes/Game/methods/campaign) when your game needs to move between registered worlds, handle shared gameplay commands, or save game state. In a campaign, your game supplies its own players and rules. Both options can run offline. [Solo quickstart](/quickstart) · [Checkpoints](/checkpoints) · [Coordinated LAN](/coordinated-lan)

@@ -1,0 +1,42 @@
+---
+title: Connect to Steam
+description: "Start one Steam client attachment and verify the launch AppID."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Use standalone Steamworks to add app services to an existing game. This connection check uses one ordinary Godot node and needs no world or player scene. For a game that uses Steam to host or join, boot the game with its Steam profile instead. [Host a Steam game](/steam/listen-servers)
+
+## Connect your game to Steam
+
+Run this script on a `Node` with Steam running and signed in. For Spacewar, set `use_spacewar` to `true` and launch under AppID `480`. For your own app, leave the default to use the AppID Steam supplies. [Launch with an AppID](/steam/setup#launch-with-an-appid)
+
+- [`SteamConfig.spacewar()`](/api/classes/SteamConfig/methods/spacewar) selects a test profile and checks for a Spacewar launch. A null settings value uses the current launch context.
+- [`Steamworks.boot(self, settings)`](/api/classes/Steamworks/methods/boot) attaches the Steam client to this node for as long as the node stays in the tree.
+- [`boot_result()`](/api/classes/Steamworks/methods/boot_result) reports whether attachment succeeded. After success, [`is_online()`](/api/classes/Steamworks/methods/is_online) reports the live Steam connection separately.
+
+```gdscript
+extends Node
+
+const TEST_GROUP: String = "my-studio-training"
+
+@export var use_spacewar: bool = false
+
+var _steam: Steamworks
+
+
+func _ready() -> void:
+    var settings: SteamConfig
+    if use_spacewar:
+        settings = SteamConfig.spacewar(TEST_GROUP)
+
+    _steam = Steamworks.boot(self, settings)
+    var result: SteamResult = _steam.boot_result()
+    if not result.ok:
+        push_error(result.message)
+        return
+
+    print("Steam AppID %d ready. Online: %s" % [_steam.get_app_id(), _steam.is_online()])
+```
+
+For a successful Spacewar launch, the expected output is `Steam AppID 480 ready. Online: true`. [Troubleshoot startup](/steam/testing#diagnose-common-failures)

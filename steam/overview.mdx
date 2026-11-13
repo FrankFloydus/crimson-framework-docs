@@ -1,0 +1,38 @@
+---
+title: Steam Integration
+description: "Choose how your game uses Steam for app services, player-hosted sessions, or dedicated servers."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Crimson connects a Godot project to Steamworks for app services such as achievements and Steam Cloud. It can also use Steam to find, invite, and authenticate players in a multiplayer session. Pick the integration that matches the work Steam needs to do in your game.
+
+## Choose an integration
+
+| What your game needs | How to connect |
+| --- | --- |
+| Achievements, Steam Cloud, Workshop, or other app features | Attach [`Steamworks.boot(self)`](/api/classes/Steamworks/methods/boot) to a node that stays in the tree. It works alongside solo play or LAN multiplayer. |
+| A player hosts and friends join through Steam | Select [`.steam()`](/api/classes/GameConfig/methods/steam) on the game configuration. The game owns the lobby and its admission flow. Read the app services from [`game.steam()`](/api/classes/Game/methods/steam). |
+| A separate headless process hosts a world | Choose [`.steam_server()`](/api/classes/GameConfig/methods/steam_server). It uses a separate Steam GameServer connection for the playerless authority. |
+| An operator service verifies player ownership or manages orders | Run the [trusted publisher addon](/steam/publisher) in a backend with its own Steamworks credentials. |
+
+## Scope and AppID
+
+Client features use the Steam client on the same machine. Steam supplies an AppID at launch, and [`SteamConfig`](/api/classes/SteamConfig) can check the expected AppID and set a multiplayer test profile. Spacewar, Valve’s shared test app, uses AppID `480`. Use your own AppID to check the features you configured for your game. [Steam runtime and launch setup](/steam/setup)
+
+A Steamworks attachment owns service handles for one node or game scope. Removing that owner from the scene tree retires its handles. A Steam multiplayer game already owns an attachment, so its menus can get Steam app services from the game. A game lobby manages invitations and discovery while Crimson handles admission to the playable world.
+
+## Connect your game to Steam
+
+Run the connection check to confirm the launch AppID and Steam client state. [Connect to Steam](/steam/connect)
+
+## Choose a guide
+
+<CardGroup cols={2}>
+  <Card title="Setup and Windows exports" href="/steam/setup">Stage the Steam runtime and launch with the right AppID.</Card>
+  <Card title="Steam app services" href="/steam/client-services">Open achievements, record progression, and save files to Cloud.</Card>
+  <Card title="Lobbies and listen servers" href="/steam/listen-servers">Host, invite a friend, or find a public game.</Card>
+  <Card title="Dedicated servers" href="/steam/dedicated-servers">Run a playerless authority and connect a Steam guest.</Card>
+  <Card title="Trusted publisher services" href="/steam/publisher">Verify tickets and run publisher operations on your backend.</Card>
+  <Card title="Testing and troubleshooting" href="/steam/testing">Check startup, multiplayer, and the features your app ships.</Card>
+</CardGroup>

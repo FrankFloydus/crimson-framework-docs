@@ -1,0 +1,69 @@
+{
+  "WorldSession": {
+    "methods": {
+      "configure": "Create an empty WorldSessionDefinition for the standalone fixed-world session. Supply the world and player scenes before creating the session.",
+      "get_local_player": "Return the local peer's spawned Node3D, or null until the session has placed that player. The session owns the node's lifetime.",
+      "get_player": "Return the live Node3D assigned to peer_id, or null if the peer has no live actor in the current world.",
+      "get_port": "Return the active session's UDP port. While idle, return the definition's port or 7000 if no definition is assigned.",
+      "get_state": "Return the current WorldSession.State. Observe state_changed to learn when a pending join reaches RUNNING.",
+      "get_world": "Return the mounted Node3D world or null if the session has no mounted world. The node remains valid only while it belongs to the session.",
+      "host": "Start a direct ENet listen session on the configured UDP port, mount the world, and place the local player. The host uses the first marker and leaves the remaining markers for guests. Return OK when running or an immediate Godot Error.",
+      "join": "Begin a direct ENet connection to address on the configured UDP port. OK means the attempt started. Wait for RUNNING before accessing the local player.",
+      "leave": "Cancel a pending join or end an active session. Return OK when idle or when teardown starts, or ERR_BUSY if the session is changing state. Use session_ended to observe completed teardown.",
+      "start_offline": "Mount the configured world and place the local player at the first marker without opening a network listener. Return OK when running or an immediate Godot Error."
+    },
+    "signals": {
+      "session_ended": "Emitted with the transport or startup failure reason after the world is cleared and the session returns to IDLE. Start another session from this signal.",
+      "state_changed": "Emitted when the session changes state. RUNNING means the world and local player are available."
+    }
+  },
+  "WorldSessionDefinition": {
+    "methods": {
+      "create": "Create a detached WorldSession named WorldSession with a copy of this definition. Add it to the scene tree before starting it.",
+      "on_port": "Return a copy with the UDP port used by the host and guest. The valid range is 1 through 65535.",
+      "with_local_view": "Return a copy with player-relative NodePaths for the Camera3D to activate and the visual Node3D to hide on the local actor. Leave either path empty to skip that action.",
+      "with_players": "Return a copy with a Node3D player scene and a world-relative path to the spawn container. Its ordered direct Marker3D children define the spawn slots.",
+      "with_world": "Return a copy with the Node3D scene that the session mounts. Use the same scene and marker order on the host and guests."
+    }
+  },
+  "GameDefinition": {
+    "methods": {
+      "configure": "Create a new GameDefinition with its default fields. Set Inspector properties directly or branch from it with the fluent methods.",
+      "create": "Create a detached GameRuntime named Game with a copy of this definition. Add it to a persistent scene before starting a session.",
+      "starting_in": "Return a copy that selects world_id as the starting world. For coordinated play, use an ID from the world catalog.",
+      "with_multiplayer": "Return a copy with a snapshot of the supplied MultiplayerRules for immediate listen and dedicated sessions. Pass null to clear the rules.",
+      "with_player": "Return a copy with the Node3D player scene to instantiate for participants in a fixed-world game.",
+      "with_provider": "Return a copy that uses provider when the game attaches to the scene tree. Pass null to use the default session and scene loader.",
+      "with_saves": "Return a copy with the checkpoint application ID, storage directory, and positive schema version. Choose a stable project-specific app_id and a writable path under user://.",
+      "with_starting_world": "Return a copy with the starting world ID and the local Node3D scene for fixed-world play. Author PlayerSpawnPoint nodes inside the scene.",
+      "with_worlds": "Return a copy with a detached catalog for coordinated startup and travel. Map each stable world ID to a dictionary containing scene_id and a local res:// path to a .tscn or .scn file."
+    }
+  },
+  "MultiplayerRules": {
+    "methods": {
+      "allow_join_in_progress": "Return a copy with late admission enabled or disabled. Immediate listen and dedicated games require it to be enabled.",
+      "listen_coop": "Create rules with four total seats, late joins enabled, and UDP port 7000.",
+      "on_port": "Return a copy with the UDP port for hosting and joining. Use the same port on each peer, from 1 through 65535.",
+      "with_max_players": "Return a copy with the total seat count. Listen hosting supports 2 through 64 players, including the host. Dedicated hosting supports 1 through 64 guests."
+    }
+  },
+  "SaveSlot": {
+    "description": "A handle for one checkpoint slot in a named profile. Obtain it from GameRuntime.save_slot. The originating GameRuntime must remain in the scene tree for storage operations.",
+    "methods": {
+      "history": "Read a page of committed generations in newest-first order. Leave both cursor values empty for the first page or pass both values from the previous result's next cursor. The page limit is positive and capped at 16. On success, the operation reports the rows in value and the slot status.",
+      "restore": "Load a specific generation from this slot. Pass both the sequence and ID returned by save or history. Await the operation to observe whether the saved scene and stores became active.",
+      "restore_latest": "Load the current head of the slot. Await the operation to observe whether the saved scene and stores became active.",
+      "save": "Create a SaveRequest for this slot with the slot ID as its default display label. Call submit on the request to queue the save."
+    }
+  },
+  "SaveRequest": {
+    "description": "A branchable checkpoint request for a SaveSlot. Add display metadata before calling submit to capture and persist a generation.",
+    "methods": {
+      "as_autosave": "Return a copy marked as an autosave. A newer autosave for the same slot and world epoch can supersede an earlier request before capture.",
+      "named": "Return a copy with the requested display label. Submission sanitizes and bounds the label stored in the generation.",
+      "submit": "Timestamp the metadata and queue a checkpoint on the originating game. The game must be a running authority. On success, the operation's value contains the sequence and ID of the published generation.",
+      "with_context": "Return a copy with sanitized, bounded display context. Use small fields such as a location or chapter label. Persist gameplay state in the match stores.",
+      "with_preview": "Return a copy with a snapshot of an uncompressed, nonempty Image. Pass null to clear it. Submission includes a preview when it fits the metadata budget."
+    }
+  }
+}

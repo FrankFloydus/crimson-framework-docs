@@ -1,0 +1,19 @@
+[
+  {
+    "title": "Start a world from an existing game definition",
+    "setup": "Boot from your existing definition and start its saved world offline. [Move an existing project to code-first actions](/migration#keep-a-saved-game-definition)",
+    "code": "extends Node\n\n@export var previous_definition: GameDefinition\n\n\nfunc _ready() -> void:\n    if previous_definition == null:\n        push_error(\"Assign the existing game definition before starting.\")\n        return\n\n    var game: Game = GameConfig.from_definition(previous_definition).boot(self)\n    var started: GameResult = await game.play()\n    if not started.ok:\n        push_error(started.message)\n        return\n\n    print(\"The saved starting world is ready.\")\n",
+    "members": [
+      "GameConfig.methods.from_definition"
+    ]
+  },
+  {
+    "title": "Choose the match for an external debug panel",
+    "setup": "Choose the match when the preview and match both own booted scopes. Turn off the selection to return to automatic lookup. [Set up the debug panel](/game-services#select-a-game-from-a-debug-panel)",
+    "code": "extends Node\n\nconst LEVEL: PackedScene = preload(\"res://scope_level.tscn\")\nconst PLAYER: PackedScene = preload(\"res://scope_player.tscn\")\n\n@export var use_match_button: CheckButton\n\nvar _match_owner: Node\n\n\nfunc _ready() -> void:\n    var preview_owner: Node = Node.new()\n    preview_owner.name = \"Preview\"\n    add_child(preview_owner)\n\n    _match_owner = Node.new()\n    _match_owner.name = \"Match\"\n    add_child(_match_owner)\n\n    var config: GameConfig = Game.configure(LEVEL, PLAYER)\n    var preview: Game = config.boot(preview_owner)\n    var match_game: Game = config.boot(_match_owner)\n    if not preview.boot_result().ok or not match_game.boot_result().ok:\n        push_error(\"Could not attach both game scopes.\")\n        use_match_button.disabled = true\n        return\n\n    use_match_button.set_pressed_no_signal(false)\n    use_match_button.toggled.connect(_select_default)\n\n\nfunc _select_default(use_match: bool) -> void:\n    var selected: Game\n    if use_match:\n        selected = Game.for_node(_match_owner)\n        if selected == null:\n            use_match_button.set_pressed_no_signal(false)\n            push_warning(\"The match scope has retired.\")\n            return\n\n    var status: int = Game.set_default(selected)\n    if status != OK:\n        use_match_button.set_pressed_no_signal(not use_match)\n        push_error(\"Could not update the default game.\")\n        return\n\n    var current: Game = Game.current()\n    if current == null:\n        print(\"No default game selected.\")\n    else:\n        print(\"Match selected. Current phase: %d\" % current.get_phase())\n",
+    "members": [
+      "Game.methods.current",
+      "Game.methods.set_default"
+    ]
+  }
+]

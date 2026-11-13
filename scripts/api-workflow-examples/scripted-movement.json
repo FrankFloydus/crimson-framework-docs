@@ -1,0 +1,11 @@
+[
+  {
+    "title": "Send a supply drone across the room",
+    "setup": "Run a room with a supply drone. It flies four metres to the right, then stops. [Set up the drone](/scripted-movement)",
+    "code": "extends Node3D\n\nconst SPEED: float = 2.0\nconst PASS_TIME: float = 2.0\n\n\nfunc _ready() -> void:\n    var mover: Mover = Mover.attach(self)\n    if mover == null:\n        push_error(\"Could not attach the supply drone's mover.\")\n        return\n\n    var start: Vector3 = global_position\n    var started: Error = mover.move(Vector3.RIGHT * SPEED)\n    if started != OK:\n        push_error(error_string(started))\n        return\n\n    await get_tree().create_timer(PASS_TIME, false, true).timeout\n    var stopped: Error = mover.stop()\n    if stopped != OK:\n        push_error(error_string(stopped))\n        return\n\n    print(\"Supply drone stopped after %.1f m.\" % start.distance_to(global_position))\n",
+    "members": [
+      "Mover.methods.move",
+      "Mover.methods.stop"
+    ]
+  }
+]

@@ -1,0 +1,193 @@
+---
+title: "Containers, staging, and equipment"
+description: "Put supplies in a toolbox, set items aside at a workbench, and equip a tool in both hands."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+A backpack and a camp chest each have their own grid. A toolbox can sit in the backpack and hold items in a grid of its own. Equipment can use named slots such as the player's two hands.
+
+Each example runs on its own. Attach one script to a **Node** in an empty scene, run it, and read Godot's **Output**.
+
+## Put supplies in a toolbox
+
+At camp, put a repair kit in a toolbox, then see what happens if you try to put the toolbox inside itself. [`register_inventory()`](/api/classes/SpatialInventoryContainers/methods/register_inventory) tells Crimson which grids belong together. Register the backpack on its own. Register the toolbox grid with the toolbox item's ID so Crimson knows which item holds those contents.
+
+Give [`placement_policy()`](/api/classes/SpatialInventoryContainers/methods/placement_policy) to the move action so Crimson checks the move before changing either grid. It lets the kit move and keeps the toolbox in the backpack. The same check keeps an item out of two grids and prevents putting a container inside anything it already holds.
+
+```gdscript
+extends Node
+
+const PACK_SIZE: Vector2i = Vector2i(4, 3)
+const TOOLBOX_SIZE: Vector2i = Vector2i(3, 2)
+const TOOLBOX_ID: StringName = &"field_toolbox"
+const KIT_ID: StringName = &"repair_kit"
+const TOOLBOX_FOOTPRINT: Vector2i = Vector2i(2, 1)
+const KIT_FOOTPRINT: Vector2i = Vector2i(1, 1)
+const SPARE_TOOLBOX_CELL: Vector2i = Vector2i(0, 1)
+
+func _ready() -> void:
+    var pack: SpatialInventory = Inventory.grid(PACK_SIZE)
+    var tools: SpatialInventory = Inventory.grid(TOOLBOX_SIZE)
+    if pack.add(TOOLBOX_ID, TOOLBOX_FOOTPRINT) != OK or pack.add(KIT_ID, KIT_FOOTPRINT) != OK:
+        push_error("Could not pack the camp supplies.")
+        return
+
+    var containers: SpatialInventoryContainers = SpatialInventoryContainers.new()
+    if containers.register_inventory(pack) != OK:
+        push_error("Could not register the backpack.")
+        return
+    if containers.register_inventory(tools, TOOLBOX_ID) != OK:
+        push_error("Could not register the toolbox contents.")
+        return
+
+    var actions: SpatialInventoryActions = SpatialInventoryActions.new()
+    actions.drop_policy = containers.placement_policy
+    var stored: Dictionary = actions.move_item(pack, KIT_ID, tools, Vector2i.ZERO)
+    if stored.error != OK:
+        push_error(stored.reason)
+        return
+    print("Repair kit is in the toolbox: ", containers.get_owner_inventory(KIT_ID) == tools)
+
+    var refused: Dictionary = actions.move_item(pack, TOOLBOX_ID, tools, SPARE_TOOLBOX_CELL)
+    if refused.error != OK:
+        print(refused.reason)
+    print("Toolbox stayed in the backpack: ", containers.get_owner_inventory(TOOLBOX_ID) == pack)
+```
+
+When several items need to move together, [`validate_changes()`](/api/classes/SpatialInventoryContainers/methods/validate_changes) checks which grid would hold each item at the end. Then [`apply_placement_changes()`](/api/classes/SpatialInventory/methods/apply_placement_changes) checks that each item is where you expect and that everything fits. Run both checks on Godot's main thread with no other edits in between. Use [`host_placement_policy`](/api/classes/SpatialInventoryContainers/properties/host_placement_policy) for game rules such as keeping quest items out of shared chests.
+
+## Set items aside at a workbench
+
+Set a repair tool and a fuel canister on a workbench. [`stage_from()`](/api/classes/SpatialInventoryStaging/methods/stage_from) moves them onto the tray and remembers where they came from. [`place_item()`](/api/classes/SpatialInventoryStaging/methods/place_item) puts the tool in the cabinet for good. [`try_close(true)`](/api/classes/SpatialInventoryStaging/methods/try_close) tries to put the fuel back in the backpack.
+
+A spare part now occupies the fuel's old cell. The fuel stays on the tray until the player clears the cell and tries again.
+
+```gdscript
+extends Node
+
+const PACK_SIZE: Vector2i = Vector2i(4, 3)
+const TRAY_SIZE: Vector2i = Vector2i(3, 2)
+const CABINET_SIZE: Vector2i = Vector2i(4, 2)
+const TOOL_ID: StringName = &"repair_tool"
+const FUEL_ID: StringName = &"fuel_canister"
+const SPARE_ID: StringName = &"spare_part"
+const TOOL_SIZE: Vector2i = Vector2i(2, 1)
+const FUEL_SIZE: Vector2i = Vector2i(1, 1)
+const ORIGINAL_FUEL_CELL: Vector2i = Vector2i(3, 2)
+const TRAY_FUEL_CELL: Vector2i = Vector2i(2, 0)
+
+func _ready() -> void:
+    var pack: SpatialInventory = Inventory.grid(PACK_SIZE)
+    var cabinet: SpatialInventory = Inventory.grid(CABINET_SIZE)
+    if pack.add(TOOL_ID, TOOL_SIZE) != OK:
+        push_error("Could not pack the repair tool.")
+        return
+    if pack.try_place(FUEL_ID, FUEL_SIZE, ORIGINAL_FUEL_CELL) != OK:
+        push_error("Could not pack the fuel.")
+        return
+
+    var tray: SpatialInventoryStaging = SpatialInventoryStaging.new()
+    var containers: SpatialInventoryContainers = SpatialInventoryContainers.new()
+    if tray.configure(TRAY_SIZE) != OK:
+        push_error(tray.last_reason)
+        return
+    for grid: SpatialInventory in [pack, cabinet, tray.inventory]:
+        if containers.register_inventory(grid) != OK:
+            push_error("Could not register a workbench grid.")
+            return
+    tray.drop_policy = containers.placement_policy
+    tray.batch_policy = containers.validate_changes
+
+    if tray.stage_from(pack, TOOL_ID, Vector2i.ZERO) != OK:
+        push_error(tray.last_reason)
+        return
+    if tray.stage_from(pack, FUEL_ID, TRAY_FUEL_CELL) != OK:
+        push_error(tray.last_reason)
+        return
+    if tray.place_item(TOOL_ID, cabinet, Vector2i.ZERO) != OK:
+        push_error(tray.last_reason)
+        return
+    if pack.try_place(SPARE_ID, FUEL_SIZE, ORIGINAL_FUEL_CELL) != OK:
+        push_error("Could not pack the spare part.")
+        return
+    var blocked: Error = tray.try_close(true)
+    if blocked == OK or tray.is_empty():
+        push_error("The fuel should remain on the tray.")
+        return
+    print("Workbench remains open: ", tray.last_reason)
+
+    if pack.remove(SPARE_ID) != OK:
+        push_error("Could not clear the fuel's original cell.")
+        return
+    if tray.try_close(true) != OK:
+        push_error(tray.last_reason)
+        return
+
+    print("Tool in cabinet: ", cabinet.get_item_at(Vector2i.ZERO) == TOOL_ID)
+    print("Fuel back in its original cell: ", pack.get_item_at(ORIGINAL_FUEL_CELL) == FUEL_ID)
+```
+
+The tray's [`drop_policy`](/api/classes/SpatialInventoryStaging/properties/drop_policy) checks each move. Its [`batch_policy`](/api/classes/SpatialInventoryStaging/properties/batch_policy) checks the whole set of items before returning any of them. Move items through the [`tray`](/api/classes/SpatialInventoryStaging) so it knows which ones still need to go back.
+
+## Equip a two-handed tool
+
+Take the engineer's cutter out of the backpack, equip it in both hands, then put it away. [`configure()`](/api/classes/SpatialInventoryEquipment/methods/configure) links the backpack to the hand slots. The [`slot_requirements`](/api/classes/SpatialInventoryEquipment/properties/slot_requirements) function tells Crimson that this cutter takes both hands. Both slots point to the same cutter.
+
+The script previews each move first so the player can see what would happen. Your slot function can also return a message explaining why the item cannot go in that slot. Use a [`move_policy`](/api/classes/SpatialInventoryEquipment/properties/move_policy) for rules such as preventing gear changes during combat.
+
+```gdscript
+extends Node
+
+const PACK_SIZE: Vector2i = Vector2i(4, 3)
+const CUTTER_ID: StringName = &"plasma_cutter"
+const CUTTER_SIZE: Vector2i = Vector2i(2, 1)
+const MAIN_HAND: StringName = &"main_hand"
+const OFF_HAND: StringName = &"off_hand"
+const FIRST_FIT: Vector2i = Vector2i(-1, -1)
+
+func _ready() -> void:
+    var pack: SpatialInventory = Inventory.grid(PACK_SIZE)
+    if pack.add(CUTTER_ID, CUTTER_SIZE) != OK:
+        push_error("Could not pack the cutter.")
+        return
+
+    var equipment: SpatialInventoryEquipment = SpatialInventoryEquipment.new()
+    if equipment.configure(pack, [MAIN_HAND, OFF_HAND]) != OK:
+        push_error("Could not configure both hand slots.")
+        return
+    equipment.slot_requirements = _slots_for_tool
+
+    var preview: Dictionary = equipment.preview_equip(CUTTER_ID, MAIN_HAND)
+    if preview.error != OK:
+        push_error(preview.reason)
+        return
+
+    var equipped: Dictionary = equipment.equip(CUTTER_ID, MAIN_HAND, preview)
+    if not equipped.committed:
+        push_error(equipped.reason)
+        return
+    print("Main hand: ", equipment.get_slot_item(MAIN_HAND))
+    print("Off hand: ", equipment.get_slot_item(OFF_HAND))
+
+    var return_preview: Dictionary = equipment.preview_unequip(MAIN_HAND)
+    if return_preview.error != OK:
+        push_error(return_preview.reason)
+        return
+    var returned: Dictionary = equipment.unequip(MAIN_HAND, FIRST_FIT, null, return_preview)
+    if not returned.committed:
+        push_error(returned.reason)
+        return
+    print("Cutter is back at ", pack.get_placement(CUTTER_ID).origin)
+
+func _slots_for_tool(id: StringName, requested_slot: StringName) -> Variant:
+    if id == CUTTER_ID:
+        if requested_slot != MAIN_HAND:
+            return "Equip the cutter from the main hand."
+        return [MAIN_HAND, OFF_HAND]
+    return [requested_slot]
+```
+
+Pass the preview to [`equip()`](/api/classes/SpatialInventoryEquipment/methods/equip) or [`unequip()`](/api/classes/SpatialInventoryEquipment/methods/unequip) to tell Crimson which move the player saw. Show a fresh preview if the backpack, slots, or rules have changed. If equipping the cutter would push another tool out of a hand, Crimson checks that the tool fits back in the bag before changing anything. Save the [`equipment snapshot`](/api/classes/SpatialInventoryEquipment/methods/export_snapshot) with the backpack and your game's item data.
+
+[Build a shop purchase or a two-player trade](/inventory/transactions)

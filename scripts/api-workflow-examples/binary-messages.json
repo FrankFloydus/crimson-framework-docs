@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Encode an ammo update after a rifle burst",
+    "setup": "Create a level and player scene, then run the script on a plain Node. It logs the remaining rounds and the four-byte payload after the update round-trips. [Ammo update setup](/binary-messages#encode-an-ammo-update)",
+    "code": "extends Node\n\nconst LEVEL: PackedScene = preload(\"res://world.tscn\")\nconst PLAYER: PackedScene = preload(\"res://player.tscn\")\nconst AMMO_CODEC: StringName = &\"weapons.ammo\"\nconst AMMO_VERSION: int = 1\nconst AMMO_BYTES: int = 4\nconst RIFLE_ID: int = 7\nconst RIFLE_CAPACITY: int = 30\nconst ROUNDS_AFTER_BURST: int = 18\n\nclass AmmoUpdate extends RefCounted:\n    var weapon_id: int\n    var rounds: int\n    var reloading: bool\n\nvar _game: Game\n\n\nfunc _ready() -> void:\n    _game = Game.configure(LEVEL, PLAYER).boot(self)\n    if not _game.boot_result().ok:\n        push_error(_game.boot_result().message)\n        return\n\n    var codecs: NetworkCodecs = _game.codecs()\n    var registered: Error = codecs.register_codec(AMMO_CODEC, AMMO_VERSION, _write_ammo, _read_ammo)\n    if registered != OK:\n        push_error(\"Could not register the ammo codec. %s\" % error_string(registered))\n        return\n\n    var update: AmmoUpdate = AmmoUpdate.new()\n    update.weapon_id = RIFLE_ID\n    update.rounds = ROUNDS_AFTER_BURST\n    var encoded: NetworkEncodeResult = codecs.encode(AMMO_CODEC, AMMO_VERSION, update, AMMO_BYTES)\n    if not encoded.ok:\n        push_error(\"Could not encode the ammo update. %s\" % error_string(encoded.error))\n        return\n\n    var decoded: NetworkDecodeResult = codecs.decode(AMMO_CODEC, AMMO_VERSION, encoded.bytes, AMMO_BYTES)\n    if not decoded.ok:\n        push_error(\"Could not decode the ammo update. %s\" % error_string(decoded.error))\n        return\n\n    var received: AmmoUpdate = decoded.value as AmmoUpdate\n    if received == null:\n        push_error(\"The ammo codec returned an unexpected value.\")\n        return\n    print(\"Rifle magazine: %d rounds (%d bytes).\" % [received.rounds, encoded.bytes.size()])\n\n\nfunc _write_ammo(writer: NetworkWriter, value: Variant) -> Error:\n    var update: AmmoUpdate = value as AmmoUpdate\n    if update == null or update.weapon_id != RIFLE_ID or update.rounds < 0 or update.rounds > RIFLE_CAPACITY:\n        return ERR_INVALID_DATA\n    writer.write_u16(update.weapon_id)\n    writer.write_u8(update.rounds)\n    return writer.write_bool(update.reloading)\n\n\nfunc _read_ammo(reader: NetworkReader) -> Variant:\n    var update: AmmoUpdate = AmmoUpdate.new()\n    update.weapon_id = reader.read_u16()\n    update.rounds = reader.read_u8()\n    update.reloading = reader.read_bool()\n    if update.weapon_id != RIFLE_ID or update.rounds > RIFLE_CAPACITY:\n        reader.fail()\n        return null\n    return update\n",
+    "members": [
+      "Game.methods.codecs",
+      "NetworkCodecs.methods.register_codec",
+      "NetworkCodecs.methods.encode",
+      "NetworkCodecs.methods.decode",
+      "NetworkReader.methods.fail",
+      "NetworkEncodeResult.properties.bytes",
+      "NetworkDecodeResult.properties.value"
+    ]
+  },
+  {
+    "title": "Read a fixed-size practice target measurement",
+    "setup": "Attach the script to a plain Node and run the scene. Output shows the decoded target ID and distance from the six-byte reading. [Practice target setup](/binary-messages#read-and-write-fields-directly)",
+    "code": "extends Node\n\nconst PAYLOAD_BYTES: int = 6\nconst TARGET_ID: int = 12\nconst TARGET_DISTANCE: float = 42.5\n\n\nfunc _ready() -> void:\n    var writer: NetworkWriter = NetworkWriter.create(PAYLOAD_BYTES)\n    writer.write_u16(TARGET_ID)\n    writer.write_f32(TARGET_DISTANCE)\n    var bytes: PackedByteArray = writer.finish()\n    if writer.get_error() != OK:\n        push_error(\"Could not encode the target reading.\")\n        return\n\n    var reader: NetworkReader = NetworkReader.open(bytes, PAYLOAD_BYTES)\n    var target_id: int = reader.read_u16()\n    var distance: float = reader.read_f32()\n    if reader.finish() != OK:\n        push_error(\"Invalid target reading.\")\n        return\n\n    print(\"Target %d at %.1f m (%d bytes).\" % [target_id, distance, bytes.size()])\n",
+    "members": [
+      "NetworkWriter.methods.create",
+      "NetworkWriter.methods.finish",
+      "NetworkReader.methods.open",
+      "NetworkReader.methods.finish"
+    ]
+  }
+]
