@@ -5,25 +5,41 @@ description: "Use achievements, stats, Cloud, and other Steam services with or w
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Start Steamworks from a persistent scene node for app services alone. If your game already uses a Steam connection, get the services from the same game. Make the calls on Godot's main thread.
+Start Steamworks from a persistent scene node for app services alone. If your game already uses a Steam connection, get the services from the same game. Make the calls on Godot's main thread. Each example below is a separate script. Unless stated otherwise, launch with your app's Steam AppID. [Steam runtime and launch setup](/steam/setup#launch-with-an-appid)
 
 ## Start a client
 
 ### Start a standalone client
 
-Use [`Steamworks.boot(self)`](/api/classes/Steamworks/methods/boot) when your project only needs Steam app services. The [connection script](/steam/overview#connect-your-game-to-steam) prints the confirmed AppID and connection state. It selects [`SteamConfig.spacewar()`](/api/classes/SteamConfig/methods/spacewar) for a development launch or accepts your app's normal Steam launch context. [Launch with an AppID](/steam/setup#launch-with-an-appid)
+Save a scene with a `Node` root as `res://steam_services.tscn` and attach the script below. It reads the current language for your app after Steam initializes. For a basic Spacewar connection check, see [Connect to Steam](/steam/connect).
+
+```gdscript
+extends Node
+
+var _steam: Steamworks
+
+
+func _ready() -> void:
+    _steam = Steamworks.boot(self)
+    var startup: SteamResult = _steam.boot_result()
+    if not startup.ok:
+        push_warning(startup.message)
+        return
+
+    print("Steam game language: %s" % _steam.apps().current_language())
+```
 
 [`boot_result()`](/api/classes/Steamworks/methods/boot_result) reports how the attachment attempt ended. [`is_ready()`](/api/classes/Steamworks/methods/is_ready) checks whether the original client is still usable. [`is_online()`](/api/classes/Steamworks/methods/is_online) checks the live connection to Steam. Steam Offline Mode can still provide some cached features.
 
 ### Reuse a Steam game's attachment
 
-On a Steam multiplayer project, get the service through [`game.steam()`](/api/classes/Game/methods/steam). This startup script reads the configured Steam language from the same scope that will host or join. It uses the scene paths from Getting Started and your normal Steam launch AppID. Use `.steam(SteamConfig.spacewar(TEST_GROUP))` with your own test group for a Spacewar launch as shown in the listen server guide. [Host and join a Steam game](/steam/listen-servers)
+On a Steam multiplayer project, get the service through [`game.steam()`](/api/classes/Game/methods/steam). This startup script reads the app's language from the same scope that can host or join later. To try it in a new project, save a `Node3D` scene as `res://steam_services_level.tscn` and another as `res://steam_services_player.tscn`. Attach the script to a separate ordinary `Node` scene and run that scene. This check only attaches the game, so it leaves the level and player unloaded.
 
 ```gdscript
 extends Node
 
-const LEVEL: PackedScene = preload("res://world.tscn")
-const PLAYER: PackedScene = preload("res://player.tscn")
+const LEVEL: PackedScene = preload("res://steam_services_level.tscn")
+const PLAYER: PackedScene = preload("res://steam_services_player.tscn")
 
 var game: Game
 var steam: Steamworks
@@ -89,7 +105,7 @@ Resolve new service handles after reattaching. A temporary loss of connectivity 
 
 ## Open the Steam Overlay
 
-Attach this script to a persistent node and assign an **Achievements** button. Press it to request the achievements panel through [`Steamworks.open_achievements()`](/api/classes/Steamworks/methods/open_achievements). The example uses your app's launch AppID. On a Steam multiplayer project, use the Steamworks attachment supplied by `game.steam()`.
+Create a scene with a `Node` root and a button labeled **Achievements**. Attach this script to the root and assign the button in the Inspector. Press it to request the panel through [`Steamworks.open_achievements()`](/api/classes/Steamworks/methods/open_achievements).
 
 ```gdscript
 extends Node
@@ -114,13 +130,15 @@ A successful result means Steam received the request. Verify that the panel appe
 
 ## Unlock an achievement
 
-Publish an achievement for your AppID that the client can update. Replace the sample API name and call `record_training_completed()` when your training objective succeeds. Attach this script to a persistent node to keep receiving callbacks when the player changes levels.
+Publish an achievement for your AppID that the client can update. Replace the sample API name with the published name. In a test scene, attach this script to a `Node` root and assign a button labeled **Complete Training**. Press the button on a test account to simulate completing the objective. In a game, connect the actual objective to `record_training_completed()`.
 
 ```gdscript
 extends Node
 
 const TRAINING_COMPLETE: String = "TRAINING_COMPLETE"
 const STEAM_RESULT_OK: int = 1
+
+@export var complete_training_button: Button
 
 var _steam: Steamworks
 
@@ -135,6 +153,11 @@ func _ready() -> void:
     var stats: SteamStats = _steam.stats()
     stats.stats_stored.connect(_on_stats_stored)
     stats.achievement_stored.connect(_on_achievement_stored)
+    complete_training_button.pressed.connect(record_training_completed)
+
+    var saved: SteamAchievement = stats.achievement(StringName(TRAINING_COMPLETE))
+    if saved != null and saved.unlocked:
+        print("Training achievement is already unlocked.")
 
 
 func record_training_completed() -> void:
@@ -153,24 +176,37 @@ func _on_achievement_stored(name: String, current: int, maximum: int) -> void:
         print("Steam reported a full training achievement unlock.")
 ```
 
-[`unlock()`](/api/classes/SteamAchievements/methods/unlock) applies the achievement edit and asks Steam to store it. A successful submission confirms that request. [`stats_stored`](/api/classes/SteamStats#stats_stored) reports the app-wide store callback. [`achievement_stored`](/api/classes/SteamStats#achievement_stored) reports the named achievement, with zero progress and maximum for a full unlock. Confirm persistence by reading the achievement after a fresh launch, and observe a new unlock notification separately in a rendered test. [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
+[`unlock()`](/api/classes/SteamAchievements/methods/unlock) applies the achievement edit and asks Steam to store it. A successful submission confirms that request. [`stats_stored`](/api/classes/SteamStats#stats_stored) reports the app-wide store callback. [`achievement_stored`](/api/classes/SteamStats#achievement_stored) reports the named achievement, with zero progress and maximum for a full unlock. Check for `Training achievement is already unlocked.` after restarting the example. Observe a new unlock notification separately in a rendered test. [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
 
 ## Record progression
 
-Use your own AppID. In Steamworks, publish an integer stat and an achievement that the client can update. Set the script constants to their exact API names. When one game event changes several values, collect them with [`edit()`](/api/classes/SteamStats/methods/edit) and apply them together with [`submit()`](/api/classes/SteamStatsEdit/methods/submit). Attach this script to a node and call `record_win()` after a victory. Pass the [`SteamStats`](/api/classes/SteamStats) service from [`steam.stats()`](/api/classes/Steamworks/methods/stats) on your standalone or game-owned Steamworks attachment and the player's total number of wins. [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
+Publish an integer stat and achievement the client can update, then set the constants to their exact API names. In a test scene, attach the script to a `Node` and assign a button labeled **Record Test Win**. Press it on a test account to submit one known victory total. A game can call `record_win()` with the actual total at the end of a match. The script collects changes with [`edit()`](/api/classes/SteamStats/methods/edit) and applies them with [`submit()`](/api/classes/SteamStatsEdit/methods/submit). [Valve stats and achievements](https://partner.steamgames.com/doc/features/achievements)
 
 ```gdscript
 extends Node
 
 const WIN_STAT: String = "wins"
 const FIRST_WIN_ACHIEVEMENT: String = "first_win"
+const TEST_WIN_TOTAL: int = 1
 
-func record_win(stats: SteamStats, total_wins: int) -> void:
-    if stats == null:
-        push_warning("Steam stats are unavailable.")
+@export var record_button: Button
+
+var _stats: SteamStats
+
+
+func _ready() -> void:
+    var steam: Steamworks = Steamworks.boot(self)
+    var startup: SteamResult = steam.boot_result()
+    if not startup.ok:
+        push_warning(startup.message)
         return
 
-    var result: SteamStatsSubmissionResult = stats.edit() \
+    _stats = steam.stats()
+    record_button.pressed.connect(record_win.bind(TEST_WIN_TOTAL))
+
+
+func record_win(total_wins: int) -> void:
+    var result: SteamStatsSubmissionResult = _stats.edit() \
         .set_int(WIN_STAT, total_wins) \
         .unlock(FIRST_WIN_ACHIEVEMENT) \
         .submit()
@@ -184,62 +220,106 @@ The result describes the submission. [`value.applied`](/api/classes/SteamStatsSu
 
 ## Save a profile to Cloud
 
-Enable Cloud and allocate quota for your own AppID in Steamworks. Use a test account with access to that app when testing writes. Get a [`SteamCloud`](/api/classes/SteamCloud) service from [`steam.cloud()`](/api/classes/Steamworks/methods/cloud) on your standalone or game-owned Steamworks attachment. Choose one of the scripts below and attach it to a node. Call its save function with that service and your serialized bytes. Use a dedicated file key for the game's profile.
+Enable Cloud and allocate quota for your AppID in Steamworks. Use a test account with access to that app. Choose one of the scripts below, attach it to the `Node` root of a new test scene, and assign its buttons. These scripts write sample JSON under dedicated test file names. [`SteamCloud`](/api/classes/SteamCloud)
 
 ### Await the result directly
 
-Call `save_and_read_profile(cloud, profile_bytes)` when your code only needs the completed results from [`write()`](/api/classes/SteamCloud/methods/write) and [`read()`](/api/classes/SteamCloud/methods/read).
+Assign **Save Profile** and **Read Profile** buttons. Save writes a sample profile with [`write()`](/api/classes/SteamCloud/methods/write). Read loads the stored bytes with [`read()`](/api/classes/SteamCloud/methods/read) and prints the profile. Keeping the actions separate lets you read the original file on another machine.
 
 ```gdscript
 extends Node
 
-const PROFILE_FILE: String = "player-profile.json"
+const PROFILE_FILE: String = "crimson-example-profile.json"
+const STARTING_LEVEL: int = 1
 
-func save_and_read_profile(cloud: SteamCloud, profile_bytes: PackedByteArray) -> void:
-    if cloud == null:
-        push_warning("Steam Cloud is unavailable.")
+@export var save_button: Button
+@export var read_button: Button
+
+var _cloud: SteamCloud
+
+
+func _ready() -> void:
+    var steam: Steamworks = Steamworks.boot(self)
+    var startup: SteamResult = steam.boot_result()
+    if not startup.ok:
+        push_warning(startup.message)
         return
 
-    var written: SteamResult = await cloud.write(PROFILE_FILE, profile_bytes)
-    if not written.ok:
+    _cloud = steam.cloud()
+    save_button.pressed.connect(_save_profile)
+    read_button.pressed.connect(_read_profile)
+
+
+func _save_profile() -> void:
+    _set_busy(true)
+    var profile: PackedByteArray = JSON.stringify({"level": STARTING_LEVEL}).to_utf8_buffer()
+    var written: SteamResult = await _cloud.write(PROFILE_FILE, profile)
+    _set_busy(false)
+    if written.ok:
+        print("Saved profile: %s" % profile.get_string_from_utf8())
+    else:
         push_warning(written.message)
-        return
 
-    var loaded: SteamBytesResult = await cloud.read(PROFILE_FILE)
+
+func _read_profile() -> void:
+    _set_busy(true)
+    var loaded: SteamBytesResult = await _cloud.read(PROFILE_FILE)
+    _set_busy(false)
     if loaded.ok:
-        print("Read %d bytes from Steam Cloud." % loaded.value.size())
+        print("Read profile: %s" % loaded.value.get_string_from_utf8())
     else:
         push_warning(loaded.message)
+
+
+func _set_busy(busy: bool) -> void:
+    save_button.disabled = busy
+    read_button.disabled = busy
 ```
 
 ### Keep the operation handle
 
-Call `save_and_read_with_handles(cloud, profile_bytes)` to retain the operations from [`write_file()`](/api/classes/SteamCloud/methods/write_file) and [`read_file()`](/api/classes/SteamCloud/methods/read_file). The script keeps each pending handle so a screen can call `cancel_pending_requests()` when it closes.
+Assign **Save and Read** and **Cancel** buttons. The script keeps the operation from [`write_file()`](/api/classes/SteamCloud/methods/write_file) or [`read_file()`](/api/classes/SteamCloud/methods/read_file) so the screen can stop waiting. Press **Cancel** while a request is pending to try that path.
 
 ```gdscript
 extends Node
 
-const PROFILE_FILE: String = "player-profile.json"
+const PROFILE_FILE: String = "crimson-example-profile-handles.json"
+const STARTING_LEVEL: int = 1
 
+@export var save_button: Button
+@export var cancel_button: Button
+
+var _cloud: SteamCloud
 var _write_operation: SteamOperation
 var _read_operation: SteamBytesOperation
 
-func save_and_read_with_handles(cloud: SteamCloud, profile_bytes: PackedByteArray) -> void:
-    if cloud == null:
-        push_warning("Steam Cloud is unavailable.")
+
+func _ready() -> void:
+    var steam: Steamworks = Steamworks.boot(self)
+    var startup: SteamResult = steam.boot_result()
+    if not startup.ok:
+        push_warning(startup.message)
         return
+
+    _cloud = steam.cloud()
+    save_button.pressed.connect(_save_and_read_with_handles)
+    cancel_button.pressed.connect(cancel_pending_requests)
+
+
+func _save_and_read_with_handles() -> void:
     if _write_operation != null or _read_operation != null:
         push_warning("A Steam Cloud request is already pending.")
         return
 
-    _write_operation = cloud.write_file(PROFILE_FILE, profile_bytes)
+    var profile: PackedByteArray = JSON.stringify({"level": STARTING_LEVEL}).to_utf8_buffer()
+    _write_operation = _cloud.write_file(PROFILE_FILE, profile)
     var written: SteamResult = await _write_operation.wait()
     _write_operation = null
     if not written.ok:
         push_warning(written.message)
         return
 
-    _read_operation = cloud.read_file(PROFILE_FILE)
+    _read_operation = _cloud.read_file(PROFILE_FILE)
     var loaded: SteamBytesResult = await _read_operation.wait()
     _read_operation = null
     if loaded.ok:
@@ -258,40 +338,57 @@ Calling [`cancel()`](/api/classes/SteamOperation/methods/cancel) stops waiting l
 
 ### Group related writes
 
-Call `write_profile_batch(cloud, profile_bytes, settings_bytes)` to group both writes with [`begin_write_batch()`](/api/classes/SteamCloud/methods/begin_write_batch). The script closes the batch after the last result, even if a write fails. Each write still has its own result. [Steam Cloud write batches](https://partner.steamgames.com/doc/api/ISteamRemoteStorage#BeginFileWriteBatch)
+Assign a **Save Profile and Settings** button. Press it to group two writes with [`begin_write_batch()`](/api/classes/SteamCloud/methods/begin_write_batch). Each write still has its own result. The script closes the batch after the last write, including on failure. [Steam Cloud write batches](https://partner.steamgames.com/doc/api/ISteamRemoteStorage#BeginFileWriteBatch)
 
 ```gdscript
 extends Node
 
-const PROFILE_FILE: String = "player-profile.json"
-const SETTINGS_FILE: String = "settings.json"
+const PROFILE_FILE: String = "crimson-example-batch-profile.json"
+const SETTINGS_FILE: String = "crimson-example-batch-settings.json"
+const STARTING_LEVEL: int = 1
 
-func write_profile_batch(
-    cloud: SteamCloud, profile_bytes: PackedByteArray, settings_bytes: PackedByteArray
-) -> void:
-    if cloud == null:
-        push_warning("Steam Cloud is unavailable.")
+@export var save_button: Button
+
+var _cloud: SteamCloud
+
+
+func _ready() -> void:
+    var steam: Steamworks = Steamworks.boot(self)
+    var startup: SteamResult = steam.boot_result()
+    if not startup.ok:
+        push_warning(startup.message)
         return
 
-    var opened: SteamCloudWriteBatchResult = cloud.begin_write_batch()
+    _cloud = steam.cloud()
+    save_button.pressed.connect(_write_profile_batch)
+
+
+func _write_profile_batch() -> void:
+    var opened: SteamCloudWriteBatchResult = _cloud.begin_write_batch()
     if not opened.ok:
         push_warning(opened.message)
         return
 
+    save_button.disabled = true
     var batch: SteamCloudWriteBatch = opened.value
     var files: Dictionary[String, PackedByteArray] = {
-        PROFILE_FILE: profile_bytes,
-        SETTINGS_FILE: settings_bytes,
+        PROFILE_FILE: JSON.stringify({"level": STARTING_LEVEL}).to_utf8_buffer(),
+        SETTINGS_FILE: JSON.stringify({"subtitles": true}).to_utf8_buffer(),
     }
+    var all_written: bool = true
     for file_name: String in files:
-        var written: SteamResult = await cloud.write(file_name, files[file_name])
+        var written: SteamResult = await _cloud.write(file_name, files[file_name])
         if not written.ok:
             push_warning(written.message)
+            all_written = false
             break
 
     var close_error: Error = batch.close()
+    save_button.disabled = false
     if close_error != OK:
         push_warning(error_string(close_error))
+    elif all_written:
+        print("Profile and settings written. Batch closed.")
 ```
 
 [`SteamCloudWriteBatch.close()`](/api/classes/SteamCloudWriteBatch/methods/close) ends the hint. Check actual sync on a second device using the same test account. [Verify Steam Cloud sync](/steam/testing#verify-steam-cloud-sync)

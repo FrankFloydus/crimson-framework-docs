@@ -3,9 +3,9 @@
     "summary": "Start a game, coordinate its session, and move between worlds.",
     "description": "Use [Game] to configure a solo, LAN, or Steam game from an existing scene owner. Use [GameConfig] to attach a dedicated server with [code]boot_server(owner)[/code]. For a coordinated game, register [WorldDefinition] destinations and use [GameScenes] for travel.",
     "guides": {
-      "Start a solo game": "/quickstart",
-      "Host and join over LAN": "/multiplayer-quickstart",
-      "Set up a coordinated LAN game": "/coordinated-lan",
+      "Learn the game lifecycle": "/game-runtime",
+      "Choose a multiplayer model": "/multiplayer",
+      "Save and restore a checkpoint": "/checkpoints",
       "Migrate an existing project": "/migration"
     },
     "sections": {
@@ -13,7 +13,7 @@
         "summary": "Configure, attach, and run a game from GDScript.",
         "description": "Call [code]Game.configure(level, player).boot(self)[/code] from a live scene owner. Await the direct game actions for a typed [GameResult]. Use [GameProvider] and [GameBindings] to supply a custom session transport at boot.",
         "guides": {
-          "Start a solo game": "/quickstart",
+          "Learn the game lifecycle": "/game-runtime",
           "Provide and resolve scoped services": "/game-services"
         }
       },
@@ -46,7 +46,9 @@
     "summary": "Place, move, and exchange game items across inventory grids.",
     "description": "Start a standalone grid with [code]Inventory.grid(size)[/code] and add items by ID and footprint. Read their placements as [InventoryItemView] values. In coordinated games, use [InventoryConfig] to enable backpacks and provide pickup rules. A [MatchInventory] backpack places an authorized pickup and consumes it in one commit. [SpatialInventory] and the lower-level adapters provide explicit placement, equipment, container, sorting, and trade tools.",
     "guides": {
-      "Use an inventory grid and a match backpack": "/inventory"
+      "Inventory concepts": "/inventory",
+      "Build a grid backpack": "/inventory/quickstart",
+      "Pick up items in a coordinated game": "/inventory/coordinated-pickups"
     }
   },
   "Match runtime": {
@@ -59,7 +61,10 @@
   },
   "Save and restore": {
     "summary": "Capture checkpoints, inspect saved generations, and restore game state.",
-    "description": "Select a coordinated game's checkpoint slot through [code]game.save_slot(profile, slot)[/code]. [SaveSlot] and [SaveRequest] expose the slot's operations. Use [SaveCoordinator] to configure participant capture, migrations, and staged restores directly. [SavePresentation] provides metadata helpers for checkpoint menus."
+    "description": "Select a coordinated game's checkpoint slot through [code]game.save_slot(profile, slot)[/code]. [SaveSlot] and [SaveRequest] expose the slot's operations. Use [SaveCoordinator] to configure participant capture, migrations, and staged restores directly. [SavePresentation] provides metadata helpers for checkpoint menus.",
+    "guides": {
+      "Save and restore a checkpoint": "/checkpoints"
+    }
   },
   "Scene loading": {
     "summary": "Load a registered world offline or coordinate its replacement across peers.",
@@ -73,7 +78,7 @@
     "summary": "Use Steam client and game server capabilities from Godot.",
     "description": "Attach app features to an existing owner with [code]Steamworks.boot(self)[/code], or get the exact Steam game attachment from [code]game.steam()[/code]. [SteamConfig] sets the expected AppID and discovery options. Pick a service below for the capabilities your game needs.",
     "guides": {
-      "Steamworks setup": "/steam/setup",
+      "Connect to Steam": "/steam/connect",
       "Steam client services": "/steam/client-services"
     },
     "sections": {

@@ -9,7 +9,7 @@ Test in your Godot project first, then repeat the checks that matter to your gam
 
 ## Verify Steam startup
 
-1. Launch your project using the development AppID setup. Enable **Use Spacewar** in the connection example and look for `Steam AppID 480 ready. Online: true` in **Output**. The script reads [`boot_result()`](/api/classes/Steamworks/methods/boot_result) before printing the result of [`is_online()`](/api/classes/Steamworks/methods/is_online). [Connect your game to Steam](/steam/overview#connect-your-game-to-steam)
+1. Launch your project using the development AppID setup. Enable **Use Spacewar** in the connection example and look for `Steam AppID 480 ready. Online: true` in **Output**. The script reads [`boot_result()`](/api/classes/Steamworks/methods/boot_result) before printing the result of [`is_online()`](/api/classes/Steamworks/methods/is_online). [Connect your game to Steam](/steam/connect)
 2. Run your Windows debug and release exports. Confirm `steam_api64.dll` is beside each executable. [Export and verify on Windows](/steam/setup#export-and-verify-on-windows)
 3. Install the release from your private Steam branch. Launch it from the Steam Library. Steam supplies the AppID for this test, so leave `steam_appid.txt` out of the depot. Confirm the Steam features you use still initialize.
 
@@ -22,7 +22,7 @@ If your game supports offline play, repeat startup with Steam in Offline Mode. M
 
 ## Verify Steam Cloud sync
 
-Use your own Cloud-enabled AppID and a test account with access to the app. Write a test profile and confirm that the write succeeds. Close the game and allow Steam to finish syncing. Launch on a second machine with the same test account, read the same file key, and check that the profile bytes match. [Save a profile to Cloud](/steam/client-services#save-a-profile-to-cloud)
+Use your own Cloud-enabled AppID and a test account with access to the app. Use **Save Profile** on the first machine, then close the game and allow Steam to sync. Launch on a second machine with the same account and press **Read Profile**. Check that the printed JSON matches the first machine's output. [Save a profile to Cloud](/steam/client-services#save-a-profile-to-cloud)
 
 ## Verify multiplayer
 

@@ -40,25 +40,51 @@
             ]
           },
           {
-            "group": "Game development",
+            "group": "Game Runtime",
             "pages": [
+              "game-runtime",
               "game-services",
-              "coordinated-lan",
-              "dedicated-lan",
-              "inventory",
-              "migration"
+              "checkpoints"
             ]
           },
           {
-            "group": "Steamworks",
+            "group": "Multiplayer",
+            "pages": [
+              "multiplayer",
+              "coordinated-lan",
+              "dedicated-lan"
+            ]
+          },
+          {
+            "group": "Inventory",
+            "pages": [
+              "inventory",
+              "inventory/quickstart",
+              "inventory/drag-and-drop",
+              "inventory/items",
+              "inventory/containers-and-equipment",
+              "inventory/transactions",
+              "inventory/snapshots",
+              "inventory/coordinated-pickups"
+            ]
+          },
+          {
+            "group": "Steam Integration",
             "pages": [
               "steam/overview",
+              "steam/connect",
               "steam/setup",
               "steam/client-services",
               "steam/listen-servers",
               "steam/dedicated-servers",
               "steam/publisher",
               "steam/testing"
+            ]
+          },
+          {
+            "group": "Upgrading",
+            "pages": [
+              "migration"
             ]
           }
         ]

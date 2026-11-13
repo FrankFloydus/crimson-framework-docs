@@ -38,28 +38,33 @@ The test host logs when its provider creates a fresh ENet adapter. [Transport ov
 ```gdscript
 extends Node
 
+const LEVEL: PackedScene = preload("res://scope_level.tscn")
+const PLAYER: PackedScene = preload("res://scope_player.tscn")
 const LOOPBACK_ADDRESS: String = "127.0.0.1"
 
-@export var level: PackedScene
-@export var player: PackedScene
+var game: Game
+
 
 class TestTransportProvider extends GameProvider:
     func _register(bindings: GameBindings) -> void:
-        var registered: int = bindings.session_transport(_make_transport)
-        if registered != OK:
+        var status: int = bindings.session_transport(_make_transport)
+        if status != OK:
             push_error("Could not register the test transport.")
+
 
     func _make_transport() -> SessionTransport:
         print("Created the test transport.")
         return ENetSessionTransport.new()
 
+
 func _ready() -> void:
     var provider: GameProvider = TestTransportProvider.new()
-    var setup: GameConfig = Game.configure(level, player).lan().provider(provider)
-    var game: Game = setup.boot(self)
-    var hosted: GameResult = await game.host(LOOPBACK_ADDRESS)
-    if not hosted.ok:
-        push_error(hosted.message)
+    game = Game.configure(LEVEL, PLAYER).lan().provider(provider).boot(self)
+
+    var result: GameResult = await game.host(LOOPBACK_ADDRESS)
+    if not result.ok:
+        push_error(result.message)
         return
-    print("Test host ready on UDP port ", game.get_port())
+
+    print("Test host ready.")
 ```

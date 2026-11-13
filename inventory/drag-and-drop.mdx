@@ -1,0 +1,157 @@
+---
+title: "Drag and drop items"
+description: "Move items with the mouse, preview valid cells, and keep the old placement when a drop fails."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+This backpack opens with a medkit and a radio. Drag either item to a free spot to move it. Drop it over the other item or outside the grid to leave it in its original cells.
+
+1. Create a new scene with a **Control** root named `DragBackpack` and save it as `res://drag_backpack.tscn`.
+2. With the root selected, click **Attach Script** in the **Scene** dock. Save the script as `res://drag_backpack.gd` and replace its contents with the code below. The script creates and draws its own backpack.
+3. Press **F6**. Grab the lower half of the radio and drop it into the lower half of a free two-cell space. The grabbed cell stays under the pointer. Try an overlap next and check that the radio stays put.
+
+```gdscript
+extends Control
+
+const BAG_SIZE: Vector2i = Vector2i(4, 3)
+const CELL_PIXELS: int = 80
+const GRID_ORIGIN: Vector2 = Vector2(24, 64)
+const TITLE_POSITION: Vector2 = Vector2(24, 24)
+const STATUS_GAP: float = 16.0
+const ITEM_INSET: float = 3.0
+const TEXT_INSET: Vector2 = Vector2(10, 25)
+const MEDKIT_ID: StringName = &"medkit_17"
+const MEDKIT_SIZE: Vector2i = Vector2i(2, 1)
+const RADIO_ID: StringName = &"radio_02"
+const RADIO_SIZE: Vector2i = Vector2i(1, 2)
+const CELL_COLOR: Color = Color("#263546")
+const GRID_COLOR: Color = Color("#526780")
+const ITEM_COLOR: Color = Color("#29716d")
+const GHOST_COLOR: Color = Color("#398e88aa")
+const ITEM_NAMES: Dictionary[StringName, String] = {
+    MEDKIT_ID: "Medkit",
+    RADIO_ID: "Radio",
+}
+
+var _bag: SpatialInventory
+var _status: Label
+var _dragging: bool = false
+
+
+class ItemDrag extends RefCounted:
+    var source: Control
+    var id: StringName
+    var grab_offset: Vector2i
+    var rotated: bool
+
+
+func _ready() -> void:
+    custom_minimum_size = GRID_ORIGIN + Vector2(BAG_SIZE * CELL_PIXELS) + Vector2(0, CELL_PIXELS)
+    mouse_filter = Control.MOUSE_FILTER_STOP
+    _add_label("Rearrange the backpack", TITLE_POSITION)
+    var status_position: Vector2 = GRID_ORIGIN + Vector2(0, BAG_SIZE.y * CELL_PIXELS + STATUS_GAP)
+    _status = _add_label("Drag an item to a free position.", status_position)
+
+    _bag = Inventory.grid(BAG_SIZE)
+    if _bag.add(MEDKIT_ID, MEDKIT_SIZE) != OK or _bag.add(RADIO_ID, RADIO_SIZE) != OK:
+        _status.text = "The starter items did not fit."
+        return
+    queue_redraw()
+
+
+func _add_label(caption: String, at: Vector2) -> Label:
+    var label: Label = Label.new()
+    label.text = caption
+    label.position = at
+    label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    add_child(label)
+    return label
+
+
+func _draw() -> void:
+    if _bag == null:
+        return
+    for row: int in range(BAG_SIZE.y):
+        for column: int in range(BAG_SIZE.x):
+            var cell: Rect2 = _rect_at(Vector2i(column, row), Vector2i.ONE)
+            draw_rect(cell, CELL_COLOR)
+            draw_rect(cell, GRID_COLOR, false)
+
+    var font: Font = get_theme_default_font()
+    for item: InventoryItemView in _bag.items():
+        var bounds: Rect2 = _rect_at(item.origin, _occupied_size(item))
+        draw_rect(bounds.grow(-ITEM_INSET), ITEM_COLOR)
+        draw_string(font, bounds.position + TEXT_INSET, ITEM_NAMES[item.id])
+
+
+func _get_drag_data(at_position: Vector2) -> Variant:
+    var cell: Vector2i = _cell_at(at_position)
+    var item: InventoryItemView = _bag.item_at(cell)
+    if item == null:
+        return null
+
+    var drag: ItemDrag = ItemDrag.new()
+    drag.source = self
+    drag.id = item.id
+    drag.grab_offset = cell - item.origin
+    drag.rotated = item.rotated
+
+    var preview: Control = Control.new()
+    var ghost: ColorRect = ColorRect.new()
+    ghost.color = GHOST_COLOR
+    ghost.position = -Vector2(drag.grab_offset * CELL_PIXELS)
+    ghost.size = Vector2(_occupied_size(item) * CELL_PIXELS)
+    ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    preview.add_child(ghost)
+    set_drag_preview(preview)
+    _status.text = "Moving %s." % ITEM_NAMES[item.id]
+    _dragging = true
+    return drag
+
+
+func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
+    var drag: ItemDrag = data as ItemDrag
+    if drag == null or drag.source != self:
+        return false
+    var origin: Vector2i = _cell_at(at_position) - drag.grab_offset
+    return _bag.check_move(drag.id, origin, drag.rotated) == OK
+
+
+func _drop_data(at_position: Vector2, data: Variant) -> void:
+    var drag: ItemDrag = data as ItemDrag
+    var origin: Vector2i = _cell_at(at_position) - drag.grab_offset
+    var error: Error = _bag.try_move(drag.id, origin, drag.rotated)
+    if error != OK:
+        _status.text = "The item stayed in its original cells."
+        return
+    _status.text = "%s moved to %s." % [ITEM_NAMES[drag.id], origin]
+    queue_redraw()
+
+
+func _notification(what: int) -> void:
+    if what == NOTIFICATION_DRAG_END and _dragging:
+        _dragging = false
+        if not get_viewport().gui_is_drag_successful():
+            _status.text = "The item stayed in its original cells."
+
+
+func _cell_at(point: Vector2) -> Vector2i:
+    return Vector2i(((point - GRID_ORIGIN) / CELL_PIXELS).floor())
+
+
+func _rect_at(origin: Vector2i, footprint: Vector2i) -> Rect2:
+    return Rect2(GRID_ORIGIN + Vector2(origin * CELL_PIXELS), Vector2(footprint * CELL_PIXELS))
+
+
+func _occupied_size(item: InventoryItemView) -> Vector2i:
+    if item.rotated:
+        return Vector2i(item.footprint.y, item.footprint.x)
+    return item.footprint
+```
+
+Godot asks `_get_drag_data()` for the item under the pointer. The script converts the pointer position to a cell, reads the item with [`item_at()`](/api/classes/SpatialInventory/methods/item_at), and records the offset from the item's top-left cell. The ghost follows the mouse while the original placement remains in the grid.
+
+[`check_move()`](/api/classes/SpatialInventory/methods/check_move) checks whether the proposed placement fits, allowing the dragged item's own cells. [`try_move()`](/api/classes/SpatialInventory/methods/try_move) validates again and commits the move on drop. An invalid drop preserves the original placement. The display reads the committed placements when it redraws.
+
+To add item quantities or choose a rotation, see [Items and stacks](/inventory/items). To move between separate grids, see [Inventory transactions](/inventory/transactions).

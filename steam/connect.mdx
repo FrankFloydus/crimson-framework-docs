@@ -1,0 +1,40 @@
+---
+title: Connect to Steam
+description: "Start one Steam client attachment and verify the launch AppID."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Use standalone Steamworks to add app services to an existing game. This connection check uses one ordinary Godot node and needs no world or player scene. For a game that uses Steam to host or join, boot the game with its Steam profile instead. [Host a Steam game](/steam/listen-servers)
+
+## Connect your game to Steam
+
+In Godot, create a scene with an ordinary `Node` root named SteamCheck. Save it as `res://steam_check.tscn` and attach the script below as `res://steam_check.gd`. Set the scene as your project’s main scene if you are testing in an empty project. Launch with Steam running and signed in. For a direct Spacewar test, follow the platform setup to launch under AppID `480`. The script reports which app connected and whether Steam is online. [Launch with an AppID](/steam/setup#launch-with-an-appid)
+
+```gdscript
+extends Node
+
+const TEST_GROUP: String = "my-studio-training"
+
+@export var use_spacewar: bool = false
+
+var _steam: Steamworks
+
+
+func _ready() -> void:
+    var settings: SteamConfig
+    if use_spacewar:
+        settings = SteamConfig.spacewar(TEST_GROUP)
+
+    _steam = Steamworks.boot(self, settings)
+    var result: SteamResult = _steam.boot_result()
+    if not result.ok:
+        push_error(result.message)
+        return
+
+    print("Steam AppID %d ready. Online: %s" % [_steam.get_app_id(), _steam.is_online()])
+```
+
+Select the root node and enable **Use Spacewar** in the Inspector when running this script under AppID `480`. For your own app, leave it off to use the AppID Steam supplies. [SteamConfig](/api/classes/SteamConfig) · [Steamworks.boot()](/api/classes/Steamworks/methods/boot)
+
+The success message confirms local initialization. `Online: true` also confirms the client is connected to Steam. If setup fails, the script prints the startup message. [Troubleshoot startup](/steam/testing#diagnose-common-failures)

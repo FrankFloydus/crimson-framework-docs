@@ -1,0 +1,127 @@
+---
+title: Save and restore a checkpoint
+description: "Save a safe-room checkpoint, spend a medkit, and reload the saved supplies."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Give the player a safe room where they can save their supplies before continuing. In this example the player starts with one medkit. Save the checkpoint, use the medkit, then load the checkpoint to get it back.
+
+## Create the scenes
+
+1. Create a scene with a `Node3D` root named `SafeRoom`. Save it as `res://levels/safe_room.tscn`. The safe room can be empty for this test. To show a room behind the menu, add a floor mesh and a `Camera3D` as children and enable the camera's **Current** property.
+2. Create a separate scene with a `Node` root named `Main`. Under a `CanvasLayer`, add a `VBoxContainer` with three `Button` nodes labeled **Save Checkpoint**, **Use Medkit**, and **Load Checkpoint**. Add a `Label` to show supplies and results.
+3. Attach the script below to `Main`. Assign the buttons and label to the four exported fields in the Inspector. Keep these controls in `Main` so they remain available when loading the checkpoint replaces the safe-room scene.
+
+[`WorldDefinition.at()`](/api/classes/WorldDefinition/methods/at) gives the scene a stable world ID. [`Game.campaign()`](/api/classes/Game/methods/campaign) sets up a coordinated game that can save and restore world state. After [booting the game](/api/classes/GameConfig/methods/boot), the script registers a supplies store before starting the world. The **Use Medkit** button commits a change to that store. [`Game.save_slot()`](/api/classes/Game/methods/save_slot) addresses the same profile and slot for both save and load.
+
+```gdscript
+extends Node
+
+const SAFE_ROOM_ID: StringName = &"safe-room"
+const SAFE_ROOM_PATH: String = "res://levels/safe_room.tscn"
+const PROFILE_ID: String = "campaign"
+const SLOT_ID: String = "safe-room"
+const SUPPLIES_STORE: String = "supplies"
+const MEDKITS: String = "medkits"
+const STARTING_MEDKITS: int = 1
+const MEDKIT_COST: int = 1
+
+@export var save_button: Button
+@export var use_button: Button
+@export var load_button: Button
+@export var status: Label
+
+var _stores: TransactionCoordinator
+var _checkpoint: SaveSlot
+
+
+func _ready() -> void:
+    _set_busy(true)
+    var safe_room: WorldDefinition = WorldDefinition.at(SAFE_ROOM_ID, SAFE_ROOM_PATH)
+    var game: Game = Game.campaign(safe_room).boot(self)
+    var boot: GameResult = game.boot_result()
+    if not boot.ok:
+        status.text = boot.message
+        return
+
+    _stores = game.transactions()
+    var registered: Error = _stores.register_store(
+        SUPPLIES_STORE, {MEDKITS: STARTING_MEDKITS}, _prepare_supplies
+    )
+    if registered != OK:
+        status.text = "Could not register supplies: %s" % error_string(registered)
+        return
+
+    var started: GameResult = await game.play()
+    if not started.ok:
+        status.text = started.message
+        return
+
+    _checkpoint = game.save_slot(PROFILE_ID, SLOT_ID)
+    save_button.pressed.connect(_save_checkpoint)
+    use_button.pressed.connect(_use_medkit)
+    load_button.pressed.connect(_load_checkpoint)
+    _show_supplies("Safe room ready.")
+    _set_busy(false)
+
+
+func _save_checkpoint() -> void:
+    _set_busy(true)
+    var request: SaveRequest = _checkpoint.save().named("Safe room")
+    var saved: GameResult = await request.submit().wait_result()
+    _show_supplies("Checkpoint saved." if saved.ok else saved.message)
+    _set_busy(false)
+
+
+func _use_medkit() -> void:
+    var transaction: GameTransaction = _stores.begin()
+    var revision: int = _stores.get_store_revision(SUPPLIES_STORE)
+    var queued: Error = transaction.add_change(SUPPLIES_STORE, {"use_medkit": true}, revision)
+    if queued != OK:
+        _show_supplies(error_string(queued))
+        return
+
+    var spent: Dictionary = _stores.commit(transaction)
+    _show_supplies("Used a medkit." if spent.ok else str(spent.get("message", "Use failed.")))
+
+
+func _load_checkpoint() -> void:
+    _set_busy(true)
+    var restored: GameResult = await _checkpoint.restore_latest().wait_result()
+    _show_supplies("Checkpoint loaded." if restored.ok else restored.message)
+    _set_busy(false)
+
+
+func _prepare_supplies(current: Dictionary, operations: Array, _context: Dictionary) -> Dictionary:
+    var medkits: Variant = current.get(MEDKITS)
+    if medkits is not int or medkits < 0:
+        return {"ok": false, "message": "Invalid medkit count."}
+
+    var remaining: int = medkits
+    for operation: Dictionary in operations:
+        if operation.get("use_medkit") != true or remaining < MEDKIT_COST:
+            return {"ok": false, "message": "No medkit available."}
+        remaining -= MEDKIT_COST
+
+    return {"ok": true, "state": {MEDKITS: remaining}}
+
+
+func _show_supplies(message: String) -> void:
+    var supplies: Dictionary = _stores.read_store(SUPPLIES_STORE)
+    status.text = "%s  Medkits: %d" % [message, supplies[MEDKITS]]
+
+
+func _set_busy(busy: bool) -> void:
+    save_button.disabled = busy
+    use_button.disabled = busy
+    load_button.disabled = busy
+```
+
+## Try the checkpoint
+
+Run `Main`. Wait for **Medkits: 1**, then click **Save Checkpoint**, **Use Medkit**, and **Load Checkpoint**. The count drops to **0** when you use a medkit and returns to **1** after loading. Stop the game and run `Main` again. **Load Checkpoint** still opens the saved generation from disk.
+
+[`submit()`](/api/classes/SaveRequest/methods/submit) captures the committed stores and active world ID from a ready authority. Wait for its result before reporting a successful save. [`restore_latest()`](/api/classes/SaveSlot/methods/restore_latest) loads the slot's latest committed generation and activates its saved world and stores. The player can keep the menu open while the script awaits either result. To build a load menu for earlier generations, use [`history()`](/api/classes/SaveSlot/methods/history) and pass the selected generation's sequence and ID to [`restore()`](/api/classes/SaveSlot/methods/restore).
+
+Register the same store IDs and compatible restore validation before loading. With no separate restore validator, [`register_store()`](/api/classes/TransactionCoordinator/methods/register_store) uses the preparer with an empty operation array to check the loaded state. The sample checks the medkit count there. For player position, inventory, or quest progress, store those values under stable game IDs and rebuild their scene representation from the loaded data. Scene nodes and live Godot objects have their own lifetimes. Keep the world ID stable if you move its scene file.

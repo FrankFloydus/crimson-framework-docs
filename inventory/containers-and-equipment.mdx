@@ -1,0 +1,193 @@
+---
+title: "Containers, staging, and equipment"
+description: "Move items between registered grids, protect nested containers, and equip items in named slots."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+A backpack and a camp chest are separate grids. A toolbox is both an item placed in a grid and a container with a grid of its own. Equipment uses named slots, so one item can occupy both hands without duplicating its instance ID.
+
+Each example runs on its own. Attach one script to a **Node** in an empty scene, run it, and read Godot's **Output**.
+
+## Move supplies without creating a container loop
+
+Use [`SpatialInventoryContainers.register_inventory()`](/api/classes/SpatialInventoryContainers/methods/register_inventory) to register each independent grid and each container's contents. An empty container ID means the grid has no owner item. For a container's contents, supply the stable ID of its item. The registry's [`placement_policy()`](/api/classes/SpatialInventoryContainers/methods/placement_policy) prevents duplicate ownership and prevents a container from entering its own contents or a descendant's contents.
+
+At camp, put a repair kit inside a toolbox. The same policy rejects putting the toolbox inside itself.
+
+```gdscript
+extends Node
+
+const PACK_SIZE: Vector2i = Vector2i(4, 3)
+const TOOLBOX_SIZE: Vector2i = Vector2i(3, 2)
+const TOOLBOX_ID: StringName = &"field_toolbox"
+const KIT_ID: StringName = &"repair_kit"
+const TOOLBOX_FOOTPRINT: Vector2i = Vector2i(2, 1)
+const KIT_FOOTPRINT: Vector2i = Vector2i(1, 1)
+const SPARE_TOOLBOX_CELL: Vector2i = Vector2i(0, 1)
+
+func _ready() -> void:
+    var pack: SpatialInventory = Inventory.grid(PACK_SIZE)
+    var tools: SpatialInventory = Inventory.grid(TOOLBOX_SIZE)
+    if pack.add(TOOLBOX_ID, TOOLBOX_FOOTPRINT) != OK or pack.add(KIT_ID, KIT_FOOTPRINT) != OK:
+        push_error("Could not pack the camp supplies.")
+        return
+
+    var containers: SpatialInventoryContainers = SpatialInventoryContainers.new()
+    if containers.register_inventory(pack) != OK:
+        push_error("Could not register the backpack.")
+        return
+    if containers.register_inventory(tools, TOOLBOX_ID) != OK:
+        push_error("Could not register the toolbox contents.")
+        return
+
+    var actions: SpatialInventoryActions = SpatialInventoryActions.new()
+    actions.drop_policy = containers.placement_policy
+    var stored: Dictionary = actions.move_item(pack, KIT_ID, tools, Vector2i.ZERO)
+    if stored.error != OK:
+        push_error(stored.reason)
+        return
+    print("Repair kit is in the toolbox: ", containers.get_owner_inventory(KIT_ID) == tools)
+
+    var refused: Dictionary = actions.move_item(pack, TOOLBOX_ID, tools, SPARE_TOOLBOX_CELL)
+    if refused.error != OK:
+        print(refused.reason)
+    print("Toolbox stayed in the backpack: ", containers.get_owner_inventory(TOOLBOX_ID) == pack)
+```
+
+Call [`validate_changes()`](/api/classes/SpatialInventoryContainers/methods/validate_changes) before committing a raw [`apply_placement_changes()`](/api/classes/SpatialInventory/methods/apply_placement_changes) batch that can change ownership. The registry checks the final ownership graph. The grid batch then checks placement expectations and geometry before writing. Keep both steps on the main thread and avoid unrelated changes between them. For game-specific restrictions, set [`host_placement_policy`](/api/classes/SpatialInventoryContainers/properties/host_placement_policy).
+
+## Temporarily stage an item
+
+Use [`SpatialInventoryStaging`](/api/classes/SpatialInventoryStaging) for a workbench tray that physically holds items while remembering their original cells and orientation. [`stage_from()`](/api/classes/SpatialInventoryStaging/methods/stage_from) moves an item onto the tray. [`place_item()`](/api/classes/SpatialInventoryStaging/methods/place_item) moves it to a final destination and clears its return record. [`try_close(true)`](/api/classes/SpatialInventoryStaging/methods/try_close) attempts to restore everything still on the tray. If an original cell is blocked, leave the tray open and let the player make room or choose another destination.
+
+This workbench stores a repair tool in a cabinet. It keeps the unused fuel on the tray while a spare part blocks the return cell, then restores the fuel once the player clears that cell.
+
+```gdscript
+extends Node
+
+const PACK_SIZE: Vector2i = Vector2i(4, 3)
+const TRAY_SIZE: Vector2i = Vector2i(3, 2)
+const CABINET_SIZE: Vector2i = Vector2i(4, 2)
+const TOOL_ID: StringName = &"repair_tool"
+const FUEL_ID: StringName = &"fuel_canister"
+const SPARE_ID: StringName = &"spare_part"
+const TOOL_SIZE: Vector2i = Vector2i(2, 1)
+const FUEL_SIZE: Vector2i = Vector2i(1, 1)
+const ORIGINAL_FUEL_CELL: Vector2i = Vector2i(3, 2)
+const TRAY_FUEL_CELL: Vector2i = Vector2i(2, 0)
+
+func _ready() -> void:
+    var pack: SpatialInventory = Inventory.grid(PACK_SIZE)
+    var cabinet: SpatialInventory = Inventory.grid(CABINET_SIZE)
+    if pack.add(TOOL_ID, TOOL_SIZE) != OK:
+        push_error("Could not pack the repair tool.")
+        return
+    if pack.try_place(FUEL_ID, FUEL_SIZE, ORIGINAL_FUEL_CELL) != OK:
+        push_error("Could not pack the fuel.")
+        return
+
+    var tray: SpatialInventoryStaging = SpatialInventoryStaging.new()
+    var containers: SpatialInventoryContainers = SpatialInventoryContainers.new()
+    if tray.configure(TRAY_SIZE) != OK:
+        push_error(tray.last_reason)
+        return
+    for grid: SpatialInventory in [pack, cabinet, tray.inventory]:
+        if containers.register_inventory(grid) != OK:
+            push_error("Could not register a workbench grid.")
+            return
+    tray.drop_policy = containers.placement_policy
+    tray.batch_policy = containers.validate_changes
+
+    if tray.stage_from(pack, TOOL_ID, Vector2i.ZERO) != OK:
+        push_error(tray.last_reason)
+        return
+    if tray.stage_from(pack, FUEL_ID, TRAY_FUEL_CELL) != OK:
+        push_error(tray.last_reason)
+        return
+    if tray.place_item(TOOL_ID, cabinet, Vector2i.ZERO) != OK:
+        push_error(tray.last_reason)
+        return
+    if pack.try_place(SPARE_ID, FUEL_SIZE, ORIGINAL_FUEL_CELL) != OK:
+        push_error("Could not pack the spare part.")
+        return
+    var blocked: Error = tray.try_close(true)
+    if blocked == OK or tray.is_empty():
+        push_error("The fuel should remain on the tray.")
+        return
+    print("Workbench remains open: ", tray.last_reason)
+
+    if pack.remove(SPARE_ID) != OK:
+        push_error("Could not clear the fuel's original cell.")
+        return
+    if tray.try_close(true) != OK:
+        push_error(tray.last_reason)
+        return
+
+    print("Tool in cabinet: ", cabinet.get_item_at(Vector2i.ZERO) == TOOL_ID)
+    print("Fuel back in its original cell: ", pack.get_item_at(ORIGINAL_FUEL_CELL) == FUEL_ID)
+```
+
+The tray's [`drop_policy`](/api/classes/SpatialInventoryStaging/properties/drop_policy) validates each move. Its [`batch_policy`](/api/classes/SpatialInventoryStaging/properties/batch_policy) validates the entire restoration. Use the tray operations to move tracked items so the return records stay in sync.
+
+## Equip a two-handed tool
+
+[`SpatialInventoryEquipment.configure()`](/api/classes/SpatialInventoryEquipment/methods/configure) links a backpack to named slots. A [`slot_requirements`](/api/classes/SpatialInventoryEquipment/properties/slot_requirements) callback returns every slot the item occupies, or a reason string to reject the request. A [`move_policy`](/api/classes/SpatialInventoryEquipment/properties/move_policy) can apply restrictions such as combat locks and rules for returning displaced equipment.
+
+Preview the engineer's two-handed cutter, equip it in both hands, and return it to the backpack. The two occupied slots point to the same item.
+
+```gdscript
+extends Node
+
+const PACK_SIZE: Vector2i = Vector2i(4, 3)
+const CUTTER_ID: StringName = &"plasma_cutter"
+const CUTTER_SIZE: Vector2i = Vector2i(2, 1)
+const MAIN_HAND: StringName = &"main_hand"
+const OFF_HAND: StringName = &"off_hand"
+const FIRST_FIT: Vector2i = Vector2i(-1, -1)
+
+func _ready() -> void:
+    var pack: SpatialInventory = Inventory.grid(PACK_SIZE)
+    if pack.add(CUTTER_ID, CUTTER_SIZE) != OK:
+        push_error("Could not pack the cutter.")
+        return
+
+    var equipment: SpatialInventoryEquipment = SpatialInventoryEquipment.new()
+    if equipment.configure(pack, [MAIN_HAND, OFF_HAND]) != OK:
+        push_error("Could not configure both hand slots.")
+        return
+    equipment.slot_requirements = _slots_for_tool
+
+    var preview: Dictionary = equipment.preview_equip(CUTTER_ID, MAIN_HAND)
+    if preview.error != OK:
+        push_error(preview.reason)
+        return
+
+    var equipped: Dictionary = equipment.equip(CUTTER_ID, MAIN_HAND, preview)
+    if not equipped.committed:
+        push_error(equipped.reason)
+        return
+    print("Main hand: ", equipment.get_slot_item(MAIN_HAND))
+    print("Off hand: ", equipment.get_slot_item(OFF_HAND))
+
+    var return_preview: Dictionary = equipment.preview_unequip(MAIN_HAND)
+    if return_preview.error != OK:
+        push_error(return_preview.reason)
+        return
+    var returned: Dictionary = equipment.unequip(MAIN_HAND, FIRST_FIT, null, return_preview)
+    if not returned.committed:
+        push_error(returned.reason)
+        return
+    print("Cutter is back at ", pack.get_placement(CUTTER_ID).origin)
+
+func _slots_for_tool(id: StringName, requested_slot: StringName) -> Variant:
+    if id == CUTTER_ID:
+        if requested_slot != MAIN_HAND:
+            return "Equip the cutter from the main hand."
+        return [MAIN_HAND, OFF_HAND]
+    return [requested_slot]
+```
+
+Send the preview to [`equip()`](/api/classes/SpatialInventoryEquipment/methods/equip) or [`unequip()`](/api/classes/SpatialInventoryEquipment/methods/unequip) as the expected result. If the slots, backpack, or policies change while the player reviews the move, request a new preview. When an equip displaces another item, Crimson checks room for that item and publishes both the slot and backpack changes together. Save the [`equipment snapshot`](/api/classes/SpatialInventoryEquipment/methods/export_snapshot) alongside the backpack snapshot and your game's item records.
+
+[Build a shop purchase or a two-player trade](/inventory/transactions)

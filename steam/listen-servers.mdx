@@ -5,19 +5,25 @@ description: "Host a Steam game from a player's computer, confirm invites, or fi
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Select Steam with [`.steam()`](/api/classes/GameConfig/methods/steam) before you boot. The default uses the launch AppID and private invitations. Two players fit by default, including the host. Prepare the same compatible level and player scenes on both computers. Put two `Marker3D` children under `SpawnPoints` in the level and use a single `Camera3D` in the player scene. [Multiplayer scene setup](/multiplayer-quickstart)
+Select Steam with [`.steam()`](/api/classes/GameConfig/methods/steam) before you boot. The default uses the launch AppID and private invitations. Two players fit by default, including the host. Run the same project on both computers. [Steam runtime and launch setup](/steam/setup#launch-with-an-appid)
+
+## Prepare the test scenes
+
+1. Save a `Node3D` scene as `res://steam_level.tscn`. Under its root, add a `Node3D` named `SpawnPoints` with two `Marker3D` children. Set their positions to `(0, 0, 0)` and `(2.5, 0, 0)`.
+2. Save a second `Node3D` scene as `res://steam_player.tscn`. Add one `Camera3D` at `(0, 1.5, 5)` and a `MeshInstance3D` child at `(0, 1, 0)` with a capsule mesh. Use an unshaded material so the capsule is visible without lights. Add the mesh child to the `crimson_local_hidden` group so each player sees the other capsule.
+3. Save an ordinary `Node` scene as `res://steam_main.tscn`. Use it as the main scene on both computers. Attach one of the scripts below to its root. Add its buttons and label under a `CanvasLayer` so the menu stays visible as the world loads.
 
 ## Host a game from a player's machine
 
-Attach this script to the persistent root `Node` of your main scene. The paths below use the scenes from Getting Started. Assign a status label and five buttons labeled **Host**, **Invite**, **Accept**, **Dismiss**, and **Leave**. Boot both players with the same profile. The host starts the training room and opens the Steam invite picker when ready. [Launch with an AppID](/steam/setup#launch-with-an-appid)
+Attach this script to the root of `steam_main.tscn`. In the Inspector assign **Status** and **Invite Prompt** labels and five buttons labeled **Host**, **Invite**, **Accept**, **Dismiss**, and **Leave**. The script connects their signals. The host starts the training room and can open the Steam invite picker when ready.
 
 Enable **Use Spacewar** for a development launch under AppID `480`. Use a test group unique to your project and match it across host and guest. Leave it off to use your own launch AppID. [`SteamConfig.spacewar()`](/api/classes/SteamConfig/methods/spacewar)
 
 ```gdscript
 extends Node
 
-const LEVEL: PackedScene = preload("res://world.tscn")
-const PLAYER: PackedScene = preload("res://player.tscn")
+const LEVEL: PackedScene = preload("res://steam_level.tscn")
+const PLAYER: PackedScene = preload("res://steam_player.tscn")
 const TEST_GROUP: String = "my-studio-training"
 
 @export var use_spacewar: bool = false
@@ -27,6 +33,7 @@ const TEST_GROUP: String = "my-studio-training"
 @export var dismiss_button: Button
 @export var leave_button: Button
 @export var status: Label
+@export var invite_prompt: Label
 
 var _game: Game
 var _shown_offer: SteamInvite
@@ -68,8 +75,11 @@ func _show_offer(offer: SteamInvite) -> void:
     _shown_offer = offer
     accept_button.disabled = offer == null
     dismiss_button.disabled = offer == null
-    if offer != null:
-        status.text = "Join %s's training room?" % offer.from_steam_id
+    if offer == null:
+        invite_prompt.text = ""
+        return
+    var sender: String = offer.from_steam_id
+    invite_prompt.text = "Join the invited training room?" if sender.is_empty() else "Join %s's training room?" % sender
 
 
 func _accept_offer() -> void:
@@ -105,19 +115,23 @@ The example subscribes to [`invite_changed`](/api/classes/Game#invite_changed) a
 
 ## Find an open game
 
-For a discoverable Spacewar test, use the same build, AppID, and test group on both machines. Attach this alternative script to your main scene and connect **Host**, **Quick Join**, and **Cancel Search** to the matching functions. Start a host first to test joining. To check empty search behavior, use a test group without an active host.
+For a discoverable Spacewar test, use the same build, AppID, and test group on both machines. Attach this script to the root of `steam_main.tscn`. Assign a status label and three buttons labeled **Host**, **Quick Join**, and **Cancel Search**. Start a host first to test joining. To check an empty search, use a test group without an active host.
 
 ```gdscript
 extends Node
 
-const LEVEL: PackedScene = preload("res://world.tscn")
-const PLAYER: PackedScene = preload("res://player.tscn")
+const LEVEL: PackedScene = preload("res://steam_level.tscn")
+const PLAYER: PackedScene = preload("res://steam_player.tscn")
 const TEST_GROUP: String = "my-studio-training"
 
 @export var status: Label
+@export var host_button: Button
+@export var quick_join_button: Button
+@export var cancel_search_button: Button
 
 var _game: Game
 var _searching: bool = false
+var _canceling: bool = false
 
 
 func _ready() -> void:
@@ -126,15 +140,21 @@ func _ready() -> void:
     var startup: GameResult = _game.boot_result()
     if not startup.ok:
         status.text = startup.message
+        return
+    host_button.pressed.connect(host_public_game)
+    quick_join_button.pressed.connect(quick_join)
+    cancel_search_button.pressed.connect(cancel_search)
 
 
 func host_public_game() -> void:
+    if _searching or _canceling:
+        return
     var result: GameResult = await _game.host()
     status.text = "Public training room ready." if result.ok else result.message
 
 
 func quick_join() -> void:
-    if _searching:
+    if _searching or _canceling:
         return
     _searching = true
     status.text = "Looking for an open training room..."
@@ -149,7 +169,9 @@ func cancel_search() -> void:
     if not _searching:
         return
     _searching = false
+    _canceling = true
     var result: GameResult = await _game.leave()
+    _canceling = false
     status.text = "Search canceled." if result.ok else result.message
 ```
 
@@ -157,7 +179,7 @@ func cancel_search() -> void:
 
 ## Run a social lobby without a game
 
-Use [standalone Steamworks](/steam/client-services#start-a-client) for a social lobby that needs membership, metadata, and chat. Attach this script to a persistent menu and connect buttons to `create_private_lobby()`, `create_public_lobby()`, and `find_and_join_social_lobby()`. Launch both clients with Spacewar using the same AppID. Use your own launch AppID by passing no settings to `Steamworks.boot(self)`. Create a public lobby on one account and press the search button on a second account to test joining.
+Use a standalone attachment for a social lobby that needs membership, metadata, and chat. For this example, save a scene with a `Node` root as `res://social_lobby.tscn`. Attach the script to the root. Add three buttons labeled **Create Private**, **Create Public**, and **Find and Join**, and connect their `pressed` signals to `create_private_lobby()`, `create_public_lobby()`, and `find_and_join_social_lobby()` respectively. Launch both clients under Spacewar. Create a public lobby on one account and search from a second account. [Steam launch setup](/steam/setup#launch-with-an-appid)
 
 The default social lobby is private with four seats including its owner, in the `crimson` namespace. To customize it, use [`SteamLobbyOptions.configure()`](/api/classes/SteamLobbyOptions/methods/configure) and set its namespace, player limit, and visibility with [`in_namespace()`](/api/classes/SteamLobbyOptions/methods/in_namespace), [`for_players()`](/api/classes/SteamLobbyOptions/methods/for_players), and [`with_visibility()`](/api/classes/SteamLobbyOptions/methods/with_visibility). Pass the options to [`create()`](/api/classes/SteamLobbies/methods/create). The public action creates an eight-player [public lobby](/api/classes/SteamLobbyOptions#visibility) in the example namespace.
 

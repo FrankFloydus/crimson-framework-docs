@@ -12,7 +12,7 @@
   },
   {
     "title": "Host an invite-only Steam arena",
-    "setup": "Press Host to open a two-player arena, then Invite to choose a Steam friend. Launch the game through Steam.",
+    "setup": "Press Host to open a two-player arena, then Invite to choose a Steam friend. Launch the game through Steam. [Launch with an AppID](/steam/setup#launch-with-an-appid)",
     "code": "extends Node\n\nconst TOTAL_SEATS: int = 2\n\n@export var arena: PackedScene\n@export var player: PackedScene\n@export var host_button: Button\n@export var invite_button: Button\n@export var status: Label\n\nvar _game: Game\n\nfunc _ready() -> void:\n    host_button.disabled = true\n    invite_button.disabled = true\n    var setup: GameConfig = Game.configure(arena, player).steam(null, TOTAL_SEATS)\n    _game = setup.boot(self)\n    var booted: GameResult = _game.boot_result()\n    if not booted.ok:\n        status.text = booted.message\n        return\n    var steam: Steamworks = _game.steam()\n    if not steam.is_ready():\n        status.text = steam.boot_result().message\n        return\n    host_button.pressed.connect(_host)\n    invite_button.pressed.connect(_invite)\n    host_button.disabled = false\n\nfunc _host() -> void:\n    host_button.disabled = true\n    var hosted: GameResult = await _game.host()\n    if not hosted.ok:\n        status.text = hosted.message\n        host_button.disabled = false\n        return\n    status.text = \"Arena open. Lobby %s.\" % hosted.listing_id\n    invite_button.disabled = false\n\nfunc _invite() -> void:\n    var requested: GameResult = _game.invite_friends()\n    status.text = \"Choose a friend in Steam.\" if requested.ok else requested.message\n",
     "members": [
       "GameConfig.methods.steam",
@@ -23,7 +23,7 @@
   },
   {
     "title": "Find an open Spacewar arena",
-    "setup": "Press Find Game to join an open test arena. Launch both copies in Spacewar with the same test group and have one copy host first.",
+    "setup": "Press Find Game to join an open test arena. Launch both copies in Spacewar with the same test group and have one copy host first. [Launch with an AppID](/steam/setup#launch-with-an-appid)",
     "code": "extends Node\n\nconst TEST_GROUP: String = \"crimson-arena-test\"\nconst ARENA_ID: StringName = &\"arena\"\n\n@export var arena: PackedScene\n@export var player: PackedScene\n@export var find_game: Button\n@export var status: Label\n\nvar _game: Game\n\nfunc _ready() -> void:\n    find_game.disabled = true\n    var settings: SteamConfig = SteamConfig.spacewar(TEST_GROUP).public_games()\n    var setup: GameConfig = Game.configure(arena, player).world_id(ARENA_ID).steam(settings)\n    _game = setup.boot(self)\n    var booted: GameResult = _game.boot_result()\n    if not booted.ok:\n        status.text = booted.message\n        return\n    find_game.pressed.connect(_find_open_arena)\n    find_game.disabled = false\n\nfunc _find_open_arena() -> void:\n    find_game.disabled = true\n    status.text = \"Finding an open arena…\"\n    var joined: GameResult = await _game.find_and_join()\n    status.text = \"You joined the arena.\" if joined.ok else joined.message\n    find_game.disabled = joined.ok\n",
     "members": [
       "SteamConfig.methods.spacewar",

@@ -5,11 +5,15 @@ description: "Admit players, bind their identities, and move the match through t
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Use a coordinated game when the host needs a lobby before the first match or the group needs to travel between levels. In this example, the host opens a lobby, waits for one guest, starts the match in a training room, then takes both players to a foundry.
+Use a coordinated game when the host needs a lobby before the first match or the group needs to travel between levels. In this example, the host opens a lobby, waits for one guest, starts the match in a training room, then takes both players to a foundry. Start with an empty Godot 4.7 project with Crimson installed. [Installation](/installation)
 
 ## Prepare the world catalog
 
-Start with the [LAN quickstart project](/multiplayer-quickstart). Duplicate `world.tscn` as `foundry.tscn` and change the color of the box so you can tell the rooms apart. Add one `Camera3D` to each level and turn on **Current**. Use the same transform as the quickstart’s player camera. These two level cameras let you see the transitions. A coordinated game supplies its own actors and controllers.
+1. In a new scene, click **3D Scene** and rename the root `Training`. Add a `MeshInstance3D` child named `Box`. In the Inspector, assign **New BoxMesh** to **Mesh**. Under **Geometry → Material Override**, add a **New StandardMaterial3D** and set **Albedo → Color** to `#C63858`.
+2. Add a `Camera3D` under `Training`. Set **Transform → Position** to `(0, 0, 4)` and enable **Current**. Add a `DirectionalLight3D` and set its **Transform → Rotation** to `(-45°, -30°, 0°)`. Save the scene as `res://training.tscn`.
+3. In **FileSystem**, duplicate `training.tscn` as `foundry.tscn` and open the new scene. Rename the root `Foundry`. In the box's **Material Override** menu, choose **Make Unique** before changing **Albedo → Color** to `#1F6BD1`. Save the scene.
+
+The level cameras make the change from red to blue visible on both peers. A coordinated game supplies its own actors and controllers.
 
 Give each level a stable ID with [`WorldDefinition.at()`](/api/classes/WorldDefinition/methods/at). Start with [`Game.campaign()`](/api/classes/Game/methods/campaign) and register the second level with [`with_world()`](/api/classes/GameConfig/methods/with_world). Keep the same world IDs and scene catalog on both peers, and include both scenes when exporting. Keep each ID stable if you move its scene file.
 
@@ -19,14 +23,14 @@ On the host, [`open_lobby()`](/api/classes/Game/methods/open_lobby) opens admiss
 
 The host uses [`bind_player()`](/api/classes/Game/methods/bind_player) to associate each admitted peer with a game-owned identity, including the host at ENet peer ID `1`. This loopback test has two reserved identities. In a real game, resolve the guest’s verified identity on the authority before binding. A peer ID identifies a connection, and a display name supplied by the guest cannot establish identity.
 
-Replace `main.gd` with this script in both copies. **H** opens the lobby and **J** joins. Once the host has bound the guest, **Enter** awaits [`start_match()`](/api/classes/Game/methods/start_match). The host can then press **T** to await [`scenes().load(foundry)`](/api/classes/GameScenes/methods/load). Both peers observe [`world_ready`](/api/classes/Game#signals) when the new world becomes playable.
+Create a new scene with a plain `Node` root named `Main` and save it as `res://main.tscn`. Attach an empty GDScript file at `res://main.gd` to the root and paste in this script. **H** opens the lobby and **J** joins. Once the host has bound the guest, **Enter** awaits [`start_match()`](/api/classes/Game/methods/start_match). The host can then press **T** to await [`scenes().load(foundry)`](/api/classes/GameScenes/methods/load). Both peers observe [`world_ready`](/api/classes/Game#signals) when the new world becomes playable.
 
 ```gdscript
 extends Node
 
 const TRAINING_ID: StringName = &"training"
 const FOUNDRY_ID: StringName = &"foundry"
-const TRAINING_PATH: String = "res://world.tscn"
+const TRAINING_PATH: String = "res://training.tscn"
 const FOUNDRY_PATH: String = "res://foundry.tscn"
 const LOOPBACK_ADDRESS: String = "127.0.0.1"
 const HOST_PEER_ID: int = 1
@@ -82,15 +86,17 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 
 func _open_lobby() -> void:
+    _hosting = true
     if not _check_result(game.open_lobby(LOOPBACK_ADDRESS)):
+        _hosting = false
         return
 
     if game.bind_player(HOST_PEER_ID, HOST_PLAYER_ID) != OK:
         push_error("Could not bind the host.")
+        _hosting = false
         await game.leave()
         return
 
-    _hosting = true
     print("Lobby open.")
 
 
@@ -123,10 +129,11 @@ func _check_result(result: GameResult) -> bool:
 
 ## Run both peers
 
-1. Run two copies of the main scene as in the [LAN quickstart](/multiplayer-quickstart#connect-two-copies-of-the-game).
-2. Press **H** in the first window. After `Lobby open.`, press **J** in the second.
-3. Wait for `Guest bound.` on the host. Press **Enter** there. Both copies print `World ready: training` and show the training room.
-4. Press **T** on the host. Both copies print `World ready: foundry` with a newer epoch and show the new room. The guest follows the host's world transition.
-5. Press **F8** to stop both copies.
+1. Open **Debug → Customize Run Instances…**, enable **Enable Multiple Instances**, and set the count to `2`.
+2. Open `main.tscn` and press **F5**. If prompted to choose a main scene, choose **Select Current**.
+3. Press **H** in the first instance. After `Lobby open.` appears in **Output**, press **J** in the second. Look for `Lobby phase reached.` and `Guest bound. Press Enter to start.`.
+4. Press **Enter** in the host instance. Both copies print `World ready: training` and show the red box.
+5. Press **T** on the host. Both copies print `World ready: foundry` with a newer epoch and show the blue box. The guest follows the host's world transition.
+6. Press **F8** to stop both copies.
 
 Once play starts, the authority controls travel and synchronized game state. Keep match rules in the game and route player requests through its coordinated actions. [Game runtime reference](/api/modules/game-runtime)

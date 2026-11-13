@@ -1,51 +1,21 @@
 ---
 title: "Host and join a multiplayer game"
-description: "Run two copies of your first game and connect them over LAN on one machine."
+description: "Run two copies of your game and connect them over LAN on one machine."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Run two copies of your game. The first player hosts the training room and the second joins over LAN. Start with `world.tscn`, `player.tscn`, and the `Main` node and script from the solo guide. [Start a solo game](/quickstart)
+Start with an empty Godot 4.7 project with Crimson installed. [Installation](/installation)
 
-## Give each player a place to spawn
+## Set up the scenes
 
-1. Open `world.tscn` in **FileSystem**. In the **Scene** dock, expand `SpawnPoints`, select `HostSpawn`, and press **Ctrl+D**. Rename the new marker `GuestSpawn`.
-2. Set its **Transform → Position** to `(2.5, 0, 0)` and save. The two `Marker3D` children give Crimson distinct spawn slots.
+- `res://world.tscn`: A `Node3D` with a child named `SpawnPoints`. Put two `Marker3D` nodes under it at distinct positions.
+- `res://player.tscn`: A `Node3D` with one `Camera3D` and a visible body mesh. Put the mesh directly under the root in the `crimson_local_hidden` group to hide it from its own player.
+- `res://main.tscn`: A plain `Node` with the script below. Run the same scene in both instances.
 
-## Make the other player visible
+## Host and join
 
-1. Open `player.tscn`. Select the `Player` root and add a `MeshInstance3D` child named `Body`.
-2. Assign a **New CapsuleMesh** to **Mesh** and set **Transform → Position** to `(0, 1, 0)`. Give the mesh a blue material to match the screenshots.
-3. With `Body` selected, open **Node → Groups**. Add a scene group named `crimson_local_hidden` and save. Crimson hides this direct child of your own player so you see the other player’s capsule through your camera.
-
-## Configure LAN play
-
-Open `main.gd` and replace it with this checkpoint. [`lan()`](/api/classes/GameConfig/methods/lan) adds LAN hosting and joining to the same configuration. It defaults to two total seats, including the host, and UDP port `7000`.
-
-```gdscript
-extends Node
-
-const LEVEL: PackedScene = preload("res://world.tscn")
-const PLAYER: PackedScene = preload("res://player.tscn")
-
-var game: Game
-
-
-func _ready() -> void:
-    game = Game.configure(LEVEL, PLAYER).lan().boot(self)
-    var setup: GameResult = game.boot_result()
-    if not setup.ok:
-        push_error(setup.message)
-        return
-
-    print("LAN game configured.")
-```
-
-Press **F6** from `main.tscn` and check for `LAN game configured.` in **Output**. The view stays empty until a player hosts or joins. Stop the game before continuing.
-
-## Add the host, join, and leave controls
-
-Replace `main.gd` with the complete script below. The **H** and **J** keys await [`game.host()`](/api/classes/Game/methods/host) and [`game.join(address)`](/api/classes/Game/methods/join). Both actions return a [`GameResult`](/api/classes/GameResult) after the world is playable or the action fails. This test binds the host to `127.0.0.1`, so both copies run on the same machine. The **L** key awaits [`game.leave()`](/api/classes/Game/methods/leave) until the session has ended.
+Add [`lan()`](/api/classes/GameConfig/methods/lan) before booting. It defaults to two seats including the host and UDP port `7000`. The script binds to `127.0.0.1` for a test on one computer. [`host()`](/api/classes/Game/methods/host) and [`join(address)`](/api/classes/Game/methods/join) resolve when the game is playable or the action fails.
 
 ```gdscript
 extends Node
@@ -53,81 +23,47 @@ extends Node
 const LEVEL: PackedScene = preload("res://world.tscn")
 const PLAYER: PackedScene = preload("res://player.tscn")
 const LOOPBACK_ADDRESS: String = "127.0.0.1"
-const HOST_KEY: Key = KEY_H
-const JOIN_KEY: Key = KEY_J
-const LEAVE_KEY: Key = KEY_L
 
 var game: Game
-var _busy: bool = false
+var _starting: bool = false
 
 
 func _ready() -> void:
     game = Game.configure(LEVEL, PLAYER).lan().boot(self)
-    var setup: GameResult = game.boot_result()
-    if not setup.ok:
-        push_error(setup.message)
-        set_process_unhandled_key_input(false)
-        return
-
-    print("Press H to host, J to join, or L to leave.")
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
     var key: InputEventKey = event as InputEventKey
-    if key == null or not key.pressed or key.echo or _busy:
+    if key == null or not key.pressed or key.echo or _starting:
+        return
+    if game.get_phase() != Game.IDLE:
         return
 
-    if game.get_phase() == Game.IDLE:
-        if key.keycode == HOST_KEY:
-            await _enter_room(true)
-        elif key.keycode == JOIN_KEY:
-            await _enter_room(false)
-    elif game.get_phase() == Game.RUNNING and key.keycode == LEAVE_KEY:
-        _busy = true
-        var result: GameResult = await game.leave()
-        _busy = false
-        if result.ok:
-            print("Left the training room.")
-        else:
-            push_error(result.message)
-
-
-func _enter_room(hosting: bool) -> void:
-    _busy = true
     var result: GameResult
-    if hosting:
-        result = await game.host(LOOPBACK_ADDRESS)
-    else:
-        result = await game.join(LOOPBACK_ADDRESS)
-    _busy = false
+    match key.keycode:
+        KEY_H:
+            _starting = true
+            result = await game.host(LOOPBACK_ADDRESS)
+        KEY_J:
+            _starting = true
+            result = await game.join(LOOPBACK_ADDRESS)
+        _:
+            return
 
+    _starting = false
     if not result.ok:
         push_error(result.message)
         return
 
-    print("Host ready." if hosting else "Guest ready.")
+    print("Host ready." if key.keycode == KEY_H else "Guest ready.")
 ```
 
 ## Connect two copies of the game
 
-1. Save `main.gd`. In Godot, open **Debug → Customize Run Instances…**, turn on **Enable Multiple Instances**, and set the count to `2`. [Godot run instances](https://docs.godotengine.org/en/4.7/tutorials/scripting/debug/overview_of_debugging_tools.html#customize-run-instances)
-2. Open `main.tscn` and press **F5**. If Godot asks you to select a main scene, choose **Select Current**. Use the first view for the host and the second for the guest. [Godot game embedding](https://docs.godotengine.org/en/4.7/tutorials/editor/game_embedding.html)
-3. Focus the host view and press **H**. Wait for the world to appear and `Host ready.` in **Output**.
-4. Focus the guest view and press **J**. Look for `Guest ready.`. Each view shows the same box and the other player’s capsule.
-5. Press **L** in the guest view. The guest returns to an empty view, and the guest’s capsule disappears from the host’s world.
+Run two instances of `main.tscn` using Godot's **Customize Run Instances**. Press **H** in the first and wait for `Host ready.`. Press **J** in the second and look for `Guest ready.`. Both players enter the same world with their own camera. [Godot run instances](https://docs.godotengine.org/en/4.7/tutorials/scripting/debug/overview_of_debugging_tools.html#customize-run-instances)
 
-<Frame caption="Host view after the guest joins">
-  ![The host sees the training room and the guest's capsule to the right.](/images/getting-started/multiplayer-host.png)
+<Frame caption="Example host view after the guest joins">
+  ![The host sees the guest’s blue capsule on the right.](/images/getting-started/multiplayer-host.png)
 </Frame>
 
-<Frame caption="Guest view after joining the host">
-  ![The guest sees the same training room with the host's capsule to the left.](/images/getting-started/multiplayer-guest.png)
-</Frame>
-
-If the host cannot bind, stop any other copy still using the port. Use [`on_port()`](/api/classes/GameConfig/methods/on_port) with an unused UDP port before boot if needed. Both peers must use the same port. If the guest times out, wait for the host to reach `Host ready.` before joining. If a player cannot spawn, verify that `SpawnPoints` has two `Marker3D` children in distinct positions.
-
-Press **F8** to stop the test and turn off **Enable Multiple Instances** before running a single copy again.
-
-To make room for a four-player squad, add two more spawn markers and pass the new capacity to [`lan(players)`](/api/classes/GameConfig/methods/lan). Four seats include one host and three guests.
-
-For a match that waits in a lobby or travels between levels, use the coordinated flow. For a host without a local player, run a dedicated server. [Coordinated LAN](/coordinated-lan) · [Dedicated LAN server](/dedicated-lan) · [Steam lobbies and listen servers](/steam/listen-servers)
+[Coordinated LAN](/coordinated-lan) · [Dedicated LAN server](/dedicated-lan) · [Steam lobbies and listen servers](/steam/listen-servers)

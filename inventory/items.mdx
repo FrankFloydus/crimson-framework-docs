@@ -1,0 +1,170 @@
+---
+title: "Manage items, stacks, and sorting"
+description: "Place items in exact cells, split and merge quantities, and preview a backpack sort before applying it."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+Use [`Inventory.grid()`](/api/classes/Inventory/methods/grid) to create a grid and [`add()`](/api/classes/SpatialInventory/methods/add) to pack an item into the first available space. Use exact placement when the player picks a cell or the game reserves part of a grid.
+
+Each example runs on its own. Attach one script to a **Node** in an empty scene, run the scene, and read Godot's **Output**.
+
+## Place an item at an exact cell
+
+A placement keeps the item's stable ID, original footprint, top-left cell, and rotation. A rotated 2 × 1 medkit occupies one column and two rows. Pass its original footprint and set rotation to `true`. Use [`check_placement()`](/api/classes/SpatialInventory/methods/check_placement) to inspect a candidate. [`try_place()`](/api/classes/SpatialInventory/methods/try_place) checks the live grid again before it commits. Use [`check_move()`](/api/classes/SpatialInventory/methods/check_move) and [`try_move()`](/api/classes/SpatialInventory/methods/try_move) for an existing placement. The item's current cells are available to its own move.
+
+The field medic keeps the top row free for loot. Pack a medkit vertically along the right side and look it up from the second occupied cell.
+
+```gdscript
+extends Node
+
+const BAG_SIZE: Vector2i = Vector2i(4, 3)
+const MEDKIT_ID: StringName = &"field_medkit"
+const MEDKIT_SIZE: Vector2i = Vector2i(2, 1)
+const RIGHT_EDGE: Vector2i = Vector2i(3, 1)
+const SECOND_MEDKIT_CELL: Vector2i = Vector2i(3, 2)
+
+func _ready() -> void:
+    var bag: SpatialInventory = Inventory.grid(BAG_SIZE)
+    var fit: Error = bag.check_placement(MEDKIT_SIZE, RIGHT_EDGE, true)
+    if fit != OK:
+        push_error(error_string(fit))
+        return
+
+    var packed: Error = bag.try_place(MEDKIT_ID, MEDKIT_SIZE, RIGHT_EDGE, true)
+    if packed != OK:
+        push_error(error_string(packed))
+        return
+
+    var medkit: InventoryItemView = bag.item_at(SECOND_MEDKIT_CELL)
+    if medkit != null:
+        print("The lower cell belongs to ", medkit.id, " at ", medkit.origin)
+```
+
+If the player can swap items or drop across grids, use [`SpatialInventoryActions.move_item()`](/api/classes/SpatialInventoryActions/methods/move_item) with the expected source and swap placements. [Build a drag-and-drop inventory](/inventory/drag-and-drop)
+
+## Split ammunition for a teammate
+
+A stack uses one grid placement and one host-owned quantity record. Each stack has its own instance ID. The shared stack key decides which units can merge. The record's `quantity` and `max_quantity` describe its current count and capacity.
+
+Attach a [`SpatialInventoryStackAdapter`](/api/classes/SpatialInventoryStackAdapter) to [`SpatialInventoryActions`](/api/classes/SpatialInventoryActions). The adapter reads records through [`describe_stack`](/api/classes/SpatialInventoryStackAdapter/properties/describe_stack) and applies them through [`apply_changes`](/api/classes/SpatialInventoryStackAdapter/properties/apply_changes). An edit row carries the ID, expected `before` record, and proposed `after` record. An empty record means absence. Compare every expectation first, stage the records, call the supplied placement commit synchronously, and restore the previous records if it fails. Placement listeners can read the updated quantities as soon as the grid reports a change.
+
+Split four rounds into a teammate's pouch, then return the pouch's stack to the original box. The pack count falls from 12 to 8 and rises back to 12.
+
+```gdscript
+extends Node
+
+const PACK_SIZE: Vector2i = Vector2i(4, 3)
+const POUCH_SIZE: Vector2i = Vector2i(2, 1)
+const BOX_SIZE: Vector2i = Vector2i(1, 1)
+const BOX_ID: StringName = &"rifle_ammo_box"
+const SHARE_ID: StringName = &"rifle_ammo_share"
+const AMMO_KEY: StringName = &"rifle_ammo"
+const INITIAL_ROUNDS: int = 12
+const BOX_CAPACITY: int = 20
+const SHARE_ROUNDS: int = 4
+
+var _stacks: Dictionary = {
+    BOX_ID: {"key": AMMO_KEY, "quantity": INITIAL_ROUNDS, "max_quantity": BOX_CAPACITY},
+}
+
+func _ready() -> void:
+    var pack: SpatialInventory = Inventory.grid(PACK_SIZE)
+    var pouch: SpatialInventory = Inventory.grid(POUCH_SIZE)
+    if pack.add(BOX_ID, BOX_SIZE) != OK:
+        push_error("Could not pack the ammunition.")
+        return
+
+    var adapter: SpatialInventoryStackAdapter = SpatialInventoryStackAdapter.new()
+    adapter.describe_stack = _describe_stack
+    adapter.apply_changes = _apply_stack_changes
+    var actions: SpatialInventoryActions = SpatialInventoryActions.new()
+    actions.stack_adapter = adapter
+
+    var shared: Dictionary = actions.split_stack(
+        pack, BOX_ID, SHARE_ROUNDS, SHARE_ID, pouch, Vector2i.ZERO
+    )
+    if shared.error != OK:
+        push_error(shared.reason)
+        return
+    print("Pack rounds: ", _stacks[BOX_ID].quantity, ". Pouch rounds: ", _stacks[SHARE_ID].quantity)
+
+    var returned: Dictionary = actions.merge_stacks(pouch, SHARE_ID, pack, BOX_ID)
+    if returned.error != OK:
+        push_error(returned.reason)
+        return
+    print("Pack rounds after return: ", _stacks[BOX_ID].quantity, ". Pouch empty: ", pouch.items().is_empty())
+
+func _describe_stack(id: StringName) -> Dictionary:
+    return _stacks.get(id, {})
+
+func _apply_stack_changes(rows: Array[Dictionary], commit: Callable) -> Error:
+    var next: Dictionary = _stacks.duplicate(true)
+    for row: Dictionary in rows:
+        var id: StringName = row.id
+        var before: Dictionary = row.before
+        var after: Dictionary = row.after
+        if _stacks.get(id, {}) != before:
+            return ERR_BUSY
+        if after.is_empty():
+            next.erase(id)
+        else:
+            next[id] = after.duplicate(true)
+
+    var previous: Dictionary = _stacks
+    _stacks = next
+    var committed: Error = commit.call()
+    if committed != OK:
+        _stacks = previous
+    return committed
+```
+
+[`split_stack()`](/api/classes/SpatialInventoryActions/methods/split_stack) needs a fresh instance ID, a valid destination rectangle, and a quantity smaller than the source. A [`merge_stacks()`](/api/classes/SpatialInventoryActions/methods/merge_stacks) can succeed partially when the destination runs out of capacity. Read `moved`, `remaining`, and `completed` before updating the UI. Call [`invalidate_stack_records()`](/api/classes/SpatialInventoryStackAdapter/methods/invalidate_stack_records) if your game changes quantities outside the adapter.
+
+## Preview and undo a sort
+
+A sort can compact the grid while keeping a quick-access item fixed. Use one [`SpatialInventorySorter`](/api/classes/SpatialInventorySorter) per independent sort history. [`preview()`](/api/classes/SpatialInventorySorter/methods/preview) returns detached `placements` and a `changed_count`. A UI can draw these placements as a ghost layout. [`apply_preview()`](/api/classes/SpatialInventorySorter/methods/apply_preview) checks the live baseline and policy before it commits. Use [`cancel_preview()`](/api/classes/SpatialInventorySorter/methods/cancel_preview) when the player declines. [`undo()`](/api/classes/SpatialInventorySorter/methods/undo) restores the last applied sort while its expectations still hold.
+
+Preview, apply, and undo a sort. The field radio stays pinned at its quick-access cell.
+
+```gdscript
+extends Node
+
+const BAG_SIZE: Vector2i = Vector2i(5, 4)
+const RADIO_ID: StringName = &"field_radio"
+const CABLE_ID: StringName = &"climbing_cable"
+const RADIO_SIZE: Vector2i = Vector2i(1, 1)
+const CABLE_SIZE: Vector2i = Vector2i(2, 1)
+const RADIO_CELL: Vector2i = Vector2i(4, 0)
+const CABLE_CELL: Vector2i = Vector2i(2, 3)
+
+func _ready() -> void:
+    var bag: SpatialInventory = Inventory.grid(BAG_SIZE)
+    if bag.try_place(RADIO_ID, RADIO_SIZE, RADIO_CELL) != OK:
+        push_error("Could not place the pinned radio.")
+        return
+    if bag.try_place(CABLE_ID, CABLE_SIZE, CABLE_CELL) != OK:
+        push_error("Could not place the cable.")
+        return
+
+    var sorter: SpatialInventorySorter = SpatialInventorySorter.new()
+    var plan: Dictionary = sorter.preview(bag, [RADIO_ID], false)
+    if plan.error != OK:
+        push_error(error_string(plan.error))
+        return
+    print("Preview moves ", plan.changed_count, " item(s).")
+
+    var applied: Error = sorter.apply_preview()
+    if applied != OK:
+        push_error(error_string(applied))
+        return
+    print("Sorted cable: ", bag.get_placement(CABLE_ID).origin, ". Radio: ", bag.get_placement(RADIO_ID).origin)
+
+    var restored: Error = sorter.undo()
+    if restored != OK:
+        push_error(error_string(restored))
+        return
+    print("Cable returned to ", bag.get_placement(CABLE_ID).origin)
+```
+
+[Move items between containers and equipment slots](/inventory/containers-and-equipment)

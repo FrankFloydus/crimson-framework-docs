@@ -14,8 +14,8 @@ For a step-by-step example, start with [your first solo game](/quickstart), [hos
 | Module | Use it to |
 | --- | --- |
 | [Game runtime](/api/modules/game-runtime) | Boot a game scope, configure services, and start or retire game sessions. |
-| [World sessions](/api/modules/world-sessions) | Mount one shared world and manage player spawning and local views. |
-| [Sessions and transport](/api/modules/sessions-and-transport) | Host and join sessions, admit peers, and choose a transport. |
+| [World sessions](/api/modules/world-sessions) | Use the standalone fixed-world API in an existing integration. |
+| [Sessions and transport](/api/modules/sessions-and-transport) | Work with lower-level transport and admission. |
 | [Scene loading](/api/modules/scene-loading) | Prepare scenes and coordinate when they become active. |
 | [Match runtime](/api/modules/match-runtime) | Bind players to characters and apply authoritative gameplay changes. |
 | [Replication](/api/modules/replication) | Distribute committed state to the players who can see it. |
@@ -27,7 +27,7 @@ For a step-by-step example, start with [your first solo game](/quickstart), [hos
 
 ## Read a class page
 
-Expand a module in the sidebar, open a class, then expand **Properties** or **Methods**. For example, open [Game runtime](/api/modules/game-runtime), choose [`Game`](/api/classes/Game), and follow [`play()`](/api/classes/Game/methods/play). Follow **Inherits** on a class page to find members of its base class when that class is also part of Crimson.
+Expand a module in the sidebar and open a class. Some modules group their classes into areas. For example, open **Game runtime**, then **Code-first game**, then **Game → Methods → play**. Follow **Inherits** on a class page to find members of its base class. [Code-first game](/api/modules/game-runtime/code-first-game) · [`play()`](/api/classes/Game/methods/play)
 
 Each property page shows its type, access, and any documented default. Each method page shows its signature, parameters, and return value where applicable. Signals, enums, and constants are listed on their declaring class. Examples show when to use a member and what happens in the game.
 

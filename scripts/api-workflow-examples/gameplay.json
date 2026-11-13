@@ -1,7 +1,7 @@
 [
   {
     "title": "Pack a starting kit",
-    "setup": "Press **Pack supplies** to load a medkit and radio into a bag. The output shows the first available placement for each item. [Set up the supply button](/inventory#pack-a-starting-kit)",
+    "setup": "Press **Pack supplies** to load a medkit and radio into a bag. The output shows the first available placement for each item. [Build a visible backpack](/inventory/quickstart)",
     "members": [
       "Inventory.methods.grid",
       "SpatialInventory.methods.add",
@@ -15,7 +15,7 @@
   },
   {
     "title": "Take a medkit from the aid station",
-    "setup": "Take the medkit to fill the one-cell backpack. The authority keeps the flare available when the next pickup cannot fit. [Set up the aid station](/inventory#pick-up-an-item-in-a-coordinated-game)",
+    "setup": "Take the medkit to fill the one-cell backpack. The authority keeps the flare available when the next pickup cannot fit. [Set up the aid station](/inventory/coordinated-pickups)",
     "members": [
       "GameConfig.methods.inventory",
       "Game.methods.inventory",

@@ -1,43 +1,30 @@
 ---
-title: Steamworks
-description: "Connect your Godot project to Steam and choose the features your game needs."
+title: Steam Integration
+description: "Choose how your game uses Steam for app services, player-hosted sessions, or dedicated servers."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-Use Steam for app services such as achievements and Cloud, or add it as the connection for a multiplayer game. Both use the Steam client and the AppID supplied at launch.
+Crimson connects a Godot project to Steamworks for app services such as achievements and Steam Cloud. It can also use Steam to find, invite, and authenticate players in a multiplayer session. Pick the integration that matches the work Steam needs to do in your game.
+
+## Choose an integration
+
+| What your game needs | How to connect |
+| --- | --- |
+| Achievements, Steam Cloud, Workshop, or other app features | Attach [`Steamworks.boot(self)`](/api/classes/Steamworks/methods/boot) to a node that stays in the tree. It works alongside solo play or LAN multiplayer. |
+| A player hosts and friends join through Steam | Select [`.steam()`](/api/classes/GameConfig/methods/steam) on the game configuration. The game owns the lobby and its admission flow. Read the app services from [`game.steam()`](/api/classes/Game/methods/steam). |
+| A separate headless process hosts a world | Choose [`.steam_server()`](/api/classes/GameConfig/methods/steam_server). It uses a separate Steam GameServer connection for the playerless authority. |
+| An operator service verifies player ownership or manages orders | Run the [trusted publisher addon](/steam/publisher) in a backend with its own Steamworks credentials. |
+
+## Scope and AppID
+
+Client features use the Steam client on the same machine. Steam supplies an AppID at launch, and [`SteamConfig`](/api/classes/SteamConfig) can check the expected AppID and set a multiplayer test profile. Spacewar, Valve’s shared test app, uses AppID `480`. Use your own AppID to check the features you configured for your game. [Steam runtime and launch setup](/steam/setup)
+
+A Steamworks attachment owns service handles for one node or game scope. Removing that owner from the scene tree retires its handles. A Steam multiplayer game already owns an attachment, so its menus can get Steam app services from the game. A game lobby manages invitations and discovery while Crimson handles admission to the playable world.
 
 ## Connect your game to Steam
 
-Attach this script to a persistent `Node` in your main scene. Launch with the Steam client running and signed in. For a direct Spacewar test, follow the setup guide to launch under AppID `480`. The script reports which app connected and whether Steam is online. [Launch with an AppID](/steam/setup#launch-with-an-appid)
-
-```gdscript
-extends Node
-
-const TEST_GROUP: String = "my-studio-training"
-
-@export var use_spacewar: bool = false
-
-var _steam: Steamworks
-
-
-func _ready() -> void:
-    var settings: SteamConfig
-    if use_spacewar:
-        settings = SteamConfig.spacewar(TEST_GROUP)
-
-    _steam = Steamworks.boot(self, settings)
-    var result: SteamResult = _steam.boot_result()
-    if not result.ok:
-        push_error(result.message)
-        return
-
-    print("Steam AppID %d ready. Online: %s" % [_steam.get_app_id(), _steam.is_online()])
-```
-
-Enable **Use Spacewar** when running this script under AppID `480`. For your own app, leave it off to use the AppID Steam supplies. [SteamConfig](/api/classes/SteamConfig) · [Steamworks.boot()](/api/classes/Steamworks/methods/boot)
-
-A multiplayer game that boots with [`Game.configure(LEVEL, PLAYER).steam().boot(self)`](/api/classes/GameConfig/methods/steam) already has Steam services. Read them through [`game.steam()`](/api/classes/Game/methods/steam). [Host and join a Steam game](/steam/listen-servers)
+Run the connection check to confirm the launch AppID and Steam client state. [Connect to Steam](/steam/connect)
 
 ## Choose a guide
 

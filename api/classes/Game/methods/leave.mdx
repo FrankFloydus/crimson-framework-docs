@@ -29,29 +29,44 @@ An idle game succeeds immediately.
 
 ### Return to the title screen after a match
 
-Use this on the pause menu's Return to Title button. The title screen opens after the match has ended. [Game scope setup](/game-services#find-the-game-from-a-pause-menu)
+Click Return to title to end the training session and show the title screen. [Game scope setup](/game-services#find-the-game-from-a-pause-menu)
 
 ```gdscript
-extends Button
+extends Node
 
-@export var pause_menu: Control
-@export var title_menu: Control
+const LEVEL: PackedScene = preload("res://scope_level.tscn")
+const PLAYER: PackedScene = preload("res://scope_player.tscn")
+
+@export var return_button: Button
+@export var status_label: Label
+
 
 func _ready() -> void:
-    pressed.connect(_return_to_title)
+    return_button.disabled = true
+    return_button.pressed.connect(_return_to_title)
+    var game: Game = Game.configure(LEVEL, PLAYER).boot(self)
+    var started: GameResult = await game.play()
+    if not started.ok:
+        status_label.text = started.message
+        return
+
+    status_label.text = "Session ready"
+    return_button.disabled = false
+
 
 func _return_to_title() -> void:
-    var game: Game = Game.for_node(self)
+    var game: Game = Game.for_node(return_button)
     if game == null:
-        push_error("No game owns this pause menu.")
+        status_label.text = "No game owns this button."
         return
 
-    disabled = true
-    var left: GameResult = await game.leave()
-    disabled = false
-    if not left.ok:
-        push_error(left.message)
+    return_button.disabled = true
+    var result: GameResult = await game.leave()
+    if not result.ok:
+        status_label.text = result.message
+        return_button.disabled = false
         return
-    pause_menu.hide()
-    title_menu.show()
+
+    return_button.hide()
+    status_label.text = "Title screen"
 ```

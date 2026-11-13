@@ -27,28 +27,46 @@ static for_node(node: Node) -> Game
 
 ## Example
 
-### Open achievements from the pause menu
+### Return to the title screen after a match
 
-Press Achievements to request the Steam overlay. This menu shares the Steam attachment of its owning game.
+Click Return to title to end the training session and show the title screen. [Game scope setup](/game-services#find-the-game-from-a-pause-menu)
 
 ```gdscript
-extends Control
+extends Node
 
-@export var achievements_button: Button
-@export var status: Label
+const LEVEL: PackedScene = preload("res://scope_level.tscn")
+const PLAYER: PackedScene = preload("res://scope_player.tscn")
 
-var _steam: Steamworks
+@export var return_button: Button
+@export var status_label: Label
+
 
 func _ready() -> void:
-    var game: Game = Game.for_node(self)
-    achievements_button.disabled = game == null
-    if game == null:
-        status.text = "No game is attached."
+    return_button.disabled = true
+    return_button.pressed.connect(_return_to_title)
+    var game: Game = Game.configure(LEVEL, PLAYER).boot(self)
+    var started: GameResult = await game.play()
+    if not started.ok:
+        status_label.text = started.message
         return
-    _steam = game.steam()
-    achievements_button.pressed.connect(_open_achievements)
 
-func _open_achievements() -> void:
-    var requested: SteamResult = _steam.open_achievements()
-    status.text = "" if requested.ok else requested.message
+    status_label.text = "Session ready"
+    return_button.disabled = false
+
+
+func _return_to_title() -> void:
+    var game: Game = Game.for_node(return_button)
+    if game == null:
+        status_label.text = "No game owns this button."
+        return
+
+    return_button.disabled = true
+    var result: GameResult = await game.leave()
+    if not result.ok:
+        status_label.text = result.message
+        return_button.disabled = false
+        return
+
+    return_button.hide()
+    status_label.text = "Title screen"
 ```

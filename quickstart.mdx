@@ -1,49 +1,21 @@
 ---
 title: "Start a solo game"
-description: "Build a small 3D scene, write your first Crimson script, and run it offline."
+description: "Load a level and spawn a player with one Crimson script."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-You’ll build a training room and a player camera, then start a solo session. Use a Godot 4.7 project with Crimson installed. [Installation](/installation)
+Start with an empty Godot 4.7 project with Crimson installed. [Installation](/installation)
 
-## Create the world and player scenes
+## Set up the scenes
 
-### 1. Build the world
+- `res://world.tscn`: A `Node3D` with a child named `SpawnPoints`. Put one `Marker3D` under it and add something visible to the world.
+- `res://player.tscn`: A `Node3D` with one `Camera3D` facing the world from the spawn point.
+- `res://main.tscn`: A plain `Node` with the script below.
 
-1. In a new scene, click **3D Scene** in the **Scene** dock. Rename the root `World`.
-2. Select `World`, click **Add Child Node**, and add a `Node3D` named `SpawnPoints`. Select it and add a `Marker3D` named `HostSpawn`. Leave its **Transform → Position** at `(0, 0, 0)`. Crimson takes its spawn positions from the ordinary markers under `SpawnPoints`.
-3. Select `World` and add a `MeshInstance3D` named `Floor`. In the **Inspector**, open the **Mesh** dropdown and choose **New BoxMesh**. Expand it and set **Size** to `(12, 0.2, 12)`. Set the node’s **Transform → Position** to `(0, -0.1, 0)` so the floor’s top is level with the spawn point.
-4. Add another `MeshInstance3D` under `World` named `Box`. Give it a **New BoxMesh** at the default size. Set **Position** to `(0, 0.5, -3)`. To match the screenshot, add a **New StandardMaterial3D** under **Geometry → Material Override** and set its **Albedo → Color** to `#C63858`.
-5. Add a `DirectionalLight3D` under `World`. Set **Transform → Rotation** to `(-45°, -30°, 0°)` and turn on **Shadow → Enabled**. Press **Ctrl+S** and save as `res://world.tscn`.
+## Start play
 
-### 2. Build the player
-
-1. Create another scene with a **3D Scene** root named `Player`.
-2. Add one `Camera3D` child. Set its **Transform → Position** to `(0, 2, 5)` and **Rotation** to `(-20°, 0°, 0°)`. This places the camera above the spawn point and angles it toward the box.
-3. Save as `res://player.tscn`. Crimson makes this camera current for the local player when the game starts.
-
-## Start the session
-
-### 3. Create Main and check that its script runs
-
-1. In a new scene, choose **Other Node**. Search for `Node`, click **Create**, and rename the root `Main`. Save as `res://main.tscn`.
-2. Right-click `Main` in the **Scene** dock and select **Attach Script**. Choose **GDScript** and the **Object: Empty** template, set **Path** to `res://main.gd`, and click **Create**.
-3. Replace the contents of `main.gd` with this first checkpoint. Godot calls `_ready()` when the node is in the scene tree.
-
-```gdscript
-extends Node
-
-
-func _ready() -> void:
-    print("Main is ready.")
-```
-
-Save with **Ctrl+S** and press **F6** with `main.tscn` open. The game view is empty at this point. Look for `Main is ready.` in **Output**, then click **Stop** in the editor toolbar.
-
-### 4. Give Crimson the two scenes
-
-Click the script icon beside `Main` in the **Scene** dock. Replace `main.gd` with this checkpoint. [`Game.configure()`](/api/classes/Game/methods/configure) takes the two packed scenes. [`boot(self)`](/api/classes/GameConfig/methods/boot) attaches the game to `Main` and returns the [`Game`](/api/classes/Game) handle you’ll use to play.
+[`Game.configure()`](/api/classes/Game/methods/configure) takes the two scenes. [`boot(self)`](/api/classes/GameConfig/methods/boot) attaches the game to the main node. Await [`game.play()`](/api/classes/Game/methods/play) for the result of loading the world and spawning the player.
 
 ```gdscript
 extends Node
@@ -51,51 +23,19 @@ extends Node
 const LEVEL: PackedScene = preload("res://world.tscn")
 const PLAYER: PackedScene = preload("res://player.tscn")
 
-var game: Game
-
 
 func _ready() -> void:
-    game = Game.configure(LEVEL, PLAYER).boot(self)
-    var setup: GameResult = game.boot_result()
-    if not setup.ok:
-        push_error(setup.message)
-        return
-
-    print("Game configured.")
-```
-
-Save and press **F6** again. Look for `Game configured.` in **Output**. The game view stays empty until you start the session. Stop the game before editing the script again.
-
-### 5. Start solo play
-
-Keep the same boot line and await [`game.play()`](/api/classes/Game/methods/play). This action gives you a typed [`GameResult`](/api/classes/GameResult) once the world is ready or startup fails. Replace `main.gd` with this complete script.
-
-```gdscript
-extends Node
-
-const LEVEL: PackedScene = preload("res://world.tscn")
-const PLAYER: PackedScene = preload("res://player.tscn")
-
-var game: Game
-
-
-func _ready() -> void:
-    game = Game.configure(LEVEL, PLAYER).boot(self)
-
+    var game: Game = Game.configure(LEVEL, PLAYER).boot(self)
     var result: GameResult = await game.play()
     if not result.ok:
-        push_error("Could not start solo play: %s" % result.message)
+        push_error(result.message)
         return
 
     print("Solo ready.")
 ```
 
-## Run the scene
+Run `main.tscn`. The player spawns at the marker, its camera becomes active, and **Output** shows `Solo ready.`.
 
-Save and press **F6** with `main.tscn` selected. You should see the box and floor through the player camera and `Solo ready.` in **Output**. The player stays at the spawn point because this scene has no movement controls.
-
-![Running solo session showing a red box on the floor through the player camera](/images/getting-started/solo.png)
-
-If the view stays empty, read **Output** first. Check that both scene paths match the constants, `World` has a `SpawnPoints` child with a `Marker3D` below it, and the player contains one `Camera3D`. If Godot cannot find the `Game` class, verify that the addon loaded. [Verify the installation](/installation#verify-the-installation)
-
-Use these scenes to connect two players on the same computer. [Host and join a multiplayer game](/multiplayer-quickstart)
+<Frame caption="Example solo scene viewed through the spawned player’s camera">
+  ![A red box in a small 3D room.](/images/getting-started/solo.png)
+</Frame>

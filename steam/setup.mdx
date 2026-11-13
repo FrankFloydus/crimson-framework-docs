@@ -32,7 +32,7 @@ try {
 }
 ```
 
-The argument after Godot's `--` separator lets Crimson initialize the matching Steam client before the window opens. Enable the Steam Overlay in Steam for a graphical overlay test. For a connection-only test you can omit the overlay argument. Run the connection script with **Use Spacewar** enabled and look for `Steam AppID 480 ready` in Output. [Connect your game to Steam](/steam/overview#connect-your-game-to-steam) · [Valve Overlay requirements](https://partner.steamgames.com/doc/features/overlay#requirements)
+The argument after Godot's `--` separator lets Crimson initialize the matching Steam client before the window opens. Enable the Steam Overlay in Steam for a graphical overlay test. For a connection-only test you can omit the overlay argument. Run the connection script with **Use Spacewar** enabled and look for `Steam AppID 480 ready` in Output. [Connect your game to Steam](/steam/connect) · [Valve Overlay requirements](https://partner.steamgames.com/doc/features/overlay#requirements)
 
 ## Export and verify on Windows
 
@@ -72,7 +72,46 @@ func _ready() -> void:
     print("Steam client ready.")
 ```
 
-This example starts a standalone client. To use a game-owned Steam provider, keep the launch check and boot your game in the success branch. [Set up a Steam game](/steam/listen-servers)
+For a multiplayer export, use this startup script instead. Assign **Shipping App ID** to the AppID of your installed Steam game. Assign a level scene with a `SpawnPoints` node and at least two `Marker3D` children, and a player scene with one `Camera3D`. After the launch check succeeds, the script attaches the game and prints when Steam is ready.
+
+```gdscript
+extends Node
+
+@export var shipping_app_id: int
+@export var level_scene: PackedScene
+@export var player_scene: PackedScene
+
+var game: Game
+
+
+func _ready() -> void:
+    if shipping_app_id <= 0 or level_scene == null or player_scene == null:
+        push_error("Assign your shipping AppID, level, and player scenes.")
+        return
+
+    var launch_status: Error = Steamworks.restart_through_steam_if_needed(shipping_app_id)
+    if launch_status == ERR_SKIP:
+        get_tree().quit()
+        return
+    if launch_status != OK:
+        push_error("Steam launch check failed: %s" % error_string(launch_status))
+        return
+
+    var settings: SteamConfig = SteamConfig.new()
+    settings.app_id = shipping_app_id
+    game = Game.configure(level_scene, player_scene).steam(settings).boot(self)
+    var game_startup: GameResult = game.boot_result()
+    if not game_startup.ok:
+        push_error(game_startup.message)
+        return
+
+    var steam: Steamworks = game.steam()
+    var steam_startup: SteamResult = steam.boot_result()
+    if not steam_startup.ok:
+        push_error(steam_startup.message)
+        return
+    print("Steam game ready.")
+```
 
 ### Wrap an export for Steam DRM
 

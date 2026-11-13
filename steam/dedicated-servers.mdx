@@ -1,23 +1,29 @@
 ---
-title: Dedicated servers
-description: "Run a playerless LAN or Steam server and connect a guest."
+title: Steam dedicated servers
+description: "Run a headless Steam server and connect a guest by listing or locator."
 ---
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-A dedicated server runs the world without a local player. Use the same compatible level and player scenes on the server and guest, with a `Marker3D` under `SpawnPoints` for each remote seat. Keep the server and client root node names and paths consistent. [Multiplayer scene setup](/multiplayer-quickstart)
+A dedicated server runs the world without a local player. The examples below use two entry scenes and share the same level, player, and world ID. The server and guest also need the same AppID. [Steam runtime and launch setup](/steam/setup#launch-with-an-appid)
+
+## Prepare the test scenes
+
+1. Save a `Node3D` scene as `res://server_level.tscn`. Add a `Node3D` named `SpawnPoints` under its root. Add four `Marker3D` children under `SpawnPoints`, spaced apart.
+2. Save another `Node3D` scene as `res://server_player.tscn`. Add a single `Camera3D` at `(0, 1.5, 5)`. To see when the guest enters the level, add a visible mesh to `server_level.tscn` in front of the first spawn marker.
+3. Create two scenes with ordinary `Node` roots. Name both roots `Main` and save the scenes as `res://steam_server.tscn` and `res://steam_guest.tscn`. Using the same root name keeps the internal game node path the same on both peers.
 
 ## Start a playerless authority
 
 For a Steam dedicated server, use the AppID and Steam runtime from the dedicated process's launch context. An anonymous Steam server does not require an interactive Steam client. Guests sign in with an account entitled to that AppID. Use your app's Steam product metadata before deployment. [Steamworks setup](/steam/setup#launch-with-an-appid) · [Valve GameServer API](https://partner.steamgames.com/doc/api/ISteamGameServer)
 
-Attach this script to the root `Node` of your headless server scene. The scene paths are from Getting Started. The script starts a four-seat server and prints its locator only after the playerless world is ready. By default the server publishes a direct locator. Enable **Advertise In Browser** to also request Steam discovery.
+Attach this script to the root of `steam_server.tscn`. It starts a four-seat server and prints its locator only after the playerless world is ready. By default the server publishes a direct locator. Enable **Advertise In Browser** to also request Steam discovery.
 
 ```gdscript
 extends Node
 
-const LEVEL: PackedScene = preload("res://world.tscn")
-const PLAYER: PackedScene = preload("res://player.tscn")
+const LEVEL: PackedScene = preload("res://server_level.tscn")
+const PLAYER: PackedScene = preload("res://server_player.tscn")
 const WORLD_ID: StringName = &"training_room"
 const REMOTE_SEATS: int = 4
 const GAME_PORT: int = 27015
@@ -56,26 +62,35 @@ func _ready() -> void:
 
 Use distinct UDP ports for gameplay and queries. Set **Bind Address** to a specific local IPv4 address if needed. Set **Public Address** to a reachable IPv4 address when the route differs from the bound or Steam-reported address. For an operator login, set **Login Environment Key** to the name of an environment variable in the server process. Crimson reads the token from that variable when it starts. [`SteamServer`](/api/classes/SteamServer) · [`steam_server()`](/api/classes/GameConfig/methods/steam_server) · [`serve()`](/api/classes/Game/methods/serve)
 
+For a Windows development launch, run this from the directory of the staged Godot executables and the server's `steam_appid.txt`. Replace the project path with your own.
+
+```powershell
+& .\Godot_v4.7-stable_win64_console.exe --headless --path 'C:\Games\DedicatedExample' res://steam_server.tscn
+```
+
 ### Use the native LAN launcher
 
 For a local fixed-world LAN server, use [`GameConfig.boot_server(self)`](/api/classes/GameConfig/methods/boot_server). With the `--crimson-role=server` launch flag, Crimson owns argument parsing, startup, and the readiness message. [Run a headless LAN server](/dedicated-lan)
 
 ## List the server in Steam
 
-Enable **Advertise In Browser** in the server script and run it with your app's Steam launch context. Steam discovery starts after the server logs in and has a ready world, listener, and certificate. [`advertisement_requested`](/api/classes/SteamServerStatus/properties/advertisement_requested) confirms the local request. Verify that a separate Steam client can see the server. [Valve dedicated servers](https://partner.steamgames.com/doc/features/multiplayer/game_servers)
+Enable **Advertise In Browser** in the server script and run it with your app's Steam launch context. Steam discovery starts after the server logs in and has a ready world, listener, and certificate. [`advertisement_requested`](/api/classes/SteamServerStatus/properties/advertisement_requested) confirms the local request. Verify that a separate Steam client can see the server. The guest profile uses the same four-seat limit as the authority. [Valve dedicated servers](https://partner.steamgames.com/doc/features/multiplayer/game_servers)
 
-Attach this guest script to the root of the corresponding game scene. Assign an `OptionButton` and a status label. Connect **Refresh** to `refresh_servers()` and **Join** to `join_selected_server()`. The game lists servers for the training room and checks the exact selection again before joining.
+Attach this guest script to the root of `steam_guest.tscn`. Add a `CanvasLayer` with an `OptionButton`, a status label, and **Refresh** and **Join** buttons. Assign them in the Inspector. The game lists servers for the training room and checks the exact selection again before joining.
 
 ```gdscript
 extends Node
 
-const LEVEL: PackedScene = preload("res://world.tscn")
-const PLAYER: PackedScene = preload("res://player.tscn")
+const LEVEL: PackedScene = preload("res://server_level.tscn")
+const PLAYER: PackedScene = preload("res://server_player.tscn")
 const WORLD_ID: StringName = &"training_room"
+const REMOTE_SEATS: int = 4
 const MIN_FREE_SEATS: int = 1
 
 @export var server_picker: OptionButton
 @export var status: Label
+@export var refresh_button: Button
+@export var join_button: Button
 
 var _game: Game
 var _browser: SteamServerBrowser
@@ -84,13 +99,15 @@ var _busy: bool = false
 
 
 func _ready() -> void:
-    _game = Game.configure(LEVEL, PLAYER).world_id(WORLD_ID).steam().boot(self)
+    _game = Game.configure(LEVEL, PLAYER).world_id(WORLD_ID).steam(null, REMOTE_SEATS).boot(self)
     var steam: Steamworks = _game.steam()
     var startup: SteamResult = steam.boot_result()
     if not startup.ok:
         status.text = startup.message
         return
     _browser = steam.server_browser()
+    refresh_button.pressed.connect(refresh_servers)
+    join_button.pressed.connect(join_selected_server)
 
 
 func refresh_servers() -> void:
@@ -133,14 +150,15 @@ A browser row is an observation. [`inspect()`](/api/classes/SteamServerBrowser/m
 
 ## Join an exact server
 
-Existing integrations can pass a direct server locator string to [`GameRuntime.join_online()`](/api/classes/GameRuntime/methods/join_online). Attach this lower-level guest script to the same root path as the server. Set **Server Locator** to the string printed by the server. Use its launch AppID and default namespace. For a provider with a custom namespace, use the same namespace on both sides. [Valve authentication and ownership](https://partner.steamgames.com/doc/features/auth)
+Existing integrations can pass a direct server locator string to [`GameRuntime.join_online()`](/api/classes/GameRuntime/methods/join_online). For the example, attach this script to the `Main` root in `steam_guest.tscn` and set **Server Locator** to the string printed by the server. Use its launch AppID and default namespace. For a provider with a custom namespace, use the same namespace on both sides. [Valve authentication and ownership](https://partner.steamgames.com/doc/features/auth)
 
 ```gdscript
 extends Node
 
-const LEVEL: PackedScene = preload("res://world.tscn")
-const PLAYER: PackedScene = preload("res://player.tscn")
+const LEVEL: PackedScene = preload("res://server_level.tscn")
+const PLAYER: PackedScene = preload("res://server_player.tscn")
 const WORLD_ID: StringName = &"training_room"
+const REMOTE_SEATS: int = 4
 
 @export var server_locator: String = ""
 
@@ -154,7 +172,7 @@ func _ready() -> void:
         GameRuntime.configure()
         .with_starting_world(WORLD_ID, LEVEL)
         .with_player(PLAYER)
-        .with_multiplayer(MultiplayerRules.listen_coop())
+        .with_multiplayer(MultiplayerRules.listen_coop().with_max_players(REMOTE_SEATS))
         .with_provider(SteamProvider.configure())
     )
     var game: GameRuntime = definition.boot(self)

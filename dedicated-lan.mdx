@@ -5,11 +5,17 @@ description: "Start a playerless world from a Godot scene and wait for Crimson's
 
 {/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
 
-A dedicated server loads the world without spawning a local player. Every seat is available to remote players. Use the same world, player, capacity, and runtime node path on the server and its clients. This example uses the scenes from the [multiplayer quickstart](/multiplayer-quickstart).
+A dedicated server loads the world without spawning a local player. Every seat is available to remote players. You’ll create a server and a client that use the same world and player scenes. Start with an empty Godot 4.7 project with Crimson installed. [Installation](/installation)
+
+## Create the shared scenes
+
+1. In a new **3D Scene**, rename the root `World` and add a `Node3D` named `SpawnPoints`. Under it, add two `Marker3D` nodes at `(-1, 0, 0)` and `(1, 0, 0)` to give the server two spawn slots.
+2. Under `World`, add a `MeshInstance3D`. Assign a **New BoxMesh** and set its **Transform → Position** to `(0, 1, -3)`. Add a `DirectionalLight3D` with **Transform → Rotation** set to `(-45°, -30°, 0°)` and save as `res://world.tscn`.
+3. In another **3D Scene**, name the root `Player` and add one `Camera3D`. Set the camera's **Transform → Position** to `(0, 1, 4)` so the client can see the box. Save as `res://player.tscn`.
 
 ## Create the server scene
 
-Create a scene with an ordinary `Node` root named `Main`, the same root name as the client scene. Save it as `res://server.tscn`. Attach `res://server.gd` to the root.
+Create a scene with a plain `Node` root named `Main`. Save it as `res://server.tscn`. Attach an empty GDScript file at `res://server.gd` to the root and paste in this script.
 
 ```gdscript
 extends Node
@@ -24,6 +30,28 @@ func _ready() -> void:
 
 [`boot_server()`](/api/classes/GameConfig/methods/boot_server) attaches the game and enables native startup when the process receives the server role. The native launcher mounts the world, opens admission, and reports readiness. The same call without the server role only boots the configuration. This launcher takes a fixed-world LAN configuration.
 
+## Create the client scene
+
+Create another scene with a plain `Node` root named `Main` and save it as `res://client.tscn`. Attach an empty GDScript file at `res://client.gd` to the root and paste in this script. Keep the same root name, world, player, and capacity on both sides so the runtime paths and scene setup agree. The client calls [`join(address)`](/api/classes/Game/methods/join) when it starts.
+
+```gdscript
+extends Node
+
+const LEVEL: PackedScene = preload("res://world.tscn")
+const PLAYER: PackedScene = preload("res://player.tscn")
+const SERVER_ADDRESS: String = "127.0.0.1"
+
+
+func _ready() -> void:
+    var game: Game = Game.configure(LEVEL, PLAYER).lan().boot(self)
+    var result: GameResult = await game.join(SERVER_ADDRESS)
+    if not result.ok:
+        push_error(result.message)
+        return
+
+    print("Joined the dedicated server.")
+```
+
 ## Launch and connect
 
 From the directory containing `project.godot`, pass the scene path and put Crimson's arguments after Godot's `--` separator. Replace the executable path with the path to your Godot console build.
@@ -32,7 +60,7 @@ From the directory containing `project.godot`, pass the scene path and put Crims
 & 'C:\path\to\Godot_v4.7-stable_win64_console.exe' --headless --path . res://server.tscn -- --crimson-role=server
 ```
 
-Wait for `[Crimson] READY server 7000`, then launch the normal client and press **J** to join `127.0.0.1`. If the launch fails, Crimson prints `[Crimson] ERROR server` with the reason and exits with status `1`.
+Wait for `[Crimson] READY server 7000`. In Godot, open `client.tscn` and press **F6**. The box should appear through the player's camera and **Output** should show `Joined the dedicated server.` Stop the client with **F8**, then press **Ctrl+C** in the server terminal. If server launch fails, Crimson prints `[Crimson] ERROR server` with the reason and exits with status `1`.
 
 The launcher binds to `127.0.0.1` by default. For other machines on your LAN, use `--crimson-bind=<server-lan-address>` and tell clients to join that address. You can override the UDP port with `--crimson-port=<port>`. Set the same port on the client using [`on_port()`](/api/classes/GameConfig/methods/on_port).
 

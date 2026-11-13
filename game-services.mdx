@@ -7,65 +7,102 @@ description: "Pass a game into your scene, resolve the nearest scope, and provid
 
 Boot once from a persistent node such as `Main`. [`Game.configure(LEVEL, PLAYER).boot(self)`](/api/classes/Game/methods/configure) gives you a [`Game`](/api/classes/Game) handle for that scene branch. Pass it directly to menus and other consumers you wire up in the boot script.
 
+## Create the two scene assets
+
+Make `res://scope_level.tscn` with a `Node3D` root and a `Node3D` child named `SpawnPoints`. Add two `Marker3D` children under `SpawnPoints` and move the second away from the first. Make `res://scope_player.tscn` with a `Node3D` root and a single `Camera3D` child. Each example below uses these assets and has its own main scene and script.
+
 ## Find the game from a pause menu
 
-A reusable menu can call [`Game.for_node(self)`](/api/classes/Game/methods/for_node) after its owner has booted. It gets the game for the nearest owning branch. Attach this script to a **Return to title** button inside the pause menu. Assign both menus in the Inspector. When the player clicks the button, the script waits for the active session to end before switching menus.
+Create a `Node` scene with a `Button` child labeled **Return to title** and a `Label` child. Attach the script to the root and assign both controls. The root starts a solo game. The button looks up its owning game when clicked, then waits for that session to close before displaying **Title screen**. A child can resolve the scope after the parent has booted it. [`Game.for_node()`](/api/classes/Game/methods/for_node)
 
 ```gdscript
-extends Button
+extends Node
 
-@export var pause_menu: Control
-@export var title_menu: Control
+const LEVEL: PackedScene = preload("res://scope_level.tscn")
+const PLAYER: PackedScene = preload("res://scope_player.tscn")
+
+@export var return_button: Button
+@export var status_label: Label
 
 
 func _ready() -> void:
-    pressed.connect(_return_to_title)
+    return_button.disabled = true
+    return_button.pressed.connect(_return_to_title)
+    var game: Game = Game.configure(LEVEL, PLAYER).boot(self)
+    var started: GameResult = await game.play()
+    if not started.ok:
+        status_label.text = started.message
+        return
+
+    status_label.text = "Session ready"
+    return_button.disabled = false
 
 
 func _return_to_title() -> void:
-    var game: Game = Game.for_node(self)
+    var game: Game = Game.for_node(return_button)
     if game == null:
-        push_error("No game owns this pause menu.")
+        status_label.text = "No game owns this button."
         return
 
-    disabled = true
+    return_button.disabled = true
     var result: GameResult = await game.leave()
-    disabled = false
-
     if not result.ok:
-        push_error(result.message)
+        status_label.text = result.message
+        return_button.disabled = false
         return
 
-    pause_menu.hide()
-    title_menu.show()
+    return_button.hide()
+    status_label.text = "Title screen"
 ```
 
 ## Select a game from a debug panel
 
-[`Game.current()`](/api/classes/Game/methods/current) returns the selected game or the only live game. When several games are live and none is selected, it returns `null`. If your project has a preview and a match running together, attach this script to a **Use match as default** check button outside both branches. Assign the match's boot owner to **Match Owner**. Turning the button on selects that game with [`Game.set_default()`](/api/classes/Game/methods/set_default) so debug tools can look it up. Turning it off clears the selection.
+[`Game.current()`](/api/classes/Game/methods/current) returns the selected game or the only live game. When several games are live and none is selected, it returns `null`. Create a new `Node` scene with a `CheckButton` labeled **Use match as default**. Attach the script to the root and assign the button. The script boots two scopes, `Preview` and `Match`, without starting a session in either. Toggle the button and check **Output** to see [`Game.set_default()`](/api/classes/Game/methods/set_default) select or clear the match.
 
 ```gdscript
-extends CheckButton
+extends Node
 
-@export var match_owner: Node
+const LEVEL: PackedScene = preload("res://scope_level.tscn")
+const PLAYER: PackedScene = preload("res://scope_player.tscn")
+
+@export var use_match_button: CheckButton
+
+var _match_owner: Node
 
 
 func _ready() -> void:
-    toggled.connect(_select_default)
+    var preview_owner: Node = Node.new()
+    preview_owner.name = "Preview"
+    add_child(preview_owner)
+
+    _match_owner = Node.new()
+    _match_owner.name = "Match"
+    add_child(_match_owner)
+
+    var config: GameConfig = Game.configure(LEVEL, PLAYER)
+    var preview: Game = config.boot(preview_owner)
+    var match_game: Game = config.boot(_match_owner)
+    if not preview.boot_result().ok or not match_game.boot_result().ok:
+        push_error("Could not attach both game scopes.")
+        use_match_button.disabled = true
+        return
+
+    use_match_button.set_pressed_no_signal(false)
+    use_match_button.toggled.connect(_select_default)
 
 
 func _select_default(use_match: bool) -> void:
     var selected: Game
     if use_match:
-        selected = Game.for_node(match_owner)
+        selected = Game.for_node(_match_owner)
         if selected == null:
-            set_pressed_no_signal(false)
-            push_warning("Start the match before selecting it.")
+            use_match_button.set_pressed_no_signal(false)
+            push_warning("The match scope has retired.")
             return
 
     var status: int = Game.set_default(selected)
     if status != OK:
-        set_pressed_no_signal(not use_match)
+        use_match_button.set_pressed_no_signal(not use_match)
         push_error("Could not update the default game.")
         return
 
@@ -73,7 +110,7 @@ func _select_default(use_match: bool) -> void:
     if current == null:
         print("No default game selected.")
     else:
-        print("Debug game phase: %d" % current.get_phase())
+        print("Match selected. Current phase: %d" % current.get_phase())
 ```
 
 ## Know when a handle expires
@@ -84,13 +121,13 @@ func _select_default(use_match: bool) -> void:
 
 LAN uses ENet by default. To exercise your project's provider path during a local smoke test, register a factory that logs when the transport is created and returns a fresh ENet adapter. Later you can have the factory supply a different [`SessionTransport`](/api/classes/SessionTransport) without changing the menu’s game actions.
 
-Make a second copy of the [LAN project](/multiplayer-quickstart) in another folder. In that copy, replace `main.gd` with this script to start the host automatically. It prints `Created the test transport.` when boot resolves the provider. Run the original project and press **J** to join.
+Create a `Node` scene and attach the script to its root. Run it by itself. Look for `Created the test transport.` and then `Test host ready.` in **Output**. Those messages show that boot called the factory and the game successfully opened a LAN session with its adapter.
 
 ```gdscript
 extends Node
 
-const LEVEL: PackedScene = preload("res://world.tscn")
-const PLAYER: PackedScene = preload("res://player.tscn")
+const LEVEL: PackedScene = preload("res://scope_level.tscn")
+const PLAYER: PackedScene = preload("res://scope_player.tscn")
 const LOOPBACK_ADDRESS: String = "127.0.0.1"
 
 var game: Game

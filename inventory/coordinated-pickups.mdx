@@ -1,0 +1,110 @@
+---
+title: "Coordinated world pickups"
+description: "Let the authority commit a world pickup and its backpack placement together."
+---
+
+{/* Copyright Francesco Di Blasi 2026 - All Rights Reserved */}
+
+This example represents two items in an aid station. The backpack holds one item, so taking the medkit consumes it and leaves the flare available. The authority decides whether the player can take each item and commits both changes together.
+
+Save a separate world scene as `res://levels/aid_station.tscn` with an ordinary `Node` root. Attach the script to a persistent main scene outside that world. Assign two buttons labeled **Take medkit** and **Take flare**, and a status label, to its exports. The buttons stand in for interactions with the two world items.
+
+```gdscript
+extends Node
+
+const WORLD_ID: StringName = &"aid_station"
+const WORLD_PATH: String = "res://levels/aid_station.tscn"
+const BAG_SIZE: Vector2i = Vector2i.ONE
+
+@export var medkit_button: Button
+@export var flare_button: Button
+@export var status: Label
+
+var _game: Game
+var _pickup_pending: bool = false
+
+
+class AidStationPickups extends InventoryPickupSource:
+    const STORE: String = "aid_station_supplies"
+    const SOLO_PLAYER_ID: String = "local"
+    const MEDKIT_ID: StringName = &"medkit_17"
+    const FLARE_ID: StringName = &"flare_08"
+    const ITEM_SIZE: Vector2i = Vector2i.ONE
+
+    func _register_stores(stores: TransactionCoordinator) -> Error:
+        var available: Dictionary = {String(MEDKIT_ID): true, String(FLARE_ID): true}
+        return stores.register_store(STORE, available, _prepare_consumption)
+
+    func _resolve_pickup(
+        player_id: String, pickup_id: StringName, stores: TransactionCoordinator
+    ) -> InventoryPickup:
+        var id: String = String(pickup_id)
+        var available: Dictionary = stores.read_store(STORE)
+        if player_id != SOLO_PLAYER_ID or available.get(id, false) != true:
+            return null
+        return InventoryPickup.take(pickup_id, ITEM_SIZE, STORE, {"id": id})
+
+    func _prepare_consumption(
+        available: Dictionary, edits: Array, _context: Dictionary
+    ) -> Dictionary:
+        for edit: Dictionary in edits:
+            var id: String = edit.id
+            if available.get(id, false) != true:
+                return {"ok": false, "message": "That supply has already been taken."}
+            available[id] = false
+        return {"ok": true, "state": available}
+
+
+func _ready() -> void:
+    medkit_button.disabled = true
+    flare_button.disabled = true
+
+    var station: WorldDefinition = WorldDefinition.at(WORLD_ID, WORLD_PATH)
+    var config: InventoryConfig = InventoryConfig.backpack(BAG_SIZE)
+    _game = Game.campaign(station).inventory(config.pickups(AidStationPickups.new())).boot(self)
+    var started: GameResult = await _game.play()
+    if not started.ok:
+        status.text = started.message
+        return
+
+    medkit_button.pressed.connect(_take.bind(AidStationPickups.MEDKIT_ID, medkit_button))
+    flare_button.pressed.connect(_take.bind(AidStationPickups.FLARE_ID, flare_button))
+    medkit_button.disabled = false
+    flare_button.disabled = false
+    status.text = "The aid station has a medkit and a flare."
+
+
+func _take(pickup_id: StringName, pickup_button: Button) -> void:
+    if _pickup_pending:
+        return
+    var inventory: GameInventory = _game.inventory()
+    var bag: MatchInventory = inventory.backpack() if inventory != null else null
+    if bag == null:
+        status.text = "The backpack is unavailable."
+        return
+
+    _pickup_pending = true
+    var result: InventoryResult = await bag.pick_up(pickup_id)
+    _pickup_pending = false
+    if not result.ok:
+        status.text = result.message
+        return
+
+    pickup_button.hide()
+    status.text = "Packed %s at %s." % [result.item_id, result.origin]
+```
+
+Press **Take medkit**. The button disappears and the label reports the placement at `(0, 0)`. Press **Take flare**. The label reports that the backpack has no room and the flare button stays visible.
+
+### Authority and commit
+
+1. Configure [`InventoryConfig.backpack()`](/api/classes/InventoryConfig/methods/backpack) and [`pickups()`](/api/classes/InventoryConfig/methods/pickups) before booting a coordinated [`Game.campaign()`](/api/classes/Game/methods/campaign). The authority calls [`_register_stores()`](/api/classes/InventoryPickupSource/methods/_register_stores) once for each fresh authority match. It registers the game-owned source records and their prepare callback.
+2. After the world is ready, resolve [`game.inventory()`](/api/classes/Game/methods/inventory) and its local [`backpack()`](/api/classes/GameInventory/methods/backpack). Call [`pick_up()`](/api/classes/MatchInventory/methods/pick_up) with the stable pickup ID and await an [`InventoryResult`](/api/classes/InventoryResult). The authority resolves the player from the admitted command scope.
+3. Implement [`_resolve_pickup()`](/api/classes/InventoryPickupSource/methods/_resolve_pickup) to check eligibility against committed authority state. The solo example accepts the local player. In a networked game, check the admitted player's access to the item using your authority's rules and state. Return `null` to deny the request or [`InventoryPickup.take()`](/api/classes/InventoryPickup/methods/take) with the footprint and the source edit.
+4. Keep the source's prepare callback synchronous. It rechecks availability and stages removal in detached data. If validation and placement succeed, the coordinator publishes both changes at the same revision. A denial, a rejected source edit, or `InventoryFull` leaves the source and backpack unchanged.
+
+Run world and UI effects after the commit. The caller can use `result.item_id`, `result.origin`, and `result.revision` from a successful result. In a networked game, project the committed world pickup state to the peers that should see it. The backpack store stays private to the authority, and your game chooses which inventory details to show to each player.
+
+Resolve a fresh backpack when a new match becomes ready. A retained handle expires when its match retires. A headless server with no local player has no local backpack handle.
+
+For explicit grid placement, stack and equipment policies, containers, and trade, see the [Inventory API module](/api/modules/inventory).

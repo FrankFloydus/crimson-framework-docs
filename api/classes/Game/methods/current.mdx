@@ -23,30 +23,52 @@ static current() -> Game
 
 ### Choose the match for an external debug panel
 
-Select the live match when both a preview and a match own game scopes. Clear the selection to return to automatic lookup. [Set up the debug panel](/game-services#select-a-game-from-a-debug-panel)
+Choose the match when the preview and match both own booted scopes. Turn off the selection to return to automatic lookup. [Set up the debug panel](/game-services#select-a-game-from-a-debug-panel)
 
 ```gdscript
-extends CheckButton
+extends Node
 
-@export var match_owner: Node
+const LEVEL: PackedScene = preload("res://scope_level.tscn")
+const PLAYER: PackedScene = preload("res://scope_player.tscn")
+
+@export var use_match_button: CheckButton
+
+var _match_owner: Node
 
 
 func _ready() -> void:
-    toggled.connect(_select_default)
+    var preview_owner: Node = Node.new()
+    preview_owner.name = "Preview"
+    add_child(preview_owner)
+
+    _match_owner = Node.new()
+    _match_owner.name = "Match"
+    add_child(_match_owner)
+
+    var config: GameConfig = Game.configure(LEVEL, PLAYER)
+    var preview: Game = config.boot(preview_owner)
+    var match_game: Game = config.boot(_match_owner)
+    if not preview.boot_result().ok or not match_game.boot_result().ok:
+        push_error("Could not attach both game scopes.")
+        use_match_button.disabled = true
+        return
+
+    use_match_button.set_pressed_no_signal(false)
+    use_match_button.toggled.connect(_select_default)
 
 
 func _select_default(use_match: bool) -> void:
     var selected: Game
     if use_match:
-        selected = Game.for_node(match_owner)
+        selected = Game.for_node(_match_owner)
         if selected == null:
-            set_pressed_no_signal(false)
-            push_warning("Start the match before selecting it.")
+            use_match_button.set_pressed_no_signal(false)
+            push_warning("The match scope has retired.")
             return
 
     var status: int = Game.set_default(selected)
     if status != OK:
-        set_pressed_no_signal(not use_match)
+        use_match_button.set_pressed_no_signal(not use_match)
         push_error("Could not update the default game.")
         return
 
@@ -54,5 +76,5 @@ func _select_default(use_match: bool) -> void:
     if current == null:
         print("No default game selected.")
     else:
-        print("Debug game phase: %d" % current.get_phase())
+        print("Match selected. Current phase: %d" % current.get_phase())
 ```
